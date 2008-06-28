@@ -17,11 +17,21 @@ It also works for objects with indices:
 If you want a pattern like \verb|\psi_{m}| to anti-commute with
 itself, you should use the \subsprop{SelfAntiCommuting} property instead.
 
-Note that this property always refers to components; if you attach it
-to an object with \subsprop{ImplicitIndex} property, the commutation
-property does not refer to the object as a whole, but rather to its
-components. The logic behind that becomes clear when considering
-e.g.~spinor bilinears
+You can think about the difference
+between \subsprop{SelfAntiCommuting} and \subsprop{AntiCommuting} in
+the following way. If \verb|A_{m n}| is \verb|SelfAntiCommuting|, it
+means that for each value of the indices the expression \verb|A_{m n}|
+is an operator which anti-commutes with the operator for any other
+value of the indices. The matrix~$A$ is thus a matrix of
+operator-valued components which mutually anti-commute. On the other
+hand, if \verb|A| and \verb|B| are declared to
+be \verb|AntiCommuting|, then these can be viewed as two matrices of
+commuting components, whose matrix product satisfies~$A B = - B A$.
+
+If you attach the \verb|AntiCommuting| property to an object
+with an \subsprop{ImplicitIndex} property, the commutation property does
+not refer to the object as a whole, but rather to its components. The
+logic behind that becomes clear when considering e.g.~spinor bilinears
 \begin{screen}{1,2,3,4,5,6,7,9}
 {\chi, \psi}::Spinor(dimension=10, type=MajoranaWeyl).
 {\chi, \psi}::AntiCommuting.
@@ -36,7 +46,9 @@ e.g.~spinor bilinears
 \end{screen}
 Here \subscommand{prodsort} did not act because both the spinors and
 the gamma matrices have the \subsprop{ImplicitIndex} property and
-there are thus no simple rules for their re-ordering.
+there are thus no simple rules for their re-ordering. However,
+the \subscommand{spinorsort} algorithm did act, and took into account
+the fact that the components of the spinors are anti-commuting.
 
 \cdbseealgo{prodsort}
 \cdbseealgo{spinorsort}

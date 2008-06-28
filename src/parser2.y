@@ -195,8 +195,12 @@ node  : label               %prec LOWER_THAN_PARENT_REL { $$=exp.insert_after(ex
 %%
 
 
+std::ostream  *fake_txtout;
+
 int main()
 	{
+	fake_txtout = &std::cout;
+
 	exp.set_head(str_node("\\expression"));
 	return yyparse();
 	}

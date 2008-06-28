@@ -1,6 +1,6 @@
 /* 
 
-   $Id: field_theory.cc,v 1.181 2008/05/07 15:49:27 peekas Exp $
+   $Id: field_theory.cc,v 1.182 2008/06/28 09:44:33 peekas Exp $
 
 	Cadabra: an extendable open-source symbolic tensor algebra system.
 	Copyright (C) 2001-2006  Kasper Peeters <kasper.peeters@aei.mpg.de>
@@ -38,7 +38,6 @@
 
 void field_theory::register_properties()
 	{
-	properties::register_property(&create_property<Symbol>);
 	properties::register_property(&create_property<Depends>);
 	properties::register_property(&create_property<DependsInherit>);
 	properties::register_property(&create_property<Accent>);
@@ -46,11 +45,6 @@ void field_theory::register_properties()
 //	properties::register_property(&create_property<GrassmannNumberInherit>);
 	properties::register_property(&create_property<Weight>);
 	properties::register_property(&create_property<WeightInherit>);
-	}
-
-std::string Symbol::name() const
-	{
-	return "Symbol";
 	}
 
 std::string Accent::name() const

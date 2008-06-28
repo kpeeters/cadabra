@@ -4,8 +4,9 @@
 \usepackage{fancyvrb}
 \usepackage{relsize}
 
-\newcommand{\cdbproperty}[2]{property: {\bfseries\large #1}\par}
-\newcommand{\cdbalgorithm}[2]{algorithm: {\bfseries\large #1}\par}
+\newcommand{\cdbproperty}[2]{property: {\bfseries\large ::#1{\small \if!#2!\else(#2)\fi}}\par}
+\newcommand{\cdbalgorithm}[2]{algorithm: {\bfseries\large @#1}\par}
+\newcommand{\cdbreserved}[2]{reserved: {\bfseries\large $\backslash$#1}\par}
 \newcommand{\cdbseealgo}[1]{}
 \newcommand{\cdbseeprop}[1]{}
 

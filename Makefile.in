@@ -1,5 +1,5 @@
 
-export RELEASE=0.137
+export RELEASE=0.138
 
 .PHONY: static program_static test fasttest gui gui_static doc
 
@@ -34,6 +34,8 @@ gui:
 gui_static:
 	( cd gui && $(MAKE) static );
 
+push_git:
+	git push git+ssh://repo.or.cz/srv/git/cadabra.git master
 
 test: program
 	@echo "==== Running tests ===="
@@ -64,8 +66,10 @@ install_program: program
 	@INSTALL@ doc/cadabra.sty $(DESTDIR)@prefix@/share/texmf/tex/latex/cadabra/cadabra.sty
 	@INSTALL@ -d ${DESTDIR}@prefix@/share/doc/cadabra/properties
 	@INSTALL@ -d ${DESTDIR}@prefix@/share/doc/cadabra/algorithms
+	@INSTALL@ -d ${DESTDIR}@prefix@/share/doc/cadabra/reserved
 	@INSTALL@ -m 644 doc/properties/*.tex ${DESTDIR}@prefix@/share/doc/cadabra/properties
 	@INSTALL@ -m 644 doc/algorithms/*.tex ${DESTDIR}@prefix@/share/doc/cadabra/algorithms
+	@INSTALL@ -m 644 doc/reserved/*.tex ${DESTDIR}@prefix@/share/doc/cadabra/reserved
 	@INSTALL@ -m 644 doc/general.tex ${DESTDIR}@prefix@/share/doc/cadabra/general.tex
 
 install_gui: gui

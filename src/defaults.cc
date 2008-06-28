@@ -18,5 +18,5 @@ std::string defaults="\\prod{#}::Distributable.\n\
 \\commutator{#}::IndexInherit.\n\
 \\commutator{#}::Derivative.\n\
 \\anticommutator{#}::IndexInherit.\n\
-\\commutator{#}::Derivative.\n\
+\\anticommutator{#}::Derivative.\n\
 ";

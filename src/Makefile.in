@@ -129,8 +129,8 @@ lex.yy.o: lex.yy.c parser2.tab.h
 parser2.tab.o: parser2.tab.c
 	@CXX@ -c -o parser2.tab.o parser2.tab.c
 
-parser2: parser2.tab.o lex.yy.o storage.o props.o
-	@CXX@ -o parser2 parser2.tab.o lex.yy.o storage.o props.o -ll -ly -lgmpxx -lgmp
+parser2: parser2.tab.o lex.yy.o storage.o props.o 
+	@CXX@ -o parser2 $+ -ll -ly -lgmpxx -lgmp
 
 
 

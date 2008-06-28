@@ -1,6 +1,6 @@
 /* 
 
-   $Id: window.cc,v 1.124 2008/06/26 12:07:58 peekas Exp $
+   $Id: window.cc,v 1.126 2008/06/28 09:44:32 peekas Exp $
 
 	Cadabra: an extendable open-source symbolic tensor algebra system.
 	Copyright (C) 2001-2006  Kasper Peeters <kasper.peeters@aei.mpg.de>
@@ -27,7 +27,6 @@
 #include <gtkmm/filechooserdialog.h>
 #include <gtkmm/messagedialog.h>
 #include <gtkmm/aboutdialog.h>
-#include "window.hh"
 #include <sstream>
 #include <fstream>
 #include <iostream>
@@ -39,29 +38,13 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <unistd.h>
-#include <errno.h>
 #include "../src/config.h"
 
-//#define DEBUG 1
+#include "window.hh"
 
-#define LINE_SPACING 3
-
-extern std::ofstream debugout;
 
 #define THEFONT "cmtt12"
 
-
-// General tool to strip spaces from both ends
-inline std::string trim(const std::string& s) 
-	{
-	if(s.length() == 0)
-		return s;
-	int b = s.find_first_not_of(" \t\n");
-	int e = s.find_last_not_of(" \t\n");
-	if(b == -1) // No non-spaces
-		return "";
-	return std::string(s, b, e - b + 1);
-	}
 
 const char * const XCadabra::autocomplete_strings[autocomplete_strings_len] = { 
 	 "\\alpha",
@@ -113,231 +96,11 @@ const char * const XCadabra::autocomplete_strings[autocomplete_strings_len] = {
 	 "\\Psi",
 	 "\\Omega",
 	 "\\partial",
-	 "\\dot"
+	 "\\infty",
+	 "\\dot",
+	 "\\commutator",
+	 "\\anticommutator"
 };
-
-TeXBuffer::TeXBuffer(Glib::RefPtr<Gtk::TextBuffer> tb, int fs)
-	: tex_source(tb), foreground_colour("black"), font_size(fs)
-	{
-	}
-
-void TeXBuffer::generate(const std::string& startwrap, const std::string& endwrap, int horizontal_pixels,
-								 bool nobreqn)
-	{		
-	start_wrap_=startwrap;
-	end_wrap_=endwrap;
-	horizontal_pixels_=horizontal_pixels;
-	regenerate(nobreqn);
-	}
-
-void TeXBuffer::erase_file(const std::string& nm) const
-	{
-	unlink(nm.c_str());
-	}
-
-std::string TeXBuffer::handle_latex_errors(const std::string& result) const
-	{
-	std::string::size_type pos=result.find("! LaTeX Error");
-	if(pos != std::string::npos) {
-		 return "LaTeX error, probably a missing style file. See the output below.\n\n" +result;
-		 }
-	
-	pos=result.find("! TeX capacity exceeded");
-	if(pos != std::string::npos) {
-		 return "Output cell too large (TeX capacity exceeded), output suppressed.";
-		 }
-	
-	pos=result.find("! Undefined control sequence");
-	if(pos != std::string::npos) {
-		 std::string::size_type undefpos=result.find("\n", pos+30);
-		 if(undefpos==std::string::npos) 
-			  return "Undefined control sequence (failed to parse LaTeX output).";
-		 std::string::size_type backslashpos=result.rfind("\\", undefpos);
-		 if(backslashpos==std::string::npos || backslashpos < 2) 
-			  return "Undefined control sequence (failed to parse LaTeX output).";
-
-		 std::string undefd=result.substr(backslashpos-1,undefpos-pos-30);
-		 return "Undefined control sequence:\n\n" +undefd+"\nNote that all symbols which you use in cadabra have to be valid LaTeX expressions. If they are not, you can still use the LaTeXForm property to make them print correctly; see the manual for more information.";
-		 }
-
-	return "";
-	}
-
-void TeXBuffer::regenerate(bool nobreqn)
-	{
-	// We now follow
-	// 
-	// https://www.securecoding.cert.org/confluence/display/seccode/FI039-C.+Create+temporary+files+securely
-	// 
-	// for temporary files.
-
-	char olddir[1024];
-	if(getcwd(olddir, 1023)==NULL)
-		 olddir[0]=0;
-	chdir("/tmp");
-
-	char templ[]="/tmp/cdbXXXXXX";
-
-	// The size in mm or inches which we use will in the end determine how large
-	// the font will come out. 
-	//
-	// For given horizontal size, we stretch this up to the full window
-	// width using horizontal_pixels/(horizontal_size/millimeter_per_inch) dots per inch.
-	// The appropriate horizontal size in mm is determined by trial and error, 
-	// and of course scales with the number of horizontal pixels.
-
-	const double horizontal_mm=horizontal_pixels_*(12.0/font_size)/3.94;
-	debugout << "TeXing: font_size " << font_size << std::endl
-				<< "        pixels    " << horizontal_pixels_ << std::endl
-				<< "        mm        " << horizontal_mm << std::endl;
-
-	//(int)(millimeter_per_inch*horizontal_pixels/100.0); //140;
-	const double vertical_mm=10*horizontal_mm;
-	
-	// Write to .tex file and run latex.
-	std::ostringstream total;
-	int fd = mkstemp(templ);
-	if(fd == -1) 
-		 throw std::logic_error("Failed to create temporary file in /tmp.");
-
-	total << "\\documentclass[12pt]{article}\n"
-			<< "\\usepackage[dvips,voffset=0pt,hoffset=0pt,textwidth="
-			<< horizontal_mm << "mm,textheight="
-			<< vertical_mm << "mm]{geometry}\n"
-			<< "\\usepackage{color}\\usepackage{amssymb}\n"
-			<< "\\usepackage[parfill]{parskip}\n\\usepackage{tableaux}\n";
-	if(nobreqn==false)
-		 total << "\\usepackage{breqn}\n";
-	else
-		 total << "\\usepackage{cadabra}\n";
-	total	<< "\\def\\specialcolon{\\mathrel{\\mathop{:}}\\hspace{-.5em}}\n"
-			<< "\\renewcommand{\\bar}[1]{\\overline{#1}}\n"
-			<< "\\begin{document}\n\\pagestyle{empty}\n";
-	if(tex_source->get_text().size()>100000)
-		total << "Expression too long, output suppressed.\n";
-	else {
-		if(start_wrap_.size()>0) 
-			total << start_wrap_;
-		total << tex_source->get_text();
-		if(end_wrap_.size()>0)
-			total << "\n" << end_wrap_;
-		else total << "\n";
-		}
-	total << "\\end{document}\n";
-
-	write(fd, total.str().c_str(), total.str().size());
-	debugout  << templ << std::endl;
-	close(fd);
-	debugout << "---\n" << total.str() << "\n---" << std::endl;
-
-	std::string nf=std::string(templ)+".tex";
-	rename(templ, nf.c_str());
-
-	modglue::child_process latex_proc("latex");
-	latex_proc << "--interaction" << "nonstopmode" << nf;
-	std::string result;
-	try {
-		latex_proc.call("", result);
-		erase_file(std::string(templ)+".tex");
-		erase_file(std::string(templ)+".aux");
-		erase_file(std::string(templ)+".log");
-		debugout << result << std::endl;
-
-		std::string err=handle_latex_errors(result);
-		if(err.size()>0) {
-			 erase_file(std::string(templ)+".dvi");
-			 chdir(olddir);
-			 throw std::logic_error(err); 
-			 }
-		}
-	catch(std::logic_error& err) {
-		erase_file(std::string(templ)+".tex");
-		erase_file(std::string(templ)+".dvi");
-		erase_file(std::string(templ)+".aux");
-		erase_file(std::string(templ)+".log");
-		
-		std::string err=handle_latex_errors(result);
-		if(err.size()>0) {
-			 chdir(olddir);
-			 throw std::logic_error(err); 
-			 }
-
-		// Even if we cannot find an explicit error in the output, we have to terminate
-		// since LaTeX has thrown an exception.
-		chdir(olddir);
-		throw std::logic_error("Cannot start LaTeX, is it installed?");
-		}
-
-	// Convert to png. 
-	std::ostringstream cmdstr;
-	cmdstr << "dvipng -v ";
-#ifndef DEBUG
-	cmdstr << "-q* 1>/dev/null 2>&1 ";
-#endif
-	cmdstr << "-T tight -bg Transparent -fg \"rgb "
-			 << foreground_colour.get_red()/65536.0 << " "
-			 << foreground_colour.get_green()/65536.0 << " "
-			 << foreground_colour.get_blue()/65536.0 << "\" -D ";
-	cmdstr << horizontal_pixels_/(1.0*horizontal_mm)*millimeter_per_inch;
-	cmdstr << " " << std::string(templ) << ".dvi" << std::ends;
-#ifdef DEBUG
-	std::cerr << cmdstr.str() << std::endl;
-#endif
-	int ret=system(cmdstr.str().c_str());
-	if(ret==-1 && errno!=10) {
-		 erase_file(std::string(templ)+".dvi");
-		 chdir(olddir);
-		 throw std::logic_error("Cannot start dvipng, is it installed?");
-		 }
-	if(ret!=0 && errno!=10) {
-		 erase_file(std::string(templ)+"1.png");
-		 erase_file(std::string(templ)+"2.png");
-		 erase_file(std::string(templ)+"3.png");
-		 erase_file(std::string(templ)+"4.png");
-		 erase_file(std::string(templ)+".dvi");
-		 chdir(olddir);
-		 throw std::logic_error("The dvipng stage failed, ignoring output.");
-		 }
-	erase_file(std::string(templ)+".dvi");
-
-   // An overflow results in all info being put on page 2; check for
-	// presence of that file.
-	std::string cmd=std::string(templ)+"2.png";
-	bool overflow=false;
-	std::ifstream tst(cmd.c_str());
-	if(!tst.good())  
-		 cmd=std::string(templ)+"1.png";
-	else {
-		 overflow=true;
-		 tst.close();
-		 }
-
-	pixbuf = Gdk::Pixbuf::create_from_file(cmd);
-#ifdef DEBUG
-	std::cerr << "image created, cleaning up" << std::endl;
-#endif
-
-	// Remove all png temporaries.
-	erase_file(cmd);
-	if(overflow)
-		 erase_file(std::string(templ)+"1.png");
-
-#ifdef DEBUG
-	std::cerr << "generating done" << std::endl;
-#endif
-	chdir(olddir);
-	}
-
-TeXView::TeXView(Glib::RefPtr<TeXBuffer> texb, int hmargin)
-	: texbuf(texb), vbox(false, 10), hbox(false, hmargin)
-	{
-	add(vbox);
-	vbox.pack_start(hbox, Gtk::PACK_SHRINK, 10);
-	hbox.pack_start(image, Gtk::PACK_SHRINK, hmargin);
-	image.set(texb->pixbuf);
-//	set_state(Gtk::STATE_PRELIGHT);
-	modify_bg(Gtk::STATE_NORMAL, Gdk::Color("white"));
-	}
 
 
 //PropertyList::PropertyList()
@@ -353,6 +116,23 @@ TeXView::TeXView(Glib::RefPtr<TeXBuffer> texb, int hmargin)
 //	show_all();
 //	}
 
+DataCell::DataCell(cell_t ct, const std::string& str, bool texhidden)
+	: cell_type(ct), tex_hidden(texhidden), sensitive(true), sectioning(0), running(false)
+	{
+	textbuf=Gtk::TextBuffer::create();
+	textbuf->set_text(trim(str));
+	switch(cell_type) {
+		case c_error:
+		case c_output:
+		case c_comment:
+		case c_tex:
+			texbuf=TeXBuffer::create(textbuf);
+			break;
+		case c_input:
+			break;
+		}
+	}
+
 NotebookCanvas::NotebookCanvas(XCadabra& doc_)
 	: doc(doc_)
 	{
@@ -362,7 +142,7 @@ NotebookCanvas::NotebookCanvas(XCadabra& doc_)
 	scroll.add(ebox);
 	ebox.add(scrollbox);
 	ebox.modify_bg(Gtk::STATE_NORMAL, Gdk::Color("white"));
-	scrollbox.pack_start(bottomline, Gtk::PACK_SHRINK);
+//	scrollbox.pack_start(bottomline, Gtk::PACK_SHRINK);
 	}
 
 NotebookCanvas::~NotebookCanvas()
@@ -404,7 +184,7 @@ VisualCell *NotebookCanvas::add_cell(DataCell *dc, DataCell *ref, bool before)
 	newcell->datacell=dc;
 
 	// Temporarily remove bottom line marker.
-	scrollbox.remove(bottomline);
+//	scrollbox.remove(bottomline);
 
 	// Find the correct place to insert the new cell in visualcells, and keep
 	// track of the number so we can insert the widget at the right spot in the Gtk
@@ -478,8 +258,9 @@ VisualCell *NotebookCanvas::add_cell(DataCell *dc, DataCell *ref, bool before)
 			newcell->inbox->edit.content_changed.connect(
 				 sigc::bind<VisualCell *, bool>(
 					 sigc::mem_fun(this, &NotebookCanvas::scroll_into_view), newcell, false));
-																															  
-			newcell->inbox->show_all();
+	
+// SHOW																														  
+//			newcell->inbox->show_all();
 			break;
 			}
 		case DataCell::c_error:
@@ -492,7 +273,8 @@ VisualCell *NotebookCanvas::add_cell(DataCell *dc, DataCell *ref, bool before)
 			gtk_box_set_child_packing(((Gtk::Box *)(&scrollbox))->gobj(), 
 											  ((Gtk::Widget *)(newcell->outbox))->gobj(),
 											  false, false, 0, GTK_PACK_START);
-			newcell->outbox->show_all();
+// SHOW
+//			newcell->outbox->show_all();
 			
 			newcell->outbox->signal_button_release_event().connect( 
 				sigc::bind<NotebookCanvas *, VisualCell *>(
@@ -521,16 +303,17 @@ VisualCell *NotebookCanvas::add_cell(DataCell *dc, DataCell *ref, bool before)
 					sigc::mem_fun(doc, &XCadabra::handle_on_grab_focus),
 					this, newcell));
 			// Hide source depending on setting in the datacell.
-			newcell->texbox->texview.show_all();
-			if(newcell->datacell->tex_hidden) newcell->texbox->edit.hide_all();
-			else                              newcell->texbox->edit.show_all();
+// SHOW
+//			newcell->texbox->texview.show_all();
+//			if(newcell->datacell->tex_hidden) newcell->texbox->edit.hide_all();
+//			else                              newcell->texbox->edit.show_all();
 			break;
 			}
 		}
 
 	// Restore bottom line marker 
-	scrollbox.pack_start(bottomline, Gtk::PACK_SHRINK);
-	bottomline.show();
+//	scrollbox.pack_start(bottomline, Gtk::PACK_SHRINK);
+//	bottomline.show();
 
 	return newcell; //visualcells.back();
 	}
@@ -718,406 +501,16 @@ void NotebookCanvas::show()
 	ebox.show();
 	scroll.show();
 	scrollbox.show();
-	bottomline.show();
+//	bottomline.show();
 	VPaned::show();
 	}
 
-ExpressionInput::exp_input_tv::exp_input_tv(Glib::RefPtr<Gtk::TextBuffer> tb)
-	: Gtk::TextView(tb)
-	{
-	}
-
-ExpressionInput::ExpressionInput(Glib::RefPtr<Gtk::TextBuffer> tb, const std::string& fontname, int hmargin)
-	: edit(tb)
-	{
-//	scroll_.set_size_request(-1,200);
-//	scroll_.set_border_width(1);
-//	scroll_.set_policy(Gtk::POLICY_NEVER, Gtk::POLICY_ALWAYS);
-	edit.modify_font(Pango::FontDescription(fontname)); 
-	edit.set_wrap_mode(Gtk::WRAP_WORD);
-	edit.modify_text(Gtk::STATE_NORMAL, Gdk::Color("blue"));
-	edit.set_pixels_above_lines(LINE_SPACING);
-	edit.set_pixels_below_lines(LINE_SPACING);
-	edit.set_pixels_inside_wrap(2*LINE_SPACING);
-	edit.set_left_margin(hmargin);
-	edit.set_accepts_tab(false);
-
-	edit.signal_button_press_event().connect(sigc::mem_fun(this, 
-																				&ExpressionInput::handle_button_press), 
-															 false);
-//	edit.get_buffer()->signal_changed().connect(sigc::mem_fun(this, &ExpressionInput::handle_changed));
-
-//	add(hbox);
-//	hbox.add(vsep);
-//	hbox.add(edit);
-	add(edit);
-//	set_border_width(3);
-	show();
-	}
-
-bool ExpressionInput::exp_input_tv::on_key_press_event(GdkEventKey* event)
-	{
-//	std::cerr << event->keyval << ", " << event->state << " pressed" << std::endl;
-	if(get_editable() && event->keyval==GDK_Return && (event->state&Gdk::SHIFT_MASK)) {// shift-return
-		Glib::RefPtr<Gtk::TextBuffer> textbuf=get_buffer();
-		std::string tmp(trim(textbuf->get_text(get_buffer()->begin(), get_buffer()->end())));
-		// Determine whether this is a valid input cell: should end either on a delimiter or
-		// on a delimeter-space-quoted-file-name combination.
-		bool is_ok=false;
-		if(tmp.size()>0) {
-			 if(tmp[0]!='#' && tmp[tmp.size()-1]!=';' && tmp[tmp.size()-1]!=':' && tmp[tmp.size()-1]!='.' 
-				 && tmp[tmp.size()-1]!='\"') {
-				  is_ok=false;
-				  }
-			 else is_ok=true;
-			 }
-		if(!is_ok) {
-			 Gtk::MessageDialog md("Input error");
-			 md.set_secondary_text("This cell does not end with a delimiter (a \":\", \";\" or \".\")");
-			 md.set_type_hint(Gdk::WINDOW_TYPE_HINT_DIALOG);
-			 md.run();
-			 }
-		else {
-#ifdef DEBUG
-			 std::cerr << "sending: " << tmp << std::endl;
-#endif
-			 content_changed();
-			 emitter(tmp);
-			 }
-		return true;
-		}
-	else {
-		bool retval=Gtk::TextView::on_key_press_event(event);
-		while (gtk_events_pending ())
-			gtk_main_iteration ();
-
-		// If this was a real key press (i.e. not just SHIFT or ALT or similar), emit a
-		// signal so that the cell can be scrolled into view if necessary.
-		// FIXME: I do not know how to do this correctly, check docs.
-
-		if(event->keyval < 65000L)
-			 content_changed();
-		return retval;
-		}
-	}
-
-bool ExpressionInput::handle_button_press(GdkEventButton* button)
-	{
-	if(button->button!=2) return false;
-
-	Glib::RefPtr<Gtk::Clipboard> refClipboard = Gtk::Clipboard::get(GDK_SELECTION_PRIMARY);
-
-	std::vector<Glib::ustring> sah=refClipboard->wait_for_targets();
-	bool hastext=false;
-	bool hasstring=false;
-	Gtk::SelectionData sd;
-
-	// find out _where_ to insert
-	Gtk::TextBuffer::iterator insertpos;
-	int somenumber;
-	edit.get_iter_at_position(insertpos, somenumber, button->x, button->y);
-	++insertpos;
-
-	for(unsigned int i=0; i<sah.size(); ++i) {
-		 if(sah[i]=="cadabra") {
-			  sd=refClipboard->wait_for_contents("cadabra");
-			  std::string topaste=sd.get_data_as_string();
-//			  edit.get_buffer()->insert_at_cursor(topaste);
-			  edit.get_buffer()->insert(insertpos, topaste);
-			  return true;
-			  }
-		 else if(sah[i]=="TEXT")
-			  hastext=true;
-		 else if(sah[i]=="STRING")
-			  hasstring=true;
-		 }
-	
-	if(hastext)        sd=refClipboard->wait_for_contents("TEXT");
-	else if(hasstring) sd=refClipboard->wait_for_contents("STRING");
-	if(hastext || hasstring)
-		 edit.get_buffer()->insert(insertpos, sd.get_data_as_string());
-//		 edit.get_buffer()->insert_at_cursor(sd.get_data_as_string());
-
-	return true;
-	}
-
-//	gdouble page_inc, step_inc, upper, lower, pos;
-//
-//	GtkAdjustment* vadj = gtk_scrolled_window_get_vadjustment(
-//			GTK_SCROLLED_WINDOW(scrolled_window));
-//
-//	page_inc = vadj->page_increment;
-//	step_inc = vadj->step_increment;
-//	lower = vadj->lower;
-//
-//	/* Otherwise we sometimes scroll down into a page of black. */
-//	upper = vadj->upper - page_inc - step_inc;
-//
-//	/* Center on the widget. */
-//	pos = (gdouble)widget->allocation.y - page_inc/2;
-//
-//	gtk_adjustment_set_value(vadj, CLAMP(pos, lower, upper));
-//
-
-TeXInput::exp_input_tv::exp_input_tv(Glib::RefPtr<Gtk::TextBuffer> tb)
-	: Gtk::TextView(tb)
-	{
-	}
-
-TeXInput::TeXInput(Glib::RefPtr<Gtk::TextBuffer> tb, Glib::RefPtr<TeXBuffer> texb, const std::string& fontname)
-	: edit(tb), texview(texb, 10)
-	{
-//	scroll_.set_size_request(-1,200);
-//	scroll_.set_border_width(1);
-//	scroll_.set_policy(Gtk::POLICY_NEVER, Gtk::POLICY_ALWAYS);
-	edit.modify_font(Pango::FontDescription(fontname));
-	edit.set_wrap_mode(Gtk::WRAP_WORD);
-	edit.modify_text(Gtk::STATE_NORMAL, Gdk::Color("darkgray"));
-	edit.set_pixels_above_lines(LINE_SPACING);
-	edit.set_pixels_below_lines(LINE_SPACING);
-	edit.set_pixels_inside_wrap(2*LINE_SPACING);
-	edit.set_left_margin(10);
-
-//	add(expander);
-//	expander.set_label_widget(texview);
-//	expander.add(edit);
-//	expander.set_expanded();
-	pack_start(edit);
-	pack_start(texview);
-	show();
-	}
-
-bool TeXInput::toggle_visibility()
-	{
-	if(edit.is_visible()) edit.hide_all();
-	else                  edit.show_all();
-	return true;
-	}
-
-bool TeXInput::exp_input_tv::on_key_press_event(GdkEventKey* event)
-	{
-	if(get_editable() && event->keyval==GDK_Return && (event->state&Gdk::SHIFT_MASK)) {// shift-return
-//		std::cerr << "activate!!" << std::endl;
-		Glib::RefPtr<Gtk::TextBuffer> textbuf=get_buffer();
-//		std::cerr << textbuf->get_text(textbuf->get_start_iter(), textbuf->get_end_iter()) << std::endl;
-		std::string tmp(textbuf->get_text(get_buffer()->begin(), get_buffer()->end()));
-#ifdef DEBUG
-		std::cerr << "running: " << tmp << std::endl;
-#endif
-		emitter(tmp);
-//		set_editable(false);
-//		textbuf->set_text("");
-		return true;
-		}
-	else {
-		bool retval=Gtk::TextView::on_key_press_event(event);
-		return retval;
-		}
-	}
-
-Glib::RefPtr<TeXBuffer> TeXBuffer::create(Glib::RefPtr<Gtk::TextBuffer> tb)
-	{
-	return Glib::RefPtr<TeXBuffer>(new TeXBuffer(tb));
-	}
-
-DataCell::DataCell(cell_t ct, const std::string& str, bool texhidden)
-	: cell_type(ct), tex_hidden(texhidden), sensitive(true), sectioning(0), running(false)
-	{
-	textbuf=Gtk::TextBuffer::create();
-	textbuf->set_text(trim(str));
-	switch(cell_type) {
-		case c_error:
-		case c_output:
-		case c_comment:
-		case c_tex:
-			texbuf=TeXBuffer::create(textbuf);
-			break;
-		case c_input:
-			break;
-		}
-	}
-
-
-CadabraHelp::CadabraHelp(XCadabra& xc)
-	: history_pos(-1), doc(xc), buttonbox(0), back(Gtk::Stock::GO_BACK), forward(Gtk::Stock::GO_FORWARD)
-	{
-	set_title("XCadabra help");
-	set_gravity(Gdk::GRAVITY_NORTH_EAST);
-	set_default_size(std::min(Gdk::Screen::get_default()->get_width()-20,  600),
-						  std::min(Gdk::Screen::get_default()->get_height()-20, 800));
-
-
-	add(topbox);
-	topbox.pack_start(navbox, Gtk::PACK_SHRINK);
-
-//	actiongroup=Gtk::ActionGroup::create();
-//	actiongroup->add( Gtk::Action::create("MenuFile", "_File") );
-//	actiongroup->add( Gtk::Action::create("CloseWindow", Gtk::Stock::CLOSE),
-//								  sigc::mem_fun(doc, &XCadabra::on_help_close) );
-
-//	uimanager = Gtk::UIManager::create();
-//	uimanager->insert_action_group(actiongroup);
-//	add_accel_group(uimanager->get_accel_group());
-//	
-//	Glib::ustring ui_info =
-//		 "<ui>"
-//		 "  <menubar name='MenuBar'>"
-//		 "    <menu action='MenuFile'>"
-//		 "      <menuitem action='CloseWindow'/>"
-//		 "    </menu>"
-//		 "  </menubar>"
-//		 "</ui>";
-//	
-//	uimanager->add_ui_from_string(ui_info);
-//	Gtk::Widget *menubar = uimanager->get_widget("/MenuBar");
-//	topbox.pack_start(*menubar, Gtk::PACK_SHRINK);
-
-	navbox.pack_start(back, Gtk::PACK_SHRINK);
-	navbox.pack_start(forward, Gtk::PACK_SHRINK);
-	back.set_sensitive(false);
-	forward.set_sensitive(false);
-	back.signal_clicked().connect(sigc::mem_fun(*this, &CadabraHelp::on_back));
-	forward.signal_clicked().connect(sigc::mem_fun(*this, &CadabraHelp::on_forward));
-
-	topbox.add(scroll);
-	scroll.set_policy(Gtk::POLICY_NEVER, Gtk::POLICY_ALWAYS);
-	scroll.set_border_width(1);
-	scroll.add(scrollbox);
-
-	// Set-up the TeXView widget
-	textbuf=Gtk::TextBuffer::create();
-	texbuf=TeXBuffer::create(textbuf);
-	texview=new TeXView(texbuf, 12);
-	scrollbox.pack_start(*texview, Gtk::PACK_EXPAND_WIDGET, 0);
-
-
-	show_all();
-	}
-
-void CadabraHelp::display_help(objtype_t objtype, const std::string& objname)
-	{
-	if(history.size()>0 && history.back()==std::make_pair(objtype, objname)) {
-		 return; // already displaying this one
-		 }
-	history.resize(history_pos+1);
-	history.push_back(std::make_pair(objtype, objname));
-	history_pos=history.size()-1;
-
-	display_help();
-	}
-
-void CadabraHelp::display_help()
-	{
-	// Add the buttons for related topics
-	if(buttonbox!=0) {
-		 topbox.remove(*buttonbox);
-		 delete buttonbox;
-		 }
-	buttonbox = new Gtk::HBox;
-	topbox.pack_start(*buttonbox, Gtk::PACK_SHRINK);
-	relatedlabel.set_label("See also: ");
-	buttonbox->pack_start(relatedlabel, Gtk::PACK_SHRINK);
-
-	back.set_sensitive(history.size()>1);
-	forward.set_sensitive(history_pos+1<static_cast<int>(history.size()));
-
-	std::string fname;
-	if(history[history_pos].first==t_property) 
-		 fname=DESTDIR+std::string("/share/doc/cadabra/properties/");
-	else if(history[history_pos].first==t_algorithm)
-		 fname=DESTDIR+std::string("/share/doc/cadabra/algorithms/");
-	else
-		 fname=DESTDIR+std::string("/share/doc/cadabra/general");
-	fname+=history[history_pos].second+".tex";
-
-	std::string total, line;
-
-	std::ifstream helpfile(fname.c_str());
-	if(helpfile.is_open()==false)  {
-		 total = "Sorry, no help available for {\\tt "+texify(history[history_pos].second)+"}.\n";
-		 helpfile.open((DESTDIR+std::string("/share/doc/cadabra/general.tex")).c_str());
-		 if(helpfile.is_open()==false) {
-			  textbuf->set_text(total);
-			  texbuf->generate("","",560);
-			  texview->image.set(texbuf->pixbuf);
-			  return;
-			  }
-		 }
-
-	std::vector<std::string> seeprop, seealgo;
-	while(std::getline(helpfile, line)) {
-		 total+=line+"\n";
-		 if(line.substr(0,11)=="\\cdbseeprop") 
-			  seeprop.push_back(line.substr(12,line.size()-13));
-		 if(line.substr(0,11)=="\\cdbseealgo") 
-			  seealgo.push_back(line.substr(12,line.size()-13));
-		 }
-//	for(unsigned int i=0; i<seeprop.size(); ++i)
-//		 std::cerr << "see also: |::" << seeprop[i] << "|" << std::endl;
-//	for(unsigned int i=0; i<seealgo.size(); ++i)
-//		 std::cerr << "see also: |@" << seealgo[i] << "|" << std::endl;
-
-	textbuf->set_text(total);
-	try {
-		 texbuf->generate("","",560,true);
-		 }
-	catch(std::exception& ex) {
-		Gtk::MessageDialog md(ex.what());
-		md.set_type_hint(Gdk::WINDOW_TYPE_HINT_DIALOG);
-		md.run();
-		}
-
-	texview->image.set(texbuf->pixbuf);
-
-	
-	for(unsigned int i=0; i<seeprop.size(); ++i) {
-		 Gtk::Button *tmp = new Gtk::Button("::"+seeprop[i]);
-		 tmp->signal_clicked().connect(sigc::bind<objtype_t, std::string>(
-													  sigc::mem_fun(doc, &XCadabra::on_help_context_link), 
-													  t_property,
-													  seeprop[i]));
-		 buttonbox->pack_start(*tmp, Gtk::PACK_SHRINK); // FIXME: is this leaking?
-		 tmp->show_all();
-		 }
-	for(unsigned int i=0; i<seealgo.size(); ++i) {
-		 Gtk::Button *tmp = new Gtk::Button("@"+seealgo[i]);
-		 tmp->signal_clicked().connect(sigc::bind<objtype_t, std::string>(
-													  sigc::mem_fun(doc, &XCadabra::on_help_context_link), 
-													  t_algorithm,
-													  seealgo[i]));
-		 buttonbox->pack_start(*tmp, Gtk::PACK_SHRINK); // FIXME: is this leaking?
-		 tmp->show_all();
-		 }
-	buttonbox->show_all();
-	}
-
-bool CadabraHelp::on_delete_event(GdkEventAny*)
-	{
-	doc.on_help_close();
-	return true;
-	}
-
-void CadabraHelp::on_back()
-	{
-	if(history_pos>0) {
-		 --history_pos;
-		 display_help();
-		 }
-	}
-
-void CadabraHelp::on_forward()
-	{
-	if(history_pos+1<static_cast<int>(history.size())) {
-		 ++history_pos;
-		 display_help();
-		 }
-	}
 
 XCadabra::XCadabra(modglue::ext_process& cdbproc, const std::string& filename, modglue::main *mm)
 	: font_step(0), hglass(Gdk::WATCH),
 	  load_file(false), have_received(false), cmm(mm), name(filename), modified(false), running(false),
 	  running_last(0), restarting_kernel(false),
-	  b_cdbstatus(" Status: Kernel idle."), b_kernelversion("Kernel version: not running"),
+	  b_kernelversion("Kernel version: not running"),
 	  b_help(Gtk::Stock::HELP), b_stop(Gtk::Stock::STOP),
      cdb(cdbproc), selected(0)
 	{
@@ -1125,10 +518,17 @@ XCadabra::XCadabra(modglue::ext_process& cdbproc, const std::string& filename, m
 	if(res.size()>0) 
 		 std::cerr << res << std::endl;
 
+	b_help.set_tooltip_text("Show context-sensitive help. Your cursor needs to be over an algorithm (anything starting with '@') or a property (anything starting with '::'). For other types of help, see the help menu.");
+	b_stop.set_sensitive(false);
+	b_stop.set_tooltip_text("Interrupt the kernel when it is running.");
 	b_run.set_label("Run all");
+	b_run.set_tooltip_text("Evaluate all input cells of the notebook in turn.");
 	b_run_to.set_label("Run to cursor");
+	b_run_to.set_tooltip_text("Evaluate all input cells from the start of the notebook until and including the cell before the one in which the cursor is currently located.");
 	b_run_from.set_label("Run from cursor");
+	b_run_from.set_tooltip_text("Evaluate all input cells starting from the one in which the cursor is currently located, until the end of the notebook.");
 	b_kill.set_label("Restart kernel");
+	b_kill.set_tooltip_text("Restart the cadabra kernel. This brings you back to the state in which none of the cells in the notebook have been evaluated.");
 	parse_mode.push_back(m_discard);
 
 	b_cdbstatus.set_alignment( 0.0, 0.5 );
@@ -1224,6 +624,7 @@ XCadabra::XCadabra(modglue::ext_process& cdbproc, const std::string& filename, m
 								  sigc::mem_fun(*this, &XCadabra::on_help_citing) );   
 	actiongroup->add( Gtk::Action::create("AllProperties", "Properties"));
 	actiongroup->add( Gtk::Action::create("AllAlgorithms", "Algorithms"));
+	actiongroup->add( Gtk::Action::create("AllReserved", "Reserved node names"));
 	actiongroup->add( Gtk::Action::create("ContextHelp", "Current object"),
 							Gtk::AccelKey("F1"),
 								  sigc::mem_fun(*this, &XCadabra::on_help_context) );   
@@ -1338,6 +739,7 @@ XCadabra::XCadabra(modglue::ext_process& cdbproc, const std::string& filename, m
 	add_cell(newcell);
 	active_canvas->cell_grab_focus(newcell);
 	modified=false;
+	kernel_idle();
 	update_title();
 	}
 
@@ -1429,6 +831,7 @@ void XCadabra::on_run()
 	running=true;
 	running_last=0;
 	b_cdbstatus.set_text(" Status: Executing notebook.");
+	b_stop.set_sensitive(true);
 	active_canvas->select_first_input_cell();
 	}
 
@@ -1438,6 +841,7 @@ void XCadabra::on_run_to()
 
 	running=true;
 	running_last=active_cell->datacell;
+	b_stop.set_sensitive(true);
 	b_cdbstatus.set_text(" Status: Executing until cursor.");
 	active_canvas->select_first_input_cell();
 	}
@@ -1450,6 +854,7 @@ void XCadabra::on_run_from()
 		running=true;
 		running_last=0;
 		b_cdbstatus.set_text(" Status: Executing from cursor.");
+		b_stop.set_sensitive(true);
 		active_canvas->cell_grab_focus(active_cell);
 		}
 	}
@@ -1477,12 +882,17 @@ void XCadabra::on_help_about()
 
 void XCadabra::on_help_algorithms(const std::string& algorithm)
 	{
-	on_help_context_link(CadabraHelp::t_algorithm, algorithm.substr(1));
+	help_window.on_help_context_link(CadabraHelp::t_algorithm, algorithm.substr(1));
 	}
 
 void XCadabra::on_help_properties(const std::string& property)
 	{
-	on_help_context_link(CadabraHelp::t_property, property.substr(2));
+	help_window.on_help_context_link(CadabraHelp::t_property, property.substr(2));
+	}
+
+void XCadabra::on_help_reserved(const std::string& reserved)
+	{
+	help_window.on_help_context_link(CadabraHelp::t_texcommand, reserved.substr(1));
 	}
 
 void XCadabra::on_help_citing()
@@ -1542,10 +952,11 @@ bool XCadabra::current_objtype_and_name(CadabraHelp::objtype_t& objtype, std::st
 
 	if(! (before.size()==0 && after.size()==0) ) {
 		 
-		 // We provide help for properties and algorithms. Properties are delimited
+		 // We provide help for properties, algorithms and reserved node names. 
+       // Properties are delimited
 		 // to the left by '::' and to the right by anything non-alnum. Algorithms
 		 // are delimited to the left by '@' and to the right by anything non-alnum or
-		 // non '_'. 
+		 // non '_'. Reserved node names are TeX symbols, starting with '\'.
 		 // 
 		 // So scan the 'before' string for a left-delimiter and the 'after' string
 		 // for a right-delimiter.
@@ -1674,21 +1085,7 @@ void XCadabra::on_help_context()
 	std::string helpname;
 
 	if(current_objtype_and_name(objtype, helpname)) 
-		 on_help_context_link(objtype, helpname);
-	}
-
-void XCadabra::on_help_context_link(CadabraHelp::objtype_t objtype, std::string helpname)
-	{
-	if(objtype!=CadabraHelp::t_property && objtype!=CadabraHelp::t_algorithm) return;
-	if(helpwindows.size()==0) 
-		 helpwindows.push_back(new CadabraHelp(*this));
-	helpwindows.back()->display_help(objtype, helpname);
-	}
-
-void XCadabra::on_help_close()
-	{
-	delete helpwindows.back();
-	helpwindows.pop_back();
+		 help_window.on_help_context_link(objtype, helpname);
 	}
 
 bool XCadabra::on_kernel_exit(modglue::ext_process& pr)
@@ -1699,8 +1096,7 @@ bool XCadabra::on_kernel_exit(modglue::ext_process& pr)
 	disconnect_io_signals();
 
 	if(!restarting_kernel) {
-		running=false;
-		get_window()->set_cursor();
+		kernel_idle();
 		Gtk::MessageDialog md("The cadabra kernel has disconnected unexpectedly.");
 		md.set_secondary_text("If you can reproduce this, please file a bug report, quoting the text below.\n\n"+accumulated_error);
 		md.set_type_hint(Gdk::WINDOW_TYPE_HINT_DIALOG);
@@ -1797,8 +1193,7 @@ DataCell *XCadabra::add_cell(DataCell *newcell, DataCell *ref, bool before)
 			}
 		}
 	catch(std::exception& ex) {
-		running=false;
-		b_cdbstatus.set_text(" Status: Kernel idle.");
+		kernel_idle();
 		Gtk::MessageDialog md(ex.what());
 		md.set_type_hint(Gdk::WINDOW_TYPE_HINT_DIALOG);
 		md.run();
@@ -1858,12 +1253,10 @@ void XCadabra::handle_on_grab_focus(NotebookCanvas *can, VisualCell *vis)
 
 	if(running && vis) {
 		if(running_last==active_cell->datacell) {
-			running=false;
 #ifdef DEBUG
 			std::cerr << "end cell reached" << std::endl;
 #endif
-			get_window()->set_cursor();
-			b_cdbstatus.set_text(" Status: Kernel idle.");
+			kernel_idle();
 			}
 		else {
 			Glib::RefPtr<Gtk::TextBuffer> textbuf=active_cell->datacell->textbuf;
@@ -1872,9 +1265,7 @@ void XCadabra::handle_on_grab_focus(NotebookCanvas *can, VisualCell *vis)
 #ifdef DEBUG
 				std::cerr << "cell does not end with delimiter" << std::endl;
 #endif
-				running=false;
-				get_window()->set_cursor();
-				b_cdbstatus.set_text(" Status: Kernel idle.");
+				kernel_idle();
 				}
 			else {
 #ifdef DEBUG
@@ -1950,8 +1341,7 @@ bool XCadabra::handle_tex_update_request(std::string, NotebookCanvas *can, Visua
 		 vis->texbox->texview.texbuf->generate("","",horizontal_pixels);
 		 }
 	catch(std::exception& ex) {
-		 running=false;
-		 b_cdbstatus.set_text(" Status: Kernel idle.");
+		 kernel_idle();
 		 Gtk::MessageDialog md(ex.what());
 		 md.set_type_hint(Gdk::WINDOW_TYPE_HINT_DIALOG);
 		 md.run();
@@ -2032,6 +1422,14 @@ void XCadabra::remove_noninput_below(DataCell *dc)
 			}
 		++it;
 		}
+	}
+
+void XCadabra::kernel_idle()
+	{
+	running=false;
+	b_cdbstatus.set_text(" Status: Kernel idle.");
+	get_window()->set_cursor();
+	b_stop.set_sensitive(false);
 	}
 
 bool XCadabra::receive(modglue::ipipe& p)
@@ -2141,8 +1539,7 @@ bool XCadabra::receive(modglue::ipipe& p)
 			parse_mode.pop_back();
 			if(trim(error).size()!=0) {
 				DataCell *newcell=new DataCell(DataCell::c_error, trim(error));
-				running=false; // halt automatic notebook execution, if any
-				get_window()->set_cursor();
+				kernel_idle();
 				cp=add_cell(newcell, cp, false);
 //				// make previous input cell active
 //				DataCells_t::iterator dit=datacells.begin();
@@ -2206,6 +1603,17 @@ bool XCadabra::receive(modglue::ipipe& p)
 		else if(str=="</algorithm>") {
 			 add_algorithm_help(algorithm);
 			 algorithm="";
+			parse_mode.pop_back();
+			continue;
+			}
+		else if(str=="<reserved>") {
+			parse_mode.push_back(m_reserved);
+			last_was_prompt=false;
+			continue;
+			}
+		else if(str=="</reserved>") {
+			 add_reserved_help(reserved);
+			 reserved="";
 			parse_mode.pop_back();
 			continue;
 			}
@@ -2310,6 +1718,9 @@ bool XCadabra::receive(modglue::ipipe& p)
 				break;
 			case m_algorithm:
 				algorithm+=str; 
+				break;
+			case m_reserved:
+				reserved+=str; 
 				break;
 			case m_comment:
 				if(trim(str).size()>0)
@@ -2700,7 +2111,8 @@ std::string XCadabra::load(const std::string& fn, bool ignore_nonexistence)
 		std::string buffer, cdb_buffer;
 		int line_num=2;
 		bool tex_hidden=false;
-		
+
+		b_cdbstatus.set_text(" Status: Loading notebook...");
 		while(std::getline(str,ln)) {
 #ifdef DEBUG
 			std::cerr << "read: " << ln << std::endl;
@@ -2708,6 +2120,7 @@ std::string XCadabra::load(const std::string& fn, bool ignore_nonexistence)
 			if(ln=="{\\color[named]{Blue}\\begin{verbatim}") {
 				if(curstat!=s_top) {
 					err << "Illegal location of input cell at line " << line_num << ".";
+					kernel_idle();
 					return err.str();
 					}
 				curstat=s_input;
@@ -2716,6 +2129,7 @@ std::string XCadabra::load(const std::string& fn, bool ignore_nonexistence)
 			else if(ln=="\\end{verbatim}}") {
 				if(curstat!=s_input) {
 					err << "Unmatched input cell closing at line " << line_num << ".";
+					kernel_idle();
 					return err.str();
 					}
 				DataCell *newcell=new DataCell(DataCell::c_input, buffer);
@@ -2725,6 +2139,7 @@ std::string XCadabra::load(const std::string& fn, bool ignore_nonexistence)
 			else if(ln=="{\\color[named]{Red}%") {
 				if(curstat!=s_top) {
 					err << "Illegal location of error cell at line " << line_num << ".";
+					kernel_idle();
 					return err.str();
 					}
 				curstat=s_error;
@@ -2733,6 +2148,7 @@ std::string XCadabra::load(const std::string& fn, bool ignore_nonexistence)
 			else if(ln=="} % error") {
 				if(curstat!=s_error) {
 					err << "Unmatched error cell closing at line " << line_num << ".";
+					kernel_idle();
 					return err.str();
 					}
 				DataCell *newcell=new DataCell(DataCell::c_error, buffer);
@@ -2743,6 +2159,7 @@ std::string XCadabra::load(const std::string& fn, bool ignore_nonexistence)
 				if(curstat!=s_top) {
 					err << "Illegal location of output cell in Cadabra input format at line " 
 						 << line_num << ".";
+					kernel_idle();
 					return err.str();
 					}
 				curstat=s_output_as_cdb;
@@ -2753,6 +2170,7 @@ std::string XCadabra::load(const std::string& fn, bool ignore_nonexistence)
 				if(curstat!=s_output_as_cdb) {
 					err << "Unmatched output cell in Cadabra input format closing at line " 
 						 << line_num << ".";
+					kernel_idle();
 					return err.str();
 					}
 				curstat=s_top;
@@ -2762,6 +2180,7 @@ std::string XCadabra::load(const std::string& fn, bool ignore_nonexistence)
 			else if(ln.substr(0,14)=="\\begin{dmath*}") {
 				if(curstat!=s_top) {
 					err << "Illegal location of output cell at line " << line_num << ".";
+					kernel_idle();
 					return err.str();
 					}
 				curstat=s_output;
@@ -2770,6 +2189,7 @@ std::string XCadabra::load(const std::string& fn, bool ignore_nonexistence)
 			else if(ln=="\\end{dmath*}") {
 				if(curstat!=s_output) {
 					err << "Unmatched output cell closing at line " << line_num << ".";
+					kernel_idle();
 					return err.str();
 					}
 #ifdef DEBUG
@@ -2785,6 +2205,7 @@ std::string XCadabra::load(const std::string& fn, bool ignore_nonexistence)
 			else if(ln=="\\begin{verbatim}") {
 				if(curstat!=s_top) {
 					err << "Illegal location of comment cell at line " << line_num << ".";
+					kernel_idle();
 					return err.str();
 					}
 				curstat=s_comment;
@@ -2793,6 +2214,7 @@ std::string XCadabra::load(const std::string& fn, bool ignore_nonexistence)
 			else if(ln=="\\end{verbatim}") {
 				if(curstat!=s_comment) {
 					err << "Unmatched comment cell closing at line " << line_num << ".";
+					kernel_idle();
 					return err.str();
 					}
 				DataCell *newcell=new DataCell(DataCell::c_comment, buffer);
@@ -2802,6 +2224,7 @@ std::string XCadabra::load(const std::string& fn, bool ignore_nonexistence)
 			else if(ln=="% Begin TeX cell open") {
 				if(curstat!=s_top) {
 					err << "Illegal location of TeX cell at line " << line_num << ".";
+					kernel_idle();
 					return err.str();
 					}
 				curstat=s_tex;
@@ -2811,6 +2234,7 @@ std::string XCadabra::load(const std::string& fn, bool ignore_nonexistence)
 			else if(ln=="% Begin TeX cell closed") {
 				if(curstat!=s_top) {
 					err << "Illegal location of TeX cell at line " << line_num << ".";
+					kernel_idle();
 					return err.str();
 					}
 				curstat=s_tex;
@@ -2820,6 +2244,7 @@ std::string XCadabra::load(const std::string& fn, bool ignore_nonexistence)
 			else if(ln=="% End TeX cell") {
 				if(curstat!=s_tex) {
 					err << "Unmatched TeX cell closing at line " << line_num << ".";
+					kernel_idle();
 					return err.str();
 					}
 				DataCell *newcell=new DataCell(DataCell::c_tex, trim(buffer));
@@ -2835,7 +2260,9 @@ std::string XCadabra::load(const std::string& fn, bool ignore_nonexistence)
 				gtk_main_iteration ();
 			}
 		}
-	
+
+	show_all();
+	kernel_idle();
 	return "";
 	}
 
@@ -3153,4 +2580,12 @@ void XCadabra::add_algorithm_help(const std::string& algorithm)
 								 sigc::mem_fun(*this, &XCadabra::on_help_algorithms), algorithm) );   
 	uimanager->add_ui_from_string("<ui><menubar name='MenuBar'><menu action='MenuHelp'><menu action='AllAlgorithms'><menuitem action='"+algorithm+"'/></menu></menu></menubar></ui>");
 	algorithm_set.insert(algorithm.substr(1));
+	}
+
+void XCadabra::add_reserved_help(const std::string& reserved)
+	{
+	actiongroup->add( Gtk::Action::create(reserved, duplicate_underscores(reserved)),
+							sigc::bind<std::string>(
+								 sigc::mem_fun(*this, &XCadabra::on_help_reserved), reserved) );   
+	uimanager->add_ui_from_string("<ui><menubar name='MenuBar'><menu action='MenuHelp'><menu action='AllReserved'><menuitem action='"+reserved+"'/></menu></menu></menubar></ui>");
 	}

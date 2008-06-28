@@ -1,6 +1,6 @@
 /* 
 
-   $Id: manipulator.cc,v 1.231 2008/06/18 20:17:50 peekas Exp $
+   $Id: manipulator.cc,v 1.233 2008/06/28 09:44:33 peekas Exp $
 
 	Cadabra: an extendable open-source symbolic tensor algebra system.
 	Copyright (C) 2002  Kasper Peeters <kasper.peeters@aei.mpg.de>
@@ -148,7 +148,6 @@ manipulator::manipulator()
 	algorithms["@unwrap"]          =new algo_info(&create<unwrap>);
 
 	// dummies
-	dummy::register_properties();
 	algorithms["@rename_dummies"] =new algo_info(&create<rename_dummies>);
 
 	// select
@@ -887,6 +886,25 @@ exptree::iterator manipulator::handle_active_nodes_(exptree::iterator original_e
 			original_expression=expressions.end();
 			return expressions.end();
 			}
+		else if(*it->name=="@reserved") {
+			 txtout << "<reserved>\n\\prod\n</reserved>\n"
+					  << "<reserved>\n\\div\n</reserved>\n"
+					  << "<reserved>\n\\sum\n</reserved>\n"
+					  << "<reserved>\n\\pow\n</reserved>\n"
+					  << "<reserved>\n\\indexbracket\n</reserved>\n"
+					  << "<reserved>\n\\factorial\n</reserved>\n"
+					  << "<reserved>\n\\equals\n</reserved>\n"
+					  << "<reserved>\n\\unequals\n</reserved>\n"
+					  << "<reserved>\n\\sequence\n</reserved>\n"
+					  << "<reserved>\n\\comma\n</reserved>\n"
+					  << "<reserved>\n\\infty\n</reserved>\n"
+					  << "<reserved>\n\\dot\n</reserved>\n"
+					  << "<reserved>\n\\commutator\n</reserved>\n"
+					  << "<reserved>\n\\anticommutator\n</reserved>\n";
+			 expressions.erase_expression(original_expression);
+			 original_expression=expressions.end();
+			 return expressions.end();
+			 }
 		else if(*it->name=="@quit") {
 			debugout << "@quit encountered" << std::endl;
 			throw exit_exception();

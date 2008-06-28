@@ -1,6 +1,6 @@
 /* 
 
-   $Id: storage.hh,v 1.156 2008/06/22 12:23:33 peekas Exp $
+   $Id: storage.hh,v 1.157 2008/06/28 09:44:33 peekas Exp $
 
 	Cadabra: an extendable open-source symbolic tensor algebra system.
 	Copyright (C) 2001-2006  Kasper Peeters <kasper.peeters@aei.mpg.de>
@@ -31,14 +31,15 @@
 #ifndef storage_hh_
 #define storage_hh_
 
-#include <string>
-#include <vector>
 #include <iostream>
 #include <gmpxx.h>
+#include <string>
+#include <vector>
 #include <set>
 #include <map>
 #include <stdint.h>
 #include <assert.h>
+
 #include "tree.hh"
 
 typedef mpq_class               multiplier_t;

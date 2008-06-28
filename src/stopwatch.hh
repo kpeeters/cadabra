@@ -1,11 +1,7 @@
-// -*- mode: C++; c-file-style: "mnemonic"; -*-
-
 /*
   Stopwatch class for profiling purposes.
 
-  Copyright 1998-1999 Kasper Peeters.
-
-  Please send bugs, changes, problems to bugs@mnemonic.browser.org
+  Copyright 1998-2008 Kasper Peeters <kasper.peeters@aei.mpg.de>.
 
   This program and its components are free software; you can
   redistribute it and/or modify it under the terms of the GNU General

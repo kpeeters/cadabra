@@ -75,7 +75,7 @@
 %\renewcommand{\nomname}{\hspace{-3mm}\raisebox{3.2mm}{\hbox{\normalsize\it %
 %      List of algorithms and properties:}}\vspace{-7mm}}
 \renewcommand{\nomname}{\vspace{-17mm}}
-\renewcommand{\nomlabel}[1]{{\tt \def\cdbat{@}\def\cdbcc{::}#1}\hfill}
+\renewcommand{\nomlabel}[1]{{\tt \def\cdbat{@}\def\cdbcc{::}\def\cdbbs{$\backslash$}#1}\hfill}
 \renewcommand{\pagedeclaration}[1]{#1~~~}
 \renewcommand\descriptionlabel[1]{\hbox to \textwidth{\quad\quad\bf {#1}\hfill}}
 \newcommand{\cdb}{{cadabra}\xspace}
@@ -92,12 +92,14 @@
 
 \newenvironment{props}{\par\noindent{\bf properties:}\description}{\enddescription}
 \newenvironment{algs}{\par\noindent{\bf algorithms:}\description}{\enddescription}
+\newenvironment{reserved}{\par\noindent\description}{\enddescription}
 
 %\newenvironment{props}{\par\noindent{\bf properties:}\\[1ex]}{\bigskip\par}
 %\newenvironment{algs}{\par\noindent{\bf algorithms:}\\[1ex]}{\bigskip\par}
 
 \newcommand{\cdbalgorithm}[2]{\nomenclature{\cdbat#1}{\hfill\nomrefpage}\item[{\tt @#1}]}
 \newcommand{\cdbproperty}[2]{\nomenclature{\cdbcc#1}{\hfill\nomrefpage}\item[{\tt ::#1}\if!#2!\else(#2)\fi]}
+\newcommand{\cdbreserved}[2]{\nomenclature{\cdbbs#1}{\hfill\nomrefpage}\item[{\tt $\backslash$#1}\if!#2!\else\{#2\}\fi]}
 
 %\newcommand{\cdbalgorithm}[2]{\nomenclature{\cdbat#1}{\hfill\refpage}\noindent{\tt @#1}\\}
 %\newcommand{\cdbproperty}[2]{\nomenclature{\cdbcc#1}{\hfill\refpage}\noindent{\tt ::#1}\if#2{}\else(#2)\fi}
@@ -3523,16 +3525,36 @@ use \member{is\_single\_term} and \member{prod\_wrap\_single\_term}.
 
 There is a small number of node names which is reserved to always mean
 the same thing, i.e.~for which the properties are not determined by
-the property system. These are
+the property system. These can be obtained using the '@reserved'
+command. Explicitly, they are
 \begin{quote}
 \texcommand{prod}, \texcommand{div}, \texcommand{sum},
 \texcommand{pow}, \texcommand{indexbracket}, \texcommand{factorial},
 \texcommand{equals}, \texcommand{unequals}, \texcommand{sequence},
-\texcommand{comma}, \texcommand{infty}, \texcommand{dot}.
+\texcommand{comma}, \texcommand{infty}, \texcommand{dot},
+\texcommand{commutator}, \texcommand{anticommutator}.
 \end{quote}
 Some properties of these nodes are still obtained from the property
 system in order to make algorithms look more uniform, but the names of
 these reserved nodes can not be changed.
+
+\begin{reserved}
+\input{reserved/prod.tex}
+\input{reserved/div.tex}
+\input{reserved/sum.tex}
+\input{reserved/pow.tex}
+\input{reserved/indexbracket.tex}
+\input{reserved/factorial.tex}
+\input{reserved/equals.tex}
+\input{reserved/unequals.tex}
+\input{reserved/sequence.tex}
+\input{reserved/comma.tex}
+\input{reserved/infty.tex}
+\input{reserved/dot.tex}
+\input{reserved/commutator.tex}
+\input{reserved/anticommutator.tex}
+\end{reserved}
+
 
 \subsection{Utility functions}
 

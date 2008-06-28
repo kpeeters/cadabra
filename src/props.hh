@@ -1,6 +1,6 @@
 /* 
 
-   $Id: props.hh,v 1.43 2008/06/22 12:23:32 peekas Exp $
+   $Id: props.hh,v 1.44 2008/06/28 09:44:33 peekas Exp $
 
 	Cadabra: an extendable open-source symbolic tensor algebra system.
 	Copyright (C) 2001-2006  Kasper Peeters <kasper.peeters@aei.mpg.de>
@@ -412,5 +412,33 @@ const T* properties::get()
 //		}
 //	return it;
 //	}
+
+
+/* There are three special properties which are required at a much lower level
+	than the other ones, because they are used for comparison of exptrees:
+*/
+
+class Symbol : public property {
+	public:
+		virtual std::string name() const;
+};
+
+class Coordinate : public property {
+	public:
+		virtual std::string name() const;
+};
+
+class Indices : public list_property {
+	public:
+		Indices();
+		virtual bool parse(exptree&, exptree::iterator, exptree::iterator, keyval_t&);
+		virtual std::string name() const;
+		virtual std::string unnamed_argument() const { return "name"; };
+		virtual match_t equals(const property_base *) const;
+		
+		std::string set_name, parent_name;
+		bool        position_free;
+};
+
 
 #endif

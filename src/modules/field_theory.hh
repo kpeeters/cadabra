@@ -1,6 +1,6 @@
 /* 
 
-   $Id: field_theory.hh,v 1.48 2007/11/28 22:43:39 peekas Exp $
+   $Id: field_theory.hh,v 1.49 2008/06/28 09:44:33 peekas Exp $
 
 	Cadabra: an extendable open-source symbolic tensor algebra system.
 	Copyright (C) 2001-2006  Kasper Peeters <kasper.peeters@aei.mpg.de>
@@ -115,11 +115,6 @@ class WeightInherit : virtual public WeightBase {
 		virtual std::string name() const;
 		
 		enum { multiplicative, additive } combination_type;
-};
-
-class Symbol : public property {
-	public:
-		virtual std::string name() const;
 };
 
 class Accent : public PropertyInherit, public IndexInherit, virtual public property {

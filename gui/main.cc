@@ -1,6 +1,6 @@
 /* 
 
-   $Id: main.cc,v 1.38 2007/12/10 12:45:15 peekas Exp $
+   $Id: main.cc,v 1.39 2008/06/27 10:17:22 peekas Exp $
 
 	Cadabra: an extendable open-source symbolic tensor algebra system.
 	Copyright (C) 2001-2006  Kasper Peeters <kasper.peeters@aei.mpg.de>
@@ -229,7 +229,8 @@ int main (int argc, char *argv[])
 	// and don't worry too much about this.
 
 	ls_proc.fork(); // FIXME: need error message upon failure
-	*(ls_proc.output_pipe("stdin")) << "@print_status{true};\n@properties;\n@algorithms;\n" << std::flush;
+	*(ls_proc.output_pipe("stdin")) << "@print_status{true};\n@properties;\n@algorithms;\n@reserved;\n" 
+											  << std::flush;
 
 	theiface.connect_io_signals();
 

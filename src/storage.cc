@@ -1,6 +1,6 @@
 /* 
 
-   $Id: storage.cc,v 1.224 2008/06/22 12:23:32 peekas Exp $
+   $Id: storage.cc,v 1.225 2008/06/28 09:44:33 peekas Exp $
 
 	Cadabra: an extendable open-source symbolic tensor algebra system.
 	Copyright (C) 2001-2006  Kasper Peeters <kasper.peeters@aei.mpg.de>
@@ -30,7 +30,7 @@
 #include "props.hh"
 #include <iomanip>
 #include <sstream>
-#include "modules/dummies.hh"
+//#include "modules/dummies.hh"
 
 nset_t    name_set;
 rset_t    rat_set;

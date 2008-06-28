@@ -13,6 +13,9 @@ void properties::register_properties()
 	{
 	register_property(&create_property<IndexInherit>);
 	register_property(&create_property<PropertyInherit>);
+	register_property(&create_property<Symbol>);
+	register_property(&create_property<Indices>);
+	register_property(&create_property<Coordinate>);
 	}
 
 pattern::pattern()
@@ -407,3 +410,63 @@ void properties::insert_list_prop(const std::vector<exptree::iterator>& its, con
 
 
  */
+
+std::string Symbol::name() const
+	{
+	return "Symbol";
+	}
+
+std::string Coordinate::name() const
+	{
+	return "Coordinate";
+	}
+
+Indices::Indices()
+	: position_free(true)
+	{
+	}
+
+std::string Indices::name() const
+	{
+	return "Indices";
+	}
+
+property_base::match_t Indices::equals(const property_base *other) const
+	{
+	const Indices *cast_other = dynamic_cast<const Indices *>(other);
+	if(cast_other) {
+		 if(set_name == cast_other->set_name) {
+			  if(parent_name == cast_other->parent_name && position_free == cast_other->position_free)
+					return exact_match;
+			  else
+					return id_match;
+			  }
+		 return no_match;
+		 }
+	return property_base::equals(other);
+	}
+
+bool Indices::parse(exptree& tr, exptree::iterator pat, exptree::iterator prop, keyval_t& keyvals)
+	{
+	keyval_t::const_iterator ki=keyvals.find("name");
+	if(ki!=keyvals.end()) {
+		 if(*ki->second->multiplier!=1) {
+			  txtout << "Indices: use quotes to label names when they start with a number." << std::endl;
+			  return false;
+			  }
+		set_name=*ki->second->name;
+		}
+
+	ki=keyvals.find("parent");
+	if(ki!=keyvals.end()) 
+		parent_name=*ki->second->name;
+
+	ki=keyvals.find("position");
+	if(ki!=keyvals.end()) {
+		if(*ki->second->name!="free")
+			position_free=false;
+		}
+
+	return true;
+	}
+
