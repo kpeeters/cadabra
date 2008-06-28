@@ -34,8 +34,14 @@ gui:
 gui_static:
 	( cd gui && $(MAKE) static );
 
-push_git:
+push_git_public:
 	git push git+ssh://kpeeters@repo.or.cz/srv/git/cadabra.git master
+
+push_git_aei:
+	git push kaspercvs:git/cadabra master
+
+tarball:
+	git archive --format=tar --prefix=cadabra-${RELEASE}/ HEAD | gzip > ${HOME}/tmp/cadabra-${RELEASE}.tar.gz
 
 test: program
 	@echo "==== Running tests ===="
