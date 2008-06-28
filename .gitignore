@@ -4,3 +4,15 @@ Makefile
 config.log
 config.status
 .depend
+gui/xcadabra
+src/cadabra
+src/test_combinatorics
+src/test_gmp
+src/test_lie
+src/test_preprocessor
+src/test_tree
+src/test_xperm
+src/test_young
+src/tree_example
+src/tree_regression_tests
+
