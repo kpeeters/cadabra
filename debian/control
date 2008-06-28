@@ -1,0 +1,19 @@
+Source: cadabra
+Section: math
+Priority: optional
+Maintainer: Kasper Peeters <kasper.peeters@aei.mpg.de>
+Build-Depends: debhelper (>= 4.0.0), libgtkmm-2.4-dev, libgmp3-dev, libgmpxx4ldbl, libpcre3-dev, libpcre++-dev, modglue-dev
+Standards-Version: 3.6.2
+
+Package: cadabra
+Architecture: any
+Depends: ${shlibs:Depends}, lie, dvipng, texlive-math-extra, latex-xft-fonts
+Description: field-theory motivated computer algebra system
+  Cadabra is a computer algebra system designed specifically for the
+  solution of problems encountered in field theory. It has extensive
+  functionality for tensor polynomial simplification including
+  multi-term symmetries, fermions and anti-commuting variables,
+  Clifford algebras and Fierz transformations, implicit coordinate
+  dependence, multiple index types and many more. The input format is
+  a subset of TeX.
+
