@@ -1,7 +1,3 @@
-2008-06-28  Kasper Peeters  <kasper.peeters@aei.mpg.de>
-
-	* Moved to GIT.
-
 2008-06-27  Kasper Peeters  <kasper.peeters@aei.mpg.de>
 
 	* Separated the source code for the GUI into several files to make
