@@ -167,14 +167,20 @@ if test "$enable_gui" == "no"
 		  PKG_CHECK_MODULES([sigc], [sigc++-2.0]) 
 		  PKG_CHECK_MODULES([gtk], [gtk+-2.0]) 
 		  PKG_CHECK_MODULES([pango], [pango]) 
-		  PKG_CHECK_MODULES([gtkmm], [gtkmm-2.4]) 
-        if test "x`pkg-config --modversion gtkmm-2.4 | grep 2.8`" == "x" ; then
-	  	    AC_DEFINE([GTKMM_GEQ_28], 0, [Defined if Gtkmm's version is 2.8 or greater]) 
-          echo "checking for gtkmm version...  < 2.8"
-		  else
-	  	    AC_DEFINE([GTKMM_GEQ_28], 1, [Defined if Gtkmm's version is 2.8 or greater]) 
-          echo "checking for gtkmm version... >= 2.8"
-        fi
+        PKG_CHECK_MODULES(GTKMM, gtkmm-2.4 >= 2.12.0,
+                  [AC_DEFINE([GTKMM_VER],212)],
+                  [PKG_CHECK_MODULES(GTKMM, gtkmm-2.4 >= 2.8.0,
+                     [AC_DEFINE([GTKMM_VER],28)],
+                     [PKG_CHECK_MODULES(GTKMM, gtkmm-2.4 >= 2.6.0,
+                        AC_DEFINE([GTKMM_VER],26))])])
+dnl		  PKG_CHECK_MODULES([gtkmm], [gtkmm-2.4]) 
+dnl        if test "x`pkg-config --modversion gtkmm-2.4 | grep 2.8`" == "x" ; then
+dnl	  	    AC_DEFINE([GTKMM_GEQ_28], 0, [Defined if Gtkmm's version is 2.8 or greater]) 
+dnl          echo "checking for gtkmm version...  < 2.8"
+dnl		  else
+dnl	  	    AC_DEFINE([GTKMM_GEQ_28], 1, [Defined if Gtkmm's version is 2.8 or greater]) 
+dnl          echo "checking for gtkmm version... >= 2.8"
+dnl        fi
 		  PKG_CHECK_MODULES([pangomm], [pangomm-1.4])
 		  AC_CHECK_PROG(DVIPNG, dvipng, yes, no)
 		  if test "${DVIPNG}" == "no"
@@ -199,7 +205,8 @@ AC_SUBST([enable_gui])
 AC_SUBST([MAC_OS_X])
 AC_SUBST([pcrecpp])
 AC_SUBST([NESTED])
-AC_SUBST([GTKMM_GEQ_28])
+AC_SUBST([GTKMM_VER])
+dnl AC_SUBST([GTKMM_GEQ_28])
 
 dnl The output files
 AC_OUTPUT(

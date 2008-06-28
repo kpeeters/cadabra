@@ -11,6 +11,7 @@
 #include <gtkmm/textview.h>
 #include <gtkmm/separator.h>
 #include <gtkmm/actiongroup.h>
+#include <sstream>
 
 const int LINE_SPACING=3;
 

@@ -5,6 +5,7 @@
 #include <fstream>
 #include <gtkmm/messagedialog.h>
 #include <gtkmm/main.h>
+#include <stdexcept>
 
 stopwatch tex_stopwatch;
 

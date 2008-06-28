@@ -518,18 +518,21 @@ XCadabra::XCadabra(modglue::ext_process& cdbproc, const std::string& filename, m
 	if(res.size()>0) 
 		 std::cerr << res << std::endl;
 
-	b_help.set_tooltip_text("Show context-sensitive help. Your cursor needs to be over an algorithm (anything starting with '@') or a property (anything starting with '::'). For other types of help, see the help menu.");
 	b_stop.set_sensitive(false);
-	b_stop.set_tooltip_text("Interrupt the kernel when it is running.");
 	b_run.set_label("Run all");
-	b_run.set_tooltip_text("Evaluate all input cells of the notebook in turn.");
 	b_run_to.set_label("Run to cursor");
-	b_run_to.set_tooltip_text("Evaluate all input cells from the start of the notebook until and including the cell before the one in which the cursor is currently located.");
 	b_run_from.set_label("Run from cursor");
-	b_run_from.set_tooltip_text("Evaluate all input cells starting from the one in which the cursor is currently located, until the end of the notebook.");
 	b_kill.set_label("Restart kernel");
-	b_kill.set_tooltip_text("Restart the cadabra kernel. This brings you back to the state in which none of the cells in the notebook have been evaluated.");
 	parse_mode.push_back(m_discard);
+
+#if (GTKMM_VER == 212)
+	b_help.set_tooltip_text("Show context-sensitive help. Your cursor needs to be over an algorithm (anything starting with '@') or a property (anything starting with '::'). For other types of help, see the help menu.");
+	b_stop.set_tooltip_text("Interrupt the kernel when it is running.");
+	b_run.set_tooltip_text("Evaluate all input cells of the notebook in turn.");
+	b_run_to.set_tooltip_text("Evaluate all input cells from the start of the notebook until and including the cell before the one in which the cursor is currently located.");
+	b_run_from.set_tooltip_text("Evaluate all input cells starting from the one in which the cursor is currently located, until the end of the notebook.");
+	b_kill.set_tooltip_text("Restart the cadabra kernel. This brings you back to the state in which none of the cells in the notebook have been evaluated.");
+#endif
 
 	b_cdbstatus.set_alignment( 0.0, 0.5 );
 	b_kernelversion.set_alignment( 0.0, 0.5 );
@@ -869,7 +872,7 @@ void XCadabra::on_help_about()
 	md.set_copyright("\xC2\xA9 2006-2008 Kasper Peeters");
 	md.set_comments("Graphical user interface for the cadabra symbolic computer algebra system.");
 	md.set_license("XCadabra and Cadabra are available under the Gnu General Public License version 2.\n\nIf you use Cadabra or even just play with it, I would like to hear about it. Please send me an email so that I can get an idea of who is interested in this program.\n\nIf you use Cadabra in your own work, please cite both\n\nKasper Peeters\n\"A field-theory motivated approach to computer algebra\"\ncs.sc/0608005\nComput. Phys. Commun 176 (2007) 550\n\nKasper Peeters\n\"Introducing Cadabra: a symbolic computer algebra system for field theory problems\"\nhep-th/0701238\n\nThank you!");
-#if (GTKMM_GEQ_28 == 1)
+#if (GTKMM_VER == 28 || GTKMM_VER == 212)
 	md.set_wrap_license(true);
 #endif
 
