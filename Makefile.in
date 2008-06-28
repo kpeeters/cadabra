@@ -35,7 +35,7 @@ gui_static:
 	( cd gui && $(MAKE) static );
 
 push_git:
-	git push git+ssh://repo.or.cz/srv/git/cadabra.git master
+	git push git+ssh://kpeeters@repo.or.cz/srv/git/cadabra.git master
 
 test: program
 	@echo "==== Running tests ===="
