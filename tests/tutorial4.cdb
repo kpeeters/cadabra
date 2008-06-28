@@ -1,0 +1,52 @@
+::PostDefaultRules( @@eliminate_kr!(%), @@collect_terms!(%) ).
+
+D{#}::Derivative.
+\bar{#}::DiracBar.
+\partial{#}::PartialDerivative.
+\delta{A??}::Derivative.
+
+{m,n,p,q,r,s,t}::Indices(flat).
+{\mu,\nu,\rho,\sigma,\kappa}::Indices(curved,position=fixed).
+
+e^{m \mu}::Vielbein.
+e_{m \mu}::InverseVielbein.
+\delta_{\mu}^{\rho}::KroneckerDelta.
+\delta_{m n}::KroneckerDelta.
+\delta^{m n}::KroneckerDelta.
+
+\psi_{\mu}::Spinor(dimension=4, type=Majorana).
+\epsilon::Spinor(dimension=4, type=Majorana).
+\Gamma_{#}::GammaMatrix(metric=\delta).
+{\psi_{\mu}, \epsilon}::AntiCommuting.
+\psi_{\mu}::SelfAntiCommuting.
+{\epsilon,\psi_{\mu}}::SortOrder.
+{\epsilon,\psi_{\mu}}::Depends(\bar,\partial,D).
+\Gamma_{#}::Depends(\bar).
+
+# @vary[ e_{m \mu} e^{n \mu} ]( e_{m \mu} -> \bar{\epsilon}\Gamma_m \psi_\mu,
+#                                e^{n \mu} -> \delta{e^{n \mu}} );
+# 
+# @distribute[ @(%)*e^{m \rho} ]: @substitute!(%)( e_{m \mu} e^{m \rho} -> \delta_{\mu}^{\rho} ); 
+# 
+L:= -1/2 e R - 1/2 e \bar{\psi_\mu} \Gamma^{\mu\nu\rho} D_{\nu}{\psi_{\rho}};
+
+@rewrite_indices!(%){ \Gamma^{m n p} }{ e^{n \mu} };
+
+@vary!(%)( e^{n \mu} -> -\bar{\epsilon} \Gamma^m \psi^\nu e^{m \mu} e^{n \nu},
+           e         -> e \bar{\epsilon} \Gamma^n \psi_\mu e_n^\mu,
+           R         -> -2 R_{\mu\rho} e^{n \mu} \bar{\epsilon} \Gamma^n \psi^\rho,
+           \psi_\mu  -> D_{\mu}{\epsilon} );
+
+@take_match[@(%)]( \bar{D_{\mu}{\epsilon}}*A?? );
+
+@substitute!(%)( D_{\mu}{\epsilon} -> \partial_{\mu}{\epsilon} + 1/4 \omega_{\mu m n} \Gamma^{m n} \epsilon );
+
+@distribute!(%): @unwrap!(%): @rewrite_diracbar!(%);
+
+@substitute!(%)( \Gamma^{q r}\Gamma^{m n p} -> \Gamma^{m n p}\Gamma^{q r}
+        - @join![ \Gamma^{q r}\Gamma^{m n p} - \Gamma^{m n p} \Gamma^{q r} ]{expand} );
+
+@canonicalise!(%);
+@distribute!(%);
+
+# NOW we need to raise/lower indices.

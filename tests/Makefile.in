@@ -1,0 +1,72 @@
+
+MACTEST= @MAC_OS_X@
+
+TESTS=pre.res tree.res \
+      properties.res \
+	   procedure.res substitute.res dummies.res numerical.res relativity.res mixed1.res distribute.res \
+      gamma.res symmetry.res fieldtheory.res sorting.res factorise.res \
+      canonicalise.res output.res young.res diff_geometry.res \
+      powers.res derivative.res indexbracket.res linear.res linear.res combinat.res \
+		tutorial2.res tutorial3.res algebra.res lists.res defaults.res patterns.res tableaux.res \
+      repeated.res paper.res
+
+ADVTESTS=r4decompose.res kk.res 
+
+.PHONY=all
+
+TIMER=/usr/bin/time -o timing.log -a -f "%U %S"
+
+all: $(TESTS) summary
+
+advanced: $(ADVTESTS) advsummary
+
+summary: $(TESTS)
+ifeq ($(strip $(MACTEST)),)
+	@printf "total cpu time: "
+	@awk '{total+=$$0} END {print total " seconds."}' < timing.log
+endif
+
+advsummary: $(ADVTESTS)
+ifeq ($(strip $(MACTEST)),)
+	@printf "total cpu time: "
+	@awk '{total+=$$0} END {print total " seconds."}' < timing.log
+endif
+
+pre.res:
+	@printf "running test \"pre-processor\"..."
+	@../src/test_preprocessor < /dev/null > pre.res
+	@echo "passed."
+
+tree.res:
+	@printf "running test \"tree\"..."
+	@../src/tree_regression_tests < /dev/null > tree.res
+	@echo "passed."
+
+%.res: %.cdb
+	@printf "running test \"$*\"..."
+ifeq ($(strip $(MACTEST)),)
+	@${TIMER} ../src/cadabra --bare --input $< > $@ 
+else
+	@../src/cadabra --bare --input $< > $@ 
+endif
+	@echo "passed."
+
+output.res: output.cdb
+	@printf "running test \"output\"..."
+	@rm -f out1.res out2.res out1.exp out2.exp
+ifeq ($(strip $(MACTEST)),)
+	@( export CDB_TIGHTSTAR=1; export CDB_TIGHTPLUS=1; \
+      ${TIMER} ../src/cadabra --bare < $< > $@ )
+else
+	@( export CDB_TIGHTSTAR=1; export CDB_TIGHTPLUS=1; \
+      ../src/cadabra --bare < $< > $@ )
+endif
+	@diff out1.res out1.exp
+	@diff out2.res out2.exp
+	@echo "passed."
+
+clean:
+	rm -f *.res *~ cdb*.log timing.log
+
+distclean: clean
+	rm -f Makefile

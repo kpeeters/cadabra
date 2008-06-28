@@ -1,0 +1,168 @@
+
+MACTEST= @MAC_OS_X@
+
+.PHONY: all tests modules
+
+all:     cadabra modules tests 
+static:  cadabra_static
+tests:   test_gmp test_preprocessor test_tree tree_example test_combinatorics test_young \
+         tree_regression_tests test_xperm test_lie
+#test_parser 
+
+OBJS =preprocessor.o storage.o display.o parser.o main.o algorithm.o manipulator.o \
+      youngtab.o combinatorics.o props.o settings.o exchange.o defaults.o stopwatch.o
+MOBJS=modules/algebra.o modules/pertstring.o modules/convert.o modules/gamma.o \
+      modules/field_theory.o modules/select.o modules/dummies.o modules/output.o \
+      modules/properties.o modules/relativity.o modules/substitute.o \
+      modules/tableaux.o modules/diff_geometry.o modules/numerical.o \
+      modules/linear.o modules/combinat.o modules/xperm.o modules/lie.o modules/lists.o
+
+#modules/xperm_no_nests.o 
+
+SRCS      = `find . -name "*.cc"`
+MCFLAGS   = @CFLAGS@ -I. -I@top_srcdir@/src `pkg-config modglue --cflags`
+TIMESTAMP = -D"RELEASE=\"${RELEASE}\"" -D"DATETIME=\"`date | sed -e 's/  / /'`\"" -DHOSTNAME=\"`hostname`\"
+
+
+
+%.o: %.cc
+	@CXX@ ${MCFLAGS} ${TIMESTAMP} -c -o $@ $<
+
+modules/xperm.o: modules/xperm.c
+	@CC@ @NESTED@ ${MCFLAGS} ${TIMESTAMP} -c -o $@ $<
+
+#modules/xperm_no_nests.o: modules/xperm_no_nests.c
+#	@CC@ -Wall -g @NESTED@ ${MCFLAGS} ${TIMESTAMP} -c -o $@ $<
+
+modules: $(MOBJS)
+
+cadabra: $(OBJS) $(MOBJS)
+	@CXX@ -o cadabra ${LDFLAGS} `pkg-config modglue --libs` $+ -lgmpxx -lpcrecpp -lgmp
+
+#`pkg-config glib-2.0 --libs` 
+# Static linking now works!
+
+cadabra_static: $(OBJS) $(MOBJS)
+	rm -f main.o
+	@CXX@ -Wall -g ${MCFLAGS} ${TIMESTAMP} -DSTATICBUILD -c -o main.o main.cc
+ifeq ($(strip $(MACTEST)),)
+	@CXX@ -o cadabra -static $+ ${LDFLAGS} `pkg-config modglue --libs` -lmodglue \
+                             -lgmpxx -lgmp -lpcrecpp -lpcre \
+                             `pkg-config sigc++-2.0 --libs` -lsigc-2.0 -lutil
+
+else
+	export MACOSX_DEPLOYMENT_TARGET=10.3
+	@CXX@ -o cadabra $+ ${LDFLAGS} `pkg-config modglue --libs` \
+          -lgmp -lgmpxx -lpcre++ -lpcre -lexpect
+endif
+
+# In order to get the build date linked in.
+#
+main.o: ${MOBJS} Makefile
+
+# defaults.o: defaults
+# 	echo "#include<string>" > defaults.cc
+# 	echo -n "std::string defaults=\"" >> defaults.cc
+# 	cat defaults | tr '\n' '<' | sed -e 's/\\/\\\\/g' | sed -e 's/</\\n\\\n/g' >> defaults.cc
+# 	echo "\";" >> defaults.cc
+# 	@CXX@ -c -o defaults.o defaults.cc
+
+test_tree: test_tree.o 
+	@CXX@ -o test_tree test_tree.o
+
+test_lie: test_lie.o modules/lie.o
+ifeq ($(strip $(MACTEST)),)
+	@CXX@ -o test_lie test_lie.o modules/lie.o `pkg-config --libs modglue`
+else
+	@CXX@ -o test_lie test_lie.o modules/lie.o `pkg-config --libs modglue`
+endif
+
+tree_regression_tests: tree_regression_tests.o 
+	@CXX@ -o tree_regression_tests tree_regression_tests.o
+
+test_xperm: test_xperm.o modules/xperm.o
+	@CXX@ -o test_xperm test_xperm.o modules/xperm.o
+
+tree_example: tree_example.o tree.hh
+	@CXX@ -o tree_example tree_example.o
+
+test_combinatorics: test_combinatorics.o combinatorics.o
+	@CXX@ -o test_combinatorics test_combinatorics.o combinatorics.o
+
+test_young: test_young.o youngtab.o combinatorics.o
+	@CXX@ -o test_young test_young.o youngtab.o combinatorics.o ${LDFLAGS} -lgmpxx -lgmp
+
+test_preprocessor: test_preprocessor.o preprocessor.o
+	@CXX@ -o test_preprocessor test_preprocessor.o preprocessor.o ${LDFLAGS} -lgmpxx -lgmp
+
+mpi_pass_tree: mpi_pass_tree.o
+	@CXX@ -o mpi_pass_tree mpi_pass_tree.o -L/usr/lib/mpich/lib -lmpich++ -lpmpich -lmpich
+
+mpi_remote_run.o: mpi_remote_run.cc
+	mpiCC -c -o mpi_remote_run.o mpi_remote_run.cc
+
+mpi_remote_run: mpi_remote_run.o
+	mpiCC -o mpi_remote_run mpi_remote_run.o
+
+#test_parser: test_parser.o storage.o parser.o preprocessor.o display.o
+#	@CXX@ -o test_parser test_parser.o storage.o parser.o preprocessor.o display.o modules/properties.o algorithm.o -lgmpxx
+
+test_gmp: test_gmp.o 
+	@CXX@ -o test_gmp test_gmp.o ${LDFLAGS} -lgmpxx -lgmp
+
+
+
+# The 2nd generation parser. 
+# First the lexx/yacc bit.
+
+parser2.tab.h parser2.tab.c: parser2.y 
+	bison -v -d parser2.y
+
+lex.yy.c: parser2.l parser2.tab.h
+	flex -o lex.yy.c parser2.l
+
+# Then the actual compilation.
+
+lex.yy.o: lex.yy.c parser2.tab.h
+	@CXX@ -c -o lex.yy.o lex.yy.c
+
+parser2.tab.o: parser2.tab.c
+	@CXX@ -c -o parser2.tab.o parser2.tab.c
+
+parser2: parser2.tab.o lex.yy.o storage.o props.o
+	@CXX@ -o parser2 parser2.tab.o lex.yy.o storage.o props.o -ll -ly -lgmpxx -lgmp
+
+
+
+# Installation and cleanup.
+
+install:
+ifeq ($(strip $(MACTEST)),)
+	strip cadabra
+endif
+#	strip -S cadabra
+#endif
+	@INSTALL@ -m 0755 -d ${DESTDIR}@prefix@/bin
+	@INSTALL@ -m 0755 cadabra ${DESTDIR}@prefix@/bin
+
+uninstall:
+	rm -f @prefix@/bin/cadabra
+#	rm -f @prefix@/include/tree.hh
+
+clean:
+	rm -f *.o *~ cadabra cadabra_static test_tree test_combinatorics test_preprocessor test_parser test_gmp tree_example test_young tree_regression_tests test_lie test_xperm
+	rm -f parser2.output parser2.tab.c parser2.tab.h lex.yy.cc lex.yy.c
+	( cd modules; $(MAKE) clean )
+
+distclean: clean
+	rm -f Makefile out cdb.log result .depend gprof.out 
+	( cd modules; $(MAKE) distclean )
+
+.depend:
+	rm -f .depend
+	for i in ${SRCS}; \
+		do    @CXX@ ${MCFLAGS} -E -MM -MT `echo $$i | sed -e 's/\.\///' -e 's/\.cc/\.o/'` ${CFLAGS} $$i >> .depend; \
+		done
+
+include .depend
+

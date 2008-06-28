@@ -1,0 +1,611 @@
+
+# Substituting requires many dummy index relabelling. 
+#
+# Test 1: 'm' relabelling is triggered by a_{m} outside
+#         'n' relabelling in second term ditto
+#         'n' relabelling in first term because c_{pmn} -> c_{nmn} .
+
+{d1,d2,d3,d4,m,n,p,r}::Indices(vector).
+
+obj1:= a_{m}*b_{n} + c_r b_r d_{m n};
+@substitute!(%)( b_{p} -> c_{p m n} A^{m n} + c_{p} );
+@distribute!(%);
+tst1:= a_{m} * c_{n d2 d1} * A^{d2 d1}
+    + a_{m} * c_{n}
+    + c_{r} * c_{r d1 d2} * A^{d1 d2} * d_{m n}
+    + c_{r} * c_{r} * d_{m n} - @(obj1);
+@collect_terms!(%);
+@assert(tst1);
+
+@reset.
+{a,b,c}::Indices(vector).
+A_{a};
+@substitute!(%)( A_{b} -> B_{b a} C_{a} );
+
+# Test 2: testing product substitutions.
+
+@reset;
+{d1,d2,d3,d4,m,n,p,r,s,t,a,b}::Indices(vector).
+obj2:= a_{m n} * q * e * b_{m p} * o + d_{n p};
+@substitute!(%)( a_{r s} b_{r t} -> c_{s t} );
+tst2:= c_{n p} q e o + d_{n p} - @(obj2);
+@collect_terms!(%);
+@assert(tst2);
+
+
+# Test 3: Reducing to zero.
+
+obj3:= A_{m n} B_{m n} k1_{a} k1_{a} k2_{b};
+@substitute!(%)( k1_a k1_a -> 0 );
+@assert(obj3);
+
+
+# Test 4: Indices in the pattern.
+
+obj4:= A_m A_n + B_m C_n + D_{m n} A_p A_p;
+@substitute!(%)( A_a A_a -> q );
+tst4:= A_m A_n + B_m C_n + D_{m n} q - @(obj4);
+@collect_terms!(%);
+@assert(tst4);
+
+
+# Test 5: Internal contractions.
+
+obj5:= A_{m m} + A_{m n} B_{m n};
+@substitute!(%)( A_{r r} -> q );
+tst5:= q + A_{m n} B_{m n} - @(obj5);
+@collect_terms!(%);
+@assert(tst5);
+
+
+# Test 6,7,8: Various orderings of the input.
+
+tst6:= \zeta_{a b} k1_{d} k1_{a};
+@substitute!(%)( k1_{a} \zeta_{a b} -> 0 );
+@assert(tst6);
+
+tst7:= k_a k_b k_c k_b k_d;
+@substitute!(%)( k_a k_a -> 0 );
+@assert(tst7);
+
+
+@reset;
+{d1,d2,d3,d4,m,n,p,r}::Indices(vector).
+obj8:= W_{r1 r2 s1 s2} * W_{r3 s3 r4 s4};
+@substitute!(%)( W_{a b c d} -> @asym![@asym[k_a k_c zeta_{b d}]{_a,_b}]{_c,_d} );
+tst8:= (1/4 * k_{r1} * k_{s1} * zeta_{r2 s2}
+     - 1/4 * k_{r1} * k_{s2} * zeta_{r2 s1}
+     - 1/4 * k_{r2} * k_{s1} * zeta_{r1 s2}
+     + 1/4 * k_{r2} * k_{s2} * zeta_{r1 s1}) * 
+      (1/4 * k_{r3} * k_{r4} * zeta_{s3 s4}
+     - 1/4 * k_{r3} * k_{s4} * zeta_{s3 r4}
+     - 1/4 * k_{s3} * k_{r4} * zeta_{r3 s4}
+     + 1/4 * k_{s3} * k_{s4} * zeta_{r3 r4}) - @(obj8);
+@distribute!(%):
+@collect_terms!(%):
+@assert(tst8);
+
+
+
+# Test 9,10,11: multipliers
+
+obj9:= (1/2)*(y1-w1);
+@substitute!(%)(w1->y1);
+@collect_terms!(%);
+@assert(obj9);
+
+obj10:= (1/2)*(a*y1-a*w1);
+@substitute!(%)(w1->y1);
+@collect_terms!(%);
+@assert(obj10);
+
+obj11:= (1/2)*((1/3)*y1 - w1);
+@substitute!(%)(w1 -> (1/3)*y1);
+@collect_terms!(%);
+@assert(obj11);
+
+
+# Test 12: More complicated patterns.
+#
+#  (triggered  Source and destination overlap in memcpy(0x47DAF98, 0x47DAF98, 56)
+#   using valgrind)
+#
+@reset;
+{a,b,c,d,m,n,q,r,d1,d2,d3,d4}::Indices(vector).
+R_{a b c d}::RiemannTensor.
+obj12:= R_{a b m n} R_{m n c d} R_{c a q r}:
+@canonicalise!(%);
+#obj12:= R_{b a c m} * R_{d n c m};
+#@substitute!(%)( R_{a b m n} R_{c d m n} 
+#                      -> 2 R_{a m b n} R_{c m d n} );
+@substitute!(%)( R_{a b m n} R_{c d m n} 
+                      -> 2 R_{a m b n} ( R_{c m d n} - R_{d m c n} ) );
+tst12:= 4 R_{q r a c} @asym[R_{b m a n} R_{d m c n}]{_d,_c} + @(obj12);
+@distribute!(%);
+@canonicalise!(%);
+@rename_dummies!(%);
+@collect_terms!(%);
+#@assert(tst12);
+
+
+
+# Test 13: Conditions.
+#
+@reset;
+{a,b,c,d,m,n,d1,d2,d3,d4}::Indices(vector).
+R_{a b c d}::RiemannTensor.
+obj13:= R_{a b m n} R_{c b m n};
+@substitute!(%)( R_{a b m n} R_{c d m n} | { c!=a, d!=b }
+                      -> 2 R_{a m b n} ( R_{c m d n} - R_{d m c n} ) );
+tst13:= R_{a b m n} R_{c b m n} - @(obj13);
+@collect_terms!(%);
+@assert(tst13);
+@substitute!(obj13)( R_{a b m n} R_{c d m n} 
+                      -> 2 R_{a m b n} ( R_{c m d n} - R_{d m c n} ) );
+
+
+# Test 14: tree.hh bug
+#
+obj14:= C_{a b c} D_{e f g};
+@substitute!(%)( C D -> 0 );
+tst14:= C_{a b c} D_{e f g} - @(obj14);
+@collect_terms!(%);
+@assert(tst14);
+
+obj15:= C_{a b c} D_{e f g} q2 h_{a e};
+@substitute!(%)( q2 -> 0 );
+@assert(obj15);
+
+
+# Test 15: More conditions
+#
+@substitute!(%)( W_{a b c d} W_{e f g h} | \indexpairs(0) -> 0 );
+
+
+# Test 16: Dummy relabelling
+#
+@reset;
+{a,b,c,d,e,f}::Indices(vector).
+obj16:= A_{a b};
+@substitute!(%)( A_{e f} -> B_{e a} B_{a f} );
+tst16:= @(obj16) - B_{a c} B_{c b};
+@collect_terms!(%);
+@assert(tst16);
+
+
+# Test 17: Object wildcards
+
+obj17:= [ A B, C];
+@substitute!(%)( [ M? N?, P? ] -> yes );
+tst17:= @(obj17) - yes;
+@collect_terms!(%);
+@assert(tst17);
+
+obj18:= [ A_m B, C];
+@substitute!(%)( [ M?_{p?} N?, P? ] -> p? );
+tst18:= m - @(obj18);
+@collect_terms!(%);
+@assert(tst18);
+
+
+# Test 19: Regular expressions
+
+obj19:= A + B3 + C7;
+@substitute!(%)( A + M? + N?  | { \regex{M?}{"B[0-9]*"},\regex{N?}{"[A-Z]7"} } -> sin(M? N?)/N? );
+tst19:= sin(B3 C7)/C7 - @(obj19);
+@collect_terms!(%);
+@assert(tst19);
+
+
+# Test 20: Multiple rules
+
+obj20:= A*B*C*D*E;
+@substitute!(%)( A=X, C=Y );
+tst20:= X*B*Y*D*E - @(obj20);
+@collect_terms!(%);
+@assert(tst20);
+
+
+# Test 21: Object wildcards
+
+obj21:= A*\commutator{A_{m n}}{B_{p q}}*D;
+@substitute!(%)( \commutator{A??}{B??} -> fik );
+tst21:= A*fik*D-@(obj21);
+@collect_terms!(%);
+@assert(tst21);
+
+obj22:= A*\commutator{A_{m n}}{A_{m n}}*D;
+@substitute!(%)( \commutator{A??}{A??} -> fik );
+tst22:= A*fik*D-@(obj22);
+@collect_terms!(%);
+@assert(tst22);
+
+# Test 23: non-matching object wildcards
+
+obj23:= A*\commutator{A_{m n}}{B_{m n}}*D;
+@substitute!(%)( \commutator{A??}{A??} -> fik );
+tst23:= A*\commutator{A_{m n}}{B_{m n}}*D-@(obj23);
+@collect_terms!(%);
+@assert(tst23);
+
+
+# Test 24: More tricky patterns
+@reset.
+::PreDefaultRules( @@substitute!(%)( [ a??, b?? ] -> \commutator{a??}{b??} ) ).
+obj24:= a*[\delta_{a b}, M_{c d}];
+@substitute!(%)( [\delta_{r s}, M_{t u}] -> 0 );
+@assert(obj24);
+
+
+#obj24:=  [x_i, p_j] = I*\delta_{i j};
+#@substitute!(%)( [a??,b??] -> \commutator{a??}{b??} );
+
+
+# Test 25: Clever use of @@ to avoid expansion of the rhs before the
+#          match is found.
+#
+obj25:= A_{m n} B_{p q};
+obj26:= Q_{a b c d};
+@substitute!(%)( Q_{m n p q} -> @@(obj25) );
+tst26:= A_{a b} B_{c d} - @(obj26);
+@collect_terms!(%);
+@assert(tst26);
+
+
+# Test 26-28: including index type matching
+#
+obj26:= A_{m n} B_{p q};
+@substitute!(%)( A_{a b} B_{c d} -> 3 );
+tst26:= 3 - @(obj26);
+@collect_terms!(%);
+@assert(tst26);
+
+@reset;
+{a,b,c,d,e}::Indices(spinor).
+{m,n,p,q,r}::Indices(vector).
+obj27:= A_{m n} B_{p q};
+@substitute!(%)( A_{a b} B_{c d} -> 3 );
+tst27:= A_{m n} B_{p q} - @(obj27);
+@collect_terms!(%);
+@assert(tst27);
+
+obj28:= A_{m n} B_{p q};
+@substitute!(%)( A_{m n} B_{q r} -> 3 );
+tst28:= 3 - @(obj28);
+@collect_terms!(%);
+@assert(tst28);
+
+# Test 29: subtle index dummy relabelling inside \diff
+@reset;
+{m,n,p,q,r,m1,m2}::Indices(vector).
+\diff{#}::Derivative.
+obj29:= \diff{B_{m1}}_{n} * \diff{g3^{m2 m1}}_{p} * g3_{m m2};
+@substitute!(%)( \diff{g3^{m n}}_{p} g3_{q m} -> - \diff{g3_{m q}}_{p} g3^{m n} );
+tst29:= -\diff{B_{m1}}_{n} * \diff{g3_{m2 m}}_{p} * g3^{m2 m1} - @(obj29);
+@rename_dummies!(%);
+@collect_terms!(%);
+@assert(tst29);
+
+# Test 30: an old relabelling bug:
+#
+@reset;
+\diff{#}::Derivative.
+{\mu,\nu,\rho,\kappa,\lambda,\sigma,\chi,\eta,\psi}::Indices(spacetime).
+obj30:= \diff{g^{\kappa \mu}}_{\sigma} * \diff{g_{\kappa \lambda}}_{\rho} * g_{\lambda \nu};
+@substitute!(%)( \diff{g^{\mu\nu}}_{\rho} -> - g^{\mu\lambda} \diff{g_{\lambda\kappa}}_{\rho} g^{\kappa\nu});
+tst30:= (-1) * g^{\kappa \chi} * \diff{g_{\chi \eta}}_{\sigma} * g^{\eta \mu} * \diff{g_{\kappa \lambda}}_{\rho} * g_{\lambda \nu} - @(obj30);
+@rename_dummies!(%);
+@collect_terms!(%);
+@assert(tst30);
+
+# Test 31 - 33: the @rename command in combination with dummies (deprecated)
+#
+# @reset;
+# {m,n,p,q,r,s,m1,m2,m3,n1,n2,q1,q2}::Indices(spacetime).
+# obj31:= F_{m n};
+# @rename!(%){m}{n};
+# tst31:= F_{n n} - @(obj31);
+# @collect_terms!(%);
+# @assert(tst31);
+# 
+# obj32:= F_{m n} G_{n q};
+# @rename!(%){m}{n};
+# tst32:= F_{n p} G_{p q} - @(obj32);
+# @rename_dummies!(%);
+# @collect_terms!(%);
+# @assert(tst32);
+# 
+# obj33:= F_{m1 n1} G_{n1 q};
+# @rename!(%){m}{n};
+# tst33:= F_{n1 p} G_{p q} - @(obj33);
+# @rename_dummies!(%);
+# @collect_terms!(%);
+# @assert(tst33);
+
+# Test 34: the new index_rename, replacing rename for dummies.
+#
+@reset;
+{q,m1,m2,m3,m4,m5,m6,m7,m,p,n,s}::Indices(spacetime).
+obj34:= \diff{\phi}_{q} \diff{\phi}_{m1} g3_{m4 p} g3_{n s} g3^{q m1} g3^{n s};
+@index_rename!(%){m}{q}{true};
+tst34:= \diff{\phi}_{q} * \diff{\phi}_{m1} * g3_{q4 p} * g3_{n s} * g3^{q m1} * g3^{n s} - @(obj34);
+@collect_terms!(%);
+@assert(tst34);
+
+obj35:= \diff{\phi}_{q} \diff{\phi}_{m1} g3_{m p} g3_{n s} g3^{q m1} g3^{n s};
+@index_rename!(%){m}{q}{true};
+tst35:= \diff{\phi}_{m2} * \diff{\phi}_{m1} * g3_{q p} * g3_{n s} * g3^{m2 m1} * g3^{n s} - @(obj35);
+@collect_terms!(%);
+@assert(tst35);
+
+# Test 35: factors
+#
+obj35:=  (-2a -2b -2c)*Q;
+@substitute!(%)( c -> -a/2 -b/2 );
+tst35:= (-a-b)*Q - @(obj35);
+@collect_terms!(%);
+@assert(tst35);
+
+# Test 37 - 41: Non-commuting and anti-commuting objects
+#
+@reset;
+{bra,ket,a,adag}::NonCommuting.
+obj37:= bra*a*a*adag*adag*a*a*adag*adag*ket;
+@prodsort!(%);
+@substitute!(%)( a*adag -> -adag*a + 1 );
+@distribute!(%);
+tst37:= -bra a adag a adag a a adag adag ket + bra a adag a a adag adag ket - @(obj37);
+@collect_terms!(%);
+@assert(tst37);
+
+@reset;
+{\chi, \psi}::AntiCommuting.
+obj38:= A*\chi*B*C*\psi;
+@substitute!(%)( \psi * \chi -> D );
+tst38:= A*B*C*D + @(obj38);
+@collect_terms!(%);
+@assert(tst38);
+
+@reset;
+{\chi, \psi, \lambda}::AntiCommuting.
+obj39:= A*\chi*\lambda*B*C*\psi;
+@substitute!(%)( \psi * \chi -> D );
+tst39:= A*\lambda*B*C*D - @(obj39);
+@collect_terms!(%);
+@assert(tst39);
+
+@reset;
+{\chi, \psi, \lambda}::AntiCommuting.
+obj40:= A*\chi*\lambda*B*C*\psi;
+@substitute!(%)( \chi * \psi -> D );
+tst40:= A*D*\lambda*B*C + @(obj40);
+@collect_terms!(%);
+@assert(tst40);
+
+@reset;
+\theta_{a}::SelfAntiCommuting.
+{\theta_a, \chi_a}::AntiCommuting.
+obj41:= \theta_a \theta_b \chi_a \theta_c;
+@substitute!(%)( \theta_a \chi_a -> \thetachi );
+tst41:= \thetachi \theta_b \theta_c + @(obj41);
+@collect_terms!(%);
+@assert(tst41);
+
+# To add: tests with more than two factors in the replacement rule
+
+@reset;
+\Gamma{#}::GammaMatrix.
+tst42a:= (\Gamma_{m n} + A_{m} \Gamma_{n})\Gamma_{p q r};
+@substitute!(%)( (\Gamma_{q r} + A_{q} \Gamma_{r} )*\Gamma_{m n p} -> 0 );
+@assert(tst42a);
+obj42b:= \Gamma_{p q r} (\Gamma_{m n} + A_{m} \Gamma_{n});
+@substitute!(%)( (\Gamma_{q r} + A_{q} \Gamma_{r} )*\Gamma_{m n p} -> 0 );
+tst42b:= \Gamma_{p q r} (\Gamma_{m n} + A_{m} \Gamma_{n}) - @(obj42b);
+@collect_terms!(%);
+@assert(tst42b);
+
+# Test 43: vary
+#
+@reset;
+obj43:= A*B*A + D*E;
+@vary!(%)( A -> C );
+tst43:= C*B*A + A*B*C - @(obj43);
+@collect_terms!(%);
+@assert(tst43);
+
+# This example is hard to do right, let's for the time being use vary
+# only on single products, not nested ones.
+#
+# obj44:= A*(A*C*A+D*E)*E*A;
+# @vary(%)( A -> Q );
+# tst44:= Q*(A*C*A+D*E)*E*A + A*(Q*C*A+D*E)*E*A + A*(A*C*Q+D*E)*E*A + A*(A*C*A+D*E)*E*Q;
+
+\bar{?}::Accent.
+obj45:= \bar{A}*B*A;
+@vary!(%)( A -> C );
+tst45:= \bar{C}*B*A + \bar{A}*B*C - @(obj45);
+@collect_terms!(%);
+@assert(tst45);
+
+# Test 44: \hasprop
+#
+@reset;
+A::SelfAntiCommuting.
+obj44:= A*A + B*B;
+@substitute!(%)( B?? B?? | \hasprop{B??}{Fik} -> 0 );
+tst44a:= A A + B B - @(obj44);
+@collect_terms!(%);
+@assert(tst44a);
+obj44:= A*A + B*B;
+@substitute!(%)( B?? B?? | \hasprop{B??}{SelfAntiCommuting} -> 0 );
+tst44b:= B B - @(obj44);
+@collect_terms!(%);
+@assert(tst44b);
+
+@reset;
+A::SelfAntiCommuting.
+{A,C}::NonCommuting.
+obj45:= A C A;
+@substitute!(%)( B?? B?? | \hasprop{B??}{SelfAntiCommuting} -> 0 );
+tst45:= A C A - @(obj45);
+@collect_terms!(%);
+@assert(tst45);
+
+# Test 45: More signs
+#
+@reset;
+obj45:= A + B = C;
+@substitute!(%)( A?? = B?? -> A?? - B?? = 0 );
+#tst45:= A + B - C = 0 - @(obj45);
+#@collect_terms!(%);
+#@assert(tst45);
+
+# Test 46: Nesting.
+#
+@reset;
+{a,b,c,d}::Indices.
+{ \partial{#}, \partial'{#} }::PartialDerivative.
+A::Depends(\partial).
+B::Depends(\partial').
+\Omega{#}::Derivative.
+obj46:= \Omega( \partial_{a}{A} )( \partial'_{b}{B} );
+@substitute!(%)( \Omega( \partial_{a}{A??} )( B?? ) -> \partial_{a}{ \Omega(A??)(B??) } );
+tst46:= \partial_{a}{ \Omega(A)(\partial'_{b}{B}) } - @(obj46);
+@collect_terms!(%);
+@assert(tst46);
+
+# Test 47: handling parent rel
+#
+@reset;
+\partial{#}::PartialDerivative.
+obj47:= \partial_{p}{g3^{n m}} g3_{q m};
+@substitute!(%)( \partial_{p}{g3^{n m}} g3_{q m} -> - \partial_{p}{g3_{q m}} g3^{n m} );
+
+# Test 48: only match indices in the right set.
+{\mu,\nu}::Indices("4d").
+{i,j}::Indices("3d").
+obj48:= A_{\mu};
+@substitute!(%)( A_{i} -> B_{i} );
+tst48:= A_{\mu} - @(obj48);
+@collect_terms!(%);
+@assert(tst48);
+
+# Test 49-51: multipliers inside brackets
+#
+@reset.
+obj49:= A(2*B);
+@substitute!(%)( A(B) -> Q );
+tst49:= A(2*B) - @(obj49);
+@collect_terms!(%);
+@assert(tst49);
+
+@reset.
+obj50:= A(2*B);
+@substitute!(%)( A(B?) -> Q );
+tst50:= Q - @(obj50);
+@collect_terms!(%);
+@assert(tst50);
+
+@reset.
+obj51:= 2*A(B);
+@substitute!(%)( A(B) -> Q );
+tst51:= 2*Q - @(obj51);
+@collect_terms!(%);
+@assert(tst51);
+
+# Test 52: used-to-be-bug in relabelling of dummies
+@reset.
+{K,L,M,N}::Indices(vector).
+obj52:= u_{K} * t_{M} * t_{N};
+@substitute!(%)( t_{M} * t_{N} -> C_{M N} - A_{M N K} B_{K} );
+tst52:= u_{K} ( C_{M N} - A_{M N L} B_{L} ) - @(obj52);
+@collect_terms!(%);
+@assert(tst52);
+
+# Test 53: factors of '1' which remain in products
+@reset.
+obj53:= A*B*C;
+@substitute!(%)( B -> 3 );
+tst53:= 3*A*C - @(obj53);
+@collect_terms!(%);
+@assert(tst53);
+
+@reset.
+obj54:= @substitute![A*B*C]( B->3 );
+tst54:= 3*A*C - @(obj54);
+@collect_terms!(%);
+@assert(tst54);
+
+# Test 55-57: Expressions with Coordinate and Indices properties.
+#
+@reset.
+r::Coordinate.
+\partial{#}::PartialDerivative.
+r::Depends(\partial).
+{k,m}::Indices.
+obj55:= \partial_{k}{r};
+@substitute!(%)( \partial_{r}{r} -> 1);
+tst55:= \partial_{k}{r} - @(obj55);
+@collect_terms!(%);
+@assert(tst55);
+
+@reset.
+r::Coordinate.
+\partial{#}::PartialDerivative.
+r::Depends(\partial).
+{k,m}::Indices.
+obj56:= \partial_{k}{r};
+@substitute!(%)( \partial_{k}{r} -> x^k r**(-1) );
+tst56:= x^k r**(-1) - @(obj56);
+@collect_terms!(%);
+@assert(tst56);
+
+@reset.
+r::Coordinate.
+\partial{#}::PartialDerivative.
+r::Depends(\partial).
+{k,m}::Indices.
+obj57:= \partial_{r}{r};
+@substitute!(%)( \partial_{k}{r} -> x^k r**(-1) );
+tst57:= \partial_{r}{r} - @(obj57);
+@collect_terms!(%);
+@assert(tst57);
+
+# Test 58 - 60: 1's
+#
+@reset.
+obj58:= f**a;
+@substitute!(%)( a-> 1);
+tst58:= f - @(obj58);
+@collect_terms!(%);
+@assert(tst58);
+
+@reset.
+obj59:= f**a;
+@substitute!(%)( f-> 1);
+tst59:= 1 - @(obj59);
+@collect_terms!(%);
+@assert(tst59);
+
+@reset.
+obj60:= a* f**b * c;
+@substitute!(%)( f-> 1);
+tst60:= a*c - @(obj60);
+@collect_terms!(%);
+@assert(tst60);
+
+# Test 61: handling of patterns as base names
+#
+@reset.
+{\mu,\nu,\rho}::Indices(vector).
+obj61:= \epsilon_{\mu} \epsilon_{\nu} A^{\mu} B^{\nu};
+@substitute!!(%)( B?_{\mu} A?^{\mu} -> \dot(B?)(A?) );
+tst61:= \dot(\epsilon)(A) \dot(\epsilon)(B) - @(obj61);
+@collect_terms!(%);
+@assert(tst61);
+
+@substitute!!(obj61)( \dot(A?)(B?) -> A?_{\mu} B?^{\mu} );
+tst62:= \epsilon_{\mu} A^{\mu} \epsilon_{\nu} B^{\nu} - @(obj61);
+@collect_terms!(%);
+@assert(tst62);
+

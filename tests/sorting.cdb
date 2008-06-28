@@ -1,0 +1,44 @@
+
+# Sorting can be done with or without taking into account the 
+# numbers used to label dummy indices. 
+
+A_{?}::Commuting.
+
+obj:=  A_{d3 d2 d1} A_{d7 d8 a1};
+# @prodsort!(%){IgnoreNumbers};
+# tst1:= A_{d7 d8 a1} A_{d3 d2 d1} - @(obj):
+# @collect_terms!(%);
+# @assert(tst1);
+
+@prodsort!(obj);
+tst2:= A_{d3 d2 d1} A_{d7 d8 a1} - @(obj):
+@collect_terms!(%);
+@assert(tst2);
+
+# Test 2: Inheritance
+@reset.
+\Gamma_{#}::GammaMatrix. 
+\psi::Spinor.
+D_{#}::Derivative.
+\bar{#}::DiracBar.
+obj2:= \bar{\psi} * \Gamma_{m n p} * D_{p}{\psi};
+@prodsort!(%);
+tst2:= \bar{\psi} * \Gamma_{m n p} * D_{p}{\psi} - @(obj2);
+@collect_terms!(%);
+@assert(tst2);
+
+# Test 3: Powers.
+@reset.
+{ y, y**n?, x, x**n? }::SortOrder.
+obj3:= x**4 y**4;
+@prodsort!(%);
+tst3:= y**4 x**4 - @(obj3);
+@collect_terms!(%);
+@assert(tst3);
+
+@reset.
+F_{a b}::AntiSymmetric.
+F1_{a b}::AntiSymmetric.
+obj4:= F1_{a b}F_{c d}:
+@prodsort!(%);
+

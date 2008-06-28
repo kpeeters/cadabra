@@ -1,0 +1,19 @@
+
+obj1:= a*b+a*c+d;
+@factorise!(%){b,c};
+tst1:= (b+c)*a+d-@(obj1);
+@collect_terms!(%);
+@assert(tst1);
+
+obj2:= 2*a+b*a;
+@factorise!(%){b};
+tst2:= (2+b)*a-@(obj2);
+@collect_terms!(%);
+@assert(tst2);
+
+obj3:= 3*a*b + 5*c*b;
+@factorise!(%){a,c};
+tst3:= (3 a + 5 c) b - @(obj3);
+@collect_terms!(%);
+@assert(tst3);
+

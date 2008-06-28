@@ -1,0 +1,52 @@
+::KeepHistory(false).
+
+{m,n,p,q,r,s,t,u,v,w,a,b,c,d,e,f}::Indices(vector).
+{m,n,p,q,r,s,t,u,v,w,a,b,c,d,e,f}::Integer(0..9).
+
+R_{m n p q}::RiemannTensor.
+
+basisR3:= R_{m n p q} R_{r s t u} R_{v w a b} R_{c d e f};
+@all_contractions(%);
+
+FR3a:= R R R:
+@substitute!(%)( R -> R_{m n m n}, R_{m n} -> R_{m p n p} );
+FR3b:= R R_{m n} R_{m n};
+@substitute!(%)( R -> R_{m n m n}, R_{m n} -> R_{m p n p} );
+FR3c:= R_{p q} R_{p r} R_{q r};
+@substitute!(%)( R -> R_{m n m n}, R_{m n} -> R_{m p n p} );
+FR3d:= R_{p q} R_{r s} R_{p r q s};
+@substitute!(%)( R -> R_{m n m n}, R_{m n} -> R_{m p n p} );
+FR3e:= R R_{p q r s} R_{p q r s};
+@substitute!(%)( R -> R_{m n m n}, R_{m n} -> R_{m p n p} );
+FR3f:= R_{p q} R_{r s t p} R_{r s t q};
+@substitute!(%)( R -> R_{m n m n}, R_{m n} -> R_{m p n p} );
+FR3g:= R_{p q r s} R_{p q t u} R_{r s t u};
+FR3h:= R_{p q r s} R_{p t r u} R_{q t s u};
+
+@decompose(FR3a){ @(basisR3) };
+@decompose(FR3b){ @(basisR3) };
+@decompose(FR3c){ @(basisR3) };
+@decompose(FR3d){ @(basisR3) };
+@decompose(FR3e){ @(basisR3) };
+@decompose(FR3f){ @(basisR3) };
+@decompose(FR3g){ @(basisR3) };
+@decompose(FR3h){ @(basisR3) };
+
+
+R_{m n m n} R_{p q p q} R_{r s r s};
+@canonicalise!(%);
+
+
+FR3g:= \{4, 0, 0, 0, 0, 0, 0, 0\};
+FR3b:= \{0, 1, 0, 0, 0, 0, 0, 0\};
+FR3d:= \{0, 0, 1, 0, 0, 0, 0, 0\};
+FR3f:= \{0, 0, 0, 2, 0, 0, 0, 0\};
+FR3e:= \{0, 0, 0, 0, 1, 0, 0, 0\};
+FR3c:= \{0, 0, 0, 0, 0, (-1), 0, 0\};
+FR3h:= \{0, 0, 0, 0, 0, 0, 1, 0\};
+FR3a:= \{0, 0, 0, 0, 0, 0, 0, 1\};
+
+
+FR3d:= R_{p m q m} * R_{r n s n} * R_{p q r s};
+@canonicalise(%);
+ZERO!?!?

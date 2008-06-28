@@ -1,0 +1,27 @@
+
+@procedure{proc1};
+@distribute!(%);
+@procedure_end;
+
+obj1:= a (b+c) + d (e + f) + (g + h) (i + j);
+@call{proc1}{100};
+tst1:= a b + a c + d e + d f + g i + h i + g j + h j - @(obj1);
+@collect_terms!(%);
+@assert(tst1);
+
+
+# Check that property lines terminated with '.' get discarded
+# properly.
+
+@reset;
+
+@procedure{proc2};
+a_{a b c d}::Symmetric.
+@indexsort!(%):
+@collect_terms!(%):
+@procedure_end;
+
+obj2:= @asym[q*a_{a b c d}]{_a,_b,_c,_d}:
+@call{proc2}{100};
+@collect_terms!(%);
+@assert(obj2);

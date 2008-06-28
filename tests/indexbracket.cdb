@@ -1,0 +1,76 @@
+
+
+
+# Test 1:= Brackets with a sum and the same external index or indices.
+#
+# obj1:= (a+b)_\mu + (c+d)_\mu;
+# @combine!(%);
+# tst1:= (a+b+c+d)_\mu - @(obj1);
+# @collect_terms!(%);
+# @assert(tst1);
+
+
+# Test 2: Brackets in a product, with summed outer indices.
+#
+@reset.
+obj2:= (\Gamma_r)_{\alpha\beta} (\Gamma_{s t u})_{\beta\gamma};
+@combine!(%);
+tst2:= (\Gamma_r \Gamma_{s t u})_{\alpha\gamma} - @(obj2);
+@collect_terms!(%);
+@assert(tst2);
+
+obj3:= (\Gamma_r)_{\alpha\beta} Q_\beta;
+@combine!(%);
+tst3:= (\Gamma_r Q)_{\alpha} - @(obj3);
+@collect_terms!(%);
+@assert(tst3);
+
+
+# Expand
+#
+@reset.
+{\alpha, \beta, \gamma, \delta}::Indices(spinor).
+\Gamma{#}::GammaMatrix.
+Q::ImplicitIndex.
+obj4:= (\Gamma_r Q)_\alpha;
+@expand!(%);
+tst4:= (\Gamma_r)_{\alpha\beta} Q_{\beta} - @(obj4);
+@collect_terms!(%);
+@assert(tst4);
+
+@reset.
+A::Matrix.
+B::ImplicitIndex.
+{m,n,p}::Indices(vector).
+obj5:= (A B)_{m};
+@expand(%);
+tst5:= A_{m n} B_{n} - @(obj5);
+@collect_terms!(%);
+
+@reset.
+A::ImplicitIndex.
+B::Matrix.
+{m,n,p}::Indices(vector).
+obj5:= (A B)_{m};
+@expand(%);
+tst5:= A_{n} B_{n m} - @(obj5);
+@collect_terms!(%);
+
+@reset.
+B::Matrix.
+C::ImplicitIndex.
+{m,n#}::Indices(vector).
+obj6:= (A C D B)_{m};
+@expand(%);
+tst6:= A C_{n1} D B_{n1 m} - @(obj6);
+@collect_terms!(%);
+
+@reset.
+{A,B}::Matrix.
+{m,n,p}::Indices(vector).
+obj7:= (A B)_{m n};
+@expand!(%);
+tst7:= A_{m p} B_{p n} - @(obj7);
+@collect_terms!(%);
+@assert(tst7);
+

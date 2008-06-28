@@ -1,0 +1,17 @@
+Abandoned ideas:
+
+- Patterns:
+
+       a?VectorIndex     labelled name with property
+       a??VectorIndex    labelled object with property
+       ?VectorIndex      unlabelled name with property
+
+	    a?  | @@type(a?,VectorIndex)
+       a?  | @@regex(a?,"B[0-9]*")
+
+   But for the time being we could do with
+
+         a? | \type{a?}{VectorIndex}
+
+   and catch it just like we catch \regex.
+

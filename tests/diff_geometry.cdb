@@ -1,0 +1,17 @@
+
+# This has all not yet been implemented.
+#
+#
+# d::DifferentialD({x,y,z},dimension=3).
+# 
+# A:= f(x) d[y];
+# d[@(A)];
+# 
+# A(phi) d[phi] ^ B(psi) d[psi];
+# 
+# d[ @(%) ];
+
+# \diff{f(x)}{x};
+#
+# f::Depends(x).
+# \diff{f}{x};

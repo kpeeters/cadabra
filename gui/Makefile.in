@@ -1,0 +1,53 @@
+
+.PHONY: all 
+
+MACTEST= @MAC_OS_X@
+
+all: xcadabra 
+
+static: xcadabra_static
+
+OBJS   = window.o main.o
+CFLAGS = -O2 -I. -I@top_srcdir@/include `pkg-config modglue --cflags` `pkg-config --cflags gtkmm-2.4` \
+         `pkg-config --cflags pango`
+SRCS   = `find . -name "*.cc"`
+TIMESTAMP = -D"RELEASE=\"${RELEASE}\"" -D"DATETIME=\"`date | sed -e 's/  / /'`\"" -DHOSTNAME=\"`hostname`\"
+
+%.o: %.cc
+	@CXX@ -Wall @CFLAGS@ -D"DESTDIR=\"@prefix@\"" ${TIMESTAMP} ${CFLAGS} -c -o $@ $<
+
+main.o: $(OBJS) Makefile
+
+xcadabra: $(OBJS)
+	@CXX@ -o xcadabra `pkg-config modglue --libs` `pkg-config --libs gtkmm-2.4` $+ 
+
+xcadabra_static: $(OBJS)
+	@CXX@ -o xcadabra -static $+  -L@prefix@/lib `pkg-config modglue --libs` \
+                    `pkg-config --libs gtkmm-2.4` `pkg-config libxml++-2.6` \
+                    -lpthread -lexpat
+
+install:
+ifeq ($(strip $(MACTEST)),)
+	strip xcadabra
+endif
+	install -d ${DESTDIR}@prefix@/bin
+	install -m 0755 xcadabra ${DESTDIR}@prefix@/bin
+	install -d ${DESTDIR}@prefix@/share/texmf/tex/latex/cadabra
+	install tableaux.sty $(DESTDIR)@prefix@/share/texmf/tex/latex/cadabra/tableaux.sty
+
+uninstall:
+	rm -f ${DESTDIR}@prefix@/bin/xcadabra
+
+clean:
+	rm -f *~ *.o xcadabra spawner multi
+
+distclean: clean
+	rm -f Makefile .depend
+
+.depend:
+	rm -f .depend
+	for i in ${SRCS}; \
+		do    g++ -E -MM -MT `echo $$i | sed -e 's/\.\///' -e 's/\.cc/\.o/'` ${CFLAGS} $$i >> .depend; \
+		done
+
+include .depend

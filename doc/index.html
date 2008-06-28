@@ -1,0 +1,278 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" >
+
+<head>
+<title>Cadabra</title>
+<link rel="stylesheet" type="text/css" href="cadabra.css" /> 
+<link rel="shortcut icon" href="favicon.ico" /> 
+</head>
+
+<body>
+   <div class="header">
+		   <h1 class="intro">Cadabra</h1>
+			<h2 class="intro">A field-theory motivated approach to symbolic computer algebra</h2>
+			<h3 class="intro">Copyright &copy; 2001-2006  Kasper Peeters</h3>
+   </div>
+		<div class="section">
+		   <h2>Overview</h2>
+			<p>Cadabra is a computer algebra system (CAS) for the manipulation
+			of  <em>tensorial
+			expressions</em>. It is aimed at, though not necessarily
+			restricted to, theoretical high-energy physicists. Because of
+			its target audience, the program's interface, storage system
+			and underlying philosophy differ substantially from other
+			computer algebra systems.  Its main characteristics are:</p>
+			<ul>
+			<li> Usage of a TeX-like notation, which eliminates many
+			  errors in transcribing problems from paper to computer and back.</li>
+			<li> Built-in understanding of dummy indices and dummy
+			  symbols, including their automatic relabelling when necessary.
+			  Powerful algorithms for canonicalisation of objects with index
+			  symmetries, both mono-term and multi-term.</li>
+			<li> A typing system through properties, but freedom to dispense
+			  with this system entirely when it is not needed.</li>
+			<li> A new way to deal with products of non-commuting objects,
+			  enabling a notation which is identical to standard physicist's
+			  notation (i.e.&nbsp;no need for special non-commuting product operators).</li>
+			<li> A flexible optional undo system. Interactive calculations
+			 can be undone to arbitrary level without requiring a full
+			 re-evaluation of the entire calculation.</li>
+			<li> A simple and documented way to add new algorithms in
+			  the form of C++ modules, which directly operate on the internal
+			  expression tree.</li>
+			</ul>
+			<p>Cadabra has been under development for some time now, but
+         has never left my own computer.  The current version is the
+         first public release, intended to collect feedback from a
+         wider audience. So, feel free to mail me at
+         <tt>kasper.peeters&nbsp;(at)&nbsp;aei.mpg.de</tt> with
+         suggestions or constructive criticism.
+			</p>
+			</div>
+		<div class="section">
+		   <h2>License and acknowledgements</h2>
+			<p>If you use cadabra or even just play with it, I would like
+			to hear about it. Please drop me an email so that I can get an
+			idea of who is interested in this program.</p>
+			<p>Cadabra is available under the conditions of the <a
+			href="http://www.gnu.org/copyleft/gpl.html">GNU General
+			Public License</a>. If you use cadabra in your own work,
+			please cite the paper mentioned below (to keep the bean
+			counters happy).</p>
+         <p>Cadabra contains code taken from Jos&eacute;
+ 		      Martin-Garcia's <a
+ 		      href="http://metric.iem.csic.es/Martin-Garcia/xAct/index.html">xPerm</a>
+ 		      in order to canonicalise tensor expressions. Some of
+ 		      the algorithms rely on the <a
+ 		      href="http://young.sp2mi.univ-poitiers.fr/~marc/LiE/">LiE</a>
+ 		      software by Marc van Leeuwen, Arjeh Cohen and Bert Lisser.</p>
+		</div>
+		<div class="section">
+		   <h2>Screenshots</h2>
+			<p>Cadabra comes with its own graphical frontend, which is
+			based on the gtk toolkit (or rather its C++ wrapper gtkmm) and uses
+			LaTeX to typeset expressions. This is a screenshot:</p>
+			<p><a href="showcase4.png"><img src="showcase4.png"
+			height=400 alt="native gui" /></a></p>
+			<p>There is also a <a
+			href="http://www.texmacs.org">TeXmacs</a> frontend, displayed
+			in the screenshots below. The associated TeXmacs
+			files can be found in the "texmacs" subdirectory of the
+			source tarball.</p>
+			<p><a href="showcase1.png"><img src="showcase1.png"
+		height="400" alt="screenshot 1" /></a>&nbsp;&nbsp;<a
+		href="showcase3.png"><img src="showcase3.png" height="400"
+		alt="screenshot 2"/></a></p>
+		</div> 
+		<div class="section">
+		   <h2>Install a binary</h2>
+			<p><strong>(note: there are no binaries or packages
+			yet for the new graphical frontend)</strong></p>
+			<p>First check below whether there is a package for your
+			system, which is always the easiest installation method.</p>
+         <p>If you are running Linux (on an Intel processor) or Mac OS&nbsp;X, the
+			next simplest way to install cadabra is to install a
+			statically linked binary. You need to download two programs,</p>
+			<table class="downloads">
+         <tr><th>Linux, i386</th><th>Mac OS X, PPC</th></tr>
+         <tr><td><a href="prompt.gz">prompt.gz</a></td>
+             <td><a href="osx/prompt.gz">prompt.gz</a></td></tr>
+			<tr><td><a href="CDBRELEASE.gz">CDBRELEASE.gz</a></td>
+			    <td><a href="osx/CDBRELEASE.gz">CDBRELEASE.gz</a></td></tr>
+			</table>
+			<p>gunzip them both and make them executable with "<tt>chmod
+		u+x prompt cadabra</tt>". Put them somewhere in your path. Then
+		the command "<tt>prompt cadabra</tt>" should start the program
+		(or <tt>./prompt ./cadabra</tt> if the current directory is not
+		in your path); if not, email me.</p>
+		   <p>If you want to use the <a
+		href="http://www.texmacs.org">TeXmacs</a> frontend, you will
+		also need the following file:</p>
+		<ul>
+		<li><a href="init-cadabra.scm">init-cadabra.scm</a></li>
+		</ul>
+      <p>Store this file in the directory
+      <tt>~/.TeXmacs/plugins/cadabra/progs/</tt> and restart TeXmacs.</p>
+		<p>Alternatively you can try to locate the <tt>TeXmacs/plugins</tt> directory on your filesystem
+		(it is usually something like
+		<tt>/usr/share/TeXmacs/plugins</tt>), and make a (nested) subdirectory
+		<tt>cadabra/progs</tt> below that. Then copy the
+		<tt>init-cadabra.scm</tt> file to this directory and (re)start TeXmacs.</p>
+		</div>
+		<div class="section">
+		   <h2>Install using Debian, Red Hat, MacPorts, ...</h2>
+         <p>Thanks to Greg Wright, cadabra is available for Mac OS X users through <a
+			href="http://macports.org">MacPorts</a>.
+         Simply type <tt class="cmd">sudo port install cadabra</tt> and all
+         required software will be installed automatically. For
+			questions about this port, please contact <tt>gwright&nbsp;(at)&nbsp;macports.org</tt>.</p>
+         <p>Debian and RPM packages will follow in the near
+        future.</p>
+      </div>
+		<div class="section">
+		   <h2>Install from source</h2>
+			<p>Installing from source should be no harder than with any
+   		other well-behaved GNU tools, i.e.&nbsp;it should be as
+   		simple as configure/make/make install. However, you will need
+   		to have some additional libraries and tools installed before
+   		you can compile cadabra itself. In particular,</p>
+			<ul>
+			<li><a href="http://www.tcl.tk">tcl8.4</a> with <a
+   		href="http://expect.nist.gov/">libexpect</a></li> (on Debian,
+   		<tt>apt-get install tcl8.4 expect-dev</tt>)
+<!--			<li><a href="http://www.gtk.org/">glib</a></li> -->
+         <li><a href="http://www.swox.com/gmp/">gmp</a> (configured
+   		with <tt>--enable-cxx</tt>)</li> (on Debian, <tt>apt-get
+   		install libgmp3-dev libgmpxx3</tt>)
+			<li><a href="http://www.pcre.org/">pcre</a> with C++ wrapper enabled (on Debian,
+   		<tt>apt-get install libpcre3-dev lib</tt>)
+			<li><a
+   		href="http://young.sp2mi.univ-poitiers.fr/~marc/LiE/">LiE</a></li>
+   		(no Debian package available)
+			</ul>
+			<p>In order to compile the graphical front-end (add the
+			--enable-gui flag to configure) you also need</p>
+			<ul>
+			<li>gtk+</li>
+			<li>gtkmm</li>
+			<li>pangomm</li>
+			<li>dvipng</li>
+			<li>LaTeX</li>
+			<li>the breqn package for LaTeX</li>
+			</ul>
+			<p>Cadabra's configure
+			script will look for these libraries and programs, and tell
+			you when you need to install them. Consult the documentation
+			of these programs/libraries for installation
+			instructions.</p>
+			<p>You then need to compile and install my modglue library,
+			which is used to connect the various pieces of cadabra
+			together. Download this version here, since it's tuned to cadabra:</p>
+			<ul>
+			<li><a href="MODGLUERELEASE.tar.gz">MODGLUERELEASE.tar.gz</a></li>
+			</ul>
+			<p>This should be a matter of configure/make/make install. 
+			Finally, compile and install cadabra itself,</p>
+			<ul>
+			<li><a href="CDBRELEASE.tar.gz">CDBRELEASE.tar.gz</a></li>
+			</ul>
+			<p>Again, this should be a matter of configure/make/make
+			install. If compilation succeeds, you can also try "make
+			test" for some self-tests (which should all pass).</p>
+			<p>Since this is the first public release, chances are that
+		   some people will encounter problems at one of these
+		   steps. Please mail me if you need help.</p>
+		</div>
+<!--		<div class="section">
+		   <h2>Install a Debian package</h2>
+			<p>If you run Debian or a Debian-based Linux distribution (e.g.&nbsp;Ubuntu) you
+       		can grab the package file and install that directly. You
+       		will also need to install the LiE and pcre++ packages
+       		(these do not yet exist in the Debian repository) and the
+       		modglue package, all available from this site:</p>
+			  <ul>
+				 <li><a href="lie_2.2.2-1_i386.deb">lie_2.2.2-1_i386.deb</a></li>
+				 <li><a href="pcre++_2.2.2-1_i386.deb">pcre++_2.2.2-1_i386.deb</a></li>
+				 <li><a href="modglue_1.0-1_i386.deb">modglue_1.0-1_i386.deb</a></li>
+				 <li><a href="cadabra_1.0-1_i386.deb">cadabra_1.0-1_i386.deb</a></li>
+				 </ul>
+			  <p>These packages are a bit of an early experiment, so let me
+			  know if you encounter problems.</p>
+		</div>
+				-->
+		<div class="section">
+		   <h2>Documentation</h2>
+			<p>There are currently two documents about cadabra. One is
+			  a paper explaining the motivation for writing this software,
+			  as well as sketching the internal structure:</p>
+         <blockquote class="reference">
+         <div class="author">Kasper Peeters</div>
+			<div class="title"><a href="paper.ps.gz">A field-theory
+			  motivated approach to symbolic computer algebra</a></div>
+			<div class="pubinfo"><a href="http://arxiv.org/abs/cs.SC/0608005">cs.SC/0608005</a></div>
+         </blockquote>
+			<p>The second document is the reference guide and tutorial, 
+			available only from here, and still incomplete,</p>
+         <blockquote class="reference">
+         <div class="author">Kasper Peeters</div>
+			<div class="title"><a href="cadabra.ps.gz">Cadabra: reference 
+				 guide and tutorial</a></div>
+		   <div class="pubinfo">preprint AEI-2006-038</div>
+         </blockquote>
+			<p>Finally, if you are interested in the internals of the program, there is some <a
+		href="doxygen/html/index.html">doxygen documentation</a>, though
+		this is still in a rather preliminary stage.</p>
+         <p>For a history of the changes made since the first release,
+		consult the <a href="ChangeLog">ChangeLog</a>.</p>
+		</div>
+		<div class="section">
+		   <h2>Mailing list</h2>
+         <p>There is a mailing list for discussions about cadabra and
+         announcements of new versions (hosted by <a
+         href="http://www.hepforge.org">HEPforge</a>). To subscribe, send an email to</p>
+        <blockquote class="screen">
+        <div>majordomo@cedar.ac.uk</div>
+        </blockquote>
+        <p>with a body containing the line</p>
+        <blockquote class="screen">
+        <div>subscribe cadabra-discuss</div>
+        </blockquote>
+        <p>You will receive a confirmation email to which you have to
+      reply, quoting the given authentication key, in order to get
+      subscribed.</p>
+		<p>There is also an <a href="list/maillist.html">archive of the
+      mailing list</a> available.</p>
+      </div>
+<div class="footer">
+ <a href="http://validator.w3.org/check?uri=referer"><img
+        src="http://www.w3.org/Icons/valid-xhtml10"
+        alt="Valid XHTML 1.0 Strict" style="border:0;width:88px;height:31px" /></a>
+ <a href="http://jigsaw.w3.org/css-validator/check/referrer">
+  <img style="border:0;width:88px;height:31px"
+       src="http://jigsaw.w3.org/css-validator/images/vcss" 
+       alt="Valid CSS!" /></a>
+&nbsp;&nbsp;&nbsp;
+<div class="divcounter">
+<!-- Start of StatCounter Code -->
+<script type="text/javascript">
+<!-- 
+var sc_project=1732354; 
+var sc_invisible=0; 
+var sc_partition=16; 
+var sc_security="0a9e55b3"; 
+var sc_text=1; 
+//-->
+</script>
+<script type="text/javascript" src="http://www.statcounter.com/counter/counter_xhtml.js"></script>
+<noscript><div><a class="statcounter"
+      href="http://www.statcounter.com/"><img class="statcounter"
+      src="http://c17.statcounter.com/counter.php?sc_project=1732354&amp;java=0&amp;security=0a9e55b3&amp;invisible=0"
+      alt="web stats analysis" /></a></div></noscript>&nbsp;visitors
+      so far
+<!-- End of StatCounter Code -->
+</div>
+</div>
+</body>
+
+</html>

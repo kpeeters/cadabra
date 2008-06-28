@@ -1,0 +1,36 @@
+#
+# The 2nd tutorial in the manual. Tests inheritance and the AntiCommuting property.
+#
+
+{\del{#}, \delbar{#}, \pdelbar{#}, \pdel{#}}::Derivative.
+{\Psi_\mu, \Psibar_\mu, \eps, \epsbar}::AntiCommuting.
+{\Psi_\mu, \Psibar_\mu, \eps, \epsbar}::SelfAntiCommuting.
+{\Psi_\mu, \Psibar_\mu, X_\mu}::Depends(\del,\delbar).
+{\Psi_\mu, \Psibar_\mu, \eps, \epsbar, X_\mu, i}::SortOrder.
+
+
+action:= \del{X_\mu} \delbar{X_\mu} 
+        + i \Psi_\mu \delbar{\Psi_\mu} + i \Psibar_\mu \del{\Psibar_\mu};
+
+@vary!(%)( X_\mu       ->   i \epsbar \Psi_\mu + i \eps \Psibar_\mu,
+           \Psi_\mu    -> - \epsbar \del{X_\mu},
+           \Psibar_\mu -> - \eps \delbar{X_\mu} );
+
+@distribute!(%);
+@prodrule!(%);
+@distribute!(%);
+@unwrap!(%);
+@prodsort!(%);
+
+@substitute!(%)( \del{\delbar{X_{\mu}}} -> \pdelbar{\del{X_{\mu}}} );
+@substitute!(%)( \delbar{\del{X_{\mu}}} -> \pdel{\delbar{X_{\mu}}} );
+@pintegrate!(%){ \pdelbar };
+@pintegrate!(%){ \pdel };
+@rename!(%){"\pdelbar"}{"\delbar"};
+@rename!(%){"\pdel"}{"\del"};
+@prodrule!(%);
+@distribute!(%);
+@unwrap!(%);
+@prodsort!(%);
+@collect_terms!(%);
+@assert(action);

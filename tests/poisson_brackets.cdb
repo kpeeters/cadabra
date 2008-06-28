@@ -1,0 +1,11 @@
+# Example based on ...
+
+{ s, s' }::Coordinate.
+\partial{#}::PartialDerivative.
+{ X^{\mu}(s), 
+
+bracket1:= { \Pi_{\mu}(s), \Psiplus^{\nu}(s') }  -> \Omegaplus^{\nu}_{\mu\rho} \Psiplus^{\rho} \delta(s-s');
+bracket2:= { \Pi_{\mu}(s), \Psiminus^{\nu}(s') } -> \Omegaminus^{\nu}_{\mu\rho} \Psiminus^{\rho} \delta(s-s');
+bracket3:= { \Pi_{\mu}(s), \Pi_{\nu}(s') }       -> (i/2) ( Rplus_{\mu\nu\rho\lambda} \Psiplus^{\rho} \Psiplus^{\lambda} 
+                                                          + Rminus_{\mu\nu\rho\lambda} \Psiminus^{\rho} \Psiminus^{\lambda}
+                                                          + 2i H_{\mu\nu\lambda} \partial_{s}{X^{\lambda}} ) \delta(s-s');

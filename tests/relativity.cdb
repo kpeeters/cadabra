@@ -1,0 +1,212 @@
+W_{m n p q}::WeylTensor.
+W^{m n p q}::WeylTensor.
+F_{a b}::AntiSymmetric.
+F^{a b}::AntiSymmetric.
+
+# Test the Weyl/Riemann index ordering algorithm:
+#
+obj1:= W_{b2 b1 a1 a2};
+@indexsort(%);
+tst1:= W_{a1 a2 b1 b2} + @(obj1);
+@collect_terms!(%);
+@assert(tst1);
+
+# Test use of the Ricci identity, first with explicit
+# lists of anti-symmetric indices:
+#
+obj2:= W_{a b c d};
+@riemann_index_regroup!(%){b,d}{c,a};
+tst2:= (1/2)*W_{a c b d}-@(obj2);
+@collect_terms!(%);
+@assert(tst2);
+
+@pop(obj2);
+@riemann_index_regroup!(%){b,c};
+tst3:= (1/2)*W_{a d c b}-@(obj2);
+@collect_terms!(%);
+@assert(tst3);
+
+@pop(obj2);
+@riemann_index_regroup!(%){a,c};
+tst4:= (1/2)*W_{a c b d}-@(obj2);
+@collect_terms!(%);
+@assert(tst4);
+
+@pop(obj2);
+@riemann_index_regroup!(%){a,d};
+tst5:= (1/2)*W_{a d c b}-@(obj2);
+@collect_terms!(%);
+@assert(tst5);
+
+# And then with index anti-symmetry imposed by contracting tensors:
+#
+obj3:= W_{a b c d}*F^{a d};
+@riemann_index_regroup!(%);
+tst6:= (1/2)*W_{a d c b}*F^{a d}-@(obj3);
+@collect_terms!(%);
+@assert(tst6);
+
+obj4:= W_{a b c d}*W^{a d g h};
+@riemann_index_regroup!(%);
+tst7:= (1/2)*W_{a d c b}*W^{a d g h}-@(obj4);
+@collect_terms!(%);
+@assert(tst7);
+
+
+# Test 5: split_index
+#
+A_{#}::Symmetric.
+B_{#}::Symmetric.
+{M,N,P,Q,R,S,T,U}::Indices(full).
+{m,n,p,q,r,s,t,u}::Indices(part1, parent=full).
+{a,b,c,d,e,f,g,h,i}::Indices(part2, parent=full).
+obj5:= A_{M N Q} B_{Q N P};
+@split_index!(%){M,m,a};
+@split_index!(%){M,m,a};
+@canonicalise!(%);
+@collect_terms!(%);
+tst5:= A_{M m n} B_{P m n} + 2 A_{M a m} B_{P a m} + A_{M a b} B_{P a b} - @(obj5);
+@collect_terms!(%);
+@assert(tst5);
+
+@reset;
+{M,N,P,Q,R,S,T,U}::Indices(full).
+{a,b,c,d,e,f,g,h,i}::Indices(part2).
+F_{#}::AntiSymmetric.
+obj5a:= F_{a 4} F_{4 a};
+@canonicalise!(%);
+tst5a:= F_{4 a} F_{4 a} + @(obj5a);
+@collect_terms!(%);
+@assert(tst5a);
+
+@reset;
+{M,N,P,Q,R,S,T,U}::Indices(full).
+{a,b,c,d,e,f,g,h,i}::Indices(part2).
+F_{#}::AntiSymmetric.
+obj6:= F_{M N} F_{N M};
+@split_index!(%){M,a,4};
+@split_index!(%){M,a,4};
+@canonicalise!(%);
+@rename_dummies!(%);
+@collect_terms!(%);
+tst6:= - F_{a b} F_{a b} - 2 F_{4 a} F_{4 a} - @(obj6);
+@collect_terms!(%);
+@assert(tst6);
+
+@reset;
+{\mu,\nu,\rho,\sigma}::Indices(full).
+{m,n,p,q}::Indices(space).
+\diff{#}::PartialDerivative.
+obj7:= \diff{A^{\mu}}_{\mu};
+@split_index!(%){\mu,m,4};
+tst7:= \diff{A^{m}}_{m} + \diff{A^{4}}_{4} - @(obj7);
+@collect_terms!(%);
+@assert(tst7);
+
+# Test 8:= Vielbeine and co.
+#
+@reset;
+{ m, n, p }::Indices(flat, position=fixed).
+{ \mu, \nu, \rho, \mu# }::Indices(curved).
+obj8a:= H_{m n p} [ B^{m n p} + H^{m n p} ];
+@rewrite_indices!(%){H_{\mu\nu\rho}}{e_{m \mu}};
+tst8a:= H_{\mu \nu \rho} * [B^{m n p} + H^{m n p}] * e_{m \mu} * e_{n \nu} * e_{p \rho} - @(obj8a);
+@collect_terms!(%);
+@assert(tst8a);
+
+@reset;
+{ m, n, p }::Indices(flat).
+{ \mu, \nu, \rho, \mu# }::Indices(curved, position=fixed).
+obj8b:= H_{m n p} [ B^{m n p} + H^{m n p} ];
+@rewrite_indices!(%){H_{\mu\nu\rho}}{e_{m \mu}};
+tst8b:= H_{m n p} [ B^{m n p} + H^{m n p} ] - @(obj8b);
+@collect_terms!(%);
+@assert(tst8b);
+
+@reset;
+{ m, n, p }::Indices(flat, position=fixed).
+{ \mu, \nu, \rho, \mu# }::Indices(curved, position=fixed).
+obj8c:= H_{m n p} [ B^{m n p} + H^{m n p} ];
+@rewrite_indices!(%){H_{\mu\nu\rho}}{e_{m}^{\mu}};
+tst8c:= H_{\mu \nu \rho} * [B^{m n p} + H^{m n p}] * e_{m}^{\mu} * e_{n}^{\nu} * e_{p}^{\rho} - @(obj8c);
+@collect_terms!(%);
+@assert(tst8c);
+
+@reset;
+{ m,n,p,q,r,s,t,u }::Indices(curved, position=fixed).
+obj8d:= B_{m n p} B^{m n q} C_{q};
+@rewrite_indices!(%){B_{m n p}}{g^{m n}};
+tst8d:= B_{m n p} B_{r s t} C_{q} g^{m r} g^{n s} g^{q t} - @(obj8d);
+@collect_terms!(%);
+@assert(tst8d);
+
+@reset;
+{ m,n,p,q,r,s,t,u }::Indices(curved, position=free).
+obj8e:= B_{m n p} B_{m n q} C_{q};
+@rewrite_indices!(%){B_{m n p}}{g^{m n}};
+tst8e:= B_{m n p} B_{m n q} C_{q} - @(obj8e);
+@collect_terms!(%);
+@assert(tst8e);
+
+# @reset;
+# { \hat{m},\hat{n},\hat{p},\hat{q},\hat{r},\hat{s},\hat{t},\hat{u} }::Indices(curved, position=fixed).
+# obj8e:= B_{\hat{m} \hat{n} \hat{p}} B^{\hat{m} \hat{n} \hat{q}} C_{\hat{q}};
+# @rewrite_indices!(%){B_{\hat{m} \hat{n} \hat{p}}}{g^{\hat{m} \hat{n}}};
+# tst8e:= B_{\hat{m} \hat{n} \hat{p}} B_{\hat{r} \hat{s} \hat{t}} C_{\hat{q}} 
+#         g^{\hat{m} \hat{r}} g^{\hat{n} \hat{s}} g^{\hat{q} \hat{t}} - @(obj8e);
+# @collect_terms!(%);
+# @assert(tst8e);
+
+# Test 9: Eliminating vielbeine.
+#
+@reset;
+{ m, n, p }::Indices(flat).
+{ \mu, \nu, \rho }::Indices(curved).
+e_{m \mu}::Vielbein.
+obj9:= H_{m n p} e_{m \mu};
+@eliminate_vielbein!(%){H_{\mu\nu\rho}};
+tst9:= H_{\mu n p} - @(obj9);
+@collect_terms!(%);
+@assert(tst9);
+
+@reset;
+{ m, n, p }::Indices(flat).
+{ \mu, \nu, \rho }::Indices(curved).
+e_{m\mu}::Vielbein.
+obj9b:= H_{\mu\nu\rho} e_{m\mu};
+@eliminate_vielbein!(%){H_{m n p}};
+tst9b:= H_{m\nu\rho} - @(obj9b);
+@collect_terms!(%);
+@assert(tst9b);
+
+# @rewrite_indices!(%){H_{\mu\nu\rho}}{e_{m}^{\mu}};
+# @rewrite_indices!(%){ preferred={H_{\mu\nu\rho}}, vielbein=e_{m}^{\mu} };
+#
+# This command notes that it can convert an upper 'm' into a lower '\mu'
+# or the other way around. It then looks up the 'm' property to find out
+# that the 'm' index is position_free, so that it can also do a
+# lower 'm' to a lower '\mu'. For \mu, we make the index position matter,
+# position=fixed.
+
+@reset;
+g_{m? n?}::Symmetric.
+obj11:= g_{5 4};
+@canonicalise!(%);
+tst11:= g_{4 5} - @(obj11);
+@collect_terms!(%);
+@assert(tst11);
+
+# Test 10: Eliminating metrics.
+@reset.
+{m, n, p, q, r}::Indices(vector, position=fixed).
+{m, n, p, q, r}::Integer(0..9).
+g_{m n}::Metric.
+g^{m n}::InverseMetric.
+g_{m}^{n}::KroneckerDelta.
+g^{m}_{n}::KroneckerDelta.
+obj10:= g_{m p} g^{p m};
+@eliminate_metric!(%);
+@eliminate_kr!(%);
+tst10:= 10 - @(obj10);
+@collect_terms!(%);
+@assert(tst10);

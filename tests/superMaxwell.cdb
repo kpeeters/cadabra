@@ -1,0 +1,59 @@
+
+
+# West's page 25 & 26, using his notation.
+
+@reset;
+{ a,b,c,d,e }::Indices(vector).
+\bar{#}::DiracBar.
+\partial{#}::PartialDerivative.
+{ A_{a}, f_{a b} }::Depends(\partial).
+{ \epsilon, \gamma_{#} }::Depends(\bar).
+\lambda::Depends(\bar, \partial).
+{ \lambda, \gamma_{#} }::NonCommuting.
+\lambda::SelfAntiCommuting.
+\gamma_{#}::GammaMatrix.
+\delta{#}::Accent.
+f_{a b}::AntiSymmetric.
+\delta_{a b}::KroneckerDelta.
+
+# The calculation
+
+susy:= { \delta{A_{a}}   = \bar{\epsilon} \gamma_{a} \lambda,
+         \delta{\lambda} = -(1/2) \gamma_{a b} \epsilon f_{a b}         };
+
+S:= -(1/4) f_{a b} f_{a b} - (1/2) \bar{\lambda} \gamma_{a} \partial_{a}{\lambda};
+
+@vary!(%)( f_{a b} -> \partial_{a}{\delta{A_{b}}} - \partial_{b}{\delta{A_{a}}},
+           \lambda -> \delta{\lambda} );
+
+@distribute!(%);
+@prodsort!(%); 
+@canonicalise!(%);
+@collect_terms!(%);
+
+@substitute!(%)( @(susy) );
+@prodrule!(%);
+@distribute!(%);
+@unwrap!(%);
+
+# now need to unwrap \bar{\gamma \epsilon} and do majorana flip
+
+@substitute!(%)( \partial{f_{a b}}_{c} -> \ppartial{f_{a b}}_{c} );
+@pintegrate!(%){\ppartial};
+@rename!(%){\ppartial}{\partial};
+@prodrule!(%);
+@unwrap!(%);
+
+@join!(%);
+@distribute!(%);
+@eliminate_kr!(%);
+
+
+# Need to collect factors, too!
+
+# this declaration does not work:
+{ A_{a}, f_{a b}, \lambda }::Depends(\partial).
+{ \lambda, \epsilon }::Depends(\bar).
+
+# this neither!!!
+{ \epsilon }::Depends(\bar).

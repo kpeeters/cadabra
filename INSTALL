@@ -1,0 +1,9 @@
+
+To install `cadabra', do
+
+   ./configure
+   make
+   make install
+
+as usual. If you want it installed in a different directory
+than /usr/local, use the --prefix option to configure.

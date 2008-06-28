@@ -1,0 +1,409 @@
+
+#include "props.hh"
+#include "modules/dummies.hh"
+#include <stdlib.h>
+#include <typeinfo>
+#include <iostream>
+
+properties::property_map_t            properties::props;
+properties::pattern_map_t             properties::pats;
+properties::registered_property_map_t properties::registered_properties;
+
+void properties::register_properties()
+	{
+	register_property(&create_property<IndexInherit>);
+	register_property(&create_property<PropertyInherit>);
+	}
+
+pattern::pattern()
+	{
+	}
+
+pattern::pattern(const exptree::iterator_base& it)
+	: obj(it), headnode(it->name)
+	{
+	}
+
+bool pattern::match(const exptree::iterator& it) const
+	{
+	// Special case for range wildcards.
+	if(it->name==obj.begin()->name && children_wildcard()) {
+		exptree::iterator hm=obj.begin(obj.begin());
+		if(exptree::number_of_children(hm)==0) {
+			return true; // # without arguments
+			}
+		exptree::iterator hmarg=hm.begin();
+		exptree::iterator seqarg=hm; 
+		const Indices *ind=0;
+
+		if(*hmarg->name=="\\comma" || *hmarg->name!="\\sequence") {
+			exptree::iterator stt=hmarg;
+			if(*hmarg->name=="\\comma") {
+				stt=hmarg.begin();
+				seqarg=hmarg.begin();
+				seqarg.skip_children();
+				++seqarg;
+				}
+			ind=properties::get<Indices>(stt);
+			}
+		else seqarg=hmarg;
+
+		if(seqarg!=hm) {
+			exptree::sibling_iterator seqit=seqarg.begin();
+			unsigned int from=to_long(*seqit->multiplier);
+			++seqit;
+			unsigned int to  =to_long(*seqit->multiplier);
+
+			if(exptree::number_of_children(it)<from ||
+				exptree::number_of_children(it)>to ) 
+				return false;
+			}
+		
+		if(ind!=0) {
+			exptree::sibling_iterator indit=it.begin();
+			while(indit!=it.end()) {
+				const Indices *gi=properties::get<Indices>(indit);
+				if(gi!=ind) {
+					return false;
+					}
+				++indit;
+				}
+			}
+		
+		return true;
+		}
+
+	// Cases without range wildcard.
+// txtout << "comparing " << *obj.begin()->name << " " << *it->name << std::endl;
+//	exptree::print_recursive_treeform(txtout, obj.begin());
+//	exptree::print_recursive_treeform(txtout, it);
+	int res=subtree_compare(it, obj.begin(), 0, true, 0);
+	if(abs(res)<=1) {
+//		 txtout << "match!" << std::endl;
+		 return true;
+		 }
+
+	return false;
+	}
+
+bool pattern::children_wildcard() const	
+	{
+	if(exptree::number_of_children(obj.begin())==1) 
+		if(obj.begin(obj.begin())->is_range_wildcard())
+			return true;
+	return false;
+	}
+
+bool properties::has(const property_base *pb, exptree::iterator it) 
+	{
+	std::pair<property_map_t::iterator, property_map_t::iterator> pit=props.equal_range(it->name);
+	while(pit.first!=pit.second) {
+//		txtout << *it->name << std::endl;
+//		txtout << typeid(pit.first->second.second).name() << " versus " 
+//				 << typeid(pb).name() << std::endl;
+		if(typeid(*(pit.first->second.second))==typeid(*pb) && 
+			pit.first->second.first->match(it))  // match found
+			return true;
+		++pit.first;
+		}
+	return false;
+	}
+
+void properties::clear() 
+	{
+	// Clear and free the property lists. Since pointers to properties can
+	// be shared, we use the pats map and make sure that we only free each
+	// property* pointer once.
+	pattern_map_t::const_iterator it=pats.begin();
+	const property_base *previous=0;
+	while(it!=pats.end()) {
+		 if(previous!=it->first) {
+			  previous=it->first;
+			  delete it->first;
+			  }
+		 delete it->second;
+		 ++it;
+		 }
+	props.clear();
+	pats.clear();
+	}
+
+void properties::register_property(property_base* (*fun)())
+	{
+	property_base *tmp=fun(); // need a property object of this type temporarily to retrieve the name
+	registered_properties[tmp->name()]=fun;
+	delete tmp; 
+	}
+
+keyval_t::const_iterator keyval_t::find(const std::string& key) const
+	{
+	keyval_t::const_iterator it=keyvals.begin();
+	while(it!=keyvals.end()) {
+		 if(it->first==key)
+			  break;
+		 ++it;
+		 }
+	return it;
+	}
+
+keyval_t::const_iterator keyval_t::begin() const
+	{
+	return keyvals.begin();
+	}
+
+keyval_t::const_iterator keyval_t::end() const
+	{
+	return keyvals.end();
+	}
+
+void keyval_t::push_back(const kvpair_t& kv) 
+	{
+	keyvals.push_back(kv);
+	}
+
+
+bool property_base::parse(exptree& tr, exptree::iterator, exptree::iterator arg, keyval_t& keyvals)
+	{
+	if(tr.number_of_children(arg)==0) return true;
+//	txtout << name() << ": should not have any arguments." << std::endl;
+	return false;
+	}
+
+bool property_base::parse_one_argument(exptree::iterator arg, keyval_t& keyvals)
+	{
+	if(*arg->name=="\\equals") {
+		exptree::sibling_iterator key=arg.begin();
+		if(key==arg.end()) return false;
+		exptree::sibling_iterator val=key;
+		++val;
+		if(val==arg.end()) return false;
+		keyvals.push_back(keyval_t::value_type(*arg.begin()->name, val));
+		}
+	else {
+		if(unnamed_argument()!="") {
+			keyvals.push_back(keyval_t::value_type(unnamed_argument(), arg));
+			}
+		else return false;
+		}
+	return true;
+	}
+
+bool property_base::preparse_arguments(exptree::iterator prop, keyval_t& keyvals) 
+	{
+	if(exptree::number_of_children(prop)==0) return true;
+	if(exptree::number_of_children(prop)>1) return false;
+	if(*prop.begin()->name!="\\comma") { // one argument
+		if(parse_one_argument(prop.begin(), keyvals)==false)
+			return false;
+		}
+	else {
+		exptree::sibling_iterator sib=prop.begin().begin();
+		while(sib!=prop.begin().end()) {
+			if(parse_one_argument(sib, keyvals)==false)
+				return false;
+			++sib;
+			}
+		}
+	return true;
+	}
+
+
+void property_base::display(std::ostream& str) const
+	{ 
+	str << name();
+	}
+
+std::string property_base::unnamed_argument() const
+	{
+	return "";
+	}
+
+bool property_base::core_parse(keyval_t& keyvals)
+	{
+	return true;
+	}
+
+property_base::match_t property_base::equals(const property_base *) const
+	{
+	return exact_match;
+	}
+
+bool labelled_property::core_parse(keyval_t& keyvals)
+	{
+	keyval_t::const_iterator lit=keyvals.find("label");
+	if(lit!=keyvals.end()) {
+		label=*lit->second->name;
+		return true;
+		}
+	else {
+//		txtout << "This property needs a label." << std::endl;
+		return false;
+		}
+	}
+	
+bool operator<(const pattern& one, const pattern& two)
+	{
+	return tree_less(one.obj, two.obj);
+//	if(*(one.obj.begin()->name)<*(two.obj.begin()->name)) return true;
+//	return false;
+	}
+
+//bool operator==(const pattern& one, const pattern& two)
+//	  {
+//	  return one.obj==two.obj; // FIXME: handle dummy indices
+//	  }
+
+void properties::insert_prop(exptree::iterator it, const property *pr)
+	{
+//	assert(pats.find(pr)==pats.end()); // identical properties have to be assigned through insert_list_prop
+
+	pattern *pat=new pattern(it);
+
+	std::pair<property_map_t::iterator, property_map_t::iterator> pit=
+		props.equal_range(it->name);
+
+	property_map_t::iterator first_nonpattern=pit.first;
+
+	while(pit.first!=pit.second) {
+		// keep track of the first non-pattern element
+		if(exptree::number_of_children((*pit.first).second.first->obj.begin())==1) 
+			if((*pit.first).second.first->obj.begin().begin()->is_range_wildcard()) 
+				++first_nonpattern;
+			
+		if((*pit.first).second.first->match(it)) { // match found
+			if(typeid(*pr)==typeid(*(*pit.first).second.second)) {
+				const labelled_property *lp   =dynamic_cast<const labelled_property *>(pr);
+				const labelled_property *lpold=dynamic_cast<const labelled_property *>(pit.first->second.second);
+				if(!lp || !lpold || lp->label==lpold->label) {
+//					txtout << "Removing previously set property." << std::endl;
+					pattern  *oldpat=pit.first->second.first;
+					const property_base *oldprop=pit.first->second.second;
+					props.erase(pit.first);
+					pats.erase(oldprop);
+					delete oldpat;
+					delete oldprop;
+					break;
+					}
+				}
+			}
+		++pit.first;
+		}
+
+	pats.insert(pattern_map_t::value_type(pr, pat));
+	properties::props.insert(property_map_t::value_type(it->name, pat_prop_pair_t(pat,pr)));
+	}
+
+void properties::insert_list_prop(const std::vector<exptree::iterator>& its, const list_property *pr)
+	{
+	assert(pats.find(pr)==pats.end()); // identical properties have to be assigned through insert_list_prop
+	assert(its.size()>0);
+
+	// If 'pr' is exactly equal to an existing property, we should use that one instead of 
+	// introducing a duplicate.
+	pattern_map_t::iterator fit=pats.begin();
+	while(fit!=pats.end()) {
+		 if(typeid(*(*fit).first)==typeid(*pr))
+			  if(pr->equals((*fit).first)==property_base::exact_match) {
+					pr=static_cast<const list_property *>( (*fit).first );
+					break;
+					}
+		 ++fit;
+		 }
+
+	// If 'pr' has id_match with an existing property, we need to remove all property assignments
+	// for the existing one, except when there is an exact_match.
+	const property_base *to_delete_property=0;
+	pattern_map_t::iterator pit=pats.begin();
+	while(pit!=pats.end()) {
+		 if(typeid(*(*pit).first)==typeid(*pr))
+			  if(pr->equals((*pit).first)==property_base::id_match) {
+					to_delete_property = (*pit).first;
+					break;
+					}
+		 ++pit;
+		 }
+	if(to_delete_property) {
+		 pats.erase(to_delete_property);
+		 property_map_t::iterator it=props.begin();
+		 while(it!=props.end()) {
+			  property_map_t::iterator nxt=it;
+			  ++nxt;
+			  if((*it).second.second==to_delete_property) props.erase(it);
+			  it=nxt;
+			  }
+		 }
+
+	for(unsigned int i=0; i<its.size(); ++i) {
+		pattern *pat=new pattern(its[i]);
+		
+		// First find out if this property declaration overwrites a previous one; if so
+		// we need to remove the previous one.
+		// Pointers to properties are shared, so we need to delete them only once.
+		std::pair<property_map_t::iterator, property_map_t::iterator> pit=
+			props.equal_range(its[i]->name);
+		while(pit.first!=pit.second) {
+			 if((*pit.first).second.first->match(its[i])) { // found the pattern 'its[i]' in the property list
+				  if(typeid(*pr)==typeid(*(*pit.first).second.second)) {
+//						txtout << "found a property for " << *(its[i]->name) << std::endl;
+//						exptree::print_recursive_treeform(txtout, its[i]);
+
+						pattern  *oldpat=pit.first->second.first;
+						const property_base *oldprop=pit.first->second.second;
+						
+						props.erase(pit.first);
+						
+						// Delete only those entries in the pattern map which are related to
+						// this particular pattern _and_ this particular property
+						std::pair<pattern_map_t::iterator, pattern_map_t::iterator> patrange=
+							 pats.equal_range(oldprop);
+						while(patrange.first!=patrange.second) {
+							 if(patrange.first->first==oldprop && patrange.first->second==oldpat) {
+//								  txtout << "erasing property for " << *(oldpat->headnode) << std::endl;
+								  pats.erase(patrange.first); //oldprop);
+								  break;
+								  }
+							 ++patrange.first;
+							 }
+						delete oldpat;
+						break;
+						}
+				  }
+			 ++pit.first;
+			 }
+		
+		// Now register the property.
+//		txtout << "registering " << *(pat->headnode) << std::endl;
+		pats.insert(pattern_map_t::value_type(pr, pat));
+		properties::props.insert(property_map_t::value_type(its[i]->name, pat_prop_pair_t(pat,pr)));
+		}
+	}
+
+
+/*
+
+  {a,b,c,d,e}::Indices(vector).
+  {a,b,c}::Indices(spinor).
+
+  This should make a,b,c spinor indices, and keep d,e as vector indices.
+
+
+  {a,b,c}::Indices(vector).
+  {d,e}::Indices(vector).
+
+  This should make all of a,b,c,d,e vector indices.
+
+
+  {a,b,c}::Indices(vector).
+  {a,b,c,d,e,f}::Indices(spinor).
+
+  This should make all indices spinor indices.
+
+
+  {a,b,c,d,e}::Indices(vector, position=free).
+  {a,b,c}::Indices(vector, position=fixed).
+
+  You can only have one type of index for each name, so this declaration implies that
+  d,e should have their property removed.
+
+
+ */

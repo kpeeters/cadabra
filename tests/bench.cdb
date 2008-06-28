@@ -1,0 +1,14 @@
+@reset;
+A_{m n}::AntiSymmetric.
+
+A_{m1 m2} A_{m2 m3} A_{m3 m4} A_{m4 m1};
+@canonicalise!(%);
+
+A_{m1 m2}   A_{m2 m3}   A_{m3 m4}   A_{m4 m5}   A_{m5 m6}   A_{m6 m7}   A_{m7 m8}   A_{m8 m9}  A_{m9 m1};
+@canonicalise!(%);
+
+A_{m1 m2}   A_{m2 m3}   A_{m3 m4}   A_{m4 m5}   A_{m5 m6}   A_{m6 m7}   A_{m7 m8}   A_{m 8 m9}  A_{m9 m10} A_{m10 m11} 
+A_{m11 m12} A_{m12 m13} A_{m13 m14} A_{m14 m15} A_{m15 m16} A_{m16 m17} A_{m17 m18} A_{m18 m19} A_{m19 m20} A_{m20 m1};
+
+@canonicalise(%);
+

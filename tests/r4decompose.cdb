@@ -1,0 +1,53 @@
+# Test 1: R^4 decomposition and (B.11) of hep-th/0010167.
+#
+@reset;
+::KeepHistory(false).
+
+{m,n,p,q,r,s,t,u,v,w,a,b,c,d,e,f}::Indices(vector).
+W_{m n p q}::WeylTensor.
+
+R41:= W_{m n a b} W_{n p b c} W_{p s c d} W_{s m d a};
+R42:= W_{m n a b} W_{n p b c} W_{m s c d} W_{s p d a};
+R43:= W_{m n a b} W_{p s b a} W_{m n c d} W_{p s d c};
+R44:= W_{m n a b} W_{m n b a} W_{p s c d} W_{p s d c};
+R45:= W_{m n a b} W_{n p b a} W_{p s c d} W_{s m d c};
+R46:= W_{m n a b} W_{p s b a} W_{m p c d} W_{n s d c};
+R47:= W_{m n}^{m n} W_{p q}^{p q} W_{r s}^{r s} W_{t u}^{t u};
+
+#R47:= 1/840 * W_{m n p q} * W_{m n p q} * W_{r s t u} * W_{r s t u} - 2/105 * W_{m n p q} * W_{m n p r} * W_{q s t u} * W_{r s t u} + 1/420 * W_{m n p q} * W_{m n r s} * W_{p q t u} * W_{r s t u} - 4/105 * W_{m n p q} * W_{m n r s} * W_{p t r u} * W_{q u s t} + 2/105 * W_{m n p q} * W_{m r p s} * W_{n t q u} * W_{r t s u} - 4/105 * W_{m n p q} * W_{m r p s} * W_{n t r u} * W_{q t s u};
+
+@asym!(%){^{m},^{n},^{p},^{q},^{r},^{s},^{t},^{u}}:
+@substitute!(%)( W_{a b}^{c d} -> W_{a b c d} ):
+@indexsort!(%):
+@collect_terms!(%):
+@number_of_terms(%);
+# 
+# W_{m n p q} W_{m r p s} W_{n r t u} W_{q s t u};
+# 
+@canonicalise!(%):
+@collect_terms!(%);
+@number_of_terms(%);
+#
+basisR4:= { @(R41), @(R42), @(R43), @(R44), @(R45), @(R46), @(R47) };
+# basisR4:= { @(R41), @(R42), @(R43), @(R44), @(R45), @(R46) };
+
+# @collect_terms!(%); "basisR4.out"
+
+# {m,n,p,q,r,s,t,u,v,w,a,b,c,d,e,f}::Indices(vector).
+# W_{m n p q}::WeylTensor.
+# < "basisR4.out"
+#
+A5:= W_{p q r s} W_{p q t u} W_{r v t w} W_{s v u w};
+@decompose(%){ @(basisR4) };
+tstA5:= {1/4, (-1/2), 1/32, 1/64, (-1/4), 3/8, (-105/8)} - @(A5);
+@collect_terms!(%);
+@assert(tstA5);
+#
+A7:= W_{p q r s} W_{p t r u} W_{t v q w} W_{u v s w};
+@decompose(%){ @(basisR4) };
+tstA7:= {1/4, 1/2, 1/32, 1/64, (-1/4), 1/8, (-105/8)} - @(A7);
+@collect_terms!(%);
+@assert(tstA7);
+#
+# From this we indeed conclude that A7-A5 = R_{42} - 1/4 R_{46}.
+

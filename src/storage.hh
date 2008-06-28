@@ -1,0 +1,432 @@
+/* 
+
+   $Id: storage.hh,v 1.156 2008/06/22 12:23:33 peekas Exp $
+
+	Cadabra: an extendable open-source symbolic tensor algebra system.
+	Copyright (C) 2001-2006  Kasper Peeters <kasper.peeters@aei.mpg.de>
+
+	This program is free software; you can redistribute it and/or modify
+	it under the terms of the GNU General Public License as published by
+	the Free Software Foundation, version 2.
+	 
+	
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
+	
+	You should have received a copy of the GNU General Public License
+	along with this program; if not, write to the Free Software
+	Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+	
+*/
+
+/* 
+   The storage.cc and props.cc files form one module which does not
+   depend on any other file in the system (except of course on the gmp
+   library).
+
+*/
+
+#ifndef storage_hh_
+#define storage_hh_
+
+#include <string>
+#include <vector>
+#include <iostream>
+#include <gmpxx.h>
+#include <set>
+#include <map>
+#include <stdint.h>
+#include <assert.h>
+#include "tree.hh"
+
+typedef mpq_class               multiplier_t;
+typedef std::set<std::string>   nset_t;
+typedef std::set<multiplier_t>  rset_t;
+typedef uintptr_t               hashval_t;
+
+long        to_long(multiplier_t);
+std::string to_string(long);
+
+extern nset_t name_set;
+extern rset_t rat_set;
+
+class str_node { // size: 9 bytes (32 bit arch), can be reduced to 5 bytes.
+	public:
+		enum bracket_t     { b_round=0, b_square=1, b_curly=2, b_pointy=3, b_none=4, b_no=5, b_invalid=6 };
+		enum parent_rel_t  { p_sub=0, p_super=1, p_none=2, p_property=3, p_exponent=4 };
+
+		str_node(void);
+		str_node(nset_t::iterator name, bracket_t btype=b_none, parent_rel_t ptype=p_none);
+		str_node(const std::string& name, bracket_t btype=b_none, parent_rel_t ptype=p_none);
+		
+		bool operator==(const str_node&) const;
+		bool operator<(const str_node&) const;
+
+		// FIXME: In upcoming gcc, these can no longer be packed. So change these
+		// to POD types and save a few bytes as well.
+		nset_t::iterator name;
+		rset_t::iterator multiplier;
+
+		struct flag_t { // kept inside 8 bits for speed and size
+				bool            keep_after_eval : 1; 
+				bracket_t       bracket         : 3; 
+				parent_rel_t    parent_rel      : 3; 
+				bool            line_per_node   : 1;
+		}; 
+
+		flag_t fl;
+
+
+		bool is_zero() const;
+		bool is_identity() const;
+		bool is_rational() const;
+		bool is_unsimplified_rational() const;
+		bool is_integer() const;
+		bool is_index() const;            // _ or ^ parent_rel
+		bool is_quoted_string() const;
+		bool is_command() const;
+		bool is_inert_command() const;
+		bool is_name_wildcard() const;    //  ?
+		bool is_object_wildcard() const;  //  ??
+		bool is_range_wildcard() const;   //  #
+		bool is_indexstar_wildcard() const; // ?* in sub/super
+		bool is_indexplus_wildcard() const; // ?+ in sub/super
+		bool is_numbered_symbol() const;  //  [a-zA-Z]+[0-9]+
+
+		nset_t::iterator name_only();
+
+		static bool compare_names_only(const str_node&, const str_node&);
+		static bool compare_name_brack_par(const str_node&, const str_node&);
+		static bool compare_name_inverse_par(const str_node&, const str_node&);
+}; 
+
+// Helper functions for manipulation of multipliers
+void     multiply(rset_t::iterator&, multiplier_t);
+void     add(rset_t::iterator&, multiplier_t);
+void     zero(rset_t::iterator&);
+void     one(rset_t::iterator&);
+void     flip_sign(rset_t::iterator&);
+void     half(rset_t::iterator&);
+
+class exptree : public tree<str_node> {
+	public:
+		exptree();
+		exptree(tree<str_node>::iterator);
+		exptree(const str_node&);
+
+		std::ostream& print_entire_tree(std::ostream& str) const;
+		static std::ostream& print_recursive_treeform(std::ostream& str, exptree::iterator it);
+		static std::ostream& print_recursive_treeform(std::ostream& str, exptree::iterator it, unsigned int& number);
+
+		// Step up until matching node is found (if current node matches, do nothing)
+		iterator     named_parent(iterator it, const std::string&) const;
+		iterator     erase_expression(iterator it);
+		iterator     keep_only_last(iterator it);
+
+		// Calculate the hash value for the subtree starting at 'it'
+		hashval_t    calc_hash(iterator it) const;
+
+		// Quick access to arguments or argument lists for A(B)(C,D) type nodes.
+		sibling_iterator arg(iterator, unsigned int) const;
+		unsigned int     arg_size(sibling_iterator) const;
+		multiplier_t     arg_to_num(sibling_iterator, unsigned int) const; // shorthand for numerical arguments
+
+		// Like 'child', but using index iterators instead.
+		sibling_iterator tensor_index(const iterator_base& position, unsigned int) const;
+
+//		void select(unsigned int node, unsigned int mark);
+//		void select(iterator node, unsigned int mark);
+//		void unselect(unsigned int node);
+//		void unselect(iterator node, bool deep=true);
+//		void select_all(unsigned int mark);
+//		void unselect_all(unsigned int mark);
+//		void unselect_all();
+//
+//	   void marked_nodes(std::vector<iterator>&) const;
+
+		iterator         active_expression(iterator it) const;
+		// Number of \\history nodes in an expression
+		unsigned int     number_of_steps(iterator it) const;
+		// Given an iterator pointing to any node in the tree, figure
+		// out to which equation number it belongs.
+		unsigned int     number_of_equations() const;
+		unsigned int     equation_number(iterator it) const;
+		nset_t::iterator equation_label(iterator it) const;
+		iterator         equation_by_number(unsigned int i) const;
+		iterator         equation_by_name(nset_t::iterator it) const;
+		iterator         equation_by_name(nset_t::iterator it, unsigned int& ) const;
+		iterator         equation_by_number_or_name(iterator it, unsigned int last_used_equation) const;
+		iterator         equation_by_number_or_name(iterator it, unsigned int last_used_equation,
+																  unsigned int&) const;
+		std::string      equation_number_or_name(iterator it, unsigned int last_used_equation) const;
+		iterator         procedure_by_name(nset_t::iterator it) const;
+
+		/// Replace the object, keeping the original bracket and parent_rel (originally intended
+		/// to replace indices only, but now used also for e.g. normal function arguments, as in
+		/// \partial_{z}{ A(z) } with a replacement of z).
+		iterator         replace_index(iterator position, const iterator& from);
+
+      /// As in replace_index, but moves the index rather than making a copy (so that iterators
+		/// pointing to the original remain valid).
+		iterator         move_index(iterator position, const iterator& from);
+
+		/// Replace the node with the only child of the node, useful for e.g.
+		/// \prod{A} -> A. This algorithm takes care of the multiplier of the 
+		/// top node, i.e. it does 2\prod{A} -> 2 A.
+		iterator         flatten_and_erase(iterator position);
+		
+		static unsigned int number_of_indices(iterator it);
+
+		/// An iterator which iterates over indices even if they are at lower levels, 
+		/// i.e. taking into account the "Inherit" property of nodes.
+		class index_iterator : public iterator_base {
+			public:
+				index_iterator();
+				index_iterator(const index_iterator&);
+
+				static index_iterator create(const iterator_base&);
+
+				bool    operator==(const index_iterator&) const;
+				bool    operator!=(const index_iterator&) const;
+				index_iterator&  operator++();
+				index_iterator   operator++(int);
+				index_iterator&  operator+=(unsigned int);
+
+				iterator halt, walk, roof;
+			private:
+				bool is_index(iterator) const;
+		};
+
+		static index_iterator begin_index(iterator it);
+		static index_iterator end_index(iterator it);
+};
+
+//void serialise_exptree(std::ostream&, const exptree&, exptree::iterator);
+//void unserialise_exptree(const exptree&, exptree::iterator, std::ostream&);
+
+
+// literal_wildcards: if true, treat wildcard names as ordinary names.
+
+int subtree_compare(exptree::iterator one, exptree::iterator two, 
+						  int mod_prel=-2, bool checksets=true, int compare_multiplier=-2, 
+						  bool literal_wildcards=false);
+
+/// Various comparison functions, some exact, some with pattern logic.
+/// The mod_prel variable determines whether parent relations are taken into
+/// account when comparing:
+///
+///        -2: require that parent relations match (or that indices are position-free)
+///        -1: do not require that parent relations match
+///       >=0: do not require parent relations to match up to and including this level
+///
+/// Similar logic holds for the compare_multiplier parameter.
+//
+bool tree_less(const exptree& one, const exptree& two, 
+					int mod_prel=-2, bool checksets=true, int compare_multiplier=-2);
+bool tree_equal(const exptree& one, const exptree& two, 
+					 int mod_prel=-2, bool checksets=true, int compare_multiplier=-2);
+bool tree_exact_less(const exptree& one, const exptree& two, 
+							int mod_prel=-2, bool checksets=true, int compare_multiplier=-2,
+							 bool literal_wildcards=false);
+bool tree_exact_equal(const exptree& one, const exptree& two,
+							 int mod_prel=-2, bool checksets=true, int compare_multiplier=-2,
+							 bool literal_wildcards=false);
+
+bool subtree_less(exptree::iterator one, exptree::iterator two,
+						int mod_prel=-2, bool checksets=true, int compare_multiplier=-2);
+bool subtree_equal(exptree::iterator one, exptree::iterator two,
+						 int mod_prel=-2, bool checksets=true, int compare_multiplier=-2);
+bool subtree_exact_less(exptree::iterator one, exptree::iterator two,
+								int mod_prel=-2, bool checksets=true, int compare_multiplier=-2,
+								bool literal_wildcards=false);
+bool subtree_exact_equal(exptree::iterator one, exptree::iterator two,
+								 int mod_prel=-2, bool checksets=true, int compare_multiplier=-2,
+								 bool literal_wildcards=false);
+
+/// Compare two nset iterators by comparing the strings to which they point.
+//
+class nset_it_less {
+	public:
+		bool operator()(nset_t::iterator first, nset_t::iterator second) const;
+};
+
+/// Compare two trees by pattern logic, i.e. modulo index names.
+//
+class tree_less_obj {
+	public:
+		bool operator()(const exptree& first, const exptree& second) const;
+};
+
+class tree_less_modprel_obj {
+	public:
+		bool operator()(const exptree& first, const exptree& second) const;
+};
+
+class tree_equal_obj {
+	public:
+		bool operator()(const exptree& first, const exptree& second) const;
+};
+
+/// Compare two trees exactly, i.e. including exact index names.
+//
+class tree_exact_less_obj {
+	public:
+		bool operator()(const exptree& first, const exptree& second) const;
+};
+
+class tree_exact_less_mod_prel_obj {
+	public:
+		bool operator()(const exptree& first, const exptree& second) const;
+};
+
+class tree_exact_equal_obj {
+	public:
+		bool operator()(const exptree& first, const exptree& second) const;
+};
+
+class tree_exact_equal_mod_prel_obj {
+	public:
+		bool operator()(const exptree& first, const exptree& second) const;
+};
+
+/// Compare two trees exactly, treat wildcard names as ordinary names.
+//
+class tree_exact_less_no_wildcards_obj {
+	public:
+		bool operator()(const exptree& first, const exptree& second) const;
+};
+
+class tree_exact_less_no_wildcards_mod_prel_obj {
+	public:
+		bool operator()(const exptree& first, const exptree& second) const;
+};
+
+
+/// This operator does an exact comparison, with no symbols interpreted
+/// as wildcards or patterns.
+bool operator==(const exptree& first, const exptree& second);
+
+// Adjacency matrix representation of a (a subtree of) an exptree,
+// for purposes of canonicalisation.
+
+// The numerical indices denoting the factors in a product always refer
+// to the factors in the original (i.e. we keep the location of the 
+// factors fixed and only move indices around).
+
+//   class unnamed_expmat {
+//   	public:
+//   		unnamed_expmat();
+//   
+//   		typedef unsigned int                             tensor_singlet;
+//   		typedef unsigned int                             index_singlet;
+//   		typedef std::pair<tensor_singlet,tensor_singlet> tensor_doublet;
+//   		typedef std::pair<index_singlet, index_singlet>  index_doublet;
+//   
+//   		unsigned int sym_mat_offset(unsigned int one, unsigned int two) const;
+//   
+//   //		% number of open indices:             4 bits
+//   //      % number of intra-tens contractions:  4 bits
+//   //      % number of inter-tens contractions:  4 bits  =  2 bytes is plenty
+//   
+//   		struct index_pointer {   // for free indices
+//   				index_singlet    ind;
+//   				nset_t::iterator nm;
+//   				bool operator==(const index_pointer&) const;
+//   		};
+//   		struct two_tens_t {		// the off-diagonal blocks
+//   				std::vector<index_doublet> contractions;
+//   				bool operator==(const two_tens_t&) const;
+//   		};
+//   		struct one_tens_t {		// the diagonal blocks
+//   				std::vector<index_doublet> contractions; // stored sorted: .first <= .second
+//   				std::vector<index_pointer> free_indices;
+//   				bool operator==(const one_tens_t&) const;
+//   		};
+//   
+//   		std::vector<two_tens_t> inter_tens;
+//   		std::vector<one_tens_t> intra_tens;
+//   		void sort();
+//   
+//   		bool operator==(const unnamed_expmat&) const;
+//   
+//   		struct less_index_doublet : public std::binary_function<index_doublet, index_doublet, bool> {
+//   				bool operator()(const index_doublet& x, const index_doublet& y) { return (x.first < y.first); };
+//   		};
+//   		struct less_index_pointer : public std::binary_function<index_pointer, index_pointer, bool> {
+//   				bool operator()(const index_pointer& x, const index_pointer& y) { return (x.ind < y.ind); };
+//   		};
+//   
+//   	private:
+//   };
+//   
+//   class expmat : public unnamed_expmat {
+//   	public:
+//   		expmat();
+//   		expmat(exptree&, exptree::iterator);
+//   
+//   		std::vector<nset_t::iterator>            tensor_names;
+//   		std::set<nset_t::iterator, nset_it_less> used_dummies; // so we use the same set again after canonicalisation
+//   
+//   	private:
+//   		struct index_loc_t {    // used to convert tree -> adj matrix
+//   				index_loc_t(tensor_singlet, index_singlet);
+//   				tensor_singlet   tn;
+//   				index_singlet    ind;
+//   		};
+//   		typedef std::multimap<nset_t::iterator, index_loc_t, nset_it_less> index_bridge_map;
+//   };
+//   
+//   // class product {
+//   // 	public:
+//   // 		std::vector<nset_t::iterator> names;
+//   // 		
+//   // };
+//   // 
+//   // class any_node {
+//   // 	public:
+//   // 		union elms {
+//   // 				str_node str;
+//   // 				product  pr;
+//   // 		} ell;
+//   // };
+//   
+//   class expgraph {
+//   	public:
+//   		expgraph(exptree&, exptree::iterator, exptree::iterator nopermute);
+//   
+//   		void          debug_output_one(const unnamed_expmat&, std::ostream&) const;
+//   		void          debug_output(std::ostream&) const;
+//   		void          canonicalise();
+//   		const unnamed_expmat& canonicalised() const;
+//   		bool          canonicalised_positive() const;
+//   		bool          is_already_canonical() const;
+//   
+//   	private:
+//   		void         create_mat(const unnamed_expmat&, unsigned int, const std::vector<unsigned int>&);
+//   		void         create_mat(const unnamed_expmat&, const std::vector<unsigned int>&, 
+//   										const std::vector<unsigned int>&);
+//   		void         tensor_permute(exptree::sibling_iterator from, exptree::sibling_iterator to,
+//   											 unsigned int currnum);
+//   		void         create_index_permutations();
+//   		void         create_tensor_permutations();
+//   		bool         tensor_structures_match(exptree::iterator i1, exptree::iterator i2) const;
+//   		void         determine_preferred_form();
+//   
+//   		exptree&                    tr;
+//   		exptree::iterator           topnode;
+//   		exptree::iterator           nopermute;
+//   		expmat                      orig;
+//   		std::vector<unnamed_expmat> equivs;
+//   		std::vector<bool>           positive_sign;
+//   		unsigned int                preferred_form;
+//   		bool                        identically_zero;
+//   
+//   		std::vector<expmat::tensor_doublet>      id_tensor_ranges;
+//   
+//   		stopwatch sw_tensor, sw_index, sw_preferred, sw_setup;
+//   };
+
+#endif
+

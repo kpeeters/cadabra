@@ -1,0 +1,72 @@
+% Cadabra notebook version 1.0
+\documentclass[11pt]{article}
+\usepackage[textwidth=460pt, textheight=660pt]{geometry}
+\usepackage[usenames]{color}
+\usepackage[parfill]{parskip}
+\usepackage{breqn}
+\def\specialcolon{\mathrel{\mathop{:}}\hspace{-.5em}}
+\renewcommand{\bar}[1]{\overline{#1}}
+\begin{document}
+% Begin TeX cell closed
+{\bfseries\large A Fierz identity in eleven dimensions}
+
+This notebook computes the Fierz identity (5.86) in my thesis.
+% End TeX cell
+{\color[named]{Blue}\begin{verbatim}
+{\mu,\nu,\rho}::Indices(curved, position=fixed).
+{m,n,p,q,r,s,t#}::Indices(flat).
+{m,n,p,q,r,s,t#}::Integer(0..10).
+T^{#{\mu}}::AntiSymmetric.
+\psi_{\mu}::SelfAntiCommuting.
+\psi_{\mu}::Spinor(dimension=11, type=Majorana).
+\theta::Spinor(dimension=11, type=Majorana).
+\epsilon::Spinor(dimension=11, type=Majorana).
+{\theta,\epsilon,\psi_{\mu}}::AntiCommuting
+\bar{#}::DiracBar.
+\delta^{m n}::KroneckerDelta.
+\Gamma^{#{m}}::GammaMatrix(metric=\delta).
+\end{verbatim}}
+\begin{verbatim}
+Assigning property Indices to \mu, \nu, \rho.
+Assigning property Indices to m, n, p, q, r, s, t#.
+Assigning property Integer to m, n, p, q, r, s, t#.
+Assigning property AntiSymmetric to T.
+Assigning property SelfAntiCommuting to \psi.
+Assigning property Spinor to \psi.
+Assigning property Spinor to \theta.
+Assigning property Spinor to \epsilon.
+Assigning property DiracBar to \bar.
+Assigning property AntiCommuting to \theta, \epsilon, \psi, {, \bar.
+Assigning property KroneckerDelta to \delta.
+Assigning property GammaMatrix to \Gamma.
+\end{verbatim}
+{\color[named]{Blue}\begin{verbatim}
+T^{\mu\nu\rho} e_{\nu}^{s} 
+     \bar{\theta} \Gamma^{r s} \psi_{\rho}
+     \bar{\psi_{\mu}} \Gamma^{r} \epsilon;
+\end{verbatim}}
+\begin{dmath*}[compact, spread=2pt]
+1\specialcolon{}= T^{\mu \nu \rho} e_{\nu}\,^{s} \bar{\theta} \Gamma^{r s} \psi_{\rho} \bar{\psi_{\mu}} \Gamma^{r} \epsilon;
+\end{dmath*}
+{\color[named]{Blue}\begin{verbatim}
+@fierz!(%)( \theta, \epsilon, \psi_{\mu}, \psi_{\nu} );
+\end{verbatim}}
+\begin{dmath*}[compact, spread=2pt]
+1\specialcolon{}=  - \frac{1}{32}\, T^{\mu \nu \rho} e_{\nu}\,^{s} \bar{\theta} \Gamma^{r s} \Gamma^{r} \epsilon \bar{\psi_{\mu}} \psi_{\rho} - \frac{1}{32}\, T^{\mu \nu \rho} e_{\nu}\,^{s} \bar{\theta} \Gamma^{r s} \Gamma_{m} \Gamma^{r} \epsilon \bar{\psi_{\mu}} \Gamma_{m} \psi_{\rho} - \frac{1}{64}\, T^{\mu \nu \rho} e_{\nu}\,^{s} \bar{\theta} \Gamma^{r s} \Gamma_{m n} \Gamma^{r} \epsilon \bar{\psi_{\mu}} \Gamma_{n m} \psi_{\rho} - \frac{1}{192}\, T^{\mu \nu \rho} e_{\nu}\,^{s} \bar{\theta} \Gamma^{r s} \Gamma_{m n p} \Gamma^{r} \epsilon \bar{\psi_{\mu}} \Gamma_{p n m} \psi_{\rho} - \frac{1}{768}\, T^{\mu \nu \rho} e_{\nu}\,^{s} \bar{\theta} \Gamma^{r s} \Gamma_{m n p q} \Gamma^{r} \epsilon \bar{\psi_{\mu}} \Gamma_{q p n m} \psi_{\rho} - \frac{1}{3840}\, T^{\mu \nu \rho} e_{\nu}\,^{s} \bar{\theta} \Gamma^{r s} \Gamma_{m n p q t1} \Gamma^{r} \epsilon \bar{\psi_{\mu}} \Gamma_{t1 q p n m} \psi_{\rho};
+\end{dmath*}
+{\color[named]{Blue}\begin{verbatim}
+@join!(%){expand}:
+@distribute!(%):
+@eliminate_kr!(%):
+@join!(%){expand}:
+@distribute!(%):
+@eliminate_kr!(%):
+@collect_terms!(%):
+@canonicalise!(%): 
+@rename_dummies!(%):
+@collect_terms!(%);
+\end{verbatim}}
+\begin{dmath*}[compact, spread=2pt]
+1\specialcolon{}= \frac{1}{4}\, T^{\mu \nu \rho} e_{\mu}\,^{m} \bar{\theta} \Gamma^{m n} \epsilon \bar{\psi_{\nu}} \Gamma_{n} \psi_{\rho} + \frac{5}{16}\, T^{\mu \nu \rho} e_{\mu}\,^{m} \bar{\theta} \epsilon \bar{\psi_{\nu}} \Gamma_{m} \psi_{\rho} + \frac{3}{32}\, T^{\mu \nu \rho} e_{\mu}\,^{m} \bar{\theta} \Gamma^{m n}\,_{p} \epsilon \bar{\psi_{\nu}} \Gamma_{n p} \psi_{\rho} + \frac{1}{4}\, T^{\mu \nu \rho} e_{\mu}\,^{m} \bar{\theta} \Gamma^{n} \epsilon \bar{\psi_{\nu}} \Gamma_{m n} \psi_{\rho} + \frac{1}{384}\, T^{\mu \nu \rho} e_{\mu}\,^{m} \bar{\theta} \Gamma^{n}\,_{p q r} \epsilon \bar{\psi_{\nu}} \Gamma_{m n p q r} \psi_{\rho};
+\end{dmath*}
+\end{document}

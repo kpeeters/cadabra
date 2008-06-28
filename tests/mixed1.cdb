@@ -1,0 +1,32 @@
+# Determine the 2x4 window representation of the product of two Weyl
+# tensors. Tests @asym, @acanonicalorder and also
+# @riemann_index_regroup.
+
+# The \tableau{2 2 2 2} rep of W^2:
+
+W_{m n p q}::WeylTensor.
+
+WW:=      W_{r1 r2 s1 s2} W_{r3 r4 s3 s4};
+WWmanip:= (5/9)*@(WW);
+
+@young_project!(%){2,2,2,2}{0,2,1,3,4,6,5,7}:
+# @sym!(%){_{r1},_{s1}}:
+# @sym!(%){_{r2},_{s2}}:
+# @sym!(%){_{r3},_{s3}}:
+# @sym!(%){_{r4},_{s4}}:
+# 
+# @asym!(%){_{r1},_{r2},_{r3},_{r4}}:
+# @asym!(%){_{s1},_{s2},_{s3},_{s4}}:
+
+@acanonicalorder!(%){_{r1},_{r2},_{r3},_{r4}}:
+@acanonicalorder!(%){_{s1},_{s2},_{s3},_{s4}}:
+@indexsort!(%):
+@collect_terms!(%);
+
+@riemann_index_regroup!(%){r1,r2,r3,r4}{s1,s3,s3,s4};
+@collect_terms!(%);
+
+tst:= @(WW)-@(WWmanip);
+@collect_terms!(%);
+@assert(tst);
+

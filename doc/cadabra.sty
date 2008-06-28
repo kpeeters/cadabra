@@ -1,0 +1,50 @@
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{bbold}
+\usepackage{fancyvrb}
+\usepackage{relsize}
+
+\newcommand{\cdbproperty}[2]{property: {\bfseries\large #1}\par}
+\newcommand{\cdbalgorithm}[2]{algorithm: {\bfseries\large #1}\par}
+\newcommand{\cdbseealgo}[1]{}
+\newcommand{\cdbseeprop}[1]{}
+
+\newcommand{\subscommand}[1]{@{#1}}
+\newcommand{\inertcommand}[1]{{\tt @@#1}}
+\newcommand{\subsprop}[1]{{\tt #1}}
+
+\newcommand{\Cdb}{Cadabra{}}
+
+% Additional operators
+
+\DeclareMathOperator{\sgn}{sgn}
+
+
+% Screen environment, for display of verbatim material.
+
+\makeatletter
+\fvset{frame=lines,framerule=0.1pt,framesep=6pt,numbers=none,xleftmargin=5ex,fontfamily=tt,fontsize=\small}
+\newenvironment{screen}[1]{\hilitelines(#1)\color[named]{Blue}\Verbatim}{\endVerbatim\color[named]{Black}}
+\makeatother
+
+\newif\ifhilite
+\def\hilitelines(#1){%
+  \def\FancyVerbFormatLine##1{%
+    \def\fancylineinput{##1}%
+    \hilitefalse
+    \splitfirst #1,\relax,%
+    \ifhilite\else
+      \fancylineinput
+    \fi}}
+
+\def\splitfirst#1,{%
+  \ifx\relax#1\empty\else
+    \hiliteline{#1}{\fancylineinput}\expandafter\splitfirst
+  \fi}
+
+\def\hiliteline#1#2{%
+    \ifhilite\else
+      \ifnum\value{FancyVerbLine} = #1
+      \llap{{\smaller\smaller \raisebox{.8ex}{$\vartriangleright$}}\,\,\,}%
+      \fi
+    \fi}

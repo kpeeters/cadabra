@@ -1,0 +1,9 @@
+
+@dummies{vector{a,b,c,d,e,f,g}}.
+
+obj1: C_a D^a (A_c B^c)**2;
+@expand_power!(%);
+@prodflatten!(%);
+tst1: C_a D^a A_c B^c A_b B^b - @(obj1);
+@collect_terms!(%);
+@assert(tst1);

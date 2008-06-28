@@ -1,0 +1,92 @@
+# consistent
+obj1:= { a0+2*a2 + a3= 3, -a0 - a2 + a3= - (8/3) , a3 = 3};
+@lsolve(%){a0,a2,a3};
+tst1:=  {a0 = 34/3, a2 = (-17/3), a3 = 3} - @(obj1);
+@collect_terms!(%);
+@assert(tst1);
+
+# overconstrained
+obj2:= { a0 + a1 = 0, a0 - a1 = 0, a0 = 2 };
+@lsolve(%){a0,a1};
+tst2:= {a0 + a1 = 0, a0 - a1 = 0, a0 = 2} - @(obj2);
+@collect_terms!(%);
+@assert(tst2);
+
+# overspecified but consistent
+obj3:= { a0 + a1 = 0, a0 - a1 = 0, a0 = 0 };
+@lsolve(%){a0,a1};
+tst3:= {a0 = 0, a1 = 0} - @(obj3);
+@collect_terms!(%);
+@assert(tst3);
+
+# underconstrained
+obj4:= { a0 + a1 + a2 = 0, a1 + a2 = 3 };
+@lsolve(%){a0,a1,a2};
+tst4:= {a0 = (-3), a1 + a2 = 3} - @(obj4);
+@collect_terms!(%);
+@assert(tst4);
+
+# Test 5 - 7:= decomposing monomials
+#
+basis:= { a*a, a*b, a*c };
+obj5:= a b;
+@decompose(%){@(basis)};
+tst5:= {0,1,0}-@(obj5);
+@collect_terms!(%);
+@assert(tst5);
+
+@reset;
+basis:= { a*a + a*b, a*a - a*b };
+obj5b:= a*b;
+@decompose(%){@(basis)};
+tst5b:= {1/2, (-1/2)} - @(obj5b);
+@collect_terms!(%);
+@assert(tst5b);
+
+@reset;
+{m,n,p,q,r,s,t,u}::Indices(vector).
+R_{m n p q}::WeylTensor.
+basis:= { 2*A*R_{m n p q}, A*R_{m p q n} };
+obj6:= 3*A*R_{m q n p};
+@decompose!(%){@(basis)};
+tst6:= {-3/2,-3} - @(obj6);
+@collect_terms!(%);
+@assert(tst6);
+
+obj6b:= { @(obj6), @(basis) };
+@inner(%);
+tst6b:= 3 * A * R_{m n p q} + 3 * A * R_{m p q n} + @(obj6b);
+@collect_terms!(%);
+@assert(tst6b);
+
+# The result above implies that the following
+# expression vanishes:
+#
+tst7:= A*R_{m n p q} + A*R_{m p q n} + A*R_{m q n p};
+@young_project_tensor!(%);
+@distribute!(%);
+@canonicalise!(%);
+@collect_terms!(%);
+@assert(tst7);
+
+{m,n,p,q,r,s,t,u}::Indices(vector).
+R_{m n p q}::WeylTensor.
+basis8:= { 3*R_{m n p q}*R_{m n p q} };
+obj8:= 2 R_{m n p q} R_{m p n q};
+@decompose!(%){@(basis8)};
+tst8:= \comma{1/3}-@(obj8);
+@collect_terms!(%);
+@assert(tst8);
+
+@young_project_tensor!(basis8){ModuloMonoterm};
+@distribute!(%):
+@canonicalise!(%);
+@collect_terms!(%);
+obj8b:= 2 R_{m n p q} R_{m p n q};
+@decompose!(%){@(basis8)}{DontProject};
+
+
+# tst9:= Inner product.
+#
+tst9:= {{a,b,c},{d,e,f}};
+@inner(%);

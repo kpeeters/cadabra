@@ -1,0 +1,7 @@
+\dagger::Symbol.
+{ \theta, \theta^{\dagger} }::NonCommuting.
+
+::PostDefaultRules( @@substitute!(%)( \theta \theta^{\dagger} -> \theta^{\dagger} \theta + 1 ) ).
+
+\theta \theta \theta^{\dagger} \theta^{\dagger};
+

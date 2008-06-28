@@ -1,0 +1,233 @@
+
+# Testing Young tableau routines.
+
+# \tableau{?}::Tableau.
+# 
+# \tableau{2} \tableau{1 1};
+# @lr_tensor!(%);
+
+# Test 2: Tensor product decomposition on indices.
+#
+@reset.
+F_{m n}::AntiSymmetric.
+F_{m n p}::AntiSymmetric.
+V_{q r}::AntiSymmetric.
+S_{q r}::Symmetric.
+D_{#}::Derivative.
+D_{m}{F_{n p}}::TableauSymmetry(shape={2,1},indices={1,0,2}).
+{m,n,p,q,r,s}::Indices(vector).
+{m,n,p,q,r,s}::Integer(0..9).
+
+orig0b:=F_{n p q} V_{r s};
+@decompose_product(%);
+@canonicalise!(%):
+@collect_terms!(%);
+
+
+orig0b:=F_{n p q} V_{r};
+@decompose_product(%);
+@canonicalise!(%):
+@collect_terms!(%);
+
+
+orig4:= V_{m n} F_{p q};
+@decompose_product(%);
+@canonicalise!(%):
+@collect_terms!(%);
+tst4:= V_{m n} F_{p q} - @(orig4);
+@collect_terms!(%);
+@assert(tst4);
+
+
+orig0b:=F_{n p q} V_{r s};
+@decompose_product(%);
+@canonicalise!(%):
+@collect_terms!(%);
+tst0b:= F_{n p q} V_{r s} - @(orig0b);
+@collect_terms!(%);
+@assert(tst0b);
+
+orig0:=F_{n p} V_{q};
+@decompose_product(%);
+@canonicalise!(%):
+@collect_terms!(%);
+tst0:= F_{n p} V_{q} - @(orig0);
+@collect_terms!(%);
+@assert(tst0);
+
+# (1/3 * F_{n p} * V_{q} + 1/3 * F_{q p} * V_{n} - 1/3 * F_{p n} * V_{q} - 1/3 * F_{q n} * V_{p});
+# (2/3 * F_{n p} * V_{q} + 1/3 * F_{q p} * V_{n} - 1/3 * F_{q n} * V_{p});
+
+
+orig1:=D_{m}{F_{n p}} V_{q};
+@decompose_product(%);
+@canonicalise!(%):
+@collect_terms!(%);
+tst1:= 2/3 * D_{m}{F_{n p}} * V_{q} + 1/3 * D_{n}{F_{m p}} * V_{q} - 1/3 * D_{p}{F_{m n}} * V_{q}
+       - @(orig1);
+@collect_terms!(%);
+@assert(tst1);
+
+orig2:=V_{q} D_{m}{F_{n p}};
+@decompose_product(%):
+@canonicalise!(%):
+@collect_terms!(%);
+tst2:= V_{q} * (2/3 * D_{m}{F_{n p}} + 1/3 * D_{n}{F_{m p}} - 1/3 * D_{p}{F_{m n}} )
+       - @(orig2);
+@distribute!(%):
+@collect_terms!(%);
+@assert(tst2);
+
+orig3:=V_{q r} D_{m}{F_{n p}};
+@decompose_product(%):
+@canonicalise!(%):
+@collect_terms!(%);
+tst3:= V_{q r} * (2/3 * D_{m}{F_{n p}} + 1/3 * D_{n}{F_{m p}} - 1/3 * D_{p}{F_{m n}} )
+       - @(orig3);
+@distribute!(%):
+@collect_terms!(%);
+@assert(tst3);
+
+orig4b:= V_{m n} S_{p q};
+@decompose_product(%):
+@canonicalise!(%):
+@collect_terms!(%);
+tst4b:= V_{m n} S_{p q} - @(orig4b);
+@collect_terms!(%);
+@assert(tst4b);
+
+# Test 3: dimensionally dependent projections
+#
+@reset.
+{m,n,p,q,r,s,k}::Indices(vector).
+{m,n,p,q,r,s,k}::Integer(0..2).
+\epsilon_{m n p}::AntiSymmetric.
+\Gamma_{m n p}::AntiSymmetric.
+obj3:= \epsilon_{m n q} \Gamma_{r m n} - 
+       \epsilon_{m n r} \Gamma_{q m n};
+@decompose_product!(%);
+@sumflatten!(%):
+@collect_terms!(%);
+@canonicalise!(%):
+@collect_terms!(%);
+@assert(obj3);
+
+
+
+# In higher dimensions we just get the original back.
+@reset.
+{m,n,p,q,r}::Indices(vector).
+{m,n,p,q,r}::Integer(0..3).
+\epsilon_{m n p}::AntiSymmetric.
+\Gamma_{m n p}::AntiSymmetric.
+obj3hd:= \epsilon_{m n q} \Gamma_{r m n} - 
+       \epsilon_{m n r} \Gamma_{q m n};
+@decompose_product!(%);
+@number_of_terms(%);
+@sumflatten!(%):
+@collect_terms!(%);
+@canonicalise!(%):
+@collect_terms!(%);
+tst3hd:= \epsilon_{m n q} \Gamma_{r m n} - 
+       \epsilon_{m n r} \Gamma_{q m n} - @(obj3hd):
+@canonicalise!(%):
+@collect_terms!(%);
+@assert(tst3hd);
+
+# The four-dimensional analogue:
+#
+@reset.
+{m,n,p,q,r,s,k}::Indices(vector).
+{m,n,p,q,r,s,k}::Integer(0..3).
+\epsilon_{m n p q}::AntiSymmetric.
+\Gamma_{#}::AntiSymmetric.
+
+# A bit from supergravity.cnb which does not want to work:
+#
+# obj3nw:= \epsilon_{n p s k} \Gamma_{m n}
+#        - \epsilon_{n p m k} \Gamma_{s n};
+# @asym!(%){_{m}, _{p}};
+# @decompose_product!(%);
+# @collect_terms!(%);
+# @canonicalise!(%):
+# @collect_terms!(%);
+# 
+# 
+# 
+
+obj3c:= \epsilon_{m n p q} \Gamma_{r m n p} - 
+       \epsilon_{m n p r} \Gamma_{q m n p};
+@decompose_product!(%):
+@collect_terms!(%):
+@canonicalise!(%):
+@collect_terms!(%);
+@assert(obj3c);
+
+# Test 3b: trivial ones
+#
+@reset.
+{m,n}::Indices(vector).
+{m,n}::Integer(0..0).
+obj3b:= V_{m} W_{n};
+@decompose_product!(%);
+tst3b:= 1/2 V_{m} W_{n} + 1/2 V_{n} W_{m} - @(obj3b);
+@collect_terms!(%);
+@assert(tst3b);
+
+# Test 4: complicated indices
+#
+@reset.
+obj4:= A_{\dot{a} \dot{b}};
+@young_project(%){2,0}{0,1};
+tst4:= 1/2 A_{\dot{a} \dot{b}} + 1/2 A_{\dot{b} \dot{a}} - @(obj4);
+@collect_terms!(%);
+@assert(tst4);
+
+# Test 5: Bell-Robinson identity
+#
+# @reset.
+# R_{m n p q}::RiemannTensor.
+# {m,n,p,q,r,a,b,c,d}::Indices(vector).
+# {m,n,p,q,r,a,b,c,d}::Integer(0..3).
+# g_{m n}::Metric.
+# obj5:= g_{m d} R_{d a b c} R_{n a b c} - 1/4 g_{m n} R_{a b c d} R_{a b c d};
+
+# Test 6 - 8: lr_tensor.
+@reset.
+\tableau{#}::Tableau(dimension=10).
+obj6:= \tableau{2} \tableau{1}{1};
+@lr_tensor!(%);
+tst6:= \tableau{3}{1} + \tableau{2}{1}{1} - @(obj6);
+@collect_terms!(%);
+@assert(tst6);
+
+@reset.
+\ftableau{#}::FilledTableau(dimension=10).
+obj7:= \ftableau{a,b} \ftableau{c}{d};
+@lr_tensor!(%);
+tst7:= \ftableau{a,b,c}{d} + \ftableau{a,b}{c}{d} - @(obj7);
+@collect_terms!(%);
+@assert(tst7);
+
+@reset.
+\ftableau{#}::FilledTableau(dimension=10).
+obj8:= \ftableau{a_1,a_2}{a_3,a_4} \ftableau{b_1,b_2}{b_3,b_4} \ftableau{c_1,c_2}{c_3,c_4};
+@lr_tensor!(%);
+@distribute!(%);
+@lr_tensor!(%){EvenOnly};
+@sumflatten!(%);
+@length(%);
+tst8:= 16 - @(obj8);
+@collect_terms!(%);
+@assert(tst8);
+
+@reset.
+{m,n,p,q#}::Indices.
+{m,n,p,q#}::Integer(1..4).
+F_{m n}::TableauSymmetry(shape={1,1},indices={0,1},selfdual=1).
+obj9:= F_{m n};
+@young_project_tensor!(%);
+@canonicalise!(%):
+tst9:= F_{m n} + 1/2 F_{p q1} \epsilon_{m n p q1} - @(obj9);
+@collect_terms!(%);
+@assert(tst9);

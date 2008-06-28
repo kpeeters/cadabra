@@ -1,0 +1,100 @@
+
+export RELEASE=0.137
+
+.PHONY: static program_static test fasttest gui gui_static doc
+
+ifeq (@enable_gui@,no)
+all: program 
+
+install: install_program
+else
+all: program gui
+
+install: install_program install_gui
+endif
+
+
+static: program_static
+
+program:
+	( cd src && $(MAKE) );
+
+program_static:
+	( cd src && $(MAKE) static );
+
+profile:
+	( export CFLAGS=-pg && export LDFLAGS=-pg && cd src && $(MAKE) );
+
+doc:
+	( cd doc && $(MAKE) );
+
+gui:
+	( cd gui && $(MAKE) );
+
+gui_static:
+	( cd gui && $(MAKE) static );
+
+
+test: program
+	@echo "==== Running tests ===="
+	( export CDB_PARANOID=1 && export CDB_ERRORS_ARE_FATAL=1 \
+     && export CDB_PRINTSTAR=1 && cd tests && $(MAKE) clean && $(MAKE) all);
+	@echo "==== Tests passed ====="
+	@echo "**** Do not forget to run the advanced tests with 'make advtest' ****"
+
+fasttest: program
+	@echo "==== Running tests without consistency checks ===="
+	( export CDB_PRINTSTAR=1 && export CDB_ERRORS_ARE_FATAL=1 && cd tests && $(MAKE) clean && $(MAKE) all);
+	@echo "==== Tests passed ====="
+	@echo "**** Do not forget to run the advanced tests with 'make advtest' ****"
+
+advtest: program
+	@echo "==== Running advanced tests (this may take a while) ===="
+	( export CDB_PARANOID=1 && export CDB_PRINTSTAR=1 && cd tests && $(MAKE) clean && $(MAKE) advanced);
+	@echo "==== Advanced tests passed ====="
+
+install_program: program
+	( cd src && $(MAKE) install );
+	@INSTALL@ -d ${DESTDIR}@prefix@/share/man/man1
+	@INSTALL@ man/man1/cadabra.1 ${DESTDIR}@prefix@/share/man/man1
+	@INSTALL@ -d ${DESTDIR}@prefix@/bin
+	@INSTALL@ -d ${DESTDIR}@prefix@/share/TeXmacs/plugins/cadabra/progs
+	@INSTALL@ -m 644 texmacs/init-cadabra.scm ${DESTDIR}@prefix@/share/TeXmacs/plugins/cadabra/progs
+	@INSTALL@ -d ${DESTDIR}@prefix@/share/texmf/tex/latex/cadabra
+	@INSTALL@ doc/cadabra.sty $(DESTDIR)@prefix@/share/texmf/tex/latex/cadabra/cadabra.sty
+	@INSTALL@ -d ${DESTDIR}@prefix@/share/doc/cadabra/properties
+	@INSTALL@ -d ${DESTDIR}@prefix@/share/doc/cadabra/algorithms
+	@INSTALL@ -m 644 doc/properties/*.tex ${DESTDIR}@prefix@/share/doc/cadabra/properties
+	@INSTALL@ -m 644 doc/algorithms/*.tex ${DESTDIR}@prefix@/share/doc/cadabra/algorithms
+	@INSTALL@ -m 644 doc/general.tex ${DESTDIR}@prefix@/share/doc/cadabra/general.tex
+
+install_gui: gui
+	( cd gui && $(MAKE) install );
+	@INSTALL@ man/man1/xcadabra.1 ${DESTDIR}@prefix@/share/man/man1
+
+uninstall:
+	( cd src && $(MAKE) uninstall );
+
+clean:
+	( cd src && $(MAKE) clean );
+	( cd tests && $(MAKE) clean );
+	( cd gui && $(MAKE) clean );
+	( cd doc && $(MAKE) clean );
+#	( cd deb && rm -Rf usr );
+	rm -f cadabra*.deb
+	rm -f doc/*~
+	rm -f *~
+	rm -f man/man1/*~
+
+distclean: 
+	( cd src && $(MAKE) distclean );
+	( cd tests && $(MAKE) distclean );
+	( cd gui && $(MAKE) distclean );
+	( cd doc && $(MAKE) distclean );
+	rm -f Makefile config.cache config.log config.status cdb.log aclocal.m4
+	rm -f cdb*.log tst
+	rm -Rf autom4te.cache 
+
+depend:
+	( cd src && $(MAKE) .depend );
+	( cd gui && $(MAKE) .depend );

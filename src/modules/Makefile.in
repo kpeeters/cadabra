@@ -1,0 +1,10 @@
+
+nothing:
+
+
+clean:
+	rm -f *.o *~ $(TESTS)
+
+distclean: clean
+	rm -f Makefile
+

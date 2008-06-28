@@ -1,0 +1,212 @@
+
+AC_INIT(src/storage.cc)
+AC_PROG_CC
+AC_PROG_CXX
+AC_PROG_LN_S
+AC_PROG_MAKE_SET
+AC_PROG_INSTALL
+AC_PREFIX_DEFAULT(/usr/local)
+AC_SUBST(install_flags)
+AC_CONFIG_HEADER(src/config.h)
+AC_LANG(C++)
+
+# Figure out how to turn on compiler warnings.
+
+AC_DEFUN([AX_CFLAGS_WARN_ALL],[dnl
+AS_VAR_PUSHDEF([FLAGS],[CFLAGS])dnl
+AS_VAR_PUSHDEF([VAR],[ac_cv_cflags_warn_all])dnl
+AC_CACHE_CHECK([m4_ifval($1,$1,FLAGS) for maximum warnings],
+VAR,[VAR="no, unknown"
+ AC_LANG_SAVE
+ AC_LANG_C
+ ac_save_[]FLAGS="$[]FLAGS"
+for ac_arg dnl
+in "-pedantic  % -Wall"       dnl   GCC
+   "-xstrconst % -v"          dnl Solaris C
+   "-std1      % -verbose -w0 -warnprotos" dnl Digital Unix
+   "-qlanglvl=ansi % -qsrcmsg -qinfo=all:noppt:noppc:noobs:nocnd" dnl AIX
+   "-ansi -ansiE % -fullwarn" dnl IRIX
+   "+ESlit     % +w1"         dnl HP-UX C
+   "-Xc        % -pvctl[,]fullmsg" dnl NEC SX-5 (Super-UX 10)
+   "-h conform % -h msglevel 2" dnl Cray C (Unicos)
+   #
+do FLAGS="$ac_save_[]FLAGS "`echo $ac_arg | sed -e 's,%%.*,,' -e 's,%,,'`
+   AC_TRY_COMPILE([],[return 0;],
+   [VAR=`echo $ac_arg | sed -e 's,.*% *,,'` ; break])
+done
+ FLAGS="$ac_save_[]FLAGS"
+ AC_LANG_RESTORE
+])
+case ".$VAR" in
+     .ok|.ok,*) m4_ifvaln($3,$3) ;;
+   .|.no|.no,*) m4_ifvaln($4,$4,[m4_ifval($2,[
+        AC_RUN_LOG([: m4_ifval($1,$1,FLAGS)="$m4_ifval($1,$1,FLAGS) $2"])
+                      m4_ifval($1,$1,FLAGS)="$m4_ifval($1,$1,FLAGS) $2"])]) ;;
+   *) m4_ifvaln($3,$3,[
+   if echo " $[]m4_ifval($1,$1,FLAGS) " | grep " $VAR " 2>&1 >/dev/null
+   then AC_RUN_LOG([: m4_ifval($1,$1,FLAGS) does contain $VAR])
+   else AC_RUN_LOG([: m4_ifval($1,$1,FLAGS)="$m4_ifval($1,$1,FLAGS) $VAR"])
+                      m4_ifval($1,$1,FLAGS)="$m4_ifval($1,$1,FLAGS) $VAR"
+   fi ]) ;;
+esac
+AS_VAR_POPDEF([VAR])dnl
+AS_VAR_POPDEF([FLAGS])dnl
+])
+
+dnl the only difference - the LANG selection... and the default FLAGS
+
+AC_DEFUN([AX_CXXFLAGS_WARN_ALL],[dnl
+AS_VAR_PUSHDEF([FLAGS],[CXXFLAGS])dnl
+AS_VAR_PUSHDEF([VAR],[ac_cv_cxxflags_warn_all])dnl
+AC_CACHE_CHECK([m4_ifval($1,$1,FLAGS) for maximum warnings],
+VAR,[VAR="no, unknown"
+ AC_LANG_SAVE
+ AC_LANG_CPLUSPLUS
+ ac_save_[]FLAGS="$[]FLAGS"
+for ac_arg dnl
+in "-pedantic  % -Wall"       dnl   GCC
+   "-xstrconst % -v"          dnl Solaris C
+   "-std1      % -verbose -w0 -warnprotos" dnl Digital Unix
+   "-qlanglvl=ansi % -qsrcmsg -qinfo=all:noppt:noppc:noobs:nocnd" dnl AIX
+   "-ansi -ansiE % -fullwarn" dnl IRIX
+   "+ESlit     % +w1"         dnl HP-UX C
+   "-Xc        % -pvctl[,]fullmsg" dnl NEC SX-5 (Super-UX 10)
+   "-h conform % -h msglevel 2" dnl Cray C (Unicos)
+   #
+do FLAGS="$ac_save_[]FLAGS "`echo $ac_arg | sed -e 's,%%.*,,' -e 's,%,,'`
+   AC_TRY_COMPILE([],[return 0;],
+   [VAR=`echo $ac_arg | sed -e 's,.*% *,,'` ; break])
+done
+ FLAGS="$ac_save_[]FLAGS"
+ AC_LANG_RESTORE
+])
+case ".$VAR" in
+     .ok|.ok,*) m4_ifvaln($3,$3) ;;
+   .|.no|.no,*) m4_ifvaln($4,$4,[m4_ifval($2,[
+        AC_RUN_LOG([: m4_ifval($1,$1,FLAGS)="$m4_ifval($1,$1,FLAGS) $2"])
+                      m4_ifval($1,$1,FLAGS)="$m4_ifval($1,$1,FLAGS) $2"])]) ;;
+   *) m4_ifvaln($3,$3,[
+   if echo " $[]m4_ifval($1,$1,FLAGS) " | grep " $VAR " 2>&1 >/dev/null
+   then AC_RUN_LOG([: m4_ifval($1,$1,FLAGS) does contain $VAR])
+   else AC_RUN_LOG([: m4_ifval($1,$1,FLAGS)="$m4_ifval($1,$1,FLAGS) $VAR"])
+                      m4_ifval($1,$1,FLAGS)="$m4_ifval($1,$1,FLAGS) $VAR"
+   fi ]) ;;
+esac
+AS_VAR_POPDEF([VAR])dnl
+AS_VAR_POPDEF([FLAGS])dnl
+])
+
+AX_CFLAGS_WARN_ALL
+
+dnl EXPECTPATH=""
+dnl AC_CHECK_HEADER(expect.h, AC_DEFINE(EXPECTPATH, <expect.h>))
+dnl if test "$ac_cv_header_expect_h" != "yes"
+dnl    then AC_CHECK_HEADER(tcl8.4/expect.h, AC_DEFINE(EXPECTPATH, <tcl8.4/expect.h>))
+dnl         if test "$ac_cv_header_tcl8_4_expect_h" != "yes"
+dnl            then AC_MSG_ERROR([Need the expect library; get it from http://expect.nist.gov/ .])
+dnl         fi
+dnl fi
+  
+AC_CHECK_PROG(LIE, lie, yes, no)
+if test "${LIE}" == "no"
+   then AC_MSG_ERROR([Need the LiE program; get it from http://young.sp2mi.univ-poitiers.fr/~marc/LiE/ .])
+fi
+
+AC_CHECK_HEADERS(pcre.h)
+if test "${ac_cv_header_pcre_h}" == "no"
+   then AC_MSG_ERROR([Need the pcre library; get it from http://www.pcre.org/ . Make sure to set CPPFLAGS if necessary.])
+fi
+
+AC_CHECK_HEADERS(gmpxx.h)
+if test "${ac_cv_header_gmpxx_h}" == "no"
+   then AC_MSG_ERROR([Need the gmp and gmpxx library; get them from http://www.swox.com/gmp/ and configure them with --enable-cxx. Also make sure to set CPPFLAGS if necessary.])
+fi
+
+dnl AC_CHECK_HEADERS(pcre++.h)
+AC_CHECK_HEADERS(pcrecpp.h)
+dnl if test "${ac_cv_header_pcrecpp_h}" == "no" -a "${ac_cv_header_pcrepp_h}" == "no" 
+if test "${ac_cv_header_pcrecpp_h}" == "no"
+   then AC_MSG_ERROR([Need the pcrecpp library; get it from http://www.pcre.org . Make sure to set CPPFLAGS if necessary.])
+fi
+dnl if test "${ac_cv_header_pcre++_h}" == "no"
+dnl    then pcrecpp=yes
+dnl    else pcrecpp=no
+dnl fi
+  
+PKG_CHECK_MODULES([sigc], [sigc++-2.0]) 
+PKG_CHECK_MODULES([modglue], [modglue])
+AC_CHECK_PROG(PTYWRAP, ptywrap, yes, no)
+if test "${PTYWRAP}" == "no"
+   then AC_MSG_ERROR([You have the modglue library, but the "ptywrap" tool which comes with it is not installed or executable.])
+fi
+
+MAC_OS_X=""
+if test "`uname`" == "Darwin"
+   then MAC_OS_X="1"
+        echo "checking system type... Darwin"
+   else echo "checking system type... Unix"
+fi
+
+echo -n "Checking whether to use -fnested-functions..."
+echo "main() {};" > conftmp.c
+NESTED=-fnested-functions
+if gcc -fnested-functions -c -o conftmp.o conftmp.c 1>/dev/null 2>&1
+   then echo " yes"
+   else NESTED=""
+        echo " no"
+fi
+rm -f conftmp.c conftmp.o
+
+dnl Optional configuration of the experimental GUI
+AC_MSG_CHECKING([whether to build the GUI])
+AC_ARG_ENABLE([gui],  [AS_HELP_STRING([--enable-gui], 
+              [Enable building of the graphical front-end (default is yes)])], , enable_gui=yes)
+if test "$enable_gui" == "no"
+   then echo "no"
+   else echo "yes"
+		  PKG_CHECK_MODULES([sigc], [sigc++-2.0]) 
+		  PKG_CHECK_MODULES([gtk], [gtk+-2.0]) 
+		  PKG_CHECK_MODULES([pango], [pango]) 
+		  PKG_CHECK_MODULES([gtkmm], [gtkmm-2.4]) 
+        if test "x`pkg-config --modversion gtkmm-2.4 | grep 2.8`" == "x" ; then
+	  	    AC_DEFINE([GTKMM_GEQ_28], 0, [Defined if Gtkmm's version is 2.8 or greater]) 
+          echo "checking for gtkmm version...  < 2.8"
+		  else
+	  	    AC_DEFINE([GTKMM_GEQ_28], 1, [Defined if Gtkmm's version is 2.8 or greater]) 
+          echo "checking for gtkmm version... >= 2.8"
+        fi
+		  PKG_CHECK_MODULES([pangomm], [pangomm-1.4])
+		  AC_CHECK_PROG(DVIPNG, dvipng, yes, no)
+		  if test "${DVIPNG}" == "no"
+		     then AC_MSG_ERROR([Need the dvipng program; get it from http://sourceforge.net/projects/dvipng/ .])
+		  fi
+		  AC_CHECK_PROG(LATEX, latex, yes, no)
+		  if test "${LATEX}" == "no"
+		     then AC_MSG_ERROR([Need a working LaTeX installation.])
+		  fi
+		  printf '\\nonstopmode\\documentclass{article}\\usepackage{breqn}\\begin{document}\\begin{dmath*}x^2\\end{dmath*}\\end{document}\n' > conftmp.tex
+		  printf "checking for breqn package..."
+		  if latex conftmp.tex > /dev/null 2>&1
+		     then echo " yes"
+		     else echo " no"
+		          AC_MSG_ERROR([Need the breqn LaTeX package; get it from ftp://ftp.ams.org/pub/tex/ .])
+		  fi
+		  rm -f conftmp.tex conftmp.log conftmp.dvi conftmp.aux
+fi
+
+
+AC_SUBST([enable_gui])
+AC_SUBST([MAC_OS_X])
+AC_SUBST([pcrecpp])
+AC_SUBST([NESTED])
+AC_SUBST([GTKMM_GEQ_28])
+
+dnl The output files
+AC_OUTPUT(
+  Makefile 
+  src/Makefile 
+  src/modules/Makefile
+  tests/Makefile
+  gui/Makefile
+  doc/Makefile
+)

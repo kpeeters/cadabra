@@ -1,0 +1,105 @@
+brute:
+
+ (1/8 * D_{m}{F_{n p}} * V_{q} 
++ 1/8 * D_{n}{F_{m p}} * V_{q} 
+
+- 1/8 * D_{m}{F_{n q}} * V_{p} 
+- 1/8 * D_{m}{F_{p n}} * V_{q} 
++ 1/8 * D_{m}{F_{p q}} * V_{n} 
++ 1/8 * D_{m}{F_{q n}} * V_{p} 
+- 1/8 * D_{m}{F_{q p}} * V_{n} 
+
+- 1/8 * D_{n}{F_{m q}} * V_{p} 
+- 1/8 * D_{p}{F_{m n}} * V_{q} 
++ 1/8 * D_{p}{F_{m q}} * V_{n} 
++ 1/8 * D_{q}{F_{m n}} * V_{p} 
+- 1/8 * D_{q}{F_{m p}} * V_{n});
+
+smart:
+
+ (1/4 * D_{m}{F_{n p}} * V_{q} 
++ 1/8 * D_{n}{F_{m p}} * V_{q} 
+
+- 1/4 * D_{m}{F_{n q}} * V_{p} 
++ 1/4 * D_{m}{F_{q n}} * V_{p}  vs  D_{m}{F_{p q}} V_{n}
+
+- 1/8 * D_{n}{F_{m q}} * V_{p} 
+- 1/8 * D_{p}{F_{m n}} * V_{q} 
++ 1/8 * D_{p}{F_{m q}} * V_{n} 
++ 1/8 * D_{q}{F_{m n}} * V_{p} 
+- 1/8 * D_{q}{F_{m p}} * V_{n});
+
+The boxes are isolated correctly.
+The implicit antisymmetry of the original tensor is found correctly.
+And even the combinatorics output is correct:
+
+1 0 2 3 
+1 0 3 2 
+3 0 1 2 
+
+Nevertheless, the permutation with 1/4 prefactors is not correct.
+
+Is this really correct?:
+
+			src_fd+=sym[i][j];
+			dst_fd+=sym.original[j];
+
+If this is, can we use different sublengths to achieve what we want?
+ 
+_   _
+1 0 2 3  ->  1 0 2 3    D_{m}{F_{n p}} V_{q}
+1 0 3 2 		 1 0 3 2    D_{m}{F_{n q}} V_{p}
+3 0 1 2 		 2 0 3 1    D_{m}{F_{p q}} V_{n}
+
+Yes, this works of course. Interesting duality: sublength blocks are
+for permutation by location what input_asym is for permutation by
+value.
+
+ n m
+ p 
+ q
+
+A:=  1/24 * V_{m n} * F_{p q} 
+
+   - 1/24 * V_{m n} * F_{q p} 
+
+   - 1/24 * V_{m p} * F_{n q} 
+   + 1/24 * V_{m p} * F_{q n} 
+
+   + 1/24 * V_{m q} * F_{n p} 
+   - 1/24 * V_{m q} * F_{p n} 
+   - 1/24 * V_{n m} * F_{p q} 
+   + 1/24 * V_{n m} * F_{q p} 
+   + 1/24 * V_{n p} * F_{m q} 
+   - 1/24 * V_{n p} * F_{q m} 
+   - 1/24 * V_{n q} * F_{m p} 
+   + 1/24 * V_{n q} * F_{p m} 
+   + 1/24 * V_{p m} * F_{n q} 
+   - 1/24 * V_{p m} * F_{q n} 
+   - 1/24 * V_{p n} * F_{m q} 
+   + 1/24 * V_{p n} * F_{q m} 
+   + 1/24 * V_{p q} * F_{m n} 
+   - 1/24 * V_{p q} * F_{n m} 
+   - 1/24 * V_{q m} * F_{n p} 
+   + 1/24 * V_{q m} * F_{p n} 
+   + 1/24 * V_{q n} * F_{m p} 
+   - 1/24 * V_{q n} * F_{p m} 
+   - 1/24 * V_{q p} * F_{m n} 
+   + 1/24 * V_{q p} * F_{n m};
+
+B:= V_{m n} * F_{p q} 
+
+  - V_{m p} * F_{n q} 
+  + V_{m q} * F_{n p} 
+  + V_{n p} * F_{m q} 
+  - V_{n q} * F_{m p} 
+  + V_{p q} * F_{m n};
+
+
+@(A)-@(B):
+@canonicalise!(%):
+@collect_terms!(%);
+
+
+
+

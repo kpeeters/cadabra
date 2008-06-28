@@ -1,0 +1,21 @@
+
+
+\poisson{#}::Derivative.
+{ A_{a b}(x?), B^{a b}(y?) }::Depends(\poisson).
+
+\poisson( Q(x) A_{a b}(x) R(x') A_{e f}(x') )( S B^{c d}(y) T(y') B^{g h}(y') );
+
+@prodrule!(%);
+@prodrule!(%);
+
+@distribute!(%);
+
+@unwrap!(%);
+
+@substitute!(%)( 
+  \poisson( A_{a b}(x?) )( B^{c d}(y?) ) = \delta_{a}^{c} \delta_{b}^{d} \delta(x?,y?) );
+
+
+\poisson(   \partial(A_{a b}(x))_{x}   )(  B^{c d}(x')  );
+
+@substitute!(%)( \poisson( \partial( A?? )_{x} )( B?? ) -> \partial(\poisson( A?? )( B?? ) )_{x} );

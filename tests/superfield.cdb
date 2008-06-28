@@ -1,0 +1,52 @@
+
+\partial{#}::PartialDerivative.
+\dagger{#}::HermiteanConjugate.
+
+{ A, F }::Depends(\partial).
+\psi::Depends(\partial, \dagger).
+\theta::Depends(\dagger).
+
+{ \theta, \sigma^m, \psi, \theta, \bar{\theta} }::NonCommuting.
+
+\Phi:= A + i \theta \sigma^m \bar{\theta} \partial_{m}{A} 
+       + (1/4) \theta\theta \bar{\theta}\bar{\theta} \partial_{m}{\partial^{m}{A}}
+       + \sqrt{2} \theta\psi - I/\sqrt{2} \theta\theta \partial_{m}{\psi} \sigma^m \bar{\theta}
+       + \theta\theta F;
+
+\dagger{ @(\Phi) };
+
+
+
+conjugation:
+
+\dagger{ \chi \sigma^m \bar{\psi} } 
+
+  = \dagger{ \chi^a \sigma^m_{a \dot{a}} \bar{\psi}^{\dot{a}} }
+  
+  = \psi^{a} \sigma^m_{a \dot{a}}^\dagger \bar{\chi}^{\dot{a}}
+
+  [sigma^m is hermitean
+ 
+  = \psi \sigma^m \bar{\chi}
+
+
+\dagger{ \chi \sigma^m \bar{\sigma}^n \psi } 
+
+  = \bar\psi \bar\sigma^n \sigma^m \bar\chi
+
+
+fermi flips:
+
+\chi \sigma^m \bar\psi = \chi^a \sigma^m_{a \dot{a}} \bar\psi^{\dot{a}}
+
+   = - \bar\psi^{\dot{a}} \sigma^m_{a \dot{a}} \chi^a 
+
+   = - \epsilon^{\dot{a} \dot{b}} \bar\psi_{\dot{b}}
+       \sigma^m_{a \dot{a}} \epsilon^{ab} \chi_{b}
+
+   = - \bar\psi_{\dot{b}} \eps^{\dot{a}\dot{b}} \eps^{ab} \sigma^m_{a \dot{b}} \chi_{b}
+ 
+   = - \bar\psi \bar\sigma^m \chi .
+
+ (so use this to sort all unbarred objects to the left?)
+

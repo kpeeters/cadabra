@@ -1,0 +1,107 @@
+\documentclass[11pt]{kasper}
+\usepackage{relsize}
+
+\begin{document}
+\title{{\tt combinatorics.hh} documentation}
+\author{Kasper Peeters}
+\address{1}{{\it MPI/AEI f\"ur Gravitationsphysik, Am M\"uhlenberg 1, 14476
+Potsdam, Germany}}
+\email{k.peeters@damtp.cam.ac.uk}
+\maketitle
+\begin{abstract}
+The {\tt combinatorics.hh} class is bla bla
+\end{abstract}
+
+\begin{sectionunit}
+\title{Reference guide}
+\maketitle
+The {\tt combinatorics.hh} class library contains two classes for the
+generation of combinations
+\begin{sectionunit}
+\title{The {\tt combinations} class}
+\maketitle
+The {\tt combinations} class takes a vector of elements, and generates
+combinations of a subset of these elements that satisfy several 
+requirements. 
+\begin{description}
+\item[{\tt sublengths}]~\\
+Stores the lengths of the object ranges in which objects can only
+appear in increasing order. The usual concepts of ``combinations and
+permutations'' translate to the following content of the {\tt
+sublengths} vector:
+\begin{equation}
+\begin{aligned}
+\text{combinations:} &\quad \text{one element, $v$=total length}\, ,\\
+\text{permutations:} &\quad \text{$n$ elements, all equal to $1$}.
+\end{aligned}
+\end{equation}
+However, many more general situations are possible with {\tt
+  combinatorics.hh}. See the examples below.
+
+\item[{\tt input\_asym}] ~\\
+Stores sets of objects which have to be ``implicitly
+permuted''. That is, permutations are done only modulo the
+permutations of the objects in these sets. An example may help:
+\begin{equation}
+\begin{aligned}
+\{a,b,c\}           &\rightarrow \frac{1}{6}(a,b,c + a,c,b + b,a,c + c,a,b + b,c,a + c,b,a)\\
+\{a,b,c\}_{\{0,1\}} &\rightarrow \frac{1}{3}(a,b,c + a,c,b + c,a,b)\\
+\{a,b,c\}_{\{0,2\}} &\rightarrow \frac{1}{3}(a,b,c + a,c,b + b,a,c)\\
+\{a,b,c\}^{\{2,1\}} &\rightarrow \frac{1}{3}(a,b,c + a,c,b + c,a,b)
+\end{aligned}
+\end{equation}
+Note that this does not just remove terms, it also corrects the
+multiplicative factor.
+\end{description}
+\end{sectionunit}
+\begin{sectionunit}
+\title{The {\tt symmetriser} class}
+\maketitle
+The {\tt symmetriser} class takes a vector of elements, and applies
+permutations or combinations to it. The difference with {\tt
+  combinations} is that {\tt symmetriser} can be used to apply several
+permutations successively. 
+
+Here is an example,
+\begin{screen}
+symmetriser<string> sm;
+sm.original.push_back("r1");
+sm.original.push_back("r2");
+sm.original.push_back("r3");
+sm.original.push_back("r4");
+sm.original.push_back("r5");
+
+sm.block_length=1;
+sm.permutation_sign=-1;
+sm.permute_blocks.push_back(1);
+sm.permute_blocks.push_back(2);
+sm.apply_symmetry();
+\end{screen}
+This permutes the {\tt r2} and {\tt r3} items, with a minus sign under
+exchange, leaving the other elements unchanged. 
+
+\begin{description}
+\item[set storage]
+\item[result storage]
+\item[permuting by position]
+\item[permuting by value]
+\item[weights]
+\item[input symmetries] Just as with the {\tt combinations} class,
+the {\tt symmetriser} class can be told to apply symmetries only 
+modulo given symmetries. Take care when permuting objects by value:
+the \verb|input\_asym| data still refer to object locations, not
+object values (this may be a tricky bug to find when you are permuting
+integers). The object locations are always relative to the set of 
+permuted values, not with respect to the complete set of original values.
+\end{description}
+
+
+\end{sectionunit}
+\end{sectionunit}
+
+\begin{sectionunit}
+\title{Examples}
+\maketitle
+
+\end{sectionunit}
+\end{document}

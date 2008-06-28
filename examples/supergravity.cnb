@@ -1,0 +1,556 @@
+% Cadabra notebook version 1.0
+\documentclass[11pt]{article}
+\usepackage[textwidth=460pt, textheight=660pt]{geometry}
+\usepackage[usenames]{color}
+\usepackage[parfill]{parskip}
+\usepackage{breqn}
+\def\specialcolon{\mathrel{\mathop{:}}\hspace{-.5em}}
+\renewcommand{\bar}[1]{\overline{#1}}
+\begin{document}
+% Begin TeX cell closed
+{\large\bfseries Superinvariance of four-dimensional $N=1$ supergravity.}
+
+This notebook follows the notation and conventions of P. van Nieuwenhuizen, ``Supergravity'', Phys.~Rep.~68 (1981) 189, except for $\gamma_5$ which is always written using the product of four gamma matrices. We will use the 1.5 order formalism as described in section 1.6 and~1.7.
+% End TeX cell
+{\color[named]{Blue}\begin{verbatim}
+::PostDefaultRules( @@eliminate_kr!(%), @@prodsort!(%), @@collect_terms!(%) ).
+\end{verbatim}}
+\begin{verbatim}
+Assigning property PostDefaultRules to .
+\end{verbatim}
+% Begin TeX cell closed
+Declaration of derivative operators and Dirac conjugation:
+% End TeX cell
+{\color[named]{Blue}\begin{verbatim}
+D{#}::Derivative.
+\bar{#}::DiracBar.
+\partial{#}::PartialDerivative.
+\delta{A??}::Derivative.
+\end{verbatim}}
+\begin{verbatim}
+Assigning property Derivative to D.
+Assigning property DiracBar to \bar.
+Assigning property PartialDerivative to \partial.
+Assigning property Derivative to \delta.
+\end{verbatim}
+% Begin TeX cell closed
+Indices for flat and curved space:
+% End TeX cell
+{\color[named]{Blue}\begin{verbatim}
+{m,n,p,q,r,s,t,u,m#}::Indices(flat).
+{m,n,p,q,r,s,t,u,m#}::Integer(0..3).
+{\mu,\nu,\rho,\sigma,\kappa,\lambda,\alpha,\beta,\gamma}::Indices(curved,position=fixed).
+{\mu,\nu,\rho,\sigma,\kappa,\lambda,\alpha,\beta,\gamma}::Integer(0..3).
+\end{verbatim}}
+\begin{verbatim}
+Assigning property Indices to m, n, p, q, r, s, t, u, m#.
+Assigning property Integer to m, n, p, q, r, s, t, u, m#.
+Assigning property Indices to \mu, \nu, \rho, \sigma, \kappa, \lambda, \alpha, \beta, \gamma.
+Assigning property Integer to \mu, \nu, \rho, \sigma, \kappa, \lambda, \alpha, \beta, \gamma.
+\end{verbatim}
+% Begin TeX cell closed
+Declaration of all bosonic fields:
+% End TeX cell
+{\color[named]{Blue}\begin{verbatim}
+e^{m \mu}::Vielbein.
+e_{m \mu}::InverseVielbein.
+g^{\mu\nu}::InverseMetric.
+g_{\mu\nu}::Metric.
+\omega_{\mu m n}::TableauSymmetry( indices={1,2}, shape={1,1} ).
+\delta_{\mu}^{\rho}::KroneckerDelta.
+\delta^{\mu}_{\rho}::KroneckerDelta.
+\delta^{m n}::KroneckerDelta.
+R_{\mu\nu m n}::TableauSymmetry( indices={0,1}, shape={1,1}, indices={2,3}, shape={1,1} ).
+{ e^{m \mu}, e_{m \mu}, e, T^{\mu}_{\nu\rho} }::Depends(\partial, D).
+T^{\mu}_{\nu\rho}::TableauSymmetry( indices={1,2}, shape={1,1} ).
+\epsilon_{m n p q}::AntiSymmetric.
+\epsilon^{\mu\nu\rho\sigma}::AntiSymmetric.
+\end{verbatim}}
+\begin{verbatim}
+Assigning property Vielbein to e.
+Assigning property InverseVielbein to e.
+Assigning property InverseMetric to g.
+Assigning property Metric to g.
+Assigning property TableauSymmetry to \omega.
+Assigning property KroneckerDelta to \delta.
+Assigning property KroneckerDelta to \delta.
+Assigning property KroneckerDelta to \delta.
+Assigning property TableauSymmetry to R.
+Assigning property Depends to e, e, e, T.
+Assigning property TableauSymmetry to T.
+Assigning property AntiSymmetric to \epsilon.
+Assigning property AntiSymmetric to \epsilon.
+\end{verbatim}
+% Begin TeX cell closed
+Declaration of all fermionic fields:
+% End TeX cell
+{\color[named]{Blue}\begin{verbatim}
+{ \epsilon,\psi_{\mu},\psi_{\mu\nu} }::Spinor(dimension=4, type=Majorana).
+\Gamma_{#{m}}::GammaMatrix(metric=\delta).
+\Gamma_{#{\mu}}::GammaMatrix(metric=g).
+{ \psi_{\mu\nu}, \psi_{\mu}, \epsilon }::AntiCommuting.
+{ \psi_{\mu}, \psi_{\mu\nu} }::SelfAntiCommuting.
+{ \epsilon, \psi_{\mu}, \psi_{\mu\nu} }::SortOrder.
+{ \epsilon, \psi_{\mu}, \psi_{\mu\nu} }::Depends(\bar,\partial,D).
+\Gamma_{#}::Depends(\bar).
+\psi_{\mu\nu}::AntiSymmetric.
+\end{verbatim}}
+\begin{verbatim}
+Assigning property Spinor to \epsilon, \psi, \psi.
+Assigning property GammaMatrix to \Gamma.
+Assigning property GammaMatrix to \Gamma.
+Assigning property AntiCommuting to \psi, \psi, \epsilon.
+Assigning property SelfAntiCommuting to \psi, \psi.
+Assigning property SortOrder to \epsilon, \psi, \psi.
+Assigning property Depends to \epsilon, \psi, \psi.
+Assigning property Depends to \Gamma.
+Assigning property AntiSymmetric to \psi.
+\end{verbatim}
+% Begin TeX cell closed
+The Lagrangian of $N=1$ four-dimensionsal supergravity,
+% End TeX cell
+{\color[named]{Blue}\begin{verbatim}
+L:= -1/2 e e^{n \nu} e^{m \mu} R_{\mu\nu n m} 
+                 - 1/2 e \bar{\psi_\mu} \Gamma^{\mu\nu\rho} D_{\nu}{\psi_{\rho}};
+\end{verbatim}}
+\begin{dmath*}[compact, spread=2pt]
+L\specialcolon{}=  - \frac{1}{2}\, R_{\mu \nu n m} e e^{m \mu} e^{n \nu} - \frac{1}{2}\, \bar{\psi_{\mu}} \Gamma^{\mu \nu \rho} D_{\nu}{\psi_{\rho}} e;
+\end{dmath*}
+{\color[named]{Blue}\begin{verbatim}
+@rewrite_indices!(%){ \Gamma^{m n p} }{ e^{n \mu} };
+\end{verbatim}}
+\begin{dmath*}[compact, spread=2pt]
+L\specialcolon{}=  - \frac{1}{2}\, R_{\mu \nu n m} e e^{m \mu} e^{n \nu} - \frac{1}{2}\, \bar{\psi_{\mu}} \Gamma^{m n p} D_{\nu}{\psi_{\rho}} e e^{m \mu} e^{n \nu} e^{p \rho};
+\end{dmath*}
+% Begin TeX cell closed
+This action is supposed to be invariant under the following supersymmetry transformation rules:
+% End TeX cell
+{\color[named]{Blue}\begin{verbatim}
+susy:= { e^{n \mu} -> -\bar{\epsilon} \Gamma^m \psi_\nu e^{m \mu} e^{n \nu},
+         e         -> e \bar{\epsilon} \Gamma^n \psi_\mu e^{n\mu},
+         \psi_\mu  -> D_{\mu}{\epsilon} };
+\end{verbatim}}
+\begin{dmath*}[compact, spread=2pt]
+susy\specialcolon{}= \{e^{n \mu} \rightarrow (-1)\, \bar{\epsilon} \Gamma^{m} \psi_{\nu} e^{m \mu} e^{n \nu},\quad e \rightarrow \bar{\epsilon} \Gamma^{n} \psi_{\mu} e e^{n \mu},\quad \psi_{\mu} \rightarrow D_{\mu}{\epsilon}\};
+\end{dmath*}
+{\color[named]{Blue}\begin{verbatim}
+@vary!(L)( @(susy) );
+\end{verbatim}}
+\begin{dmath*}[compact, spread=2pt]
+L\specialcolon{}=  - \frac{1}{2}\, R_{\mu \nu n m} \bar{\epsilon} \Gamma^{p} \psi_{\rho} e e^{p \rho} e^{m \mu} e^{n \nu} + \frac{1}{2}\, R_{\mu \nu n m} e \bar{\epsilon} \Gamma^{p} \psi_{\rho} e^{p \mu} e^{m \rho} e^{n \nu} + \frac{1}{2}\, R_{\mu \nu n m} e e^{m \mu} \bar{\epsilon} \Gamma^{p} \psi_{\rho} e^{p \nu} e^{n \rho} - \frac{1}{2}\, \bar{D_{\mu}{\epsilon}} \Gamma^{m n p} D_{\nu}{\psi_{\rho}} e e^{m \mu} e^{n \nu} e^{p \rho} - \frac{1}{2}\, \bar{\psi_{\mu}} \Gamma^{m n p} D_{\nu}{D_{\rho}{\epsilon}} e e^{m \mu} e^{n \nu} e^{p \rho} - \frac{1}{2}\, \bar{\psi_{\mu}} \Gamma^{m n p} D_{\nu}{\psi_{\rho}} \bar{\epsilon} \Gamma^{q} \psi_{\sigma} e e^{q \sigma} e^{m \mu} e^{n \nu} e^{p \rho} + \frac{1}{2}\, \bar{\psi_{\mu}} \Gamma^{m n p} D_{\nu}{\psi_{\rho}} e \bar{\epsilon} \Gamma^{q} \psi_{\sigma} e^{q \mu} e^{m \sigma} e^{n \nu} e^{p \rho} + \frac{1}{2}\, \bar{\psi_{\mu}} \Gamma^{m n p} D_{\nu}{\psi_{\rho}} e e^{m \mu} \bar{\epsilon} \Gamma^{q} \psi_{\sigma} e^{q \nu} e^{n \sigma} e^{p \rho} + \frac{1}{2}\, \bar{\psi_{\mu}} \Gamma^{m n p} D_{\nu}{\psi_{\rho}} e e^{m \mu} e^{n \nu} \bar{\epsilon} \Gamma^{q} \psi_{\sigma} e^{q \rho} e^{p \sigma};
+\end{dmath*}
+% Begin TeX cell closed
+The $D_\nu D_\rho \epsilon$ factor can be rewritten as a Riemann tensor,
+% End TeX cell
+{\color[named]{Blue}\begin{verbatim}
+@substitute!(%)( D_{\nu}{ D_{\rho}{ \epsilon } } 
+                            -> 1/4 R_{\nu\rho m n} \Gamma^{m n} \epsilon):
+@prodsort!(%);
+\end{verbatim}}
+\begin{dmath*}[compact, spread=2pt]
+L\specialcolon{}=  - \frac{1}{2}\, R_{\mu \nu n m} \bar{\epsilon} \Gamma^{p} \psi_{\rho} e e^{m \mu} e^{n \nu} e^{p \rho} + \frac{1}{2}\, R_{\mu \nu n m} \bar{\epsilon} \Gamma^{p} \psi_{\rho} e e^{m \rho} e^{n \nu} e^{p \mu} + \frac{1}{2}\, R_{\mu \nu n m} \bar{\epsilon} \Gamma^{p} \psi_{\rho} e e^{m \mu} e^{n \rho} e^{p \nu} - \frac{1}{2}\, \bar{D_{\mu}{\epsilon}} \Gamma^{m n p} D_{\nu}{\psi_{\rho}} e e^{m \mu} e^{n \nu} e^{p \rho} - \frac{1}{8}\, R_{\nu \rho q r} \bar{\psi_{\mu}} \Gamma^{m n p} \Gamma^{q r} \epsilon e e^{m \mu} e^{n \nu} e^{p \rho} - \frac{1}{2}\, \bar{\psi_{\mu}} \Gamma^{m n p} D_{\nu}{\psi_{\rho}} \bar{\epsilon} \Gamma^{q} \psi_{\sigma} e e^{m \mu} e^{n \nu} e^{p \rho} e^{q \sigma} + \frac{1}{2}\, \bar{\psi_{\mu}} \Gamma^{m n p} D_{\nu}{\psi_{\rho}} \bar{\epsilon} \Gamma^{q} \psi_{\sigma} e e^{m \sigma} e^{n \nu} e^{p \rho} e^{q \mu} + \frac{1}{2}\, \bar{\psi_{\mu}} \Gamma^{m n p} D_{\nu}{\psi_{\rho}} \bar{\epsilon} \Gamma^{q} \psi_{\sigma} e e^{m \mu} e^{n \sigma} e^{p \rho} e^{q \nu} + \frac{1}{2}\, \bar{\psi_{\mu}} \Gamma^{m n p} D_{\nu}{\psi_{\rho}} \bar{\epsilon} \Gamma^{q} \psi_{\sigma} e e^{m \mu} e^{n \nu} e^{p \sigma} e^{q \rho};
+\end{dmath*}
+% Begin TeX cell closed
+The $\overline{D_{\mu}{\epsilon}}$ term needs to be partially integrated. We isolate it and then take the covariant derivative apart.
+% End TeX cell
+{\color[named]{Blue}\begin{verbatim}
+deps:=@take_match![@(L)]( \bar{D_{\mu}{\epsilon}}*A?? );
+\end{verbatim}}
+\begin{dmath*}[compact, spread=2pt]
+deps\specialcolon{}= (\frac{-1}{2})\, \bar{D_{\mu}{\epsilon}} \Gamma^{m n p} D_{\nu}{\psi_{\rho}} e e^{m \mu} e^{n \nu} e^{p \rho};
+\end{dmath*}
+{\color[named]{Blue}\begin{verbatim}
+@substitute!(%)( \bar{D_{\mu}{\epsilon}} -> 
+             \partial_{\mu}{\bar{\epsilon}} 
+              - 1/4 \bar{\epsilon}\omega_{\mu m n} \Gamma^{m n} ):
+@distribute!(%);
+\end{verbatim}}
+\begin{dmath*}[compact, spread=2pt]
+deps\specialcolon{}=  - \frac{1}{2}\, \partial_{\mu}{\bar{\epsilon}} \Gamma^{m n p} D_{\nu}{\psi_{\rho}} e e^{m \mu} e^{n \nu} e^{p \rho} + \frac{1}{8}\, \bar{\epsilon} \Gamma^{q r} \Gamma^{m n p} D_{\nu}{\psi_{\rho}} \omega_{\mu q r} e e^{m \mu} e^{n \nu} e^{p \rho};
+\end{dmath*}
+{\color[named]{Blue}\begin{verbatim}
+@pintegrate!(%)(\partial):
+@prodrule!(%):
+@distribute!(%):
+@unwrap!(%);
+\end{verbatim}}
+\begin{dmath*}[compact, spread=2pt]
+deps\specialcolon{}= \frac{1}{2}\, \bar{\epsilon} \Gamma^{m n p} \partial_{\mu}{D_{\nu}{\psi_{\rho}}} e e^{m \mu} e^{n \nu} e^{p \rho} + \frac{1}{2}\, \bar{\epsilon} \Gamma^{m n p} D_{\nu}{\psi_{\rho}} \partial_{\mu}{e} e^{m \mu} e^{n \nu} e^{p \rho} + \frac{1}{2}\, \bar{\epsilon} \Gamma^{m n p} D_{\nu}{\psi_{\rho}} \partial_{\mu}{e^{m \mu}} e e^{n \nu} e^{p \rho} + \frac{1}{2}\, \bar{\epsilon} \Gamma^{m n p} D_{\nu}{\psi_{\rho}} \partial_{\mu}{e^{n \nu}} e e^{m \mu} e^{p \rho} + \frac{1}{2}\, \bar{\epsilon} \Gamma^{m n p} D_{\nu}{\psi_{\rho}} \partial_{\mu}{e^{p \rho}} e e^{m \mu} e^{n \nu} + \frac{1}{8}\, \bar{\epsilon} \Gamma^{q r} \Gamma^{m n p} D_{\nu}{\psi_{\rho}} \omega_{\mu q r} e e^{m \mu} e^{n \nu} e^{p \rho};
+\end{dmath*}
+{\color[named]{Blue}\begin{verbatim}
+@substitute!(%)( \Gamma^{q r}\Gamma^{m n p}  
+           -> - @join![ \Gamma^{m n p} \Gamma^{q r} - \Gamma^{q r} \Gamma^{m n p} ]{expand} );
+\end{verbatim}}
+\begin{dmath*}[compact, spread=2pt]
+deps\specialcolon{}= \frac{1}{2}\, \bar{\epsilon} \Gamma^{m n p} \partial_{\mu}{D_{\nu}{\psi_{\rho}}} e e^{m \mu} e^{n \nu} e^{p \rho} + \frac{1}{2}\, \bar{\epsilon} \Gamma^{m n p} D_{\nu}{\psi_{\rho}} \partial_{\mu}{e} e^{m \mu} e^{n \nu} e^{p \rho} + \frac{1}{2}\, \bar{\epsilon} \Gamma^{m n p} D_{\nu}{\psi_{\rho}} \partial_{\mu}{e^{m \mu}} e e^{n \nu} e^{p \rho} + \frac{1}{2}\, \bar{\epsilon} \Gamma^{m n p} D_{\nu}{\psi_{\rho}} \partial_{\mu}{e^{n \nu}} e e^{m \mu} e^{p \rho} + \frac{1}{2}\, \bar{\epsilon} \Gamma^{m n p} D_{\nu}{\psi_{\rho}} \partial_{\mu}{e^{p \rho}} e e^{m \mu} e^{n \nu} + \frac{1}{8}\, \bar{\epsilon} ( - \Gamma^{m n r} \delta^{p q} + \Gamma^{m n q} \delta^{p r} + \Gamma^{m p r} \delta^{n q} - \Gamma^{m p q} \delta^{n r} - \Gamma^{n p r} \delta^{m q} + \Gamma^{n p q} \delta^{m r} + \Gamma^{q n p} \delta^{m r} - \Gamma^{q n m} \delta^{p r} + \Gamma^{q p m} \delta^{n r} - \Gamma^{r n p} \delta^{m q} + \Gamma^{r n m} \delta^{p q} - \Gamma^{r p m} \delta^{n q}) D_{\nu}{\psi_{\rho}} \omega_{\mu q r} e e^{m \mu} e^{n \nu} e^{p \rho};
+\end{dmath*}
+{\color[named]{Blue}\begin{verbatim}
+@distribute!(%):
+@canonicalise!(%):
+@rename_dummies!(%):
+@substitute!(%)( \partial_{\mu}{D_{\nu}{\psi_{\rho}}} 
+                                -> 1/4 R_{\mu\nu m n}\Gamma^{m n} \psi_{\rho} );
+\end{verbatim}}
+\begin{dmath*}[compact, spread=2pt]
+deps\specialcolon{}= \frac{1}{8}\, R_{\mu \nu q r} \bar{\epsilon} \Gamma^{m n p} \Gamma^{q r} \psi_{\rho} e e^{m \mu} e^{n \nu} e^{p \rho} + \frac{1}{2}\, \bar{\epsilon} \Gamma^{m n p} D_{\mu}{\psi_{\nu}} \partial_{\rho}{e} e^{m \mu} e^{n \nu} e^{p \rho} + \frac{1}{2}\, \bar{\epsilon} \Gamma^{m n p} D_{\mu}{\psi_{\nu}} \partial_{\rho}{e^{m \rho}} e e^{n \mu} e^{p \nu} + \frac{1}{2}\, \bar{\epsilon} \Gamma^{m n p} D_{\mu}{\psi_{\nu}} \partial_{\rho}{e^{m \mu}} e e^{n \nu} e^{p \rho} - \frac{1}{2}\, \bar{\epsilon} \Gamma^{m n p} D_{\mu}{\psi_{\nu}} \partial_{\rho}{e^{m \nu}} e e^{n \mu} e^{p \rho} - \frac{1}{2}\, \bar{\epsilon} \Gamma^{m n p} D_{\mu}{\psi_{\nu}} \omega_{\rho m q} e e^{n \mu} e^{p \rho} e^{q \nu} + \frac{1}{2}\, \bar{\epsilon} \Gamma^{m n p} D_{\mu}{\psi_{\nu}} \omega_{\rho m q} e e^{n \nu} e^{p \rho} e^{q \mu} + \frac{1}{2}\, \bar{\epsilon} \Gamma^{m n p} D_{\mu}{\psi_{\nu}} \omega_{\rho m q} e e^{n \mu} e^{p \nu} e^{q \rho};
+\end{dmath*}
+% Begin TeX cell closed
+This now needs to be rewritten in terms of the torsion, and then the torsion is to be replaced with a fermi bilinear.
+% End TeX cell
+{\color[named]{Blue}\begin{verbatim}
+@substitute!(%)( \partial_{\rho}{e} -> - e e_{n \mu} \partial_{\rho}{ e^{n \mu} } );
+\end{verbatim}}
+\begin{dmath*}[compact, spread=2pt]
+deps\specialcolon{}= \frac{1}{8}\, R_{\mu \nu q r} \bar{\epsilon} \Gamma^{m n p} \Gamma^{q r} \psi_{\rho} e e^{m \mu} e^{n \nu} e^{p \rho} - \frac{1}{2}\, \bar{\epsilon} \Gamma^{m n p} D_{\mu}{\psi_{\nu}} \partial_{\rho}{e^{q \sigma}} e e_{q \sigma} e^{m \mu} e^{n \nu} e^{p \rho} + \frac{1}{2}\, \bar{\epsilon} \Gamma^{m n p} D_{\mu}{\psi_{\nu}} \partial_{\rho}{e^{m \rho}} e e^{n \mu} e^{p \nu} + \frac{1}{2}\, \bar{\epsilon} \Gamma^{m n p} D_{\mu}{\psi_{\nu}} \partial_{\rho}{e^{m \mu}} e e^{n \nu} e^{p \rho} - \frac{1}{2}\, \bar{\epsilon} \Gamma^{m n p} D_{\mu}{\psi_{\nu}} \partial_{\rho}{e^{m \nu}} e e^{n \mu} e^{p \rho} - \frac{1}{2}\, \bar{\epsilon} \Gamma^{m n p} D_{\mu}{\psi_{\nu}} \omega_{\rho m q} e e^{n \mu} e^{p \rho} e^{q \nu} + \frac{1}{2}\, \bar{\epsilon} \Gamma^{m n p} D_{\mu}{\psi_{\nu}} \omega_{\rho m q} e e^{n \nu} e^{p \rho} e^{q \mu} + \frac{1}{2}\, \bar{\epsilon} \Gamma^{m n p} D_{\mu}{\psi_{\nu}} \omega_{\rho m q} e e^{n \mu} e^{p \nu} e^{q \rho};
+\end{dmath*}
+{\color[named]{Blue}\begin{verbatim}
+@substitute!(%)( \partial_{\mu}{e^{m \nu}} -> 
+                      -\omega_{\mu m n} e^{n \nu} - C^{\nu}_{\mu\rho} e^{m \rho} ):
+@distribute!(%);
+\end{verbatim}}
+\begin{dmath*}[compact, spread=2pt]
+deps\specialcolon{}= \frac{1}{8}\, R_{\mu \nu q r} \bar{\epsilon} \Gamma^{m n p} \Gamma^{q r} \psi_{\rho} e e^{m \mu} e^{n \nu} e^{p \rho} + \frac{1}{2}\, \bar{\epsilon} \Gamma^{m n p} D_{\mu}{\psi_{\nu}} \omega_{\rho q r} e e_{q \sigma} e^{m \mu} e^{n \nu} e^{p \rho} e^{r \sigma} + \frac{1}{2}\, C^{\sigma}\,_{\rho \kappa} \bar{\epsilon} \Gamma^{m n p} D_{\mu}{\psi_{\nu}} e e_{q \sigma} e^{m \mu} e^{n \nu} e^{p \rho} e^{q \kappa} - \frac{1}{2}\, C^{\rho}\,_{\rho \sigma} \bar{\epsilon} \Gamma^{m n p} D_{\mu}{\psi_{\nu}} e e^{m \sigma} e^{n \mu} e^{p \nu} - \frac{1}{2}\, C^{\mu}\,_{\rho \sigma} \bar{\epsilon} \Gamma^{m n p} D_{\mu}{\psi_{\nu}} e e^{m \sigma} e^{n \nu} e^{p \rho} + \frac{1}{2}\, C^{\nu}\,_{\rho \sigma} \bar{\epsilon} \Gamma^{m n p} D_{\mu}{\psi_{\nu}} e e^{m \sigma} e^{n \mu} e^{p \rho};
+\end{dmath*}
+{\color[named]{Blue}\begin{verbatim}
+@substitute!(%)( e_{q \sigma} e^{q \kappa} -> \delta_{\sigma}^{\kappa},
+                 e_{q \sigma} e^{r \sigma} -> \delta^{q r} ):
+@canonicalise!(%):
+@rename_dummies!(%);
+\end{verbatim}}
+\begin{dmath*}[compact, spread=2pt]
+deps\specialcolon{}= \frac{1}{8}\, R_{\mu \nu m n} \bar{\epsilon} \Gamma^{p q r} \Gamma^{m n} \psi_{\rho} e e^{p \mu} e^{q \nu} e^{r \rho} + \frac{1}{2}\, C^{\mu}\,_{\nu \mu} \bar{\epsilon} \Gamma^{m n p} D_{\rho}{\psi_{\sigma}} e e^{m \nu} e^{n \rho} e^{p \sigma} - \frac{1}{2}\, C^{\mu}\,_{\mu \nu} \bar{\epsilon} \Gamma^{m n p} D_{\rho}{\psi_{\sigma}} e e^{m \nu} e^{n \rho} e^{p \sigma} - \frac{1}{2}\, C^{\mu}\,_{\nu \rho} \bar{\epsilon} \Gamma^{m n p} D_{\mu}{\psi_{\sigma}} e e^{m \nu} e^{n \rho} e^{p \sigma} + \frac{1}{2}\, C^{\mu}\,_{\nu \rho} \bar{\epsilon} \Gamma^{m n p} D_{\sigma}{\psi_{\mu}} e e^{m \nu} e^{n \rho} e^{p \sigma};
+\end{dmath*}
+{\color[named]{Blue}\begin{verbatim}
+@substitute!(%)( C^{\mu}_{\nu\kappa} 
+              -> 1/2 C^{\mu}_{\nu\kappa} + 1/2 C^{\mu}_{\kappa\nu} + T^{\mu}_{\nu\kappa} ):
+@distribute!(%):
+@canonicalise!(%);
+\end{verbatim}}
+\begin{dmath*}[compact, spread=2pt]
+deps\specialcolon{}= \frac{1}{8}\, R_{\mu \nu m n} \bar{\epsilon} \Gamma^{p q r} \Gamma^{m n} \psi_{\rho} e e^{p \mu} e^{q \nu} e^{r \rho} - \bar{\epsilon} \Gamma^{m n p} D_{\mu}{\psi_{\nu}} T^{\rho}\,_{\rho \sigma} e e^{m \mu} e^{n \nu} e^{p \sigma} - \frac{1}{2}\, \bar{\epsilon} \Gamma^{m n p} D_{\mu}{\psi_{\nu}} T^{\mu}\,_{\rho \sigma} e e^{m \nu} e^{n \rho} e^{p \sigma} + \frac{1}{2}\, \bar{\epsilon} \Gamma^{m n p} D_{\mu}{\psi_{\nu}} T^{\nu}\,_{\rho \sigma} e e^{m \mu} e^{n \rho} e^{p \sigma};
+\end{dmath*}
+{\color[named]{Blue}\begin{verbatim}
+@substitute!(%)( D_{\mu}{\psi_{\sigma}} 
+    -> 1/2 D_{\mu}{\psi_{\sigma}} + 1/2 D_{\sigma}{\psi_{\mu}} + \psi_{\mu\sigma} ):
+@distribute!(%):
+@canonicalise!(%);
+\end{verbatim}}
+\begin{dmath*}[compact, spread=2pt]
+deps\specialcolon{}= \frac{1}{8}\, R_{\mu \nu m n} \bar{\epsilon} \Gamma^{p q r} \Gamma^{m n} \psi_{\rho} e e^{p \mu} e^{q \nu} e^{r \rho} - T^{\mu}\,_{\mu \nu} \bar{\epsilon} \Gamma^{m n p} \psi_{\rho \sigma} e e^{m \nu} e^{n \rho} e^{p \sigma} - T^{\mu}\,_{\nu \rho} \bar{\epsilon} \Gamma^{m n p} \psi_{\mu \sigma} e e^{m \nu} e^{n \rho} e^{p \sigma};
+\end{dmath*}
+% Begin TeX cell closed
+Put this back into the main variation and continue...
+% End TeX cell
+{\color[named]{Blue}\begin{verbatim}
+@replace_match!(L)( \bar{D_{\mu}{\epsilon}}*A?? -> @(deps) );
+\end{verbatim}}
+\begin{dmath*}[compact, spread=2pt]
+L\specialcolon{}=  - \frac{1}{2}\, R_{\mu \nu n m} \bar{\epsilon} \Gamma^{p} \psi_{\rho} e e^{m \mu} e^{n \nu} e^{p \rho} + \frac{1}{2}\, R_{\mu \nu n m} \bar{\epsilon} \Gamma^{p} \psi_{\rho} e e^{m \rho} e^{n \nu} e^{p \mu} + \frac{1}{2}\, R_{\mu \nu n m} \bar{\epsilon} \Gamma^{p} \psi_{\rho} e e^{m \mu} e^{n \rho} e^{p \nu} + \frac{1}{8}\, R_{\mu \nu m n} \bar{\epsilon} \Gamma^{p q r} \Gamma^{m n} \psi_{\rho} e e^{p \mu} e^{q \nu} e^{r \rho} - T^{\mu}\,_{\mu \nu} \bar{\epsilon} \Gamma^{m n p} \psi_{\rho \sigma} e e^{m \nu} e^{n \rho} e^{p \sigma} - T^{\mu}\,_{\nu \rho} \bar{\epsilon} \Gamma^{m n p} \psi_{\mu \sigma} e e^{m \nu} e^{n \rho} e^{p \sigma} - \frac{1}{8}\, R_{\nu \rho q r} \bar{\psi_{\mu}} \Gamma^{m n p} \Gamma^{q r} \epsilon e e^{m \mu} e^{n \nu} e^{p \rho} - \frac{1}{2}\, \bar{\psi_{\mu}} \Gamma^{m n p} D_{\nu}{\psi_{\rho}} \bar{\epsilon} \Gamma^{q} \psi_{\sigma} e e^{m \mu} e^{n \nu} e^{p \rho} e^{q \sigma} + \frac{1}{2}\, \bar{\psi_{\mu}} \Gamma^{m n p} D_{\nu}{\psi_{\rho}} \bar{\epsilon} \Gamma^{q} \psi_{\sigma} e e^{m \sigma} e^{n \nu} e^{p \rho} e^{q \mu} + \frac{1}{2}\, \bar{\psi_{\mu}} \Gamma^{m n p} D_{\nu}{\psi_{\rho}} \bar{\epsilon} \Gamma^{q} \psi_{\sigma} e e^{m \mu} e^{n \sigma} e^{p \rho} e^{q \nu} + \frac{1}{2}\, \bar{\psi_{\mu}} \Gamma^{m n p} D_{\nu}{\psi_{\rho}} \bar{\epsilon} \Gamma^{q} \psi_{\sigma} e e^{m \mu} e^{n \nu} e^{p \sigma} e^{q \rho};
+\end{dmath*}
+{\color[named]{Blue}\begin{verbatim}
+@canonicalise!(%):
+@rename_dummies!(%):
+@collect_terms!(%);
+\end{verbatim}}
+\begin{dmath*}[compact, spread=2pt]
+L\specialcolon{}= \frac{1}{2}\, R_{\mu \nu m n} \bar{\epsilon} \Gamma^{p} \psi_{\rho} e e^{m \mu} e^{n \nu} e^{p \rho} - R_{\mu \nu m n} \bar{\epsilon} \Gamma^{p} \psi_{\rho} e e^{m \mu} e^{n \rho} e^{p \nu} + \frac{1}{8}\, R_{\mu \nu m n} \bar{\epsilon} \Gamma^{p q r} \Gamma^{m n} \psi_{\rho} e e^{p \mu} e^{q \nu} e^{r \rho} - T^{\mu}\,_{\mu \nu} \bar{\epsilon} \Gamma^{m n p} \psi_{\rho \sigma} e e^{m \nu} e^{n \rho} e^{p \sigma} - T^{\mu}\,_{\nu \rho} \bar{\epsilon} \Gamma^{m n p} \psi_{\mu \sigma} e e^{m \nu} e^{n \rho} e^{p \sigma} - \frac{1}{8}\, R_{\mu \nu m n} \bar{\psi_{\rho}} \Gamma^{p q r} \Gamma^{m n} \epsilon e e^{p \mu} e^{q \nu} e^{r \rho} - \frac{1}{2}\, \bar{\psi_{\mu}} \Gamma^{m n p} D_{\nu}{\psi_{\rho}} \bar{\epsilon} \Gamma^{q} \psi_{\sigma} e e^{m \mu} e^{n \nu} e^{p \rho} e^{q \sigma} + \frac{1}{2}\, \bar{\psi_{\mu}} \Gamma^{m n p} D_{\nu}{\psi_{\rho}} \bar{\epsilon} \Gamma^{q} \psi_{\sigma} e e^{m \nu} e^{n \rho} e^{p \sigma} e^{q \mu} - \frac{1}{2}\, \bar{\psi_{\mu}} \Gamma^{m n p} D_{\nu}{\psi_{\rho}} \bar{\epsilon} \Gamma^{q} \psi_{\sigma} e e^{m \mu} e^{n \rho} e^{p \sigma} e^{q \nu} + \frac{1}{2}\, \bar{\psi_{\mu}} \Gamma^{m n p} D_{\nu}{\psi_{\rho}} \bar{\epsilon} \Gamma^{q} \psi_{\sigma} e e^{m \mu} e^{n \nu} e^{p \sigma} e^{q \rho};
+\end{dmath*}
+% Begin TeX cell closed
+Let us focus on the two terms with Riemann tensors which were obtained from the gravitino variation. We select them, and then simplify the product of gamma matrices,
+% End TeX cell
+{\color[named]{Blue}\begin{verbatim}
+vpsi:=@take_match[@(L)]( \Gamma^{m n p}\Gamma^{r s} A?? );
+\end{verbatim}}
+\begin{dmath*}[compact, spread=2pt]
+vpsi\specialcolon{}= \frac{1}{8}\, R_{\mu \nu m n} \bar{\epsilon} \Gamma^{p q r} \Gamma^{m n} \psi_{\rho} e e^{p \mu} e^{q \nu} e^{r \rho} - \frac{1}{8}\, R_{\mu \nu m n} \bar{\psi_{\rho}} \Gamma^{p q r} \Gamma^{m n} \epsilon e e^{p \mu} e^{q \nu} e^{r \rho};
+\end{dmath*}
+{\color[named]{Blue}\begin{verbatim}
+@join!(vpsi){expand}:
+@distribute!(%):
+@spinorsort!(%):
+@canonicalise!(%);
+\end{verbatim}}
+\begin{dmath*}[compact, spread=2pt]
+vpsi\specialcolon{}= R_{\mu \nu p q} \bar{\epsilon} \Gamma^{r} \psi_{\rho} e e^{p \mu} e^{q \rho} e^{r \nu} - \frac{1}{2}\, R_{\mu \nu p q} \bar{\epsilon} \Gamma^{r} \psi_{\rho} e e^{p \mu} e^{q \nu} e^{r \rho};
+\end{dmath*}
+% Begin TeX cell closed
+That looks nice, we can now plug these terms back into the action where they came from. We then end up with only four-fermi terms,
+% End TeX cell
+{\color[named]{Blue}\begin{verbatim}
+@replace_match!(L)( \Gamma^{m n p}\Gamma^{r s} A?? -> @(vpsi) ):
+@rename_dummies!(%):
+@collect_terms!(%);
+\end{verbatim}}
+\begin{dmath*}[compact, spread=2pt]
+L\specialcolon{}=  - T^{\mu}\,_{\mu \nu} \bar{\epsilon} \Gamma^{m n p} \psi_{\rho \sigma} e e^{m \nu} e^{n \rho} e^{p \sigma} - T^{\mu}\,_{\nu \rho} \bar{\epsilon} \Gamma^{m n p} \psi_{\mu \sigma} e e^{m \nu} e^{n \rho} e^{p \sigma} - \frac{1}{2}\, \bar{\psi_{\mu}} \Gamma^{m n p} D_{\nu}{\psi_{\rho}} \bar{\epsilon} \Gamma^{q} \psi_{\sigma} e e^{m \mu} e^{n \nu} e^{p \rho} e^{q \sigma} + \frac{1}{2}\, \bar{\psi_{\mu}} \Gamma^{m n p} D_{\nu}{\psi_{\rho}} \bar{\epsilon} \Gamma^{q} \psi_{\sigma} e e^{m \nu} e^{n \rho} e^{p \sigma} e^{q \mu} - \frac{1}{2}\, \bar{\psi_{\mu}} \Gamma^{m n p} D_{\nu}{\psi_{\rho}} \bar{\epsilon} \Gamma^{q} \psi_{\sigma} e e^{m \mu} e^{n \rho} e^{p \sigma} e^{q \nu} + \frac{1}{2}\, \bar{\psi_{\mu}} \Gamma^{m n p} D_{\nu}{\psi_{\rho}} \bar{\epsilon} \Gamma^{q} \psi_{\sigma} e e^{m \mu} e^{n \nu} e^{p \sigma} e^{q \rho};
+\end{dmath*}
+% Begin TeX cell closed
+The Riemann tensor terms have cancelled completely. Inserting the torsion now leaves us with
+% End TeX cell
+{\color[named]{Blue}\begin{verbatim}
+@substitute!(%)( T^{\mu}_{\nu\rho} -> -1/4 \bar{\psi_{\nu}} \Gamma^{m} \psi_{\rho} e^{m\mu} ):
+@canonicalise!(%): @rename_dummies!(%);
+\end{verbatim}}
+\begin{dmath*}[compact, spread=2pt]
+L\specialcolon{}= \frac{1}{4}\, \bar{\psi_{\mu}} \Gamma^{m} \psi_{\nu} e^{m \mu} \bar{\epsilon} \Gamma^{n p q} \psi_{\rho \sigma} e e^{n \nu} e^{p \rho} e^{q \sigma} + \frac{1}{4}\, \bar{\psi_{\mu}} \Gamma^{m} \psi_{\nu} e^{m \rho} \bar{\epsilon} \Gamma^{n p q} \psi_{\rho \sigma} e e^{n \mu} e^{p \nu} e^{q \sigma} - \frac{1}{2}\, \bar{\psi_{\mu}} \Gamma^{m n p} D_{\nu}{\psi_{\rho}} \bar{\epsilon} \Gamma^{q} \psi_{\sigma} e e^{m \mu} e^{n \nu} e^{p \rho} e^{q \sigma} + \frac{1}{2}\, \bar{\psi_{\mu}} \Gamma^{m n p} D_{\nu}{\psi_{\rho}} \bar{\epsilon} \Gamma^{q} \psi_{\sigma} e e^{m \nu} e^{n \rho} e^{p \sigma} e^{q \mu} - \frac{1}{2}\, \bar{\psi_{\mu}} \Gamma^{m n p} D_{\nu}{\psi_{\rho}} \bar{\epsilon} \Gamma^{q} \psi_{\sigma} e e^{m \mu} e^{n \rho} e^{p \sigma} e^{q \nu} + \frac{1}{2}\, \bar{\psi_{\mu}} \Gamma^{m n p} D_{\nu}{\psi_{\rho}} \bar{\epsilon} \Gamma^{q} \psi_{\sigma} e e^{m \mu} e^{n \nu} e^{p \sigma} e^{q \rho};
+\end{dmath*}
+{\color[named]{Blue}\begin{verbatim}
+@eliminate_vielbein!(%){\Gamma^{m n p}, \Gamma^{m}}:
+@canonicalise!(%);
+\end{verbatim}}
+\begin{dmath*}[compact, spread=2pt]
+L\specialcolon{}= \frac{1}{4}\, \bar{\psi_{\mu}} \Gamma^{\mu} \psi_{\nu} \bar{\epsilon} \Gamma^{\nu \rho \sigma} \psi_{\rho \sigma} e + \frac{1}{4}\, \bar{\psi_{\mu}} \Gamma^{\nu} \psi_{\rho} \bar{\epsilon} \Gamma^{\mu \rho \sigma} \psi_{\nu \sigma} e - \frac{1}{2}\, \bar{\psi_{\mu}} \Gamma^{\mu \nu \rho} D_{\nu}{\psi_{\rho}} \bar{\epsilon} \Gamma^{\sigma} \psi_{\sigma} e + \frac{1}{2}\, \bar{\psi_{\mu}} \Gamma^{\nu \rho \sigma} D_{\nu}{\psi_{\rho}} \bar{\epsilon} \Gamma^{\mu} \psi_{\sigma} e - \frac{1}{2}\, \bar{\psi_{\mu}} \Gamma^{\mu \nu \rho} D_{\sigma}{\psi_{\nu}} \bar{\epsilon} \Gamma^{\sigma} \psi_{\rho} e + \frac{1}{2}\, \bar{\psi_{\mu}} \Gamma^{\mu \nu \rho} D_{\nu}{\psi_{\sigma}} \bar{\epsilon} \Gamma^{\sigma} \psi_{\rho} e;
+\end{dmath*}
+{\color[named]{Blue}\begin{verbatim}
+@substitute!(%)( \Gamma^{\sigma\nu\rho} D_{\nu}{\psi_{\rho}} 
+               ->\Gamma^{\sigma\nu\rho} \psi_{\nu\rho});
+\end{verbatim}}
+\begin{dmath*}[compact, spread=2pt]
+L\specialcolon{}= \frac{1}{4}\, \bar{\psi_{\mu}} \Gamma^{\mu} \psi_{\nu} \bar{\epsilon} \Gamma^{\nu \rho \sigma} \psi_{\rho \sigma} e + \frac{1}{4}\, \bar{\psi_{\mu}} \Gamma^{\nu} \psi_{\rho} \bar{\epsilon} \Gamma^{\mu \rho \sigma} \psi_{\nu \sigma} e - \frac{1}{2}\, \bar{\psi_{\mu}} \Gamma^{\mu \nu \kappa} \psi_{\nu \kappa} \bar{\epsilon} \Gamma^{\sigma} \psi_{\sigma} e + \frac{1}{2}\, \bar{\psi_{\mu}} \Gamma^{\nu \rho \sigma} D_{\nu}{\psi_{\rho}} \bar{\epsilon} \Gamma^{\mu} \psi_{\sigma} e - \frac{1}{2}\, \bar{\psi_{\mu}} \Gamma^{\mu \nu \rho} D_{\sigma}{\psi_{\nu}} \bar{\epsilon} \Gamma^{\sigma} \psi_{\rho} e + \frac{1}{2}\, \bar{\psi_{\mu}} \Gamma^{\mu \nu \rho} D_{\nu}{\psi_{\sigma}} \bar{\epsilon} \Gamma^{\sigma} \psi_{\rho} e;
+\end{dmath*}
+{\color[named]{Blue}\begin{verbatim}
+@substitute!(%)( D_{\mu}{\psi_{\sigma}} 
+    -> 1/2 D_{\mu}{\psi_{\sigma}} + 1/2 D_{\sigma}{\psi_{\mu}} + \psi_{\mu\sigma} ):
+@distribute!(%):
+@canonicalise!(%):
+@rename_dummies!(%):
+@collect_terms!(%);
+\end{verbatim}}
+\begin{dmath*}[compact, spread=2pt]
+L\specialcolon{}= \frac{1}{4}\, \bar{\psi_{\mu}} \Gamma^{\mu} \psi_{\nu} \bar{\epsilon} \Gamma^{\nu \rho \sigma} \psi_{\rho \sigma} e + \frac{1}{4}\, \bar{\psi_{\mu}} \Gamma^{\nu} \psi_{\rho} \bar{\epsilon} \Gamma^{\mu \rho \sigma} \psi_{\nu \sigma} e - \frac{1}{2}\, \bar{\psi_{\mu}} \Gamma^{\mu \nu \rho} \psi_{\nu \rho} \bar{\epsilon} \Gamma^{\sigma} \psi_{\sigma} e + \frac{1}{2}\, \bar{\psi_{\mu}} \Gamma^{\nu \rho \sigma} \psi_{\nu \rho} \bar{\epsilon} \Gamma^{\mu} \psi_{\sigma} e + \bar{\psi_{\mu}} \Gamma^{\mu \nu \rho} \psi_{\nu \sigma} \bar{\epsilon} \Gamma^{\sigma} \psi_{\rho} e;
+\end{dmath*}
+% Begin TeX cell closed
+Now we need to Fierz, indicating the preferred form of the bilinears. We will sort such that the fermion pairs appear as $\psi\psi$ and $\epsilon\psi_{(2)}$.
+% End TeX cell
+{\color[named]{Blue}\begin{verbatim}
+@fierz!(%)( \psi_{\mu}, \psi_{\rho}, \epsilon, \psi_{\sigma\kappa} );
+\end{verbatim}}
+\begin{dmath*}[compact, spread=2pt]
+L\specialcolon{}= \frac{1}{4}\, \bar{\psi_{\mu}} \Gamma^{\mu} \psi_{\nu} \bar{\epsilon} \Gamma^{\nu \rho \sigma} \psi_{\rho \sigma} e + \frac{1}{4}\, \bar{\psi_{\mu}} \Gamma^{\nu} \psi_{\rho} \bar{\epsilon} \Gamma^{\mu \rho \sigma} \psi_{\nu \sigma} e + \frac{1}{8}\, \bar{\psi_{\mu}} \Gamma^{\mu \nu \rho} \Gamma^{\sigma} \psi_{\sigma} \bar{\epsilon} \psi_{\nu \rho} e + \frac{1}{8}\, \bar{\psi_{\mu}} \Gamma^{\mu \nu \rho} \Gamma^{\kappa} \Gamma^{\sigma} \psi_{\sigma} \bar{\epsilon} \Gamma_{\kappa} \psi_{\nu \rho} e + \frac{1}{16}\, \bar{\psi_{\mu}} \Gamma^{\mu \nu \rho} \Gamma^{\kappa \lambda} \Gamma^{\sigma} \psi_{\sigma} \bar{\epsilon} \Gamma_{\lambda \kappa} \psi_{\nu \rho} e + \frac{1}{48}\, \bar{\psi_{\mu}} \Gamma^{\mu \nu \rho} \Gamma^{\kappa \lambda \alpha} \Gamma^{\sigma} \psi_{\sigma} \bar{\epsilon} \Gamma_{\alpha \lambda \kappa} \psi_{\nu \rho} e + \frac{1}{192}\, \bar{\psi_{\mu}} \Gamma^{\mu \nu \rho} \Gamma^{\kappa \lambda \alpha \beta} \Gamma^{\sigma} \psi_{\sigma} \bar{\epsilon} \Gamma_{\beta \alpha \lambda \kappa} \psi_{\nu \rho} e - \frac{1}{8}\, \bar{\psi_{\mu}} \Gamma^{\nu \rho \sigma} \Gamma^{\mu} \psi_{\sigma} \bar{\epsilon} \psi_{\nu \rho} e - \frac{1}{8}\, \bar{\psi_{\mu}} \Gamma^{\nu \rho \sigma} \Gamma^{\kappa} \Gamma^{\mu} \psi_{\sigma} \bar{\epsilon} \Gamma_{\kappa} \psi_{\nu \rho} e - \frac{1}{16}\, \bar{\psi_{\mu}} \Gamma^{\nu \rho \sigma} \Gamma^{\kappa \lambda} \Gamma^{\mu} \psi_{\sigma} \bar{\epsilon} \Gamma_{\lambda \kappa} \psi_{\nu \rho} e - \frac{1}{48}\, \bar{\psi_{\mu}} \Gamma^{\nu \rho \sigma} \Gamma^{\kappa \lambda \alpha} \Gamma^{\mu} \psi_{\sigma} \bar{\epsilon} \Gamma_{\alpha \lambda \kappa} \psi_{\nu \rho} e - \frac{1}{192}\, \bar{\psi_{\mu}} \Gamma^{\nu \rho \sigma} \Gamma^{\kappa \lambda \alpha \beta} \Gamma^{\mu} \psi_{\sigma} \bar{\epsilon} \Gamma_{\beta \alpha \lambda \kappa} \psi_{\nu \rho} e - \frac{1}{4}\, \bar{\psi_{\mu}} \Gamma^{\mu \nu \rho} \Gamma^{\sigma} \psi_{\rho} \bar{\epsilon} \psi_{\nu \sigma} e - \frac{1}{4}\, \bar{\psi_{\mu}} \Gamma^{\mu \nu \rho} \Gamma^{\kappa} \Gamma^{\sigma} \psi_{\rho} \bar{\epsilon} \Gamma_{\kappa} \psi_{\nu \sigma} e - \frac{1}{8}\, \bar{\psi_{\mu}} \Gamma^{\mu \nu \rho} \Gamma^{\kappa \lambda} \Gamma^{\sigma} \psi_{\rho} \bar{\epsilon} \Gamma_{\lambda \kappa} \psi_{\nu \sigma} e - \frac{1}{24}\, \bar{\psi_{\mu}} \Gamma^{\mu \nu \rho} \Gamma^{\kappa \lambda \alpha} \Gamma^{\sigma} \psi_{\rho} \bar{\epsilon} \Gamma_{\alpha \lambda \kappa} \psi_{\nu \sigma} e - \frac{1}{96}\, \bar{\psi_{\mu}} \Gamma^{\mu \nu \rho} \Gamma^{\kappa \lambda \alpha \beta} \Gamma^{\sigma} \psi_{\rho} \bar{\epsilon} \Gamma_{\beta \alpha \lambda \kappa} \psi_{\nu \sigma} e;
+\end{dmath*}
+{\color[named]{Blue}\begin{verbatim}
+@join!(%){expand}:
+@distribute!(%):
+@prodsort!(%):
+@join!(%){expand}:
+@distribute!(%):
+@prodsort!(%):
+@canonicalise!(%): @rename_dummies!(%): @collect_terms!(%);
+\end{verbatim}}
+\begin{dmath*}[compact, spread=2pt]
+L\specialcolon{}= \frac{1}{4}\, \bar{\psi_{\mu}} \Gamma^{\mu} \psi_{\nu} \bar{\epsilon} \Gamma^{\nu \rho \sigma} \psi_{\rho \sigma} e + \frac{1}{4}\, \bar{\psi_{\mu}} \Gamma^{\nu} \psi_{\rho} \bar{\epsilon} \Gamma^{\mu \rho \sigma} \psi_{\nu \sigma} e + \frac{1}{2}\, \bar{\psi_{\mu}} \Gamma^{\mu} \psi_{\nu} \bar{\epsilon} \Gamma_{\rho \sigma \kappa} \psi_{\lambda \alpha} e g^{\nu \rho} g^{\sigma \lambda} g^{\kappa \alpha} + \frac{1}{2}\, \bar{\psi_{\mu}} \Gamma^{\nu} \psi_{\rho} \bar{\epsilon} \Gamma_{\sigma \kappa \lambda} \psi_{\nu \alpha} e g^{\mu \sigma} g^{\rho \kappa} g^{\lambda \alpha} - \frac{1}{2}\, \bar{\psi_{\mu}} \Gamma^{\mu \nu} \psi_{\rho} \bar{\epsilon} \Gamma_{\nu \sigma \kappa \lambda} \psi_{\alpha \beta} e g^{\rho \sigma} g^{\kappa \alpha} g^{\lambda \beta} + \frac{1}{2}\, \bar{\psi_{\mu}} \Gamma^{\nu \rho} \psi_{\sigma} \bar{\epsilon} \Gamma_{\nu \kappa \lambda \alpha} \psi_{\rho \beta} e g^{\mu \kappa} g^{\sigma \lambda} g^{\alpha \beta};
+\end{dmath*}
+% Begin TeX cell closed
+Finally, eliminate the metric and collect terms.
+% End TeX cell
+{\color[named]{Blue}\begin{verbatim}
+@eliminate_metric!(%)( \Gamma_{\sigma\kappa\lambda}, \Gamma_{\sigma\kappa\lambda\rho} ):
+@rename_dummies!(%):
+@collect_terms!(%);
+\end{verbatim}}
+\begin{dmath*}[compact, spread=2pt]
+L\specialcolon{}= \frac{3}{4}\, \bar{\psi_{\mu}} \Gamma^{\mu} \psi_{\nu} \bar{\epsilon} \Gamma^{\nu \rho \sigma} \psi_{\rho \sigma} e + \frac{3}{4}\, \bar{\psi_{\mu}} \Gamma^{\nu} \psi_{\rho} \bar{\epsilon} \Gamma^{\mu \rho \sigma} \psi_{\nu \sigma} e - \frac{1}{2}\, \bar{\psi_{\mu}} \Gamma^{\mu \nu} \psi_{\rho} \bar{\epsilon} \Gamma_{\nu}\,^{\rho \sigma \kappa} \psi_{\sigma \kappa} e + \frac{1}{2}\, \bar{\psi_{\mu}} \Gamma^{\nu \rho} \psi_{\sigma} \bar{\epsilon} \Gamma_{\nu}\,^{\mu \sigma \kappa} \psi_{\rho \kappa} e;
+\end{dmath*}
+{\color[named]{Blue}\begin{verbatim}
+@canonicalise!(%);
+\end{verbatim}}
+\begin{dmath*}[compact, spread=2pt]
+L\specialcolon{}= \frac{3}{4}\, \bar{\psi_{\mu}} \Gamma^{\mu} \psi_{\nu} \bar{\epsilon} \Gamma^{\nu \rho \sigma} \psi_{\rho \sigma} e + \frac{3}{4}\, \bar{\psi_{\mu}} \Gamma^{\nu} \psi_{\rho} \bar{\epsilon} \Gamma^{\mu \rho \sigma} \psi_{\nu \sigma} e - \frac{1}{2}\, \bar{\psi_{\kappa}} \Gamma^{\kappa \mu} \psi_{\nu} \bar{\epsilon} \Gamma_{\mu}\,^{\nu \rho \sigma} \psi_{\rho \sigma} e - \frac{1}{2}\, \bar{\psi_{\kappa}} \Gamma^{\mu \nu} \psi_{\rho} \bar{\epsilon} \Gamma_{\kappa}\,^{\mu \rho \sigma} \psi_{\nu \sigma} e;
+\end{dmath*}
+% Begin TeX cell closed
+Since this does not quite vanish yet, we try to first verify the van Nieuwenhuizen 
+result. See page 213.
+% End TeX cell
+{\color[named]{Blue}\begin{verbatim}
+tst:= -1/4 \epsilon^{\mu\nu\rho\sigma} \epsilon_{m n p q} 
+                 \bar{\psi_{\mu}} \Gamma_{m n p q} \Gamma_{r} \psi_{\rho\sigma} 
+                 \bar{\epsilon}\Gamma_{r}\psi_{\nu};
+\end{verbatim}}
+\begin{dmath*}[compact, spread=2pt]
+tst\specialcolon{}= (\frac{-1}{4})\, \bar{\psi_{\mu}} \Gamma_{m n p q} \Gamma_{r} \epsilon^{\mu \nu \rho \sigma} \epsilon_{m n p q} \psi_{\rho \sigma} \bar{\epsilon} \Gamma_{r} \psi_{\nu};
+\end{dmath*}
+{\color[named]{Blue}\begin{verbatim}
+@join!(%){expand};
+\end{verbatim}}
+\begin{dmath*}[compact, spread=2pt]
+tst\specialcolon{}= (\frac{-1}{4})\, \bar{\psi_{\mu}} \epsilon^{\mu \nu \rho \sigma} \epsilon_{m n p q} (\Gamma_{m n p} \delta_{q r} - \Gamma_{m n q} \delta_{p r} + \Gamma_{m p q} \delta_{n r} - \Gamma_{n p q} \delta_{m r}) \psi_{\rho \sigma} \bar{\epsilon} \Gamma_{r} \psi_{\nu};
+\end{dmath*}
+{\color[named]{Blue}\begin{verbatim}
+@distribute!(%);
+\end{verbatim}}
+\begin{dmath*}[compact, spread=2pt]
+tst\specialcolon{}=  - \frac{1}{4}\, \bar{\psi_{\mu}} \Gamma_{m n p} \epsilon^{\mu \nu \rho \sigma} \epsilon_{m n p r} \psi_{\rho \sigma} \bar{\epsilon} \Gamma_{r} \psi_{\nu} + \frac{1}{4}\, \bar{\psi_{\mu}} \Gamma_{m n q} \epsilon^{\mu \nu \rho \sigma} \epsilon_{m n r q} \psi_{\rho \sigma} \bar{\epsilon} \Gamma_{r} \psi_{\nu} - \frac{1}{4}\, \bar{\psi_{\mu}} \Gamma_{m p q} \epsilon^{\mu \nu \rho \sigma} \epsilon_{m r p q} \psi_{\rho \sigma} \bar{\epsilon} \Gamma_{r} \psi_{\nu} + \frac{1}{4}\, \bar{\psi_{\mu}} \Gamma_{n p q} \epsilon^{\mu \nu \rho \sigma} \epsilon_{r n p q} \psi_{\rho \sigma} \bar{\epsilon} \Gamma_{r} \psi_{\nu};
+\end{dmath*}
+{\color[named]{Blue}\begin{verbatim}
+@canonicalise!(%): @rename_dummies!(%);
+\end{verbatim}}
+\begin{dmath*}[compact, spread=2pt]
+tst\specialcolon{}= (-1)\, \bar{\psi_{\mu}} \Gamma_{m n p} \epsilon^{\mu \nu \rho \sigma} \epsilon_{m n p q} \psi_{\nu \rho} \bar{\epsilon} \Gamma_{q} \psi_{\sigma};
+\end{dmath*}
+{\color[named]{Blue}\begin{verbatim}
+@fierz!(%){ \psi_{\mu}, \psi_{\nu}, \epsilon, \psi_{\mu\nu} };
+\end{verbatim}}
+\begin{dmath*}[compact, spread=2pt]
+tst\specialcolon{}= \frac{1}{4}\, \bar{\psi_{\mu}} \Gamma_{m n p} \Gamma_{q} \epsilon^{\mu \nu \rho \sigma} \epsilon_{m n p q} \psi_{\sigma} \bar{\epsilon} \psi_{\nu \rho} + \frac{1}{4}\, \bar{\psi_{\mu}} \Gamma_{m n p} \Gamma_{r} \Gamma_{q} \epsilon^{\mu \nu \rho \sigma} \epsilon_{m n p q} \psi_{\sigma} \bar{\epsilon} \Gamma_{r} \psi_{\nu \rho} + \frac{1}{8}\, \bar{\psi_{\mu}} \Gamma_{m n p} \Gamma_{r s} \Gamma_{q} \epsilon^{\mu \nu \rho \sigma} \epsilon_{m n p q} \psi_{\sigma} \bar{\epsilon} \Gamma_{s r} \psi_{\nu \rho} + \frac{1}{24}\, \bar{\psi_{\mu}} \Gamma_{m n p} \Gamma_{r s t} \Gamma_{q} \epsilon^{\mu \nu \rho \sigma} \epsilon_{m n p q} \psi_{\sigma} \bar{\epsilon} \Gamma_{t s r} \psi_{\nu \rho} + \frac{1}{96}\, \bar{\psi_{\mu}} \Gamma_{m n p} \Gamma_{r s t u} \Gamma_{q} \epsilon^{\mu \nu \rho \sigma} \epsilon_{m n p q} \psi_{\sigma} \bar{\epsilon} \Gamma_{u t s r} \psi_{\nu \rho};
+\end{dmath*}
+{\color[named]{Blue}\begin{verbatim}
+@join!(%){expand}:
+@distribute!(%):
+@join!(%){expand}:
+@distribute!(%):
+@canonicalise!(%):
+@rename_dummies!(%);
+\end{verbatim}}
+\begin{dmath*}[compact, spread=2pt]
+tst\specialcolon{}= \frac{1}{2}\, \bar{\psi_{\mu}} \Gamma_{m} \epsilon^{\mu \nu \rho \sigma} \epsilon_{m n p q} \psi_{\nu} \bar{\epsilon} \Gamma_{n p q} \psi_{\rho \sigma} - \frac{1}{2}\, \bar{\psi_{\mu}} \Gamma_{m n} \epsilon^{\mu \nu \rho \sigma} \epsilon_{m p q r} \psi_{\nu} \bar{\epsilon} \Gamma_{n p q r} \psi_{\rho \sigma};
+\end{dmath*}
+{\color[named]{Blue}\begin{verbatim}
+torep:=\Gamma_{m n} \epsilon_{m p q r};
+\end{verbatim}}
+\begin{dmath*}[compact, spread=2pt]
+torep\specialcolon{}= \Gamma_{m n} \epsilon_{m p q r};
+\end{dmath*}
+{\color[named]{Blue}\begin{verbatim}
+@decompose_product!(%):
+@canonicalise!(%);
+\end{verbatim}}
+\begin{dmath*}[compact, spread=2pt]
+torep\specialcolon{}= \frac{3}{4}\, \Gamma_{n m} \epsilon_{p q r m} + \frac{1}{4}\, \Gamma_{p m} \epsilon_{n q r m} - \frac{1}{4}\, \Gamma_{q m} \epsilon_{n p r m} + \frac{1}{4}\, \Gamma_{r m} \epsilon_{n p q m};
+\end{dmath*}
+{\color[named]{Blue}\begin{verbatim}
+@substitute!(tst)( \Gamma_{m n} \epsilon_{m p q r} -> @(torep) ):
+@distribute!(%):
+@canonicalise!(%):
+@collect_terms!(%);
+\end{verbatim}}
+\begin{dmath*}[compact, spread=2pt]
+tst\specialcolon{}= \frac{1}{2}\, \bar{\psi_{\mu}} \Gamma_{m} \epsilon^{\mu \nu \rho \sigma} \epsilon_{m n p q} \psi_{\nu} \bar{\epsilon} \Gamma_{n p q} \psi_{\rho \sigma};
+\end{dmath*}
+% Begin TeX cell closed
+This is supposed to be proportional to
+% End TeX cell
+{\color[named]{Blue}\begin{verbatim}
+tst2:= 1/8 \epsilon^{\mu\nu\rho\sigma} \epsilon_{m n p q} 
+                 \bar{\psi_{\mu}} \Gamma_{r} \psi_{\nu} 
+                 \bar{\epsilon} \Gamma_{r}\Gamma_{m n p q}\psi_{\rho\sigma};
+\end{verbatim}}
+\begin{dmath*}[compact, spread=2pt]
+tst2\specialcolon{}= \frac{1}{8}\, \bar{\psi_{\mu}} \Gamma_{r} \epsilon^{\mu \nu \rho \sigma} \epsilon_{m n p q} \psi_{\nu} \bar{\epsilon} \Gamma_{r} \Gamma_{m n p q} \psi_{\rho \sigma};
+\end{dmath*}
+{\color[named]{Blue}\begin{verbatim}
+@join!(%){expand}:
+@distribute!(%):
+@canonicalise!(%):
+@rename_dummies!(%);
+\end{verbatim}}
+\begin{dmath*}[compact, spread=2pt]
+tst2\specialcolon{}= \frac{1}{2}\, \bar{\psi_{\mu}} \Gamma_{m} \epsilon^{\mu \nu \rho \sigma} \epsilon_{m n p q} \psi_{\nu} \bar{\epsilon} \Gamma_{n p q} \psi_{\rho \sigma};
+\end{dmath*}
+\begin{verbatim}
+@join: not applicable.
+@distribute: not applicable.
+\end{verbatim}
+{\color[named]{Blue}\begin{verbatim}
+@(tst)-@(tst2);
+\end{verbatim}}
+\begin{dmath*}[compact, spread=2pt]
+18\specialcolon{}= 0;
+\end{dmath*}
+% Begin TeX cell closed
+Some random tests inspired by what happened above.
+% End TeX cell
+{\color[named]{Blue}\begin{verbatim}
+\epsilon_{m n p q} \Gamma_{m n p q} \Gamma_{r} \Gamma_{s t} \Gamma_{r};
+\end{verbatim}}
+\begin{dmath*}[compact, spread=2pt]
+10\specialcolon{}= \Gamma_{m n p q} \Gamma_{r} \Gamma_{s t} \Gamma_{r} \epsilon_{m n p q};
+\end{dmath*}
+{\color[named]{Blue}\begin{verbatim}
+@join!(%){expand};
+\end{verbatim}}
+\begin{dmath*}[compact, spread=2pt]
+10\specialcolon{}= (\Gamma_{m n p} \delta_{q r} - \Gamma_{m n q} \delta_{p r} + \Gamma_{m p q} \delta_{n r} - \Gamma_{n p q} \delta_{m r}) \Gamma_{s t} \Gamma_{r} \epsilon_{m n p q};
+\end{dmath*}
+{\color[named]{Blue}\begin{verbatim}
+@distribute!(%);
+\end{verbatim}}
+\begin{dmath*}[compact, spread=2pt]
+10\specialcolon{}= \Gamma_{m n p} \Gamma_{s t} \Gamma_{q} \epsilon_{m n p q} - \Gamma_{m n q} \Gamma_{s t} \Gamma_{p} \epsilon_{m n p q} + \Gamma_{m p q} \Gamma_{s t} \Gamma_{n} \epsilon_{m n p q} - \Gamma_{n p q} \Gamma_{s t} \Gamma_{m} \epsilon_{m n p q};
+\end{dmath*}
+{\color[named]{Blue}\begin{verbatim}
+@join!(%){expand};
+\end{verbatim}}
+\begin{dmath*}[compact, spread=2pt]
+10\specialcolon{}= (\Gamma_{m n t} \delta_{p s} - \Gamma_{m n s} \delta_{p t} - \Gamma_{m p t} \delta_{n s} + \Gamma_{m p s} \delta_{n t} + \Gamma_{n p t} \delta_{m s} - \Gamma_{n p s} \delta_{m t} + \Gamma_{m} \delta_{n t} \delta_{p s} - \Gamma_{m} \delta_{n s} \delta_{p t} - \Gamma_{p} \delta_{m s} \delta_{n t} + \Gamma_{p} \delta_{m t} \delta_{n s} + \Gamma_{n} \delta_{m s} \delta_{p t} - \Gamma_{n} \delta_{m t} \delta_{p s}) \Gamma_{q} \epsilon_{m n p q} - (\Gamma_{m n t} \delta_{q s} - \Gamma_{m n s} \delta_{q t} - \Gamma_{m q t} \delta_{n s} + \Gamma_{m q s} \delta_{n t} + \Gamma_{n q t} \delta_{m s} - \Gamma_{n q s} \delta_{m t} + \Gamma_{m} \delta_{n t} \delta_{q s} - \Gamma_{m} \delta_{n s} \delta_{q t} - \Gamma_{q} \delta_{m s} \delta_{n t} + \Gamma_{q} \delta_{m t} \delta_{n s} + \Gamma_{n} \delta_{m s} \delta_{q t} - \Gamma_{n} \delta_{m t} \delta_{q s}) \Gamma_{p} \epsilon_{m n p q} + (\Gamma_{m p t} \delta_{q s} - \Gamma_{m p s} \delta_{q t} - \Gamma_{m q t} \delta_{p s} + \Gamma_{m q s} \delta_{p t} + \Gamma_{p q t} \delta_{m s} - \Gamma_{p q s} \delta_{m t} + \Gamma_{m} \delta_{p t} \delta_{q s} - \Gamma_{m} \delta_{p s} \delta_{q t} - \Gamma_{q} \delta_{m s} \delta_{p t} + \Gamma_{q} \delta_{m t} \delta_{p s} + \Gamma_{p} \delta_{m s} \delta_{q t} - \Gamma_{p} \delta_{m t} \delta_{q s}) \Gamma_{n} \epsilon_{m n p q} - (\Gamma_{n p t} \delta_{q s} - \Gamma_{n p s} \delta_{q t} - \Gamma_{n q t} \delta_{p s} + \Gamma_{n q s} \delta_{p t} + \Gamma_{p q t} \delta_{n s} - \Gamma_{p q s} \delta_{n t} + \Gamma_{n} \delta_{p t} \delta_{q s} - \Gamma_{n} \delta_{p s} \delta_{q t} - \Gamma_{q} \delta_{n s} \delta_{p t} + \Gamma_{q} \delta_{n t} \delta_{p s} + \Gamma_{p} \delta_{n s} \delta_{q t} - \Gamma_{p} \delta_{n t} \delta_{q s}) \Gamma_{m} \epsilon_{m n p q};
+\end{dmath*}
+{\color[named]{Blue}\begin{verbatim}
+@distribute!(%);
+\end{verbatim}}
+\begin{dmath*}[compact, spread=2pt]
+10\specialcolon{}= \Gamma_{m n t} \Gamma_{q} \epsilon_{m n s q} - \Gamma_{m n s} \Gamma_{q} \epsilon_{m n t q} - \Gamma_{m p t} \Gamma_{q} \epsilon_{m s p q} + \Gamma_{m p s} \Gamma_{q} \epsilon_{m t p q} + \Gamma_{n p t} \Gamma_{q} \epsilon_{s n p q} - \Gamma_{n p s} \Gamma_{q} \epsilon_{t n p q} + \Gamma_{m} \Gamma_{q} \epsilon_{m t s q} - \Gamma_{m} \Gamma_{q} \epsilon_{m s t q} - \Gamma_{p} \Gamma_{q} \epsilon_{s t p q} + \Gamma_{p} \Gamma_{q} \epsilon_{t s p q} + \Gamma_{n} \Gamma_{q} \epsilon_{s n t q} - \Gamma_{n} \Gamma_{q} \epsilon_{t n s q} - \Gamma_{m n t} \Gamma_{p} \epsilon_{m n p s} + \Gamma_{m n s} \Gamma_{p} \epsilon_{m n p t} + \Gamma_{m q t} \Gamma_{p} \epsilon_{m s p q} - \Gamma_{m q s} \Gamma_{p} \epsilon_{m t p q} - \Gamma_{n q t} \Gamma_{p} \epsilon_{s n p q} + \Gamma_{n q s} \Gamma_{p} \epsilon_{t n p q} - \Gamma_{m} \Gamma_{p} \epsilon_{m t p s} + \Gamma_{m} \Gamma_{p} \epsilon_{m s p t} + \Gamma_{q} \Gamma_{p} \epsilon_{s t p q} - \Gamma_{q} \Gamma_{p} \epsilon_{t s p q} - \Gamma_{n} \Gamma_{p} \epsilon_{s n p t} + \Gamma_{n} \Gamma_{p} \epsilon_{t n p s} + \Gamma_{m p t} \Gamma_{n} \epsilon_{m n p s} - \Gamma_{m p s} \Gamma_{n} \epsilon_{m n p t} - \Gamma_{m q t} \Gamma_{n} \epsilon_{m n s q} + \Gamma_{m q s} \Gamma_{n} \epsilon_{m n t q} + \Gamma_{p q t} \Gamma_{n} \epsilon_{s n p q} - \Gamma_{p q s} \Gamma_{n} \epsilon_{t n p q} + \Gamma_{m} \Gamma_{n} \epsilon_{m n t s} - \Gamma_{m} \Gamma_{n} \epsilon_{m n s t} - \Gamma_{q} \Gamma_{n} \epsilon_{s n t q} + \Gamma_{q} \Gamma_{n} \epsilon_{t n s q} + \Gamma_{p} \Gamma_{n} \epsilon_{s n p t} - \Gamma_{p} \Gamma_{n} \epsilon_{t n p s} - \Gamma_{n p t} \Gamma_{m} \epsilon_{m n p s} + \Gamma_{n p s} \Gamma_{m} \epsilon_{m n p t} + \Gamma_{n q t} \Gamma_{m} \epsilon_{m n s q} - \Gamma_{n q s} \Gamma_{m} \epsilon_{m n t q} - \Gamma_{p q t} \Gamma_{m} \epsilon_{m s p q} + \Gamma_{p q s} \Gamma_{m} \epsilon_{m t p q} - \Gamma_{n} \Gamma_{m} \epsilon_{m n t s} + \Gamma_{n} \Gamma_{m} \epsilon_{m n s t} + \Gamma_{q} \Gamma_{m} \epsilon_{m s t q} - \Gamma_{q} \Gamma_{m} \epsilon_{m t s q} - \Gamma_{p} \Gamma_{m} \epsilon_{m s p t} + \Gamma_{p} \Gamma_{m} \epsilon_{m t p s};
+\end{dmath*}
+{\color[named]{Blue}\begin{verbatim}
+@join!(%){expand};
+\end{verbatim}}
+\begin{dmath*}[compact, spread=2pt]
+10\specialcolon{}= \epsilon_{m n s q} (\Gamma_{m n t q} + \Gamma_{m n} \delta_{q t} - \Gamma_{m t} \delta_{n q} + \Gamma_{n t} \delta_{m q}) - \epsilon_{m n t q} (\Gamma_{m n s q} + \Gamma_{m n} \delta_{q s} - \Gamma_{m s} \delta_{n q} + \Gamma_{n s} \delta_{m q}) - \epsilon_{m s p q} (\Gamma_{m p t q} + \Gamma_{m p} \delta_{q t} - \Gamma_{m t} \delta_{p q} + \Gamma_{p t} \delta_{m q}) + \epsilon_{m t p q} (\Gamma_{m p s q} + \Gamma_{m p} \delta_{q s} - \Gamma_{m s} \delta_{p q} + \Gamma_{p s} \delta_{m q}) + \epsilon_{s n p q} (\Gamma_{n p t q} + \Gamma_{n p} \delta_{q t} - \Gamma_{n t} \delta_{p q} + \Gamma_{p t} \delta_{n q}) - \epsilon_{t n p q} (\Gamma_{n p s q} + \Gamma_{n p} \delta_{q s} - \Gamma_{n s} \delta_{p q} + \Gamma_{p s} \delta_{n q}) + \epsilon_{m t s q} (\Gamma_{m q} + \delta_{m q}) - \epsilon_{m s t q} (\Gamma_{m q} + \delta_{m q}) - \epsilon_{s t p q} (\Gamma_{p q} + \delta_{p q}) + \epsilon_{t s p q} (\Gamma_{p q} + \delta_{p q}) + \epsilon_{s n t q} (\Gamma_{n q} + \delta_{n q}) - \epsilon_{t n s q} (\Gamma_{n q} + \delta_{n q}) - \epsilon_{m n p s} (\Gamma_{m n t p} + \Gamma_{m n} \delta_{p t} - \Gamma_{m t} \delta_{n p} + \Gamma_{n t} \delta_{m p}) + \epsilon_{m n p t} (\Gamma_{m n s p} + \Gamma_{m n} \delta_{p s} - \Gamma_{m s} \delta_{n p} + \Gamma_{n s} \delta_{m p}) + \epsilon_{m s p q} (\Gamma_{m q t p} + \Gamma_{m q} \delta_{p t} - \Gamma_{m t} \delta_{p q} + \Gamma_{q t} \delta_{m p}) - \epsilon_{m t p q} (\Gamma_{m q s p} + \Gamma_{m q} \delta_{p s} - \Gamma_{m s} \delta_{p q} + \Gamma_{q s} \delta_{m p}) - \epsilon_{s n p q} (\Gamma_{n q t p} + \Gamma_{n q} \delta_{p t} - \Gamma_{n t} \delta_{p q} + \Gamma_{q t} \delta_{n p}) + \epsilon_{t n p q} (\Gamma_{n q s p} + \Gamma_{n q} \delta_{p s} - \Gamma_{n s} \delta_{p q} + \Gamma_{q s} \delta_{n p}) - \epsilon_{m t p s} (\Gamma_{m p} + \delta_{m p}) + \epsilon_{m s p t} (\Gamma_{m p} + \delta_{m p}) + \epsilon_{s t p q} (\Gamma_{q p} + \delta_{p q}) - \epsilon_{t s p q} (\Gamma_{q p} + \delta_{p q}) - \epsilon_{s n p t} (\Gamma_{n p} + \delta_{n p}) + \epsilon_{t n p s} (\Gamma_{n p} + \delta_{n p}) + \epsilon_{m n p s} (\Gamma_{m p t n} + \Gamma_{m p} \delta_{n t} - \Gamma_{m t} \delta_{n p} + \Gamma_{p t} \delta_{m n}) - \epsilon_{m n p t} (\Gamma_{m p s n} + \Gamma_{m p} \delta_{n s} - \Gamma_{m s} \delta_{n p} + \Gamma_{p s} \delta_{m n}) - \epsilon_{m n s q} (\Gamma_{m q t n} + \Gamma_{m q} \delta_{n t} - \Gamma_{m t} \delta_{n q} + \Gamma_{q t} \delta_{m n}) + \epsilon_{m n t q} (\Gamma_{m q s n} + \Gamma_{m q} \delta_{n s} - \Gamma_{m s} \delta_{n q} + \Gamma_{q s} \delta_{m n}) + \epsilon_{s n p q} (\Gamma_{p q t n} + \Gamma_{p q} \delta_{n t} - \Gamma_{p t} \delta_{n q} + \Gamma_{q t} \delta_{n p}) - \epsilon_{t n p q} (\Gamma_{p q s n} + \Gamma_{p q} \delta_{n s} - \Gamma_{p s} \delta_{n q} + \Gamma_{q s} \delta_{n p}) + \epsilon_{m n t s} (\Gamma_{m n} + \delta_{m n}) - \epsilon_{m n s t} (\Gamma_{m n} + \delta_{m n}) - \epsilon_{s n t q} (\Gamma_{q n} + \delta_{n q}) + \epsilon_{t n s q} (\Gamma_{q n} + \delta_{n q}) + \epsilon_{s n p t} (\Gamma_{p n} + \delta_{n p}) - \epsilon_{t n p s} (\Gamma_{p n} + \delta_{n p}) - \epsilon_{m n p s} (\Gamma_{n p t m} + \Gamma_{n p} \delta_{m t} - \Gamma_{n t} \delta_{m p} + \Gamma_{p t} \delta_{m n}) + \epsilon_{m n p t} (\Gamma_{n p s m} + \Gamma_{n p} \delta_{m s} - \Gamma_{n s} \delta_{m p} + \Gamma_{p s} \delta_{m n}) + \epsilon_{m n s q} (\Gamma_{n q t m} + \Gamma_{n q} \delta_{m t} - \Gamma_{n t} \delta_{m q} + \Gamma_{q t} \delta_{m n}) - \epsilon_{m n t q} (\Gamma_{n q s m} + \Gamma_{n q} \delta_{m s} - \Gamma_{n s} \delta_{m q} + \Gamma_{q s} \delta_{m n}) - \epsilon_{m s p q} (\Gamma_{p q t m} + \Gamma_{p q} \delta_{m t} - \Gamma_{p t} \delta_{m q} + \Gamma_{q t} \delta_{m p}) + \epsilon_{m t p q} (\Gamma_{p q s m} + \Gamma_{p q} \delta_{m s} - \Gamma_{p s} \delta_{m q} + \Gamma_{q s} \delta_{m p}) - \epsilon_{m n t s} (\Gamma_{n m} + \delta_{m n}) + \epsilon_{m n s t} (\Gamma_{n m} + \delta_{m n}) + \epsilon_{m s t q} (\Gamma_{q m} + \delta_{m q}) - \epsilon_{m t s q} (\Gamma_{q m} + \delta_{m q}) - \epsilon_{m s p t} (\Gamma_{p m} + \delta_{m p}) + \epsilon_{m t p s} (\Gamma_{p m} + \delta_{m p});
+\end{dmath*}
+{\color[named]{Blue}\begin{verbatim}
+@distribute!(%);
+\end{verbatim}}
+\begin{dmath*}[compact, spread=2pt]
+10\specialcolon{}= \Gamma_{m n t q} \epsilon_{m n s q} + \Gamma_{m n} \epsilon_{m n s t} - \Gamma_{m n s q} \epsilon_{m n t q} - \Gamma_{m n} \epsilon_{m n t s} - \Gamma_{m p t q} \epsilon_{m s p q} - \Gamma_{m p} \epsilon_{m s p t} + \Gamma_{m p s q} \epsilon_{m t p q} + \Gamma_{m p} \epsilon_{m t p s} + \Gamma_{n p t q} \epsilon_{s n p q} + \Gamma_{n p} \epsilon_{s n p t} - \Gamma_{n p s q} \epsilon_{t n p q} - \Gamma_{n p} \epsilon_{t n p s} - \Gamma_{m q} \epsilon_{m t s q} + \Gamma_{m q} \epsilon_{m s t q} + \Gamma_{p q} \epsilon_{s t p q} - \Gamma_{p q} \epsilon_{t s p q} - \Gamma_{n q} \epsilon_{s n t q} + \Gamma_{n q} \epsilon_{t n s q} - \Gamma_{m n t p} \epsilon_{m n p s} + \Gamma_{m n s p} \epsilon_{m n p t} + \Gamma_{m q t p} \epsilon_{m s p q} - \Gamma_{m q s p} \epsilon_{m t p q} - \Gamma_{n q t p} \epsilon_{s n p q} + \Gamma_{n q s p} \epsilon_{t n p q} + \Gamma_{q p} \epsilon_{s t p q} - \Gamma_{q p} \epsilon_{t s p q} + \Gamma_{m p t n} \epsilon_{m n p s} - \Gamma_{m p s n} \epsilon_{m n p t} - \Gamma_{m q t n} \epsilon_{m n s q} + \Gamma_{m q s n} \epsilon_{m n t q} + \Gamma_{p q t n} \epsilon_{s n p q} - \Gamma_{p q s n} \epsilon_{t n p q} - \Gamma_{q n} \epsilon_{s n t q} + \Gamma_{q n} \epsilon_{t n s q} + \Gamma_{p n} \epsilon_{s n p t} - \Gamma_{p n} \epsilon_{t n p s} - \Gamma_{n p t m} \epsilon_{m n p s} + \Gamma_{n p s m} \epsilon_{m n p t} + \Gamma_{n q t m} \epsilon_{m n s q} - \Gamma_{n q s m} \epsilon_{m n t q} - \Gamma_{p q t m} \epsilon_{m s p q} + \Gamma_{p q s m} \epsilon_{m t p q} - \Gamma_{n m} \epsilon_{m n t s} + \Gamma_{n m} \epsilon_{m n s t} + \Gamma_{q m} \epsilon_{m s t q} - \Gamma_{q m} \epsilon_{m t s q} - \Gamma_{p m} \epsilon_{m s p t} + \Gamma_{p m} \epsilon_{m t p s};
+\end{dmath*}
+{\color[named]{Blue}\begin{verbatim}
+@canonicalise!(%);
+\end{verbatim}}
+\begin{dmath*}[compact, spread=2pt]
+10\specialcolon{}= 3\, \Gamma_{t m n q} \epsilon_{s m n q} - 3\, \Gamma_{s m n q} \epsilon_{t m n q} + 3\, \Gamma_{t m p q} \epsilon_{s m p q} - 3\, \Gamma_{s m p q} \epsilon_{t m p q} + 3\, \Gamma_{t n p q} \epsilon_{s n p q} - 3\, \Gamma_{s n p q} \epsilon_{t n p q} + 3\, \Gamma_{t m n p} \epsilon_{s m n p} - 3\, \Gamma_{s m n p} \epsilon_{t m n p};
+\end{dmath*}
+{\color[named]{Blue}\begin{verbatim}
+@rename_dummies!(%);
+\end{verbatim}}
+\begin{dmath*}[compact, spread=2pt]
+10\specialcolon{}= 12\, \Gamma_{t m n p} \epsilon_{s m n p} - 12\, \Gamma_{s m n p} \epsilon_{t m n p};
+\end{dmath*}
+{\color[named]{Blue}\begin{verbatim}
+@decompose_product!(%):
+@canonicalise!(%):
+\end{verbatim}}
+\begin{dmath*}[compact, spread=2pt]
+10\specialcolon{}= 0;
+\end{dmath*}
+\begin{verbatim}
+@collect_terms: not applicable.
+\end{verbatim}
+{\color[named]{Blue}\begin{verbatim}
+\Gamma_{r} \Gamma_{s t} \Gamma_{r};
+\end{verbatim}}
+\begin{dmath*}[compact, spread=2pt]
+3\specialcolon{}= \Gamma_{r} \Gamma_{s t} \Gamma_{r};
+\end{dmath*}
+{\color[named]{Blue}\begin{verbatim}
+@join!(%){expand};
+\end{verbatim}}
+\begin{dmath*}[compact, spread=2pt]
+3\specialcolon{}= (\Gamma_{r s t} + \Gamma_{t} \delta_{r s} - \Gamma_{s} \delta_{r t}) \Gamma_{r};
+\end{dmath*}
+{\color[named]{Blue}\begin{verbatim}
+@distribute!(%);
+\end{verbatim}}
+\begin{dmath*}[compact, spread=2pt]
+3\specialcolon{}= \Gamma_{r s t} \Gamma_{r} + \Gamma_{t} \Gamma_{s} - \Gamma_{s} \Gamma_{t};
+\end{dmath*}
+{\color[named]{Blue}\begin{verbatim}
+@join!(%){expand};
+\end{verbatim}}
+\begin{dmath*}[compact, spread=2pt]
+3\specialcolon{}= \Gamma_{r s t r} + 2\, \Gamma_{t s} + 2\, \Gamma_{s t};
+\end{dmath*}
+{\color[named]{Blue}\begin{verbatim}
+@canonicalise!(%);
+\end{verbatim}}
+\begin{dmath*}[compact, spread=2pt]
+3\specialcolon{}= 0;
+\end{dmath*}
+\end{document}

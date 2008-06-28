@@ -1,0 +1,215 @@
+\documentclass{beamer}
+\usepackage{fancyvrb}
+\usepackage{xspace}
+\usefonttheme[onlymath]{serif}
+
+%------------------------------------------------------------------------------
+\fvset{frame=lines,framerule=0.1pt,framesep=5pt,numbers=none,xleftmargin=0ex,fontfamily=tt,fontsize=\scriptsize}
+\newenvironment{screen}{\vspace{1ex}\Verbatim}{\endVerbatim\vspace{1ex}}
+
+\setbeamertemplate{navigation symbols}{}
+\setbeamersize{text margin right=2em}
+\setbeamersize{text margin left=2em}
+\newcommand{\Cpp}{{\leavevmode\rm{\hbox{C\hskip -0.1ex\raise
+		  0.5ex\hbox{\tiny ++}}}}\xspace}
+\newcommand{\Blue}[1]{{\color[named]{Blue} #1}}
+%------------------------------------------------------------------------------
+
+%------------------------------------------------------------------------------
+%
+% Young tableau macro (taken from Distler & Zamora [hep-th/9810206])
+% Usage: $\tableau{2 1 1}$ 
+%
+\newdimen\tableauside\tableauside=1ex   %1.0ex
+\newdimen\tableaurule\tableaurule=.32pt   %0.4pt
+\newdimen\tableaustep
+\def\phantomhrule#1{\hbox{\vbox to0pt{\hrule height\tableaurule width#1\vss}}}
+\def\phantomvrule#1{\vbox{\hbox to0pt{\vrule width\tableaurule height#1\hss}}}
+\def\sqr{\vbox{%
+  \phantomhrule\tableaustep
+  \hbox{\phantomvrule\tableaustep\kern\tableaustep\phantomvrule\tableaustep}%
+  \hbox{\vbox{\phantomhrule\tableauside}\kern-\tableaurule}}}
+\def\squares#1{\hbox{\count0=#1\noindent\loop\sqr
+  \advance\count0 by-1 \ifnum\count0>0\repeat}}
+\def\tableau#1{\vcenter{\offinterlineskip
+  \tableaustep=\tableauside\advance\tableaustep by-\tableaurule
+  \kern\normallineskip\hbox
+    {\kern\normallineskip\vbox
+      {\gettableau#1 0 }%
+     \kern\normallineskip\kern\tableaurule}%
+  \kern\normallineskip\kern\tableaurule}}
+\def\gettableau#1 {\ifnum#1=0\let\next=\null\else
+  \squares{#1}\let\next=\gettableau\fi\next}
+%------------------------------------------------------------------------------
+
+% add: indexbracket
+%     (\Gamma_{m n} - \Gamma_{m} * \Gamma_{n})_{\alpha\beta} \psi_{\beta}
+%   (fails to input correctly!!!)
+%     @join!(%);
+% add: generate basis -> LiE
+% add: variational derivatives: see substitute.cdb 
+%    {m,n,p,q,r,s}::Indices(vector).
+%    A_{m n} A_{m p} B_{p n};
+%    @vary!(%)( A_{m n} -> varA_{m n} );
+%    @factorise is now tricky, do we need a separate other one?
+
+%------------------------------------------------------------------------------
+\begin{document}
+\begin{frame}{Cadabra overview\hspace{.52\textwidth}\raisebox{.2ex}{\hbox{\small Kasper Peeters}}}
+\medskip
+
+\Blue{Features}:
+\begin{small}\begin{itemize}\setlength{\itemsep}{-2pt}
+\item Designed for ``field theory problems'' {\scriptsize (general~rel., quantum field~th., \ldots)}.
+\item Dummy index problems handled at internal storage level.
+\item Multiple spaces, multiple index types, implicit dependence: $T^{\alpha \dot{\beta}}_{m}(x)$ \ldots
+\item Commuting \& non-commuting tensors, user-specified sort order.
+\item All tensor symmetries handled (monoterm $\rightarrow$ {\tt xPerm} \& multi-term).
+\end{itemize}\end{small}
+\medskip
+
+\Blue{Interface}:
+\begin{small}\begin{itemize}\setlength{\itemsep}{-2pt}
+\item {\rm \TeX} input language. Command line \& TeXmacs
+  frontend.
+\item Object behaviour specified by ``properties'' which can inherit.
+\item Conservative: no hidden algorithms unless the user enables them.
+\item Unlimited undo (optional).
+\end{itemize}\end{small}
+\medskip
+
+\Blue{Implementation}:
+\begin{small}\begin{itemize}\setlength{\itemsep}{-2pt}
+\item Standalone \Cpp, GPL license, no dependence on non-free tools.
+\item Preliminary: \url{http://www.aei.mpg.de/~peekas/cadabra/}
+\end{itemize}\end{small}
+
+
+\end{frame}
+%------------------------------------------------------------------------------
+
+\begin{frame}{Example I: Multi-term symmetries}
+
+\begin{itemize}
+\item \Blue{Given}: basis for 4-th order Weyl tensor monomials
+\begin{small}
+\begin{equation*}
+\begin{aligned}
+W_1 &= W_{m n a b} W_{n p b c} W_{p s c d} W_{s m d a}\,,\quad
+W_2 = W_{m n a b} W_{n p b c} W_{m s c d} W_{s p d a}\,,\\[1ex]
+W_3 &= W_{m n a b} W_{p s b a} W_{m n c d} W_{p s d c}\,,\quad
+W_4 = W_{m n a b} W_{m n b a} W_{p s c d} W_{p s d c}\,,\\[1ex]
+W_5 &= W_{m n a b} W_{n p b a} W_{p s c d} W_{s m d c}\,,\quad
+W_6 = W_{m n a b} W_{p s b a} W_{m p c d} W_{n s d c}\,,\\[1ex]
+& \quad\quad\quad\quad W_7 = W_{m n}{}^{[m n} W_{p q}{}^{p q} W_{r s}{}^{r s} W_{t u}{}^{t u]}\,.
+\end{aligned}
+\end{equation*}
+\end{small}
+\medskip
+
+\item \Blue{Problem}: prove the identity
+\begin{equation*}
+W_{p q r s} W_{p t r u} W_{t v q w} W_{u v s w}- W_{p q r s} W_{p q t u} W_{r v t w} W_{s v u w} 
+ = W_2 - \tfrac{1}{4} W_6
+\end{equation*}
+Relies on the cyclic Ricci identity.
+\medskip
+
+\item \Blue{Algorithm}: project each Weyl with its Young projector~$\tableau{2
+  2}$, canonicalise using mono-term symmetries, decompose.
+\end{itemize}
+\end{frame}
+
+
+%------------------------------------------------------------------------------
+\begin{frame}[fragile]
+\frametitle{Example I: Multi-term symmetries}
+
+\begin{screen}
+{m,n,p,q,r,s,t,u,v,w,a,b,c,d,e,f}::Indices(vector).
+W_{m n p q}::WeylTensor.
+
+W1: W_{m n a b} W_{n p b c} W_{p s c d} W_{s m d a};
+...
+W7: W_{m n}^{m n} W_{p q}^{p q} W_{r s}^{r s} W_{t u}^{t u};
+@asym!(%){^{m},^{n},^{p},^{q},^{r},^{s},^{t},^{u}}:
+@substitute!(%)( W_{a b}^{c d} -> W_{a b c d} ):
+@canonicalise!(%):
+basisW4: { @(W1), @(W2), @(W3), @(W4), @(W5), @(W6), @(W7) };
+
+W_{p q r s} W_{p t r u} W_{t v q w} W_{u v s w} 
+  - W_{p q r s} W_{p q t u} W_{r v t w} W_{s v u w};
+@decompose!(%){ @(basisW4) };
+@list_sum!(%);
+\end{screen}
+\vspace{-3ex}
+\begin{screen}
+{ 0, 1, 0, 0, 0, -1/4, 0 };
+\end{screen}
+\end{frame}
+
+%------------------------------------------------------------------------------
+\begin{frame}[fragile]
+\frametitle{Example II: Commuting \& non-commuting objects}
+
+\begin{itemize}
+\item Combinations of commuting and non-commuting
+  tensors, e.g.~with~$\Gamma^m \psi_m = 0$ in 4d,
+\begin{equation*}
+\begin{aligned}
+\bar{\psi}_m (\Gamma_{m n} + A_{m} \Gamma_{n}) \Gamma_{p q r} \psi_{r}
+& = 6 \delta_{n p} \bar{\psi_{m}} \Gamma_{q} \psi_{m} - A_{m}
+\bar{\psi_{m}} \Gamma_{n p} \psi_{q} \\
+& ~ + A_{m} \bar{\psi_{m}}
+\Gamma_{n q} \psi_{p} - A_{m} \bar{\psi_{m}} \Gamma_{p q}
+\psi_{n} \\
+& ~ - 3 \delta_{n p} A_{m} \bar{\psi_{m}} \psi_{q}\,.
+\end{aligned}
+\end{equation*}
+\medskip
+
+\item Object properties:
+\begin{screen}
+{m,n,p,q,r}::Integer(0..3).
+\bar{#}::DiracBar.
+\Gamma{#}::GammaMatrix.
+\psi_{m}::Spinor(dimension=4).
+\psi_{m}::GammaTraceless.
+\delta_{m n}::KroneckerDelta.
+{ \delta_{m n}, A_{m}, \psi_{m}, \Gamma_{#} }::SortOrder.
+\end{screen}
+\end{itemize}
+\end{frame}
+
+%------------------------------------------------------------------------------
+\begin{frame}[fragile]
+\frametitle{Example II: Commuting \& non-commuting objects}
+
+\begin{itemize}
+\item The actual calculation (note the {\rm \TeX{}} input)
+\begin{screen}
+\bar{\psi_{m}} (\Gamma_{m n} + A_{m} \Gamma_{n}) \Gamma_{p q r} \psi_{r};
+
+@distribute!(%);          
+@join!(%);                
+@distribute!(%);
+@prodsort!(%);
+@remove_gamma_trace!(%);  
+@prodsort!(%);
+@remove_gamma_trace!(%);  
+\end{screen}
+\medskip
+
+\item Output:
+\begin{screen}
+6 \delta_{n p} * \bar{\psi_{m}} * \Gamma_{q} * \psi_{m} 
+- A_{m} * \bar{\psi_{m}} * \Gamma_{n p} * \psi_{q} 
++ A_{m} * \bar{\psi_{m}} * \Gamma_{n q} * \psi_{p} 
+- A_{m} * \bar{\psi_{m}} * \Gamma_{p q} * \psi_{n} 
+- 3 \delta_{n p} * A_{m} * \bar{\psi_{m}} * \psi_{q};
+\end{screen}
+\end{itemize}
+
+\end{frame}
+
+\end{document}

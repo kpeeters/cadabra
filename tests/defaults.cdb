@@ -1,0 +1,53 @@
+
+# Testing the DefaultRules system.
+
+# Test 1: Basics
+#
+::PostDefaultRules(@@distribute!(%), @@collect_terms!(%)).
+obj1:= (a+b)(c+d);
+tst1:= a c + a d + b c + b d - @(obj1);
+@assert(tst1);
+
+# Test 2: More complicated
+# 
+@reset;
+\commutator{#}::IndexInherit.
+::PreDefaultRules( @@substitute!(%)( [a?_{d?},b?_{e?}] -> \commutator{a?_{d?}}{b?_{e?}} ) ).
+::PostDefaultRules(@@distribute!(%),
+               @@substitute!(%)( \commutator{x_i}{p_j} -> I*\delta_{i j} )).
+obj2:= 3 [x_a, p_b] - 6 [x_a, x_b];
+tst2:= 3 I \delta_{a b} - 6 [ x_{a}, x_{b} ] - @(obj2);
+@collect_terms!(%);
+@assert(tst2);
+
+# Test 3: The example from gamma.cdb, from section 4.7 of Abra, now with default rules.
+#
+@reset;
+::PostDefaultRules( @@eliminate_kr!(%), @@prodsort!(%), @@canonicalise!(%), @@collect_terms!(%) ).
+
+\delta_{m n}::SelfCommuting.
+\delta_{m n}::KroneckerDelta.
+\delta^{m n}::SelfCommuting.
+\delta^{m n}::KroneckerDelta.
+{m, n, p, q, r, a, b}::Integer(1..10).
+
+\GAMMA^{#}::GammaMatrix(metric=\delta).
+
+obj3:= \GAMMA^{m n p q r}\GAMMA^{a}\GAMMA^{b}\GAMMA^{m n p}\GAMMA^{c}\GAMMA^{q r};
+@join!(%){expand}:
+@distribute!(%):
+
+@join!(%){expand}:
+@distribute!(%):
+@join!(%){expand}:
+@distribute!(%):
+@join!(%){expand}:
+@distribute!(%):
+@join!(%){expand}:
+@distribute!(%):
+
+tst3:= \GAMMA^{a}*@(obj3);
+@distribute!(%):
+@join!(%){expand}:
+@distribute!(%):
+@assert(tst3);

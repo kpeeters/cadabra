@@ -1,0 +1,45 @@
+\cdbproperty{AntiCommuting}{}
+
+Makes components anti-commuting. Example:
+\begin{screen}{1,2}
+{A,B}::AntiCommuting.
+B A;
+@prodsort!(%);
+(-1) A B;
+\end{screen}
+It also works for objects with indices:
+\begin{screen}{1,2}
+{\psi_{m}, \chi}::AntiCommuting.
+\psi_{m} \chi \psi_{n};
+@prodsort!(%);
+(-1) \chi \psi_{m} \psi_{n};
+\end{screen}
+If you want a pattern like \verb|\psi_{m}| to anti-commute with
+itself, you should use the \subsprop{SelfAntiCommuting} property instead.
+
+Note that this property always refers to components; if you attach it
+to an object with \subsprop{ImplicitIndex} property, the commutation
+property does not refer to the object as a whole, but rather to its
+components. The logic behind that becomes clear when considering
+e.g.~spinor bilinears
+\begin{screen}{1,2,3,4,5,6,7,9}
+{\chi, \psi}::Spinor(dimension=10, type=MajoranaWeyl).
+{\chi, \psi}::AntiCommuting.
+\bar{#}::DiracBar.
+\Gamma{#}::GammaMatrix.
+{\chi, \psi}::SortOrder.
+\bar{\psi} \Gamma_{m n p} \chi;
+@prodsort!(%);
+@prodsort: not applicable.
+@spinorsort!(%);
+\bar{\chi} \Gamma_{m n p} \psi;
+\end{screen}
+Here \subscommand{prodsort} did not act because both the spinors and
+the gamma matrices have the \subsprop{ImplicitIndex} property and
+there are thus no simple rules for their re-ordering.
+
+\cdbseealgo{prodsort}
+\cdbseealgo{spinorsort}
+\cdbseeprop{SelfAntiCommuting}
+\cdbseeprop{Commuting}
+\cdbseeprop{ImplicitIndex}

@@ -1,0 +1,94 @@
+% Cadabra notebook version 1.0
+\documentclass[11pt]{article}
+\usepackage[textwidth=460pt, textheight=660pt]{geometry}
+\usepackage[usenames]{color}
+\usepackage[parfill]{parskip}
+\usepackage{breqn}
+\def\specialcolon{\mathrel{\mathop{:}}\hspace{-.5em}}
+\renewcommand{\bar}[1]{\overline{#1}}
+\begin{document}
+{\color[named]{Blue}\begin{verbatim}
+{ a,b,c,d,e }::Indices(vector).
+{\partial{#}, \nabla{#}}::PartialDerivative.
+{ A_{a}, F_{a b} }::Depends(\partial).
+{ a,b,c,d,e }::Indices(vector).
+\delta{#}::Accent.
+F_{a b}::AntiSymmetric.
+\delta_{a b}::KroneckerDelta.
+\end{verbatim}}
+\begin{verbatim}
+Assigning property Indices to a, b, c, d, e.
+Assigning property PartialDerivative to \partial, \nabla.
+Assigning property Depends to A, F.
+Assigning property Indices to a, b, c, d, e.
+Assigning property Accent to \delta.
+Assigning property AntiSymmetric to F.
+Assigning property KroneckerDelta to \delta.
+\end{verbatim}
+{\color[named]{Blue}\begin{verbatim}
+S:= -(1/4) F_{a b} F_{a b};
+\end{verbatim}}
+% orig
+% (-1/4) F_{a b} F_{a b};
+% end_orig
+\begin{dmath*}[compact, spread=2pt]
+S\specialcolon{}= (\frac{-1}{4})\, F_{a b} F_{a b};
+\end{dmath*}
+{\color[named]{Blue}\begin{verbatim}
+@substitute!(%)( F_{a b} -> \partial_{a}{A_{b}} - \partial_{b}{A_{a}} );
+\end{verbatim}}
+% orig
+% (-1/4) (\partial_{a}{A_{b}} - \partial_{b}{A_{a}}) (\partial_{a}{A_{b}} - \partial_{b}{A_{a}});
+% end_orig
+\begin{dmath*}[compact, spread=2pt]
+S\specialcolon{}= (\frac{-1}{4})\, (\partial_{a}{A_{b}} - \partial_{b}{A_{a}}) (\partial_{a}{A_{b}} - \partial_{b}{A_{a}});
+\end{dmath*}
+{\color[named]{Blue}\begin{verbatim}
+@distribute!(%);
+\end{verbatim}}
+% orig
+%  - 1/4 \partial_{a}{A_{b}} \partial_{a}{A_{b}} + 1/4 \partial_{a}{A_{b}} \partial_{b}{A_{a}} + 1/4 \partial_{b}{A_{a}} \partial_{a}{A_{b}} - 1/4 \partial_{b}{A_{a}} \partial_{b}{A_{a}};
+% end_orig
+\begin{dmath*}[compact, spread=2pt]
+S\specialcolon{}=  - \frac{1}{4}\, \partial_{a}{A_{b}} \partial_{a}{A_{b}} + \frac{1}{4}\, \partial_{a}{A_{b}} \partial_{b}{A_{a}} + \frac{1}{4}\, \partial_{b}{A_{a}} \partial_{a}{A_{b}} - \frac{1}{4}\, \partial_{b}{A_{a}} \partial_{b}{A_{a}};
+\end{dmath*}
+{\color[named]{Blue}\begin{verbatim}
+@vary!(%)( A_{b} -> \delta{A_{b}});
+\end{verbatim}}
+% orig
+%  - 1/4 \partial_{a}{\delta{A_{b}}} \partial_{a}{A_{b}} - 1/4 \partial_{a}{A_{b}} \partial_{a}{\delta{A_{b}}} + 1/4 \partial_{a}{\delta{A_{b}}} \partial_{b}{A_{a}} + 1/4 \partial_{a}{A_{b}} \partial_{b}{\delta{A_{a}}} + 1/4 \partial_{b}{\delta{A_{a}}} \partial_{a}{A_{b}} + 1/4 \partial_{b}{A_{a}} \partial_{a}{\delta{A_{b}}} - 1/4 \partial_{b}{\delta{A_{a}}} \partial_{b}{A_{a}} - 1/4 \partial_{b}{A_{a}} \partial_{b}{\delta{A_{a}}};
+% end_orig
+\begin{dmath*}[compact, spread=2pt]
+S\specialcolon{}=  - \frac{1}{4}\, \partial_{a}{\delta{A_{b}}} \partial_{a}{A_{b}} - \frac{1}{4}\, \partial_{a}{A_{b}} \partial_{a}{\delta{A_{b}}} + \frac{1}{4}\, \partial_{a}{\delta{A_{b}}} \partial_{b}{A_{a}} + \frac{1}{4}\, \partial_{a}{A_{b}} \partial_{b}{\delta{A_{a}}} + \frac{1}{4}\, \partial_{b}{\delta{A_{a}}} \partial_{a}{A_{b}} + \frac{1}{4}\, \partial_{b}{A_{a}} \partial_{a}{\delta{A_{b}}} - \frac{1}{4}\, \partial_{b}{\delta{A_{a}}} \partial_{b}{A_{a}} - \frac{1}{4}\, \partial_{b}{A_{a}} \partial_{b}{\delta{A_{a}}};
+\end{dmath*}
+{\color[named]{Blue}\begin{verbatim}
+@prodsort!(%):
+@rename_dummies!(%):
+@collect_terms!(%);
+\end{verbatim}}
+% orig
+%  - \partial_{a}{A_{b}} \partial_{a}{\delta{A_{b}}} + \partial_{a}{A_{b}} \partial_{b}{\delta{A_{a}}};
+% end_orig
+\begin{dmath*}[compact, spread=2pt]
+S\specialcolon{}=  - \partial_{a}{A_{b}} \partial_{a}{\delta{A_{b}}} + \partial_{a}{A_{b}} \partial_{b}{\delta{A_{a}}};
+\end{dmath*}
+{\color[named]{Blue}\begin{verbatim}
+@substitute!(%)( \partial_{a}{\delta{A_{b}}} -> \nabla_{a}{\delta{A_{b}}} );
+\end{verbatim}}
+% orig
+%  - \partial_{a}{A_{b}} \nabla_{a}{\delta{A_{b}}} + \partial_{a}{A_{b}} \nabla_{b}{\delta{A_{a}}};
+% end_orig
+\begin{dmath*}[compact, spread=2pt]
+S\specialcolon{}=  - \partial_{a}{A_{b}} \nabla_{a}{\delta{A_{b}}} + \partial_{a}{A_{b}} \nabla_{b}{\delta{A_{a}}};
+\end{dmath*}
+{\color[named]{Blue}\begin{verbatim}
+@pintegrate!(%)( \nabla ):
+@rename!(%){"\nabla"}{"\partial"};
+\end{verbatim}}
+% orig
+% \partial_{a}{\partial_{a}{A_{b}}} \delta{A_{b}} - \partial_{b}{\partial_{a}{A_{b}}} \delta{A_{a}};
+% end_orig
+\begin{dmath*}[compact, spread=2pt]
+S\specialcolon{}= \partial_{a}{\partial_{a}{A_{b}}} \delta{A_{b}} - \partial_{b}{\partial_{a}{A_{b}}} \delta{A_{a}};
+\end{dmath*}
+\end{document}

@@ -1,0 +1,24 @@
+# Various tests with numerical pre-factors.
+
+a:= (1/5)*b-(1/5)*q;
+c:= d-(5/6)*@(a);
+
+d:= b/4*a;
+
+e:= a*(-3);
+
+obj1:= -1/36*A-1/9*B;
+tst1:= @(obj1)+1/36*A+1/9*B;
+@collect_terms!(%);
+@assert(tst1);
+
+# Test 2: NumericalFlat property
+#
+
+@reset.
+\partial{#}::PartialDerivative.
+obj2:= 3 a b \partial_{m n}( 5 c d );
+@numerical_flatten!!(%);
+tst2:= 15 a b \partial_{m n}( c d ) - @(obj2);
+@collect_terms!(%);
+@assert(tst2);

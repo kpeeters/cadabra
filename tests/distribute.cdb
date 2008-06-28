@@ -1,0 +1,63 @@
+obj1:= a*(b+c);
+@distribute!(%);
+test1:= a*b+a*c - @(obj1);
+@collect_terms!(%);
+@assert(test1);
+
+c*(a+1)*(b+d);
+@distribute!(%);
+
+
+# Fixed-level distribute:
+#
+obj2:= d+(a+b*(e+f))*(c+d);
+@distribute!1(%);
+tst2:= d+(a+b*(e+f))*(c+d) - @(obj2);
+@collect_terms!(%):
+@assert(tst2);
+
+@distribute!4(obj2);
+tst3:= d+(a+b*e+b*f)*(c+d) - @(obj2);
+@collect_terms!(%);
+@assert(tst3);
+
+@pop(obj2);
+
+@distribute!2(obj2);
+tst4:= d+a*c + b*(e+f)*c + a*d + b*(e+f)*d - @(obj2);
+@collect_terms!(%);
+@assert(tst4);
+
+# ... with more than one entry at a given level:
+#
+obj3:= d+(a+b*(e+f))*(c+d) + (q+c*(e+p))*ff;
+@distribute!4(obj3);
+tst3:= d+(a+b*e+b*f)*(c+d) + (q+c*e+c*p)*ff - @(obj3);
+@collect_terms!(%);
+@assert(tst3);
+
+# Test 4:= Indexbracket
+#
+obj4:= A (B+C)_\mu D;
+@distribute!(%);
+@remove_indexbracket!(%);
+tst4:= A B_\mu D + A C_\mu D - @(obj4);
+@collect_terms!(%);
+@assert(tst4);
+
+# Test 5:= Multipliers and products (testing cleanup_nests)
+#
+obj5:= A*B*C;
+@substitute!(%)( B -> 3 E F );
+tst5:= 3*A*E*F*C - @(obj5);
+@collect_terms!(%);
+@assert(tst5);
+
+# Test 6: bracket types
+@reset.
+\Omega{#}::Derivative.
+obj6:= \Omega(A+B)(C+D);
+@distribute!(%);
+tst6:= \Omega(A)(C) + \Omega(B)(C) + \Omega(A)(D) + \Omega(B)(D) - @(obj6);
+@collect_terms!(%);
+@assert(tst6);

@@ -1,0 +1,54 @@
+
+# Tests of the ** operator and routines to collect exponents.
+
+obj1:= sin(x) b sin(x) c sin(x)**3 d;
+@collect_factors!(%);
+tst1:= sin(x)**5 b c d - @(obj1);
+@collect_terms!(%);
+@assert(tst1);
+
+
+obj2:= A_{m n} b A_{m n};
+@collect_factors!(%);
+tst2:= A_{m n} b A_{m n} - @(obj2);
+@collect_terms!(%);
+@assert(tst2);
+
+
+obj3:= a**(2+3b) c a**(sin(x));
+@collect_factors!(%);
+tst3:= a**((2 + 3 * b) + sin(x)) * c - @(obj3);
+@collect_terms!(%);
+@assert(tst3);
+
+tst4:= x**2;
+@substitute!(%)( x-> 0);
+@assert(tst4);
+
+obj5:= p**2 p**{-1};
+@collect_factors!(%);
+tst5:= p - @(obj5);
+@collect_terms!(%);
+@assert(tst5);
+
+obj6:= 3 p**2 p**{-2} * h_{m n} * h^{m n};
+@collect_factors!(%);
+tst6:= 3 h_{m n} h^{m n} - @(obj6);
+@collect_terms!(%);
+@assert(tst6);
+
+obj7:= 3 p p**{-1} * h_{m n} * h^{m n};
+@collect_factors!(%);
+tst7:= 3 h_{m n} h^{m n} - @(obj7);
+@collect_terms!(%);
+@assert(tst7);
+
+# Test 8: Catch powers <=1.
+@reset.
+obj8:= A**(-1);
+@expand_power!(%);
+tst8:= A**(-1) - @(obj8);
+@collect_terms!(%);
+@assert(tst8);
+
+

@@ -1,0 +1,17 @@
+
+# Testing output routines. We write several output files
+# 
+#    out1.res
+#    out1.exp
+#
+# with the generated and expected output, and compare
+# these using diff.
+
+@print[a*(b*c)]; "out1.res"
+@print["a*(b*c)"]; "out1.exp"
+
+#\delbar::LaTeXForm("\bar{\partial}").
+
+\Gamma{#}::GammaMatrix(metric=\delta).
+@print["The result is : (\Gamma^{a b}_{c}+2*\Gamma^{a}*\delta^{b}_{c});"]; "out2.exp"
+@print["The result is : " ~ @join[\Gamma^{a b}\Gamma_{c}] ~ ";"]; "out2.res"

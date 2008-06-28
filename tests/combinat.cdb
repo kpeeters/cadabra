@@ -1,0 +1,27 @@
+
+# Test 1: basic permute functions.
+#
+obj1:= { a, b, c, d };
+@permute(%){true}{6}{1,0,1,0}{1}{0,1,0,0}{2};
+tst1:= {{a, b, b, d, d, d}, {b, b, c, d, d, d}} - @(obj1);
+@collect_terms!(%);
+@assert(tst1);
+
+obj2:= { a, b, c, d };
+@permute(%){true}{<10}{1,0,1,0}{1}{0,1,0,0}{2};
+tst2:= {{a, b, b}, 
+{b, b, c}, 
+{a, b, b, d}, 
+{b, b, c, d}, 
+{a, b, b, d, d}, 
+{b, b, c, d, d}, 
+{a, b, b, d, d, d}, 
+{b, b, c, d, d, d}, 
+{a, b, b, d, d, d, d}, 
+{b, b, c, d, d, d, d}, 
+{a, b, b, d, d, d, d, d}, 
+{b, b, c, d, d, d, d, d}, 
+{a, b, b, d, d, d, d, d, d}, 
+{b, b, c, d, d, d, d, d, d}} - @(obj2);
+@collect_terms!(%);
+@assert(tst2);

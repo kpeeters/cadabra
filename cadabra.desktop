@@ -1,0 +1,11 @@
+[Desktop Entry]
+Encoding=UTF-8
+Name=Cadabra
+GenericName=Cadabra computer algebra system
+Comment=Computer algebra system for field theory problems
+Icon=cadabra
+Type=Application
+Categories=Math;Science;Education
+Exec=xcadabra
+Terminal=false
+

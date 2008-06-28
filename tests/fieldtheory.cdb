@@ -1,0 +1,333 @@
+
+\delta{#}::KroneckerDelta.
+obj1:= 2*a*\delta^{i1 j1 i2 j2};
+@breakgendelta!(%);
+@distribute!(%);
+test1:= a*\delta^{i1 j1}\delta^{i2 j2}-a*\delta^{i2 j1}\delta^{i1 j2}-@(obj1);
+@collect_terms!(%);
+@assert(test1);
+
+n::Integer(0..d).
+obj2:= a*\delta_{n n};
+@eliminate_kr!(obj2);
+tst2:= a*(d+1) - @(obj2);
+@collect_terms!(%);
+@assert(tst2);
+
+@reset.
+{m, p, q, r}::Integer(1..10).
+\delta{#}::KroneckerDelta.
+obj3:= a*\delta_{p p};
+@eliminate_kr!(obj3);
+tst3:= 10 a - @(obj3);
+@collect_terms!(%);
+@assert(tst3);
+
+z::Integer.
+obj4:= a*\delta_{z z};
+@eliminate_kr!(%);
+tst4:= a*\delta_{z z} - @(obj4);
+@collect_terms!(%);
+@assert(tst4);
+
+# Test5:= Epsilon tensor^2 removal, both with Euclidean and Lorentzian signature.
+#
+@reset.
+\delta{#}::KroneckerDelta.
+\eps_{#}::EpsilonTensor(delta=\delta).
+{m,n,p}::Integer(1..3).
+obj5:= \eps_{m n p} \eps_{m n p};
+@epsprod2gendelta!(%);
+tst5:= 6 - @(obj5);
+@collect_terms!(%);
+@assert(tst5);
+
+@reset.
+g_{m n}::Metric(signature=-1).
+\delta{#}::KroneckerDelta.
+\eps_{#}::EpsilonTensor(metric=g_{m n}, delta=\delta).
+{m,n,p}::Integer(1..3).
+obj5b:= \eps_{m n p} \eps_{m n p};
+@epsprod2gendelta!(%);
+tst5b:= 6 + @(obj5b);
+@collect_terms!(%);
+@assert(tst5b);
+
+@reset.
+\Delta{#}::KroneckerDelta.
+\eps_{#}::EpsilonTensor(delta=\Delta_{m n});
+{m,n,p}::Integer(1..3).
+\eps_{m n p} \eps_{m n p};
+obj5c:= \eps_{m n p} \eps_{m n p};
+@epsprod2gendelta!(%);
+tst5c:= 6 - @(obj5c);
+@collect_terms!(%);
+@assert(tst5c);
+
+@reset.
+\Delta{#}::KroneckerDelta.
+\eps_{#}::EpsilonTensor(delta=\Delta_{m n});
+{m,n,p}::Integer(1..3).
+obj5d:= \eps_{m n p} \eps^{m n p};
+@epsprod2gendelta!(%);
+tst5d:= 6 - @(obj5d);
+@collect_terms!(%);
+@assert(tst5d);
+
+
+# Test 6 & 7:= when breaking up a gendelta into elementary Kroneckers, 
+#             anti-symmetrisations which are not needed because they
+#             are implied by contracting tensors are skipped automatically.
+#             This works for TableauSymmetry and AntiSymmetric properties.
+#
+@reset.
+\delta{#}::KroneckerDelta.
+\eps_{#}::EpsilonTensor(delta=\delta).
+F_{q r s a b c}::TableauSymmetry(shape={1,1}, indices={0,1}, shape={1,1,1}, indices={3,4,5}).
+obj6:= \eps_{m n q} \eps_{r s t} F_{b1 b2 b3 m n q};
+@epsprod2gendelta!(%);
+@breakgendelta!(%);
+@eliminate_kr!(%);
+tst6:= 6 F_{b1 b2 b3 r s t} - @(obj6);
+@collect_terms!(%);
+@assert(tst6);
+
+@reset.
+\delta{#}::KroneckerDelta.
+\eps_{#}::EpsilonTensor(delta=\delta).
+{a,b,c,d,e,f,g,m}::Integer(0..9).
+ddGstar_{a b c d e}::TableauSymmetry(shape={1,1,1}, indices={2,3,4}).
+obj7:= \eps_{m b c d} \eps_{m e f g} ddGstar_{a b c d e};
+@epsprod2gendelta!(%);
+@breakgendelta!(%);
+@distribute!(%);
+@eliminate_kr!(%);
+tst7:= -14 ddGstar_{a e f g e} + 14 ddGstar_{a f e g e} - 14 ddGstar_{a g e f e} + @(obj7);
+@collect_terms!(%);
+@assert(tst7);
+
+# Test 8 & 9:= elimination of anti-symmetrised Garnir elements.
+#
+@reset.
+\eps_{#}::EpsilonTensor.
+DF_{a b c d}::TableauSymmetry(shape={2,1,1}, indices={0,1,2,3}).
+tst8:= DF_{a b c d} \eps_{d n k a b q c k} \eps_{u y r o};
+@impose_bianchi!(%);
+@assert(tst8);
+
+DG_{a b c d e}::TableauSymmetry(shape={2,1,1,1}, indices={1,0,2,3,4}).
+tst9:= DF_{a b c d} DG_{m a b c d};
+@impose_bianchi!(%);
+@assert(tst9);
+
+# Test 10: Partial integration on indicated operators.
+# (note:= always first use substitute to 'mark' the operator
+#  which is to be integrated).
+#
+@reset;
+obj10:= a*b_{m} + \diff{e}_{m}*c*d*f + g*h*\diff{k}_{m};
+@pintegrate!(%){\diff};
+tst10:= a*b_{m} - \diff{c*d*f}_{m}*e - \diff{g*h}_{m}*k - @(obj10);
+@collect_terms!(%);
+@assert(tst10);
+
+obj11:= g*h*\diff{k}_{m n};
+@pintegrate!(%){\diff};
+tst11:= \diff{g*h}_{m n} * k - @(obj11);
+@collect_terms!(%);
+@assert(tst11);
+
+obj12:= Q * \diff{A_{m}}_{p};
+@pintegrate!(%){\diff};
+tst12:= \diff{Q}_{p} A_{m} + @(obj12);
+@collect_terms!(%);
+@assert(tst12);
+
+# Test 11:= Einsteinify, i.e. raise indices or put in metrics.
+#
+#{a,b,c,d,e,f,g,h}::Indices(vector).
+#obj13:= A_{a b a d}*A_{c d b c};
+#@einsteinify!(%){ginv};
+
+# Test 12:= Generating scalars.
+#
+@reset;
+A_{m n}::Symmetric.
+A_{m n}::Traceless.
+{m,n,p,q,r,s,t,u}::Indices(vector).
+{m,n,p,q,r,s,t,u}::Integer(0..9).
+obj14:= A_{m n} A_{p q} A_{r s} A_{t u};
+@all_contractions(%);
+@rename!(%){"\comma"}{"\sum"};
+tst14:= A_{m n} A_{m n} A_{r s} A_{r s} + A_{m n} A_{n p} A_{p q} A_{q m} 
+      - @(obj14);
+@canonicalise!(%);
+@rename_dummies!(%);
+@collect_terms!(%);
+@assert(tst14);
+
+# Test 13:= Depends
+#
+@reset;
+\del{#}::Derivative.
+X::Depends(\del).
+obj13:= \del{X*Y*Z};
+@prodrule!(%);
+@unwrap!(%);
+tst13:= \del{X}*Y*Z - @(obj13);
+@collect_terms!(%);
+@assert(tst13);
+
+@reset;
+\del{#}::Derivative.
+X::Depends(\del).
+obj13b:= \del{X*Y*Z};
+@unwrap!(%);
+tst13b:= Y * Z * \del{X} - @(obj13b);
+@collect_terms!(%);
+@assert(tst13b);
+
+@reset;
+\del{#}::Derivative.
+X::Depends(\del).
+obj13c:= \del{X+Y+Z};
+@unwrap!(%);
+tst13c:= \del{X+Y+Z} - @(obj13c);
+@collect_terms!(%);
+@assert(tst13c);
+
+
+
+# Test 14-17: Unwrap
+#
+@reset.
+\del{#}::Derivative.
+X::Depends(\del).
+obj14:= \del{Y*X*Z*Q*R};
+@unwrap!(%);
+tst14:= Y*Z*Q*R*\del{X} - @(obj14);
+@collect_terms!(%);
+@assert(tst14);
+
+@reset;
+\bar{#}::Accent.
+X::Depends(\bar).
+obj15:= \bar{Y*X*Z*Q*R};
+@unwrap!(%);
+tst15:= Y*Z*Q*R*\bar{X} - @(obj15);
+@collect_terms!(%);
+@assert(tst15);
+
+@reset;
+{X, Y, Z}::Depends(\diff).
+obj16:= \diff{X + Y + A + Z}_{\mu};
+@unwrap!(%);
+tst16:= \diff{X + Y + A + Z}_{\mu} - @(obj16);
+@collect_terms!(%);
+@assert(tst16);
+
+# Test 18: inverted order
+#
+@reset.
+\del{#}::Derivative.
+X::Depends(\del).
+obj18:= \del_{a}{Y*X*Z*Q*R};
+@unwrap!(%);
+tst18:= Y*Z*Q*R*\del_{a}{X} - @(obj18);
+@collect_terms!(%);
+@assert(tst18);
+
+# Test 19: explicit dependence.
+@reset.
+a::Coordinate.
+\del{#}::Derivative.
+obj19:= \del_{a}( X^{\mu}(a) Y^{\nu}(b) );
+@unwrap!(%);
+tst19:= Y^{\nu}(b) \del_{a}{ X^{\mu}(a) } - @(obj19);
+@collect_terms!(%);
+@assert(tst19);
+
+# Test 20: single arguments.
+@reset.
+\del{#}::Derivative.
+X^{\mu}::Depends(\del).
+obj20:= \del_{a}{ X^{\mu} };
+@unwrap!(%);
+tst20:= \del_{a}{ X^{\mu} } - @(obj20);
+@collect_terms!(%);
+@assert(tst20);
+
+# Test 21: anti-commuting objects
+@reset.
+\del{#}::Derivative.
+\theta^{\alpha}::SelfAntiCommuting.
+\lambda^{\alpha}::SelfAntiCommuting.
+{ \theta^{\alpha}, \lambda^{\alpha} }::AntiCommuting.
+\theta^{\alpha}::Depends(\del).
+obj21:= \del_{a}( \theta^{\alpha} \lambda^{\beta} \theta^{\gamma} );
+@unwrap!(%);
+tst21:= \lambda^{\beta} \del_{a}( \theta^{\alpha} \theta^{\gamma} ) + @(obj21);
+@collect_terms!(%);
+@assert(tst21);
+
+# Test 22: more advanced Kronecker delta elimination
+#
+@reset;
+{m,n,p,q,r,s}::Indices(vector).
+\delta{#}::Derivative.
+\delta_{m}^{n}::KroneckerDelta.
+obj22:= A \delta_{m}^{n} \delta{ B^{m p}*C_{p q} };
+@eliminate_kr!(%);
+tst22:= A \delta{ B^{n p} * C_{p q} } - @(obj22);
+@collect_terms!(%);
+@assert(tst22);
+
+# Test 23: More depends
+#
+@reset.
+\partial{#}::PartialDerivative.
+A_{m n}::Depends(\partial).
+obj23:= \partial_{m n}{ A_{p q} };
+@unwrap!(%);
+tst23:= \partial_{m n}{ A_{p q} } - @(obj23);
+@collect_terms!(%);
+@assert(tst23);
+
+obj24:= \partial_{m n}{ A_{p q} * B_{r s} };
+@unwrap!(%);
+
+@reset.
+\delta{#}::KroneckerDelta.
+obj25:= A_{m n} \delta^{m p};
+@eliminate_kr!(%);
+tst25:= A^{p}_{n} - @(obj25);
+@collect_terms!(%);
+@assert(tst25);
+
+@reset.
+\delta{#}::KroneckerDelta.
+obj26:= A_{m n} \delta^{m 4};
+@eliminate_kr!(%);
+tst26:= A^{4}_{n} - @(obj26);
+@collect_terms!(%);
+@assert(tst26);
+
+# Test 27: More unwrap
+@reset.
+\partial{#}::PartialDerivative.
+A::Depends(\partial).
+obj27:= \partial_{m}{2 A T};
+@unwrap!(%);
+tst27:= T \partial_{m}{2 A} - @(obj27);
+@collect_terms!(%);
+@assert(tst27);
+
+# Test 28: Numerical indices in kronecker deltas
+@reset.
+\delta{#}::KroneckerDelta.
+obj28:= \Pi_{\alpha \beta} \delta^{\alpha}_{0} \delta^{\beta}_{0};
+@eliminate_kr!(%);
+tst28:= \Pi_{0 0} - @(obj28);
+@collect_terms!(%);
+@assert(tst28);
+

@@ -1,0 +1,11 @@
+obj1:= A_{m} B_{m} A_{n} B_{n};
+@substitute!(%)( A_{m} B_{n} -> Q);
+tst1:= Q A_{n} B_{n} - @(obj1);
+@collect_terms!(%);
+@assert(tst1);
+
+obj2:= A_{m} B_{m} A_{n} B_{n};
+@substitute!!(%)( A_{m} B_{n} -> Q, A_{m} A_{m} -> P);
+tst2:= Q Q - @(obj2);
+@collect_terms!(%);
+@assert(tst2);
