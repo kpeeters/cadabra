@@ -259,8 +259,7 @@ VisualCell *NotebookCanvas::add_cell(DataCell *dc, DataCell *ref, bool before)
 				 sigc::bind<VisualCell *, bool>(
 					 sigc::mem_fun(this, &NotebookCanvas::scroll_into_view), newcell, false));
 	
-// SHOW																														  
-//			newcell->inbox->show_all();
+			newcell->inbox->show_all();
 			break;
 			}
 		case DataCell::c_error:
@@ -273,8 +272,7 @@ VisualCell *NotebookCanvas::add_cell(DataCell *dc, DataCell *ref, bool before)
 			gtk_box_set_child_packing(((Gtk::Box *)(&scrollbox))->gobj(), 
 											  ((Gtk::Widget *)(newcell->outbox))->gobj(),
 											  false, false, 0, GTK_PACK_START);
-// SHOW
-//			newcell->outbox->show_all();
+			newcell->outbox->show_all();
 			
 			newcell->outbox->signal_button_release_event().connect( 
 				sigc::bind<NotebookCanvas *, VisualCell *>(
@@ -303,10 +301,10 @@ VisualCell *NotebookCanvas::add_cell(DataCell *dc, DataCell *ref, bool before)
 					sigc::mem_fun(doc, &XCadabra::handle_on_grab_focus),
 					this, newcell));
 			// Hide source depending on setting in the datacell.
-// SHOW
-//			newcell->texbox->texview.show_all();
-//			if(newcell->datacell->tex_hidden) newcell->texbox->edit.hide_all();
-//			else                              newcell->texbox->edit.show_all();
+
+			newcell->texbox->texview.show_all();
+			if(newcell->datacell->tex_hidden) newcell->texbox->edit.hide_all();
+			else                              newcell->texbox->edit.show_all();
 			break;
 			}
 		}

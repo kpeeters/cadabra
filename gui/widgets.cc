@@ -10,7 +10,7 @@
 stopwatch tex_stopwatch;
 
 //#define DEBUG 1
-//#define OLDLATEX 1
+#define OLDLATEX 1
 
 // General tool to strip spaces from both ends
 std::string trim(const std::string& s) 
@@ -80,7 +80,7 @@ void TeXBuffer::regenerate(bool nobreqn)
 	// 
 	// for temporary files.
 
-	tex_stopwatch.start();
+//	tex_stopwatch.start();
 
 	char olddir[1024];
 	if(getcwd(olddir, 1023)==NULL)
@@ -99,7 +99,7 @@ void TeXBuffer::regenerate(bool nobreqn)
 
 	const double horizontal_mm=horizontal_pixels_*(12.0/font_size)/3.94;
 #ifdef DEBUG
-	std::cerr << "Tex_Stopwatch: font_size " << font_size << std::endl
+	std::cerr << "tex_it: font_size " << font_size << std::endl
 				 << "        pixels    " << horizontal_pixels_ << std::endl
 				 << "        mm        " << horizontal_mm << std::endl;
 #endif
@@ -259,8 +259,8 @@ void TeXBuffer::regenerate(bool nobreqn)
 #endif
 	chdir(olddir);
 
-	tex_stopwatch.stop();
-	std::cerr << "Tex_Stopwatch so far " << tex_stopwatch << std::endl;
+//	tex_stopwatch.stop();
+//	std::cerr << "Tex_Stopwatch so far " << tex_stopwatch << std::endl;
 	}
 
 TeXView::TeXView(Glib::RefPtr<TeXBuffer> texb, int hmargin)
