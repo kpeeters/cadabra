@@ -895,20 +895,27 @@ exptree::iterator manipulator::handle_active_nodes_(exptree::iterator original_e
 			return expressions.end();
 			}
 		else if(*it->name=="@reserved") {
-			 txtout << "<reserved>\n\\prod\n</reserved>\n"
-					  << "<reserved>\n\\div\n</reserved>\n"
-					  << "<reserved>\n\\sum\n</reserved>\n"
-					  << "<reserved>\n\\pow\n</reserved>\n"
-					  << "<reserved>\n\\indexbracket\n</reserved>\n"
-					  << "<reserved>\n\\factorial\n</reserved>\n"
-					  << "<reserved>\n\\equals\n</reserved>\n"
-					  << "<reserved>\n\\unequals\n</reserved>\n"
-					  << "<reserved>\n\\sequence\n</reserved>\n"
+			 // If any of these change, the documentation in cadabra.tex needs to
+			 // be updated as well.
+			 txtout << "<reserved>\n\\anticommutator\n</reserved>\n"
+				     << "<reserved>\n\\arrow\n</reserved>\n"
 					  << "<reserved>\n\\comma\n</reserved>\n"
-					  << "<reserved>\n\\infty\n</reserved>\n"
-					  << "<reserved>\n\\dot\n</reserved>\n"
 					  << "<reserved>\n\\commutator\n</reserved>\n"
-					  << "<reserved>\n\\anticommutator\n</reserved>\n";
+					  << "<reserved>\n\\conditional\n</reserved>\n"
+					  << "<reserved>\n\\div\n</reserved>\n"
+					  << "<reserved>\n\\dot\n</reserved>\n"
+					  << "<reserved>\n\\equals\n</reserved>\n"
+					  << "<reserved>\n\\expression\n</reserved>\n"
+					  << "<reserved>\n\\factorial\n</reserved>\n"
+					  << "<reserved>\n\\indexbracket\n</reserved>\n"
+					  << "<reserved>\n\\infty\n</reserved>\n"
+					  << "<reserved>\n\\label\n</reserved>\n"
+					  << "<reserved>\n\\pow\n</reserved>\n"
+				     << "<reserved>\n\\prod\n</reserved>\n"
+					  << "<reserved>\n\\regex\n</reserved>\n"
+					  << "<reserved>\n\\sequence\n</reserved>\n"
+					  << "<reserved>\n\\sum\n</reserved>\n"
+					  << "<reserved>\n\\unequals\n</reserved>\n";
 			 expressions.erase_expression(original_expression);
 			 original_expression=expressions.end();
 			 return expressions.end();
