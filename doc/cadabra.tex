@@ -185,7 +185,7 @@
 \pagestyle{empty}
 \begin{flushright}
 original: July 2006\\
-this version: June 2008\\
+this version: July 3rd, 2008\\
 AEI-2006-038
 \end{flushright}
 \vspace{6ex}
@@ -2304,6 +2304,61 @@ output of the commands inside the procedure has been suppressed,
 despite the appearance of the semi-colon line delimiter.
 
 
+\subsection{Reserved node names}
+\label{s:reserved_names}
+
+There is a small number of node names which is reserved to always mean
+the same thing, i.e.~for which the properties are not determined by
+the property system. These can be obtained using the `@reserved'
+command. Explicitly, they are
+\begin{quote}
+\texcommand{anticommutator},
+\texcommand{arrow},
+\texcommand{comma}, 
+\texcommand{commutator}, 
+\texcommand{conditional},
+\texcommand{div}, 
+\texcommand{dot},
+\texcommand{equals}, 
+\texcommand{expression},
+\texcommand{factorial},
+\texcommand{indexbracket}, 
+\texcommand{infty}, 
+\texcommand{label},
+\texcommand{pow}, 
+\texcommand{prod}, 
+\texcommand{regex}, 
+\texcommand{sequence},
+\texcommand{sum},
+\texcommand{unequals}.
+\end{quote}
+Some properties of these nodes are still obtained from the property
+system in order to make algorithms look more uniform, but the names of
+these reserved nodes can not be changed.
+
+\begin{reserved}
+\input{reserved/anticommutator.tex}
+\input{reserved/arrow.tex}
+\input{reserved/comma.tex}
+\input{reserved/commutator.tex}
+\input{reserved/conditional.tex}
+\input{reserved/div.tex}
+\input{reserved/dot.tex}
+\input{reserved/equals.tex}
+\input{reserved/expression.tex}
+\input{reserved/factorial.tex}
+\input{reserved/indexbracket.tex}
+\input{reserved/infty.tex}
+\input{reserved/label.tex}
+\input{reserved/pow.tex}
+\input{reserved/prod.tex}
+\input{reserved/regex.tex}
+\input{reserved/sequence.tex}
+\input{reserved/sum.tex}
+\input{reserved/unequals.tex}
+\end{reserved}
+
+
 \subsection{Environment variables}
 \label{s:environment_variables}
 
@@ -3520,40 +3575,6 @@ which enhance the functionality of the {\tt tree.hh} library.
 \subsubsection{Acting on products or single terms}
 
 use \member{is\_single\_term} and \member{prod\_wrap\_single\_term}.
-
-\subsubsection{Reserved node names}
-
-There is a small number of node names which is reserved to always mean
-the same thing, i.e.~for which the properties are not determined by
-the property system. These can be obtained using the '@reserved'
-command. Explicitly, they are
-\begin{quote}
-\texcommand{prod}, \texcommand{div}, \texcommand{sum},
-\texcommand{pow}, \texcommand{indexbracket}, \texcommand{factorial},
-\texcommand{equals}, \texcommand{unequals}, \texcommand{sequence},
-\texcommand{comma}, \texcommand{infty}, \texcommand{dot},
-\texcommand{commutator}, \texcommand{anticommutator}.
-\end{quote}
-Some properties of these nodes are still obtained from the property
-system in order to make algorithms look more uniform, but the names of
-these reserved nodes can not be changed.
-
-\begin{reserved}
-\input{reserved/prod.tex}
-\input{reserved/div.tex}
-\input{reserved/sum.tex}
-\input{reserved/pow.tex}
-\input{reserved/indexbracket.tex}
-\input{reserved/factorial.tex}
-\input{reserved/equals.tex}
-\input{reserved/unequals.tex}
-\input{reserved/sequence.tex}
-\input{reserved/comma.tex}
-\input{reserved/infty.tex}
-\input{reserved/dot.tex}
-\input{reserved/commutator.tex}
-\input{reserved/anticommutator.tex}
-\end{reserved}
 
 
 \subsection{Utility functions}

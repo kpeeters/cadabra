@@ -1,3 +1,18 @@
+2008-07-03  Kasper Peeters  <kasper.peeters@aei.mpg.de>
+
+	* Fixed a long-standing bug related to handling of active nodes in
+	default rules.
+
+	* Fixed display behaviour of \conditional, \unequals and \regex.
+
+2008-07-02  Kasper Peeters  <kasper.peeters@aei.mpg.de>
+
+	* Fixed paste behaviour in the GUI (put cursor after pasted text,
+	disable selection).
+
+	* Fixed a bug related to canonicalisation of expressions with
+	pattern indices.
+
 2008-06-28  Kasper Peeters  <kasper.peeters@aei.mpg.de>
 
 	* Moved to GIT.

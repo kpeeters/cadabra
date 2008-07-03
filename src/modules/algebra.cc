@@ -474,8 +474,10 @@ TableauBase::tab_t KroneckerDelta::get_tab(exptree& tr, exptree::iterator it, un
 			it=tr.begin(it);
 		else break;
 		} 
+	
+	if(tr.number_of_children(it)%2!=0)
+		 throw consistency_error("Encountered a KroneckerDelta object with an odd number of indices.");
 
-	assert(tr.number_of_children(it)%2==0);
 	bool onlytwo=false;
 	if(tr.number_of_children(it)==2)
 		onlytwo=true;

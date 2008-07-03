@@ -90,6 +90,8 @@ class node_printer : public node_base_printer {
 		void print_parent_rel(std::ostream&, str_node::parent_rel_t, bool first);
 		void print_children(std::ostream&, exptree::iterator, int skip=0);
 
+		std::string texify(const std::string&) const;
+
 		// some random junk variables
 		bool isdelta;
 		bool isweyl;
@@ -211,6 +213,20 @@ class print_unequals : public node_printer {
 	public:
 		print_unequals(exptree_output&);
 		virtual ~print_unequals() {};
+		virtual void print_infix(std::ostream&, iterator );
+};
+
+class print_conditional : public node_printer {
+	public:
+		print_conditional(exptree_output&);
+		virtual ~print_conditional() {};
+		virtual void print_infix(std::ostream&, iterator );
+};
+
+class print_regex : public node_printer {
+	public:
+		print_regex(exptree_output&);
+		virtual ~print_regex() {};
 		virtual void print_infix(std::ostream&, iterator );
 };
 

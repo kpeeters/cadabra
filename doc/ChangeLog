@@ -1,3 +1,11 @@
+2008-06-30  Kasper Peeters  <kasper.peeters@aei.mpg.de>
+
+	* Released 2.52
+
+	* Made depth member function static so it can be used independent
+	of an actual tree, and added a version with two iterators to
+	measure depths relative to a different node.
+
 2008-02-28  Kasper Peeters  <kasper.peeters@aei.mpg.de>
 
 	* Released 2.51

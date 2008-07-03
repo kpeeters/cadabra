@@ -501,7 +501,7 @@ bool manipulator::handle_input()
 				if(status_output) txtout << "<error>\n";
 				if(status_output) txtout << "ERROR: " << texify(ex.what()) << std::endl;
 				else              txtout << "ERROR: " << ex.what() << std::endl;
-				txtout << "       Expression removed." << std::endl << std::endl;
+//				txtout << "       Expression removed." << std::endl << std::endl;
 				if(status_output) txtout << "</error>\n";
 				input_buffer.clear();
 				goto anotherline;
@@ -558,12 +558,20 @@ bool manipulator::handle_input()
 					}
 				pit=it;
 				it=apply_pre_default_rules_(it);
+				it=expressions.named_parent(it, "\\expression");
 				pit=it;
 				pit=handle_active_nodes_(it);
-				// The expression, or in fact the entire tree, may have been
+				// The "pit" iterator does not necessarily refer to the top of the
+				// expression.
+
+				// Also, the expression, or in fact the entire tree, may have been
 				// removed by the algorithm. Proceed with care.
 				if(pit!=expressions.end()) {
-					pit=apply_post_default_rules_(pit);
+					 // We need to walk back up to the top of the subtree for this 
+					 // expression.
+					 pit = expressions.named_parent(pit, "\\expression");
+//					 exptree::print_recursive_treeform(txtout, pit);
+					 pit=apply_post_default_rules_(pit);
 					extract_properties_(pit);
 					last_used_equation_number=expressions.equation_number(pit);
 					if(incomment) {
@@ -601,7 +609,7 @@ bool manipulator::handle_input()
 				txtout << std::endl;
 				if(status_output) txtout << "ERROR: " << texify(ex.what()) << "." << std::endl;
 				else              txtout << "ERROR: " << ex.what() << "." << std::endl;
-				txtout << "       Expression removed." << std::endl << std::endl;
+//				txtout << "       Expression removed." << std::endl << std::endl;
 				if(status_output) txtout << "</error>\n";
 				if(output_format==exptree_output::out_texmacs)
 					txtout << DATA_END;
@@ -621,7 +629,7 @@ bool manipulator::handle_input()
 				txtout << std::endl;
 				if(status_output) txtout << "ERROR: " << texify(ex.what()) << std::endl;
 				else              txtout << "ERROR: " << ex.what() << std::endl;
-				txtout << "       Expression removed." << std::endl << std::endl;
+//				txtout << "       Expression removed." << std::endl << std::endl;
 				if(status_output) txtout << "</error>\n";
 				if(output_format==exptree_output::out_texmacs)
 					txtout << DATA_END;

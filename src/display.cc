@@ -60,6 +60,7 @@ void exptree_output::setup_handlers(bool infix)
 				printers_["\\factorial"]    =&create<print_mathml_factorial>;
 				printers_["\\equals"]  	    =&create<print_mathml_equals>;
 				printers_["\\unequals"]     =&create<print_mathml_unequals>;
+//				printers_["\\conditional"]  =&create<print_mathml_conditional>;
 				printers_["\\sequence"]     =&create<print_mathml_sequence>;
 				printers_["\\comma"]   	    =&create<print_mathml_comma>;
 				// FIXME: these two are not yet declared reserved?
@@ -69,11 +70,13 @@ void exptree_output::setup_handlers(bool infix)
 			default:
 				printers_["\\expression"]   =&create<print_expression>;
 				printers_["\\div"]     	    =&create<print_div>;
-				printers_["\\wedge"]        =&create<print_wedge>;
+//				printers_["\\wedge"]        =&create<print_wedge>;
 				printers_["\\prod"]    	    =&create<print_prod>;
 				printers_["\\sum"]     	    =&create<print_sum>;
 				printers_["\\equals"]  	    =&create<print_equals>;
 				printers_["\\unequals"]     =&create<print_unequals>;
+				printers_["\\conditional"]  =&create<print_conditional>;
+				printers_["\\regex"]        =&create<print_regex>;
 				printers_["\\arrow"]        =&create<print_arrow>;
 				printers_["\\dot"]          =&create<print_dot>;
 				printers_["\\comma"]   	    =&create<print_comma>;
@@ -494,8 +497,55 @@ void print_unequals::print_infix(std::ostream& str, exptree::iterator it)
 	++rhs;
 
 	parent.get_printer(lhs)->print_infix(str, lhs);
-	if(parent.tight_plus) str << "!=";
-	else                       str << " != ";
+	if(parent.tight_plus) str << " ";
+	if(parent.output_format==exptree_output::out_xcadabra || 
+		parent.output_format==exptree_output::out_texmacs )
+		 str << "\\not=";
+	else
+		 str << "!=";
+	if(parent.tight_plus) str << " ";
+	parent.get_printer(rhs)->print_infix(str, rhs);	
+	}
+
+print_conditional::print_conditional(exptree_output& eo)
+	: node_printer(eo)
+	{
+	}
+
+void print_conditional::print_infix(std::ostream& str, exptree::iterator it)
+	{
+	sibling_iterator lhs=tr.begin(it), rhs=lhs;
+	++rhs;
+
+	parent.get_printer(lhs)->print_infix(str, lhs);
+	if(parent.tight_plus) str << " ";
+	if(parent.output_format==exptree_output::out_xcadabra || 
+		parent.output_format==exptree_output::out_texmacs )
+		 str << " \\;\\vert\\; ";
+	else
+		 str << "|";
+	if(parent.tight_plus) str << " ";
+	parent.get_printer(rhs)->print_infix(str, rhs);	
+	}
+
+print_regex::print_regex(exptree_output& eo)
+	: node_printer(eo)
+	{
+	}
+
+void print_regex::print_infix(std::ostream& str, exptree::iterator it)
+	{
+	if(parent.output_format!=exptree_output::out_xcadabra && 
+		parent.output_format!=exptree_output::out_texmacs )
+		 return node_printer::print_infix(str, it);
+	
+	sibling_iterator lhs=tr.begin(it), rhs=lhs;
+	++rhs;
+
+	parent.get_printer(lhs)->print_infix(str, lhs);
+	if(parent.tight_plus) str << " ";
+	str << " =_{\\cal R} ";
+	if(parent.tight_plus) str << " ";
 	parent.get_printer(rhs)->print_infix(str, rhs);	
 	}
 
@@ -874,11 +924,21 @@ void node_printer::print_infix(std::ostream& str, exptree::iterator it)
 	else if(parent.output_format==exptree_output::out_xcadabra) {
 		 const LaTeXForm *lf=properties::get<LaTeXForm>(it);
 		 if(lf) str << lf->latex;
-		 else   str << *it->name;
+		 else   str << texify(*it->name);
 		}
 	else str << *it->name;
 
 	print_children(str, it);
+	}
+
+std::string node_printer::texify(const std::string& str) const
+	{
+	std::string res;
+   for(unsigned int i=0; i<str.size(); ++i) {
+		 if(str[i]=='#') res+="\\#";
+		 res+=str[i];
+      }
+   return res;
 	}
 
 void node_printer::print_children(std::ostream& str, exptree::iterator it, int skip) 

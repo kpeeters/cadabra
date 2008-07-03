@@ -9,8 +9,8 @@
 
 /** \mainpage tree.hh
     \author   Kasper Peeters
-    \version  2.51
-    \date     28-Feb-2008
+    \version  2.52
+    \date     30-Jun-2008
     \see      http://www.aei.mpg.de/~peekas/tree/
     \see      http://www.aei.mpg.de/~peekas/tree/ChangeLog
 
@@ -411,8 +411,9 @@ class tree {
 		int      size(const iterator_base&) const;
 		/// Check if tree is empty.
 		bool     empty() const;
-		/// Compute the depth to the root.
-		int      depth(const iterator_base&) const;
+		/// Compute the depth to the root or to a fixed other iterator.
+		static int depth(const iterator_base&);
+		static int depth(const iterator_base&, const iterator_base&);
 		/// Determine the maximal depth of the tree.
 		int      max_depth() const;
 		/// Determine the maximal depth of the tree below a given one.
@@ -1650,12 +1651,25 @@ bool tree<T, tree_node_allocator>::empty() const
 	}
 
 template <class T, class tree_node_allocator>
-int tree<T, tree_node_allocator>::depth(const iterator_base& it) const
+int tree<T, tree_node_allocator>::depth(const iterator_base& it) 
 	{
 	tree_node* pos=it.node;
 	assert(pos!=0);
 	int ret=0;
 	while(pos->parent!=0) {
+		pos=pos->parent;
+		++ret;
+		}
+	return ret;
+	}
+
+template <class T, class tree_node_allocator>
+int tree<T, tree_node_allocator>::depth(const iterator_base& it, const iterator_base& root) 
+	{
+	tree_node* pos=it.node;
+	assert(pos!=0);
+	int ret=0;
+	while(pos->parent!=0 && pos!=root.node) {
 		pos=pos->parent;
 		++ret;
 		}

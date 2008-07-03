@@ -117,9 +117,9 @@ std::ostream& exptree::print_recursive_treeform(std::ostream& str, exptree::iter
 			str << std::setw(3) << num << ":";
 			offset=1;
 			}
-//		if(!compact_tree)
-//			for(int i=offset; i<depth(beg); ++i) 
-//				str << "  ";
+		if(!compact_tree)
+			 for(int i=offset; i<depth(beg); ++i) 
+				str << "  ";
 		switch((*beg).fl.parent_rel) {
 			case str_node::p_super: str << "^"; break;
 			case str_node::p_sub:   str << "_"; break;
@@ -1232,15 +1232,15 @@ bool tree_exact_equal_obj::operator()(const exptree& one, const exptree& two) co
 
 bool tree_exact_less_mod_prel_obj::operator()(const exptree& one, const exptree& two) const
 	{
-	return tree_exact_less(one, two, 0);
+	return tree_exact_less(one, two, 0, true, -2, true);
 	}
 
 bool tree_exact_equal_mod_prel_obj::operator()(const exptree& one, const exptree& two) const
 	{
-	return tree_exact_equal(one, two, 0);
+	return tree_exact_equal(one, two, 0, true, -2, true);
 	}
 
 bool operator==(const exptree& first, const exptree& second)
 	{
-	return tree_exact_equal(first, second);
+	return tree_exact_equal(first, second, 0, true, -2, true);
 	}

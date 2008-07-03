@@ -51,3 +51,16 @@ tst3:= \GAMMA^{a}*@(obj3);
 @join!(%){expand}:
 @distribute!(%):
 @assert(tst3);
+
+# Test 4: Default rules with indirect reference to other expressions.
+#
+# @reset.
+# {\mu,\nu,\rho,\sigma}::Indices.
+# \delta{#}::KroneckerDelta.
+# \eta_{\mu\nu}::Metric.
+# ElimOffDiagMetric := { \eta_{0 i} -> 0, \eta_{i 0} -> 0, \eta_{0 0} -> 1 };
+# ::PostDefaultRules( @@substitute!(%)( @(ElimOffDiagMetric) ), @@eliminate_metric!(%), @@eliminate_kr!(%), @@rename_dummies!(%), @@collect_terms!(%) ).
+# obj4 := \eta_{\mu \nu} X^\nu + \delta_{\mu \lambda} Y_\lambda;
+# tst4 := X_{\mu} + Y_{\mu} - @(obj4);
+# @collect_terms!(%);
+# @assert(tst4);

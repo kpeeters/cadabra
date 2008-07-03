@@ -92,7 +92,11 @@ class manipulator : public sigc::trackable {
 		std::string       getline_precut_buffer;
 
 		bool              is_whitespace_(const std::string& str) const;
-		exptree::iterator handle_active_nodes_(exptree::iterator);  // return expression to print
+
+		/// Activate all '@' nodes. The returned iterator points inside the
+		/// expression which has to be printed (though not necessarily to the top node), 
+		/// or to expressions.end() if the expression has been removed.
+		exptree::iterator handle_active_nodes_(exptree::iterator);  
 		nset_t::iterator  collect_labels_(exptree&, exptree::iterator);
 		void              cleanup_new_expression_(exptree::iterator);
 		exptree::iterator apply_pre_default_rules_(exptree::iterator);

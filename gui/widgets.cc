@@ -375,8 +375,8 @@ bool ExpressionInput::handle_button_press(GdkEventButton* button)
 		 if(sah[i]=="cadabra") {
 			  sd=refClipboard->wait_for_contents("cadabra");
 			  std::string topaste=sd.get_data_as_string();
-//			  edit.get_buffer()->insert_at_cursor(topaste);
-			  edit.get_buffer()->insert(insertpos, topaste);
+			  insertpos=edit.get_buffer()->insert(insertpos, topaste);
+			  edit.get_buffer()->place_cursor(insertpos);
 			  return true;
 			  }
 		 else if(sah[i]=="TEXT")
@@ -387,9 +387,10 @@ bool ExpressionInput::handle_button_press(GdkEventButton* button)
 	
 	if(hastext)        sd=refClipboard->wait_for_contents("TEXT");
 	else if(hasstring) sd=refClipboard->wait_for_contents("STRING");
-	if(hastext || hasstring)
-		 edit.get_buffer()->insert(insertpos, sd.get_data_as_string());
-//		 edit.get_buffer()->insert_at_cursor(sd.get_data_as_string());
+	if(hastext || hasstring) {
+		 insertpos=edit.get_buffer()->insert(insertpos, sd.get_data_as_string());
+		 edit.get_buffer()->place_cursor(insertpos);
+		 }
 
 	return true;
 	}

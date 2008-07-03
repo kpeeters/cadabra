@@ -2262,7 +2262,7 @@ std::string XCadabra::load(const std::string& fn, bool ignore_nonexistence)
 			}
 		}
 
-	show_all();
+//	show_all();
 	kernel_idle();
 	return "";
 	}

@@ -609,3 +609,18 @@ tst62:= \epsilon_{\mu} A^{\mu} \epsilon_{\nu} B^{\nu} - @(obj61);
 @collect_terms!(%);
 @assert(tst62);
 
+
+# Test 62: more tricky conditionals
+#
+@reset.
+obj62a:= \eta_{0 1};
+@substitute!(%)( \eta_{a? b?} | { \regex{a?}{"[0-9]"}, \regex{b?}{"[0-9]"}, a? != b? } -> 0 );
+assert(obj62a);
+obj62b:= \eta_{0 1};
+@substitute!(%)( \eta_{#1? #2?} | { \regex{#1?}{"[0-9]"}, \regex{#2?}{"[0-9]"}, #1? != #2? } -> 0 );
+@assert(obj62b);
+obj62c:= \eta_{0 i};
+@substitute!(%)( \eta_{#1? #2?} | { \regex{#1?}{"[0-9]"}, \regex{#2?}{"[0-9]"}, #1? != #2? } -> 0 );
+tst62c:= \eta_{0 i} - @(obj62c);
+@collect_terms!(%);
+@assert(tst62c);

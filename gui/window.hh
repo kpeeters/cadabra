@@ -224,7 +224,6 @@ class XCadabra : public Gtk::Window {
 		/// The DataCell ownership is handled by the XCadabra class once
 		/// it has been added here.
 		DataCell *add_cell(DataCell *, DataCell *ref=0, bool before=true);
-//DataCell::cell_t, const std::string&, bool tex_hidden=false,
 		void add_canvas();
 
 		/// Signals from Gtk, such as closing windows or changing the text
