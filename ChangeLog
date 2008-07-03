@@ -1,5 +1,7 @@
 2008-07-03  Kasper Peeters  <kasper.peeters@aei.mpg.de>
 
+	* Released 0.138
+
 	* Fixed a long-standing bug related to handling of active nodes in
 	default rules.
 
