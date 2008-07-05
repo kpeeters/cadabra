@@ -350,3 +350,7 @@ tst:= \phi \partial_{0}{\phi} + \partial_{0}{\lambda} - @(obj);
 # @drop_weight!(%){small}{2};
 # @assert(tst);
 
+# Test 33: collect_terms and patterns
+@reset.
+obj33:= \commutator{B??}{\commutator{C??}{A??}} + \commutator{C??}{\commutator{B??}{A??};
+@collect_terms!(%);

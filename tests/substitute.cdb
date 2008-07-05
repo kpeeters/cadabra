@@ -624,3 +624,14 @@ obj62c:= \eta_{0 i};
 tst62c:= \eta_{0 i} - @(obj62c);
 @collect_terms!(%);
 @assert(tst62c);
+
+# Test 63: non-commuting operators
+#
+@reset.
+{i,j,k,l}::Indices.
+{ P_{i}, Q_{j} }::NonCommuting.
+obj63:= P_{i} Q_{j};
+@substitute!(%)( Q_{a?} P_{b?} -> \commutator{Q_{a?}}{P_{b?}} + P_{b?}Q_{a?} );
+tst63:= P_{i} Q_{j} - @(obj63);
+@collect_terms!(%);
+@assert(tst63);

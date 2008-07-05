@@ -471,8 +471,11 @@ class factorise : public algorithm {
 		virtual void     description() const;
 		virtual bool     can_apply(iterator);
 		virtual result_t apply(iterator&);
-	private:
-		std::set<nset_t::iterator, nset_it_less> factnodes; // objects to be taken in brackets;  
+
+	protected:
+		result_t apply_generic(iterator&, bool do_factor_in);
+
+		std::set<exptree, tree_less_obj> factnodes; // objects to be taken in brackets;  
                                                           // FIXME: use patterns
 		bool      compare_restricted(iterator one, iterator two) const;
 		bool      compare_prod_nonprod(iterator prod, iterator nonprod) const;
@@ -485,6 +488,22 @@ class factorise : public algorithm {
 		typedef term_hash_t::iterator                      term_hash_iterator_t;
 
 		term_hash_t term_hash;
+};
+
+class factor_out : public factorise {
+	public:
+		factor_out(exptree&, iterator);
+		
+		virtual void     description() const;
+		virtual result_t apply(iterator&);
+};
+
+class factor_in : public factorise {
+	public:
+		factor_in(exptree&, iterator);
+
+		virtual void     description() const;
+		virtual result_t apply(iterator&);
 };
 
 class canonicalise : public algorithm {

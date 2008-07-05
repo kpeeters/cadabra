@@ -1,3 +1,12 @@
+2008-07-05  Kasper Peeters  <kasper.peeters@aei.mpg.de>
+
+	* Deleting an input cell now correctly re-positions the cursor in
+	the next input cell or open TeX cell.
+
+2008-07-04  Kasper Peeters  <kasper.peeters@aei.mpg.de>
+
+TODO	* Fixed a bug which would make "A?? + B??" reduce to...
+
 2008-07-03  Kasper Peeters  <kasper.peeters@aei.mpg.de>
 
 	* Released 0.138

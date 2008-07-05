@@ -300,8 +300,7 @@ class XCadabra : public Gtk::Window {
 		void add_algorithm_help(const std::string&);
 		void add_reserved_help(const std::string&);
 		std::set<std::string> property_set, algorithm_set;
-		static const unsigned int autocomplete_strings_len=54;
-		static const char * const autocomplete_strings[autocomplete_strings_len];
+		static const char * const autocomplete_strings[];
 		std::string duplicate_underscores(const std::string& str) const;
 
 		/// Cut-n-paste data

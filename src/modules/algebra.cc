@@ -2186,6 +2186,37 @@ algorithm::result_t collect_factors::apply(iterator& st)
 
 
 
+factor_out::factor_out(exptree& tr, iterator it)
+	: factorise(tr, it)
+	{
+	}
+
+void factor_out::description() const
+	{
+	txtout << "bla" << std::endl;
+	}
+
+algorithm::result_t factor_out::apply(iterator& it)
+	{
+	return apply_generic(it, false);
+	}
+
+factor_in::factor_in(exptree& tr, iterator it)
+	: factorise(tr, it)
+	{
+	}
+
+void factor_in::description() const
+	{
+	txtout << "bla" << std::endl;
+	}
+
+algorithm::result_t factor_in::apply(iterator& it)
+	{
+	return apply_generic(it, true);
+	}
+
+
 factorise::factorise(exptree& tr, iterator it)
 	: algorithm(tr, it)
 	{
@@ -2205,7 +2236,7 @@ bool factorise::can_apply(iterator st)
 		if(ar==args_end()) return false;
 
 		for(unsigned int i=0; i<tr.arg_size(ar); ++i) 
-			factnodes.insert(tr.arg(ar,i)->name);
+			 factnodes.insert(exptree(tr.arg(ar,i)));
 		return true;
 		}
 	else return false;
@@ -2219,7 +2250,7 @@ hashval_t factorise::calc_restricted_hash(iterator it) const
 	hashval_t ret=1;
 	bool first=true;
 	while(sib!=tr.end(it)) { // see storage.cc for the original calc_hash
-		if(factnodes.count(sib->name)==0) {
+		 if(factnodes.count(exptree(sib))==0) {
 			if(first) { 
 				first=false;
 				ret=tr.calc_hash(sib);
@@ -2253,8 +2284,8 @@ bool factorise::compare_prod_nonprod(iterator prod, iterator nonprod) const
 	sibling_iterator it=tr.begin(prod);
 	bool found=false;
 	while(it!=tr.end(prod)) {
-		if(factnodes.count(it->name)==0) {
-			if(nonprod->name==it->name) {
+		 if(factnodes.count(exptree(it))==0) {
+			 if(nonprod->name==it->name) { // FIXME: subtree_equal
 				if(found) return false; // already found
 				else found=true;
 				}
@@ -2262,7 +2293,7 @@ bool factorise::compare_prod_nonprod(iterator prod, iterator nonprod) const
 			}
 		++it;
 		}
-	if(found || (!found && factnodes.count(nonprod->name)!=0)) return true;
+	if(found || (!found && factnodes.count(nonprod)!=0)) return true;
 	return false;
 	}
 
@@ -2272,11 +2303,11 @@ bool factorise::compare_restricted(iterator one, iterator two) const
 		if(*one->name=="\\prod") {
 			sibling_iterator it1=tr.begin(one), it2=tr.begin(two);
 			while(it1!=tr.end(one) && it2!=tr.end(two)) {
-				if(factnodes.count(it1->name)!=0) {
+				 if(factnodes.count(exptree(it1))!=0) {
 					++it1;
 					continue;
 					}
-				if(factnodes.count(it2->name)!=0) {
+				 if(factnodes.count(exptree(it2))!=0) {
 					++it2;
 					continue;
 					}
@@ -2297,6 +2328,11 @@ bool factorise::compare_restricted(iterator one, iterator two) const
 	}
 
 algorithm::result_t factorise::apply(iterator& it)
+	{
+	return apply_generic(it, true);
+	}
+
+algorithm::result_t factorise::apply_generic(iterator& it, bool do_factor_in)
 	{
 	algorithm::result_t ret=l_no_action;
 	fill_hash_map(it);
@@ -2321,7 +2357,7 @@ algorithm::result_t factorise::apply(iterator& it)
 				iterator prefacprod=prefac.append_child(prefac.begin(), str_node("\\prod", str_node::b_round));
 				sibling_iterator ps=tr.begin(thisbin1->second);
 				while(ps!=tr.end(thisbin1->second)) {
-					if(factnodes.count(ps->name)!=0) {
+					 if(factnodes.count(exptree(ps))!=0) {
 						iterator theterm=prefac.append_child(prefacprod, (iterator)(ps));
 						theterm->fl.bracket=str_node::b_round;
 						}
@@ -2381,7 +2417,7 @@ algorithm::result_t factorise::apply(iterator& it)
 			if(tr.number_of_children(prefit->second.begin())>1) { // only do this if there really is more than just one term
 				sibling_iterator facit=tr.begin(prefit->first);
 				while(facit!=tr.end(prefit->first)) {
-					if(factnodes.count(facit->name)>0)
+					 if(factnodes.count(exptree(facit))>0)
 						facit=tr.erase(facit);
 					else
 						++facit;
@@ -2540,7 +2576,7 @@ algorithm::result_t collect_terms::collect_from_hash_map()
 			thisbin2=thisbin1;
 			++thisbin2;
 			while(thisbin2!=term_hash.end() && thisbin2->first==curr) {
-				if(subtree_exact_equal((*thisbin1).second, (*thisbin2).second, -2, true, 0)) {
+				 if(subtree_exact_equal((*thisbin1).second, (*thisbin2).second, -2, true, 0, true)) {
 					res=l_applied;
 					add((*thisbin1).second->multiplier, *((*thisbin2).second->multiplier));
 					zero((*thisbin2).second->multiplier);

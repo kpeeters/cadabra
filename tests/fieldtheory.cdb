@@ -331,3 +331,11 @@ tst28:= \Pi_{0 0} - @(obj28);
 @collect_terms!(%);
 @assert(tst28);
 
+# Test 29: Unwrap
+#
+@reset.
+{ Q_{a?}, P_{a?}, J_{a? b?} }::Depends(\commutator).
+Vdef := -i/\hbar \commutator{Q_i}{P_0};
+JV := \commutator{J_{0 i}}{ @(Vdef)};
+@unwrap!(JV);
+@numerical_flatten!(JV);

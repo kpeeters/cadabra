@@ -46,7 +46,7 @@
 #define THEFONT "cmtt12"
 
 
-const char * const XCadabra::autocomplete_strings[autocomplete_strings_len] = { 
+const char * const XCadabra::autocomplete_strings[] = { 
 	 "\\alpha",
 	 "\\beta",
 	 "\\gamma",
@@ -1033,9 +1033,8 @@ bool XCadabra::on_autocomplete()
 			  }
 		 else {
 			  alg_or_prop=false;
-//			  std::cerr << sizeof(autocomplete_strings) << std::endl;
 			  helpname="\\"+helpname;
-			  for(unsigned int i=0; i<autocomplete_strings_len; ++i) {
+			  for(unsigned int i=0; i<sizeof(autocomplete_strings)/sizeof(*autocomplete_strings); ++i) {
 					if(helpname.size()<strlen(autocomplete_strings[i])) {
 						 if(strncmp(autocomplete_strings[i], helpname.c_str(), helpname.size())==0) {
 							  options_exist=true;
@@ -2381,7 +2380,15 @@ void XCadabra::on_edit_remove_cell()
 #ifdef DEBUG
 		std::cerr << "grabbing focus" << std::endl;
 #endif
-		active_canvas->cell_grab_focus(*fnd);
+		// We have to put the cursor in the next input cell or in the next open TeX cell.
+		// So walk down the cells until we meet this condition (or end).
+		while(fnd!=datacells.end() 
+				&& (*fnd)->cell_type!=DataCell::c_input 
+				&& !( (*fnd)->cell_type==DataCell::c_comment && (*fnd)->tex_hidden==false) )
+			 ++fnd;
+
+		if(fnd!=datacells.end())
+			 active_canvas->cell_grab_focus(*fnd);
 		}
 	else {
 #ifdef DEBUG
