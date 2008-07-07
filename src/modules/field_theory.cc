@@ -1799,16 +1799,25 @@ algorithm::result_t unwrap::apply(iterator& it)
 			tr.flatten(prodwrap);
 			prodwrap=tr.erase(prodwrap);
 			}
-		else if(*prodwrap->name=="\\prod" && *tr.parent(prodwrap)->name=="\\prod") {
-			tr.flatten(prodwrap);
-			prodwrap=tr.erase(prodwrap);
-			prodwrap=tr.parent(prodwrap);
-			}
+		else {
+			 // Moving factors around has potentially led to a top-level product
+			 // which contains children with non-unit multiplier.
+			 prodcollectnum pc(tr, prodwrap);
+			 if(pc.can_apply(prodwrap))
+				  pc.apply(prodwrap);
+
+			 // Unnest products if necessary.
+			 if(*prodwrap->name=="\\prod" && *tr.parent(prodwrap)->name=="\\prod") {
+				  tr.flatten(prodwrap);
+				  prodwrap=tr.erase(prodwrap);
+				  prodwrap=tr.parent(prodwrap);
+				  }
+			 }
 		it=prodwrap;
 		}
 	else it=prodwrap;
 
-//	tr.print_recursive_treeform(txtout, prodwrap);
+//	tr.print_recursive_treeform(txtout, it);
 // Adding one of the following lines screws up expressions...
 //	cleanup_expression(tr, it);
 //	cleanup_nests(tr,it);

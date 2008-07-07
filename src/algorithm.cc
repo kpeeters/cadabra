@@ -776,6 +776,7 @@ bool algorithm::check_consistency(iterator it) const
 	w1.start();
 	debugout << "checking consistency ... " << std::flush;
 	assert(*it->name=="\\expression");
+	iterator entry=it;
 	iterator end=it;
 	end.skip_children();
 	++end;
@@ -806,7 +807,7 @@ bool algorithm::check_consistency(iterator it) const
 						sibling_iterator sumchch=sumch.begin();
 						while(sumchch!=sumch.end()) { 
 							if(sumchch->fl.bracket==str_node::b_none) {
-								tr.print_recursive_treeform(txtout, it);
+								tr.print_recursive_treeform(debugout, entry);
 								throw consistency_error("Found a sum node with \\sum child without bracketed children.");
 								}
 							++sumchch;

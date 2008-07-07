@@ -1052,6 +1052,7 @@ int subtree_compare(exptree::iterator one, exptree::iterator two,
 
 	// Once we hit an index, the comparison at a lower level goes differently. 
 	if(one->is_index()) {
+//		 std::cerr << "is index" << std::endl;
 		if(literal_wildcards==false && (one->is_object_wildcard() || two->is_object_wildcard())) return 0;
 		const Coordinate *cdn1=0; //properties::get<Coordinate>(one);
 		const Coordinate *cdn2=0; //properties::get<Coordinate>(two);
@@ -1134,9 +1135,9 @@ int subtree_compare(exptree::iterator one, exptree::iterator two,
 	else if(compare_multiplier>0)  --compare_multiplier;
 
 	while(sib1!=one.end()) {
-//		 txtout << *sib1->name << "??" << *sib2->name << std::endl;
-		int ret=subtree_compare(sib1,sib2, mod_prel, checksets, compare_multiplier);
-//		txtout << ret << std::endl;
+//		 std::cerr << *sib1->name << "??" << *sib2->name << std::endl;
+		 int ret=subtree_compare(sib1,sib2, mod_prel, checksets, compare_multiplier, literal_wildcards);
+//		std::cerr << ret << std::endl;
 		if(abs(ret)>1)
 			return ret;
 		if(ret!=0 && remember_ret==0) 

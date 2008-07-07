@@ -1,3 +1,11 @@
+2008-07-07  Kasper Peeters  <kasper.peeters@aei.mpg.de>
+
+	* Fixed a bug which would leave the tree in inconsistent state
+	after some uses of @unwrap.
+
+	* Squashed a bug which would apply default rules on the wrong
+	expression. 
+
 2008-07-05  Kasper Peeters  <kasper.peeters@aei.mpg.de>
 
 	* Deleting an input cell now correctly re-positions the cursor in
@@ -5,7 +13,12 @@
 
 2008-07-04  Kasper Peeters  <kasper.peeters@aei.mpg.de>
 
-TODO	* Fixed a bug which would make "A?? + B??" reduce to...
+	* Fixed a bug which would make patterns occurring at any level
+	other than the first always be treated as patterns, never as
+	literal. This would mess up @collect_terms on e.g.
+
+	     \commutator{B??}{\commutator{C??}{A??}} 
+	                 + \commutator{C??}{\commutator{B??}{A??};
 
 2008-07-03  Kasper Peeters  <kasper.peeters@aei.mpg.de>
 

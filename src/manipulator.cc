@@ -781,7 +781,8 @@ exptree::iterator manipulator::apply_pre_default_rules_(exptree::iterator it)
 	if(dr) {
 		unsigned int eqnumbuf=last_used_equation_number;
 		iterator expression_to_print; // dummy
-		last_used_equation_number=expressions.number_of_equations();
+		last_used_equation_number=expressions.equation_number(it);
+//		last_used_equation_number=expressions.number_of_equations();
 		debugout << "applying pre default rules..." << std::endl;
 	   iterator rlist=dr->rules.begin();
 		for(unsigned int i=0; i<dr->rules.arg_size(rlist); ++i) {
@@ -799,11 +800,12 @@ exptree::iterator manipulator::apply_post_default_rules_(exptree::iterator it)
 	const PostDefaultRules *dr=properties::get<PostDefaultRules>();
 	if(dr) {
 		iterator expression_to_print; // dummy
-		last_used_equation_number=expressions.number_of_equations();
+		last_used_equation_number=expressions.equation_number(it);
 		debugout << "applying post default rules..." << std::endl;
+//		exptree::print_recursive_treeform(debugout, it);
 	   iterator rlist=dr->rules.begin();
 		for(unsigned int i=0; i<dr->rules.arg_size(rlist); ++i) {
-//			txtout << "applying " << *(dr->rules.arg(rlist, i)->name) << std::endl;
+//			debugout << "applying " << *(dr->rules.arg(rlist, i)->name) << std::endl;
 //			expressions.print_recursive_treeform(txtout, it);
 			iterator original_expression=it;
 			handle_external_commands_(original_expression, dr->rules.arg(rlist,i), expression_to_print);

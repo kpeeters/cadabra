@@ -3338,59 +3338,68 @@ algorithm::result_t canonicalise::apply(iterator& it)
 //					txtout << cperm[i] << " ";
 //				txtout << std::endl;
 		if(cperm[0]!=0) {
-			if(static_cast<unsigned int>(cperm[total_number_of_indices+1])==total_number_of_indices+1) {
+			 bool has_changed=false;
+			 for(unsigned int i=0; i<total_number_of_indices+1; ++i) {
+				  if(perm[i]!=cperm[i]) {
+						has_changed=true;
+						break;
+						}
+				  }
+			 if(has_changed) {
+				  if(static_cast<unsigned int>(cperm[total_number_of_indices+1])==total_number_of_indices+1) {
 //					txtout << "- ";
-				flip_sign(it->multiplier);
-				}
-			expression_modified=true;
-			
-			index_map_t::iterator freeit=ind_free.begin();
-			bool using_free=true;
-			unsigned int firstdummy=0;
-			for(unsigned int i=0; i<total_number_of_indices; ++i) {
-				if(freeit==ind_free.end()) {
-					freeit=ind_dummy.begin(); // continue with the dummies
-					using_free=false;
-					firstdummy=i;
-					}
-				// xPerm assumes that all indices are in the same set, but
-				// we do not want that, it mixes up dummies in different sets. 
-				
-				// Hopefully fixed in the near future with a modified xperm.c, 
-				// which only exchanges dummy pairs if they come from the same 
-				// set (as indicated in dummysetlabels.
-				
-				// Meanwhile, a hack:
-				if(index_sets.size()>0 && !using_free) {
-					 // We are going to put an index into position "cperm[i]-1". We need to figure
-					 // out its type, because we have to take a dummy from the right set. We can do this
-					 // by looking at the type of the index which sat in this position. However, that
-					 // will fail if the index which sat there was numerical. There is a hack for this
-					 // somewhere above, but it only works when there is one index type...
-
-					 std::string required_type=indexpos_to_indextype[cperm[i]-1];
+						flip_sign(it->multiplier);
+						}
+				  expression_modified=true;
+				  
+				  index_map_t::iterator freeit=ind_free.begin();
+				  bool using_free=true;
+				  unsigned int firstdummy=0;
+				  for(unsigned int i=0; i<total_number_of_indices; ++i) {
+						if(freeit==ind_free.end()) {
+							 freeit=ind_dummy.begin(); // continue with the dummies
+							 using_free=false;
+							 firstdummy=i;
+							 }
+						// xPerm assumes that all indices are in the same set, but
+						// we do not want that, it mixes up dummies in different sets. 
+						
+						// Hopefully fixed in the near future with a modified xperm.c, 
+						// which only exchanges dummy pairs if they come from the same 
+						// set (as indicated in dummysetlabels.
+						
+						// Meanwhile, a hack:
+						if(index_sets.size()>0 && !using_free) {
+							 // We are going to put an index into position "cperm[i]-1". We need to figure
+							 // out its type, because we have to take a dummy from the right set. We can do this
+							 // by looking at the type of the index which sat in this position. However, that
+							 // will fail if the index which sat there was numerical. There is a hack for this
+							 // somewhere above, but it only works when there is one index type...
+							 
+							 std::string required_type=indexpos_to_indextype[cperm[i]-1];
 //					if(required_type==" undeclared")
 //						txtout << "indexpos " << cperm[i]-1 << std::endl;
-					assert(required_type!=" undeclared");
-					assert(index_sets.find(required_type)!=index_sets.end());
-					std::multiset<exptree, tree_exact_less_mod_prel_obj>& theset=index_sets[required_type];
-					std::multiset<exptree, tree_exact_less_mod_prel_obj>::iterator theind=theset.begin();
-					assert(theind!=theset.end());
-					iterator ri = tr.replace_index(num_to_it_map[cperm[i]], theind->begin());
-					// FIXME: The following is tempting, because it enables objects with symmetries
-					// between indices which do not have the same parent rel. However, this is
-					// full of subtleties; better to disable this altogether for indices which
-					// have fixed position (which is, however, tricky with wildcards like \Gamma{#}).
+							 assert(required_type!=" undeclared");
+							 assert(index_sets.find(required_type)!=index_sets.end());
+							 std::multiset<exptree, tree_exact_less_mod_prel_obj>& theset=index_sets[required_type];
+							 std::multiset<exptree, tree_exact_less_mod_prel_obj>::iterator theind=theset.begin();
+							 assert(theind!=theset.end());
+							 iterator ri = tr.replace_index(num_to_it_map[cperm[i]], theind->begin());
+							 // FIXME: The following is tempting, because it enables objects with symmetries
+							 // between indices which do not have the same parent rel. However, this is
+							 // full of subtleties; better to disable this altogether for indices which
+							 // have fixed position (which is, however, tricky with wildcards like \Gamma{#}).
 //					ri->fl.parent_rel=theind->begin()->fl.parent_rel;
-					theset.erase(theind);
-					}
-				else {
-					 iterator ri = tr.replace_index(num_to_it_map[cperm[i]], freeit->first.begin());
-					 ri->fl.parent_rel=freeit->first.begin()->fl.parent_rel;
-					 }
-				++freeit;
-				}
-			}
+							 theset.erase(theind);
+							 }
+						else {
+							 iterator ri = tr.replace_index(num_to_it_map[cperm[i]], freeit->first.begin());
+							 ri->fl.parent_rel=freeit->first.begin()->fl.parent_rel;
+							 }
+						++freeit;
+						}
+				  }
+			 }
 		else {
 			zero(it->multiplier);
 			expression_modified=true;
@@ -3412,7 +3421,8 @@ algorithm::result_t canonicalise::apply(iterator& it)
 	totalsw.stop();
 //	txtout << "total canonicalise took " << totalsw << std::endl;
 	
-	return l_applied;
+	if(expression_modified) return l_applied;
+	else return l_no_action;
 	}
 
 reduce::reduce(exptree& tr, iterator it)

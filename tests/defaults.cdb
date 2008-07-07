@@ -64,3 +64,14 @@ tst3:= \GAMMA^{a}*@(obj3);
 # tst4 := X_{\mu} + Y_{\mu} - @(obj4);
 # @collect_terms!(%);
 # @assert(tst4);
+
+# Test 5: Default rule applied to an expression which is not the
+#         last one in the tree.
+@reset.
+::PostDefaultRules( @@substitute!(%)( A A -> Q ) ).
+one:= A B C;
+two:= A D E;
+@substitute!(one)( B -> A );
+tst:= Q C - @(one);
+@collect_terms!(%);
+@assert(tst);

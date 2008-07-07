@@ -115,6 +115,8 @@ class NotebookCanvas : public Gtk::VPaned {
 
 		/// Remove a VisualCell corresponding to the given DataCell.
 		void         remove_cell(DataCell *);
+		/// Make a cell grab focus. This will trigger a run of this cell, with various
+		/// other side-effects before it returns.
 		void         cell_grab_focus(VisualCell *);
 		void         cell_grab_focus(DataCell *);
 		void         select_first_input_cell();
@@ -122,7 +124,9 @@ class NotebookCanvas : public Gtk::VPaned {
 
 //		void         scroll_to(Gtk::Allocation al);
 		void         redraw_cells();
+		bool         scroll_into_view_callback(VisualCell *);
 		bool         scroll_into_view(VisualCell *, bool center=false);
+		bool         scroll_into_view(DataCell   *, bool center=false);
 		void         scroll_to_start();
 		void         scroll_to_end();
 		void         scroll_up();
