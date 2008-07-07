@@ -1,5 +1,9 @@
 2008-07-07  Kasper Peeters  <kasper.peeters@aei.mpg.de>
 
+	* Released 0.139
+
+	* Various improvements/fixes to GUI notebook view focus.
+
 	* Fixed a bug which would leave the tree in inconsistent state
 	after some uses of @unwrap.
 
