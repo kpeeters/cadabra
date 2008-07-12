@@ -8,7 +8,15 @@ A A B A B A;
 @collect_factors!(%);
 A**4 B**2;
 \end{screen}
-The exponent notation can be expanded again using \subscommand{expand\_power}.
+Arbitrary powers can be collected this way,
+\begin{screen}{1,2}
+X X**(-1) X**(-4);
+@collect_factors!(%);
+X**(-3);
+\end{screen}
+The exponent notation can be expanded again 
+using \subscommand{expand\_power}.
+
 ~
 
 \cdbseealgo{expand_power}

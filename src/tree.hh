@@ -9,8 +9,8 @@
 
 /** \mainpage tree.hh
     \author   Kasper Peeters
-    \version  2.52
-    \date     30-Jun-2008
+    \version  2.54
+    \date     11-Jul-2008
     \see      http://www.aei.mpg.de/~peekas/tree/
     \see      http://www.aei.mpg.de/~peekas/tree/ChangeLog
 
@@ -1948,7 +1948,7 @@ bool tree<T, tree_node_allocator>::leaf_iterator::operator!=(const leaf_iterator
 template <class T, class tree_node_allocator>
 bool tree<T, tree_node_allocator>::leaf_iterator::operator==(const leaf_iterator& other) const
    {
-   if(other.node==this->node && other.top==this->top) return true;
+   if(other.node==this->node && other.top_node==this->top_node) return true;
    else return false;
    }
 
@@ -2629,14 +2629,20 @@ template <class T, class tree_node_allocator>
 typename tree<T, tree_node_allocator>::leaf_iterator& tree<T, tree_node_allocator>::leaf_iterator::operator++()
    {
 	assert(this->node!=0);
-	while(this->node->next_sibling==0) {
-		if (this->node->parent==0) return *this;
-		this->node=this->node->parent;
-		if (top_node != 0 && this->node==top_node) return *this;
-		}
-	this->node=this->node->next_sibling;
-	while(this->node->first_child)
-		this->node=this->node->first_child;
+	if(this->node->first_child!=0) { // current node is no longer leaf (children got added)
+		 while(this->node->first_child) 
+			  this->node=this->node->first_child;
+		 }
+	else {
+		 while(this->node->next_sibling==0) { 
+			  if (this->node->parent==0) return *this;
+			  this->node=this->node->parent;
+			  if (top_node != 0 && this->node==top_node) return *this;
+			  }
+		 this->node=this->node->next_sibling;
+		 while(this->node->first_child)
+			  this->node=this->node->first_child;
+		 }
 	return *this;
    }
 

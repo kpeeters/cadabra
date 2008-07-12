@@ -1012,7 +1012,7 @@ exptree::iterator manipulator::handle_active_nodes_(exptree::iterator original_e
 		
 		// All the rest is handled externally:
 		if(handle_external_commands_(original_expression, it, expression_to_print))
-			once_modified=true;
+			 once_modified=true;
 		
 		it=next;
 		}

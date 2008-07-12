@@ -618,6 +618,8 @@ algorithm::result_t substitute::apply(iterator& st)
 		iterator ip=subtree_insertion_points[i];
 		cleanup_nests(tr, ip);
 		}
+	std::cerr << "cleaning up" << std::endl;
+	exptree::print_recursive_treeform(txtout, st);
 	cleanup_nests(tr, st);
 //	prodcollectnum pc(tr, tr.end());
 //	pc.apply(st);
