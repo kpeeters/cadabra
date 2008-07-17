@@ -805,7 +805,7 @@ exptree::iterator manipulator::apply_post_default_rules_(exptree::iterator it)
 //		exptree::print_recursive_treeform(debugout, it);
 	   iterator rlist=dr->rules.begin();
 		for(unsigned int i=0; i<dr->rules.arg_size(rlist); ++i) {
-//			debugout << "applying " << *(dr->rules.arg(rlist, i)->name) << std::endl;
+			debugout << "applying " << *(dr->rules.arg(rlist, i)->name) << std::endl;
 //			expressions.print_recursive_treeform(txtout, it);
 			iterator original_expression=it;
 			handle_external_commands_(original_expression, dr->rules.arg(rlist,i), expression_to_print);

@@ -54,16 +54,16 @@ tst3:= \GAMMA^{a}*@(obj3);
 
 # Test 4: Default rules with indirect reference to other expressions.
 #
-# @reset.
-# {\mu,\nu,\rho,\sigma}::Indices.
-# \delta{#}::KroneckerDelta.
-# \eta_{\mu\nu}::Metric.
-# ElimOffDiagMetric := { \eta_{0 i} -> 0, \eta_{i 0} -> 0, \eta_{0 0} -> 1 };
-# ::PostDefaultRules( @@substitute!(%)( @(ElimOffDiagMetric) ), @@eliminate_metric!(%), @@eliminate_kr!(%), @@rename_dummies!(%), @@collect_terms!(%) ).
-# obj4 := \eta_{\mu \nu} X^\nu + \delta_{\mu \lambda} Y_\lambda;
-# tst4 := X_{\mu} + Y_{\mu} - @(obj4);
-# @collect_terms!(%);
-# @assert(tst4);
+@reset.
+{\mu,\nu,\rho,\sigma}::Indices.
+\delta{#}::KroneckerDelta.
+\eta_{\mu\nu}::Metric.
+ElimOffDiagMetric := { \eta_{0 i} -> 0, \eta_{i 0} -> 0, \eta_{0 0} -> 1 };
+::PostDefaultRules( @@substitute!(%)( @(ElimOffDiagMetric) ), @@eliminate_metric!(%), @@eliminate_kr!(%), @@rename_dummies!(%), @@collect_terms!(%) ).
+obj4 := \eta_{\mu \nu} X^\nu + \delta_{\mu \lambda} Y_\lambda;
+tst4 := X_{\mu} + Y_{\mu} - @(obj4);
+@collect_terms!(%);
+@assert(tst4);
 
 # Test 5: Default rule applied to an expression which is not the
 #         last one in the tree.
@@ -75,3 +75,36 @@ two:= A D E;
 tst:= Q C - @(one);
 @collect_terms!(%);
 @assert(tst);
+
+# Test 6: Default rules with generated zeroes.
+#
+@reset.
+::PostDefaultRules( @@substitute!(%)( \eta_{a? b?} -> a? v_{b?} ) ).
+obj6:= J_{1 0} P_{2};
+@substitute!(%)( J_{a? b?} P_{c?} -> \eta_{a? c?} w_{b?} - \eta_{b? c?} w_{a?} );
+tst6:= v_{2} w_{0} - @(obj6);
+@collect_terms!(%);
+@assert(tst6);
+# This always works, but the key is whether the 0 has been simplified automatically
+# immediately after the substitute step. If you put the command in the normal flow,
+# instead of in the default rules, then the zeroes are always cleaned up properly:
+# (again, this has to be run by hand to see it).
+@reset.
+obj6:= J_{1 0} P_{2};
+@substitute!(%)( J_{a? b?} P_{c?} -> \eta_{a? c?} w_{b?} - \eta_{b? c?} w_{a?} );
+@substitute!(%)( \eta_{a? b?} -> a? v_{b?} ) );
+tst6:= v_{2} w_{0} - @(obj6);
+@collect_terms!(%);
+@assert(tst6);
+
+# Test 7: Default rule which leads to a nested \prod{\sum{\prod{..}{..}}}{..} expression
+#         which should be flattened.
+@reset.
+{i,j,k}::Indices.
+::PostDefaultRules( @@substitute!(%)( \eta_{0 j} -> 0, \eta_{i j} -> \delta_{i j} ) ).
+obj7:=  I * \hbar**(-1) * P_{0} * \commutator{J_{0 i}}{Q_{j}};
+@substitute!(%)( \commutator{J_{a? b?}}{Q_{c?}} -> \eta_{a? c?} Q_{b?} - \eta_{b? c?} Q_{a?} );
+tst7:=  I * \hbar**(-1) * P_{0} * \delta_{i j} * Q_{0} + @(obj7);
+@collect_terms!(%);
+@assert(tst7);
+

@@ -773,7 +773,7 @@ bool XCadabra::on_key_press_event(GdkEventKey* event)
 	// Now first handle normal Gtk events so that we can skip to other cells 
 	// etc. After that we update the notebook position if required.
 	bool retval=Window::on_key_press_event(event);
-	if(active_cell)
+	if(active_cell && event->keyval < 65000) // FIXME: how to find dead keys?
 		 active_canvas->scroll_into_view(active_cell);
 	
 	return retval;
@@ -1483,7 +1483,8 @@ bool XCadabra::receive(modglue::ipipe& p)
 			continue;
 			}
 		else if(str.substr(0,7)=="Cadabra") {
-			b_kernelversion.set_label("Kernel: "+str.substr(8,5)+".");
+			size_t spacepos=str.find_first_of(' ', 8);
+			b_kernelversion.set_label("Kernel: "+str.substr(8, spacepos-8)+".");
 			}
 		else if(str=="<comment>") {
 			parse_mode.push_back(m_comment);
@@ -1715,6 +1716,11 @@ bool XCadabra::receive(modglue::ipipe& p)
 									}
 								++it;
 								}
+							if(!running) { // put cell in view
+								 while (gtk_events_pending ())
+									  gtk_main_iteration ();
+								 active_canvas->scroll_into_view(active_cell);
+								 }
 							}
 						}
 					}

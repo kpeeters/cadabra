@@ -3424,7 +3424,12 @@ it is allowed for the {\tt can\_apply} member to store results for later use in
 {\tt apply}. However, multiple calls to can be made to this combo, so
 any data stored should be erased upon each call to {\tt can\_apply}.
 \item[\vbox{\hbox{\tt apply\_result apply(iterator\&)}
-            \hbox{\tt apply\_result apply(sibling\_iterator\&, sibling\_iterator\&)}}]
+            \hbox{\tt apply\_result apply(sibling\_iterator\&,
+              sibling\_iterator\&)}}]
+This is where the actual algorithm is applied. It is allowed to
+modify the iterator if necessary. No elements in the tree which sit
+above the entry point should ever be changed.
+
 Before exiting this function, the member variable {\tt
 expression\_modified} has to be set according to whether or not the
 apply call made any changes to the expression.

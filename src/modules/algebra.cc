@@ -1223,7 +1223,7 @@ algorithm::result_t prodcollectnum::apply(iterator& it)
 		tr.begin(it)->multiplier=it->multiplier;
 		tr.flatten(it);
 		it=tr.erase(it);
-		pushup_multiplier(it);
+//		pushup_multiplier(it); This is not allowed (nor necessary) as it touches the tree above the entry point.
 		}
 	else if(tr.number_of_children(it)==0) { // i.e. from '3*4*7*9' 
 		it->name=name_set.insert("1").first;

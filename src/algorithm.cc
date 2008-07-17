@@ -211,10 +211,12 @@ void algorithm::apply(unsigned int lue, bool multiple, bool until_nochange, bool
 			copy_expression(previous_expression);
 		actold=tr.active_expression(actold);
 		if(multiple) {
+//			 debugout << "acting with " << *(this_command->name) << " multiple." << std::endl;
 			subtree=actold;
 			apply_recursive(subtree, true, act_at_level, called_by_manipulator, until_nochange);
 			}
 		else {
+//			 debugout << "acting with " << *(this_command->name) << " single." << std::endl;
 			subtree=tr.begin(actold);
 			if(can_apply(subtree)) {
 				++number_of_calls;
@@ -225,9 +227,9 @@ void algorithm::apply(unsigned int lue, bool multiple, bool until_nochange, bool
 				if(expression_modified) {
 					++number_of_modifications;
 					global_success=g_applied;
-					debugout << "**** " << std::endl;
+//					debugout << "**** " << std::endl;
 					tr.print_recursive_treeform(debugout, tr.begin());
-					debugout << "==== " << std::endl;
+//					debugout << "==== " << std::endl;
 					if(getenv("CDB_PARANOID")) 					
 						check_consistency(tr.named_parent(subtree,"\\expression"));
 					}
@@ -416,6 +418,8 @@ bool algorithm::apply_recursive(exptree::iterator& st, bool check_cons, int act_
 		int num=1;
 		int applied=0;
 
+//		debugout << "entering loop... for " << typeid(*this).name()  << std::endl;
+//		exptree::print_recursive_treeform(debugout, tr.begin());
 		while(tr.is_valid(wit) && wit!=end) { // loop over the entire tree
 			bool change_st=false; 
 			iterator start=wit;
@@ -423,6 +427,8 @@ bool algorithm::apply_recursive(exptree::iterator& st, bool check_cons, int act_
 			// we have to propagate that change into 'st'.
 			if(start==st) change_st=true; 
 			if(can_apply(start)) {
+//				debugout << "can apply, entry point:" << std::endl;
+//				exptree::print_recursive_treeform(debugout, start);
 				if(global_success<g_operand_determined)
 					global_success=g_operand_determined;
 				expression_modified=false;
@@ -448,6 +454,8 @@ bool algorithm::apply_recursive(exptree::iterator& st, bool check_cons, int act_
 				++number_of_calls;
 				std::string www=*wit->name;
 				result_t res=apply(start);
+//				debugout << "after apply: " << *(start->multiplier) << std::endl;
+//				exptree::print_recursive_treeform(debugout, start);
 				wit=start; // this copying back and forth is needed because wit has different type
 				switch(res) {
 					case l_no_action:
@@ -466,6 +474,10 @@ bool algorithm::apply_recursive(exptree::iterator& st, bool check_cons, int act_
 							atleastoneglobal=true;
 							}
 						// Handle zeroes and ones.
+//						std::cerr << "handling zeroes and ones. Full tree:" << std::endl;
+//						exptree::print_recursive_treeform(debugout, tr.begin());
+//						std::cerr << "start tree:" << std::endl;
+//						exptree::print_recursive_treeform(debugout, start);
 						if(wit!=tr.end() && *wit->multiplier==0) { 
 							 propagate_zeroes(wit,st);
 							 if(*wit->multiplier==0) { // a top-level zero 

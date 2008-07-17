@@ -609,8 +609,11 @@ algorithm::result_t substitute::apply(iterator& st)
    // node and we are not allowed to touch the tree above the entry point; these
 	// things are taken care of by the algorithm class itself).
 	if(*st->name=="\\prod") {
+//		 debugout << "calling prodcollectnum" << std::endl;
+//		 exptree::print_recursive_treeform(debugout, st);
 		prodcollectnum pc(tr, tr.end());
 		pc.apply(st);
+//		 exptree::print_recursive_treeform(debugout, st);
 		}
 
 	// Cleanup nests on all insertion points and on the top node.
@@ -618,8 +621,7 @@ algorithm::result_t substitute::apply(iterator& st)
 		iterator ip=subtree_insertion_points[i];
 		cleanup_nests(tr, ip);
 		}
-	std::cerr << "cleaning up" << std::endl;
-	exptree::print_recursive_treeform(txtout, st);
+	
 	cleanup_nests(tr, st);
 //	prodcollectnum pc(tr, tr.end());
 //	pc.apply(st);
@@ -628,6 +630,7 @@ algorithm::result_t substitute::apply(iterator& st)
 //		txtout << "replacement took " << tmr << std::endl;
 //		start_reporting_outside=true;
 //		}
+//	debugout << "leaving with st=" << *st->name << std::endl;
 	tmr.reset();
 	return l_applied;
 	}
