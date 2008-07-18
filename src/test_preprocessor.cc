@@ -52,7 +52,7 @@ int main(int argc, char **argv)
 	try {
 		regression*=testit(
 			"i k^{\\mu} ( lim_{z\\rightarrow w} (z-w)^{-1/2} \\psi_{\\mu}(w) S_{\\alpha}(z) )",
-			"\\prod{i}{k^{\\mu}}{\\prod(lim_{z \\rightarrow w})(\\sub(z)(w)^{\\sub{0}{\\div{1}{2}}})(\\psi_{\\mu}(w))(S_{\\alpha}(z))}");
+			"\\prod{i}{k^{\\mu}}{\\prod(lim_{z \\rightarrow w})(\\sub(z)(w)^{\\sub{0}{\\frac{1}{2}}})(\\psi_{\\mu}(w))(S_{\\alpha}(z))}");
 		regression*=testit(
 			"(a+b*c)",
 			"\\sum(a)(\\prod{b}{c})");
@@ -126,7 +126,7 @@ int main(int argc, char **argv)
 
 		regression*=testit(
 			"thnu((-y1-y2)/2)",
-		   "thnu(\\div{\\sub(0)(y1)(y2)}{2})");
+		   "thnu(\\frac{\\sub(0)(y1)(y2)}{2})");
 
 		regression*=testit(
 			"a^2b",

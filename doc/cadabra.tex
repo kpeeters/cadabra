@@ -185,7 +185,7 @@
 \pagestyle{empty}
 \begin{flushright}
 original: July 2006\\
-this version: July 3rd, 2008\\
+this version: July 18th, 2008\\
 AEI-2006-038
 \end{flushright}
 \vspace{6ex}
@@ -2236,6 +2236,7 @@ A + B3 + C7:
                                 \regex{N?}{"[A-Z]7"} } -> sin(M? N?)/N? );
 sin(B3 C7)/C7;
 \end{screen}
+
 It is also possible to select objects based on whether or not they are
 associated with a particular property, e.g.\footnote{More compact
 notations may look tempting, but were abandoned in favour of the
@@ -2247,7 +2248,24 @@ A A + B B;
 @substitute!(%)( Q?? Q?? | \hasprop{Q??}{SelfAntiCommuting} -> 0 );
 B B;
 \end{screen}
-Combinations of different types of conditionals are of course also possible.
+Combinations of different types of conditionals are of course also
+possible. This type of constraint can be used to construct replacement
+rules which act on objects of a certain type without knowing what
+their name is. The following example illustrates this.
+\begin{screen}{1,2,3}
+\sigma_{a?}::SigmaMatrix.
+\sigma_{1}\sigma_{2} + \rho_{1} \rho_{2};
+@substitute!(%)( S?_{1} S?_{2} | \hasprop{S?_{1}}{SigmaMatrix} -> I*S?_{3}  );
+I \sigma_{3} + \rho_{1} \rho_{2};
+\end{screen}
+This could also have been written without specifying the numerical
+values of the indices explicitly, 
+\begin{screen}{1,2,3}
+\sigma_{a?}::SigmaMatrix.
+\sigma_{1}\sigma_{2} + \rho_{1} \rho_{2};
+@substitute!(%)( S?_{a?} S?_{b?} | \hasprop{S?_{a?}}{SigmaMatrix} -> I*\epsilon_{a? b? c} \sigma_{c}  );
+I \epsilon_{1 2 c} \sigma_{c} + \rho_{1} \rho_{2};
+\end{screen}
 
 
 %Note that declarations and substitution both use patterns, but the
@@ -2321,7 +2339,7 @@ command. Explicitly, they are
 \texcommand{comma}, 
 \texcommand{commutator}, 
 \texcommand{conditional},
-\texcommand{div}, 
+\texcommand{frac}, 
 \texcommand{dot},
 \texcommand{equals}, 
 \texcommand{expression},
@@ -2346,7 +2364,7 @@ these reserved nodes can not be changed.
 \input{reserved/comma.tex}
 \input{reserved/commutator.tex}
 \input{reserved/conditional.tex}
-\input{reserved/div.tex}
+\input{reserved/frac.tex}
 \input{reserved/dot.tex}
 \input{reserved/equals.tex}
 \input{reserved/expression.tex}

@@ -401,7 +401,21 @@ bool substitute::satisfies_conditions()
 				return false;
 				}
 			const property_base *aprop=pit->second();
-			bool ret=properties::has(aprop, subtree_replacement_map[lhs->name]);
+
+			subtree_replacement_map_t::iterator subfind=subtree_replacement_map.find(lhs->name);
+			replacement_map_t::iterator         patfind=replacement_map.find(exptree(lhs));
+
+			if(subfind==subtree_replacement_map.end() && patfind==replacement_map.end()) {
+				 txtout << "Pattern " << *lhs->name << " in \\hasprop did not occur in match." << std::endl;
+				 delete aprop;
+				 return false;
+				 }
+			
+			bool ret=false;
+			if(subfind==subtree_replacement_map.end()) 
+				 ret=properties::has(aprop, (*patfind).second.begin());
+			else
+				 ret=properties::has(aprop, (*subfind).second);
 			delete aprop;
 			return ret;
 			}

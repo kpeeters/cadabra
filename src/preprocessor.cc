@@ -37,7 +37,7 @@ const unsigned char preprocessor::orders[]     ={ '!', tok_pow, '/', '*', tok_we
 																  '-', '+', '.', '=', tok_unequals, 
 																  '<', '>', '|', tok_arrow, tok_set_option, 
 																  tok_declare, ',', '~', 0 };
-const char * const  preprocessor::order_names[]={ "\\factorial", "\\pow", "\\div", "\\prod", "\\wedge", 
+const char * const  preprocessor::order_names[]={ "\\factorial", "\\pow", "\\frac", "\\prod", "\\wedge", 
 																  "\\sub", "\\sum", "\\sequence", 
 																  "\\equals", "\\unequals", "\\less",
 																  "\\greater", "\\conditional", 
@@ -118,7 +118,7 @@ unsigned int preprocessor::current_bracket_(bool deep) const
 
 bool preprocessor::default_is_product_() const
 	{
-	if(cur.order==order_prod || cur.order==order_div || cur.order==order_arrow || cur.order==order_comma ||
+	if(cur.order==order_prod || cur.order==order_frac || cur.order==order_arrow || cur.order==order_comma ||
 		cur.order==order_minus || cur.order==order_plus || cur.order==order_equals ||
 		cur.order==order_unequals) 
 		return true; // spaces in comma-separated lists/products are stars

@@ -21,7 +21,19 @@ sum:= a + b + c + d;
 @length[@(sum)];
 2:= 4;
 \end{screen}
+
+Here is a more complicated example which takes all terms except the
+first and last from an expression:
+\begin{screen}{1,2}
+a+b+c+d+e+f+g;
+@take(%){ 1..@collect_terms[@length[@(%)]-2] };
+b+c+d+e+f;
+\end{screen}
+(remember that counting terms starts from zero).
+
 If you just want to display the number of elements, use
-\subscommand{number\_of\_terms}.
+\subscommand{number\_of\_terms}; this is an output command and does
+not change the expression.
 
 \cdbseealgo{number_of_terms}
+\cdbseealgo{take_match}

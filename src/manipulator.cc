@@ -906,7 +906,7 @@ exptree::iterator manipulator::handle_active_nodes_(exptree::iterator original_e
 					  << "<reserved>\n\\comma\n</reserved>\n"
 					  << "<reserved>\n\\commutator\n</reserved>\n"
 					  << "<reserved>\n\\conditional\n</reserved>\n"
-					  << "<reserved>\n\\div\n</reserved>\n"
+					  << "<reserved>\n\\frac\n</reserved>\n"
 					  << "<reserved>\n\\dot\n</reserved>\n"
 					  << "<reserved>\n\\equals\n</reserved>\n"
 					  << "<reserved>\n\\expression\n</reserved>\n"

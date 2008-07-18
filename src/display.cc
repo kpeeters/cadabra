@@ -53,7 +53,7 @@ void exptree_output::setup_handlers(bool infix)
 			case out_mathml:
 				printers_["\\expression"]   =&create<print_mathml_expression>;
 				printers_["\\prod"]    	    =&create<print_mathml_prod>;
-				printers_["\\div"]     	    =&create<print_mathml_div>;
+				printers_["\\frac"]   	    =&create<print_mathml_frac>;
 				printers_["\\sum"]     	    =&create<print_mathml_sum>;
 				printers_["\\pow"]          =&create<print_mathml_pow>;
 				printers_["\\indexbracket"] =&create<print_mathml_indexbracket>;
@@ -69,7 +69,7 @@ void exptree_output::setup_handlers(bool infix)
 				break;
 			default:
 				printers_["\\expression"]   =&create<print_expression>;
-				printers_["\\div"]     	    =&create<print_div>;
+				printers_["\\frac"]     	 =&create<print_frac>;
 //				printers_["\\wedge"]        =&create<print_wedge>;
 				printers_["\\prod"]    	    =&create<print_prod>;
 				printers_["\\sum"]     	    =&create<print_sum>;
@@ -344,12 +344,12 @@ void print_pow::print_infix(std::ostream& str, exptree::iterator it)
 		}
 	}
 
-print_div::print_div(exptree_output& eo)
+print_frac::print_frac(exptree_output& eo)
 	: node_printer(eo)
 	{
 	}
 
-void print_div::print_infix(std::ostream& str, exptree::iterator it)
+void print_frac::print_infix(std::ostream& str, exptree::iterator it)
 	{
 	sibling_iterator num=tr.begin(it), den=num;
 	++den;
@@ -360,9 +360,18 @@ void print_div::print_infix(std::ostream& str, exptree::iterator it)
 		str << "(";
 		close_bracket=true;
 		}
+	if(parent.output_format==exptree_output::out_xcadabra) 
+		 str << "\\frac{";
+
 	parent.get_printer(num)->print_infix(str, num);
-	str << "/";
+
+	if(parent.output_format==exptree_output::out_xcadabra) 
+		 str << "}{";
+	else
+		 str << "/";
 	parent.get_printer(den)->print_infix(str, den);	
+	if(parent.output_format==exptree_output::out_xcadabra) 
+		 str << "}";
 	if(close_bracket)
 		str << ")";
 	}
@@ -788,12 +797,12 @@ void print_mathml_pow::print_infix(std::ostream&, iterator)
 	{
 	}
 
-print_mathml_div::print_mathml_div(exptree_output& eo)
+print_mathml_frac::print_mathml_frac(exptree_output& eo)
 	: mathml_node_printer(eo)
 	{
 	}
 
-void print_mathml_div::print_infix(std::ostream&, iterator) 
+void print_mathml_frac::print_infix(std::ostream&, iterator) 
 	{
 	}
 

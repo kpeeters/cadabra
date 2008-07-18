@@ -43,7 +43,7 @@ class preprocessor {
 
 		enum order_labels { order_factorial=0,
 								  order_pow,
-								  order_div,
+								  order_frac,
 								  order_prod,
 								  order_wedge,
 								  order_minus,

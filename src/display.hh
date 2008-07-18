@@ -179,10 +179,10 @@ class print_pow : public node_printer {
 		virtual void print_infix(std::ostream&, iterator );
 };
 
-class print_div : public node_printer {
+class print_frac : public node_printer {
 	public:
-		print_div(exptree_output&);
-		virtual ~print_div() {};
+		print_frac(exptree_output&);
+		virtual ~print_frac() {};
 		virtual void print_infix(std::ostream&, iterator );
 };
 
@@ -311,10 +311,10 @@ class print_mathml_pow : public mathml_node_printer {
 		virtual void print_infix(std::ostream&, iterator );
 };
 
-class print_mathml_div : public mathml_node_printer {
+class print_mathml_frac : public mathml_node_printer {
 	public:
-		print_mathml_div(exptree_output&);
-		virtual ~print_mathml_div() {};
+		print_mathml_frac(exptree_output&);
+		virtual ~print_mathml_frac() {};
 		virtual void print_infix(std::ostream&, iterator );
 };
 

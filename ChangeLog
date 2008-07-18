@@ -1,3 +1,12 @@
+2008-07-18  Kasper Peeters  <kasper.peeters@aei.mpg.de>
+
+	* Made some changes to @substitute so that \hasprop can be applied
+	to more general patterns. Added some documentation to the pattern
+	section to explain this.
+
+	* Changed \div to \frac (though this will eventually go away
+	altogether). 
+
 2008-07-16  Kasper Peeters  <kasper.peeters@aei.mpg.de>
 
 	* Fixed scrolling behaviour of the GUI once more...

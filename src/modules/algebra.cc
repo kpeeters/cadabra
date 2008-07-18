@@ -1686,7 +1686,7 @@ void reduce_div::description() const
 
 bool reduce_div::can_apply(iterator st)
 	{
-	if(*st->name!="\\div") return false;
+	if(*st->name!="\\frac") return false;
 	sibling_iterator it=tr.begin(st);
 	++it; // first argument is allowed to be non-numerical
 	while(it!=tr.end(st)) {
