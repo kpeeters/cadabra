@@ -2187,7 +2187,7 @@ algorithm::result_t collect_factors::apply(iterator& st)
 
 
 factor_out::factor_out(exptree& tr, iterator it)
-	: factorise(tr, it)
+	: algorithm(tr, it)
 	{
 	}
 
@@ -2196,38 +2196,140 @@ void factor_out::description() const
 	txtout << "bla" << std::endl;
 	}
 
+bool factor_out::can_apply(iterator st)
+	{
+	if(*st->name=="\\sum") {
+		sibling_iterator ar=args_begin();
+		if(ar==args_end()) return false;
+
+		to_factor_out.clear();
+		for(unsigned int i=0; i<tr.arg_size(ar); ++i) 
+			 to_factor_out.push_back(exptree(tr.arg(ar,i)));
+		return true;
+		}
+	else return false;
+	}
+
 algorithm::result_t factor_out::apply(iterator& it)
 	{
-	return apply_generic(it, false);
+	typedef std::multimap<exptree, sibling_iterator, tree_less_obj> collector_t;
+	collector_t collector;
+
+	// Find all terms in the sum which contain one or more factors of 
+	// the arguments. 
+
+	sibling_iterator st=tr.begin(it);
+	size_t current_term=0;
+	while(st!=tr.end(it)) {
+		 exptree powers; // a collecting prod in which we store all factors which we find
+		 powers.set_head(str_node("\\prod"));
+	
+		 // We count the powers of each factor that we want to move out,
+		 // and also immediately delete these factors. 
+		 for(unsigned int tfo=0; tfo<to_factor_out.size(); ++tfo) {
+			  if(*st->name=="\\prod") {
+					sibling_iterator psi=tr.begin(st);
+					bool firstfactor=true;
+					bool foundfactor=false;
+					while(psi!=tr.end(st)) {
+						 if(subtree_equal(psi, to_factor_out[tfo].begin(), -2, true, 0))  {
+							  powers.append_child(powers.begin(), static_cast<iterator>(psi));
+							  psi=tr.erase(psi);
+							  foundfactor=true;
+							  break;
+							  }
+						 else {
+							  ++psi;
+							  firstfactor=false;
+							  }
+						 }
+					if(foundfactor) {
+						 if(firstfactor==false) 
+							  expression_modified=true;
+						 if(tr.number_of_children(st)==0) {
+							  rset_t::iterator mtmp=st->multiplier;
+							  node_one(st);
+							  st->multiplier=mtmp;
+							  }
+						 else if(tr.number_of_children(st)==1) {
+							  multiply(tr.begin(st)->multiplier, *st->multiplier);
+							  tr.flatten(st);
+							  st=tr.erase(st);
+							  }
+						 }
+					}
+			  else {
+					if(subtree_equal(st, to_factor_out[tfo].begin(), -2, true, 0)) {
+						 iterator tmp=powers.append_child(powers.begin(), static_cast<iterator>(st));
+						 one(tmp->multiplier);
+						 rset_t::iterator mtmp=st->multiplier;
+						 node_one(st);
+						 st->multiplier=mtmp;
+						 }
+					}
+			  }
+		 if(powers.number_of_children(powers.begin())>0)
+			  collector.insert(std::make_pair(powers, st));
+
+		 ++current_term;
+		 ++st;
+		 }
+	if(collector.size()==0) return l_no_action;
+	txtout << collector.size() << std::endl;
+
+	// Now generate all new, factorised terms.
+	collector_t::iterator ci=collector.begin();
+	exptree oldkey = (*ci).first;
+	while(ci!=collector.end()) {
+		 exptree term;
+		 term.set_head(str_node("\\prod"));
+		 const exptree thiskey=(*ci).first;
+
+		 term.reparent(term.begin(), thiskey.begin());
+
+		 sibling_iterator sumit=term.append_child(term.begin(),str_node("\\sum"));
+		 size_t terms=0;
+		 while(ci!=collector.end() && tree_equal((*ci).first, oldkey)) {
+			  term.append_child(sumit, (*ci).second);
+			  tr.erase((*ci).second);
+			  ++terms;
+			  ++ci;
+			  }
+		 if(terms>1) 
+			  expression_modified=true;
+
+		 // Insert the newly generated term into the tree.
+		 if(terms==1) { // a sum with only one child
+			  term.flatten(sumit);
+			  term.erase(sumit);
+			  }
+		 tr.insert_subtree(tr.begin(it), term.begin());
+
+		 if(ci==collector.end())
+			  break;
+		 oldkey=(*ci).first;
+		 }
+
+	if(tr.number_of_children(it)==1) { // the sum has been reduced to a single term now
+		 tr.flatten(it);
+		 it=tr.erase(it);
+		 }
+	
+	if(expression_modified) return l_applied;
+	else                    return l_no_action;
 	}
 
 factor_in::factor_in(exptree& tr, iterator it)
-	: factorise(tr, it)
+	: algorithm(tr, it)
 	{
 	}
 
 void factor_in::description() const
 	{
-	txtout << "bla" << std::endl;
-	}
-
-algorithm::result_t factor_in::apply(iterator& it)
-	{
-	return apply_generic(it, true);
-	}
-
-
-factorise::factorise(exptree& tr, iterator it)
-	: algorithm(tr, it)
-	{
-	}
-
-void factorise::description() const
-	{
 	txtout << "Collect identical terms in a sum" << std::endl;
 	}
 
-bool factorise::can_apply(iterator st)
+bool factor_in::can_apply(iterator st)
 	{
 	factnodes.clear();
 	assert(tr.is_valid(st));
@@ -2242,7 +2344,7 @@ bool factorise::can_apply(iterator st)
 	else return false;
 	}
 
-hashval_t factorise::calc_restricted_hash(iterator it) const
+hashval_t factor_in::calc_restricted_hash(iterator it) const
 	{
 	if(*it->name!="\\prod") return tr.calc_hash(it);
 
@@ -2265,7 +2367,7 @@ hashval_t factorise::calc_restricted_hash(iterator it) const
 	return ret;
 	}
 
-void factorise::fill_hash_map(iterator it)
+void factor_in::fill_hash_map(iterator it)
 	{
 	term_hash.clear();
 	sibling_iterator sib=tr.begin(it);
@@ -2277,7 +2379,7 @@ void factorise::fill_hash_map(iterator it)
 		}
 	}
 
-bool factorise::compare_prod_nonprod(iterator prod, iterator nonprod) const
+bool factor_in::compare_prod_nonprod(iterator prod, iterator nonprod) const
 	{
 	assert(*(prod->name)=="\\prod");
 	assert(*(nonprod->name)!="\\prod");
@@ -2297,7 +2399,7 @@ bool factorise::compare_prod_nonprod(iterator prod, iterator nonprod) const
 	return false;
 	}
 
-bool factorise::compare_restricted(iterator one, iterator two) const
+bool factor_in::compare_restricted(iterator one, iterator two) const
 	{
 	if(one->name==two->name) {
 		if(*one->name=="\\prod") {
@@ -2327,12 +2429,7 @@ bool factorise::compare_restricted(iterator one, iterator two) const
 	return true;
 	}
 
-algorithm::result_t factorise::apply(iterator& it)
-	{
-	return apply_generic(it, true);
-	}
-
-algorithm::result_t factorise::apply_generic(iterator& it, bool do_factor_in)
+algorithm::result_t factor_in::apply(iterator& it)
 	{
 	algorithm::result_t ret=l_no_action;
 	fill_hash_map(it);

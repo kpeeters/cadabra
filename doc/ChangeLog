@@ -1,3 +1,12 @@
+2008-07-20  Kasper Peeters  <kasper.peeters@aei.mpg.de>
+
+	* Released 2.54
+
+	* Changed size() members to return size_t instead of unsigned int.
+
+	* Changed behaviour of operator++ for leaf_iterator so that it can
+	be used in situations where new leaves get added during iteration.
+	
 2008-06-30  Kasper Peeters  <kasper.peeters@aei.mpg.de>
 
 	* Released 2.52

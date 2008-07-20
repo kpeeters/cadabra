@@ -464,17 +464,15 @@ class collect_terms : public algorithm {
 		term_hash_t term_hash;
 };
 
-class factorise : public algorithm {
+class factor_in : public algorithm {
 	public:
-		factorise(exptree&, iterator);
+		factor_in(exptree&, iterator);
 
 		virtual void     description() const;
 		virtual bool     can_apply(iterator);
 		virtual result_t apply(iterator&);
 
 	protected:
-		result_t apply_generic(iterator&, bool do_factor_in);
-
 		std::set<exptree, tree_less_obj> factnodes; // objects to be taken in brackets;  
                                                           // FIXME: use patterns
 		bool      compare_restricted(iterator one, iterator two) const;
@@ -490,20 +488,17 @@ class factorise : public algorithm {
 		term_hash_t term_hash;
 };
 
-class factor_out : public factorise {
+class factor_out : public algorithm {
 	public:
 		factor_out(exptree&, iterator);
 		
 		virtual void     description() const;
+		virtual bool     can_apply(iterator);
 		virtual result_t apply(iterator&);
-};
 
-class factor_in : public factorise {
-	public:
-		factor_in(exptree&, iterator);
-
-		virtual void     description() const;
-		virtual result_t apply(iterator&);
+	protected:
+		typedef std::vector<exptree> to_factor_out_t;
+		 to_factor_out_t             to_factor_out;
 };
 
 class canonicalise : public algorithm {

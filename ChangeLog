@@ -1,3 +1,11 @@
+2008-07-20  Kasper Peeters  <kasper.peeters@aei.mpg.de>
+
+	* Added @factor_out.
+
+2008-07-19  Kasper Peeters  <kasper.peeters@aei.mpg.de>
+
+	* One last scrolling bug fixed...
+
 2008-07-18  Kasper Peeters  <kasper.peeters@aei.mpg.de>
 
 	* Made some changes to @substitute so that \hasprop can be applied

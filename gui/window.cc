@@ -1656,36 +1656,36 @@ bool XCadabra::receive(modglue::ipipe& p)
 					if(datacells.back()==cp || cp==0 ) { // we are at the last cell of the notebook
 						if(datacells.size()>0 && datacells.back()->cell_type==DataCell::c_input &&
 							trim(datacells.back()->textbuf->get_text()).size()==0 ) {
-#ifdef DEBUG
-							std::cerr << "no cell needed" << std::endl;
-#endif
-							if(restarting_kernel) {
-								restarting_kernel=false;
-								active_canvas->cell_grab_focus(active_cell);
-								}
-							else {
-								 active_canvas->cell_grab_focus(datacells.back());
-								 }
-							active_canvas->scroll_into_view(active_cell);
-							}
-						else { // this last cell is not an input cell
-#ifdef DEBUG
-							std::cerr << "adding empty input cell" << std::endl;
-#endif
-							DataCell *newcell=new DataCell(DataCell::c_input, "");
-							cp=add_cell(newcell, cp, false);
-							active_canvas->cell_grab_focus(cp);
-							}
+							 // we still have an empty cell below
+							 if(restarting_kernel) {
+								  restarting_kernel=false;
+								  active_canvas->cell_grab_focus(active_cell);
+								  }
+							 else {
+								  active_canvas->cell_grab_focus(datacells.back());
+								  }
+							 while (gtk_events_pending ())
+								  gtk_main_iteration ();
+							 active_canvas->scroll_into_view(active_cell);
+							 }
+						else { // this last cell is not an input cell; add a new input cell
+							 DataCell *newcell=new DataCell(DataCell::c_input, "");
+							 cp=add_cell(newcell, cp, false);
+							 active_canvas->cell_grab_focus(cp);
+							 }
 						if(restarting_kernel) {
 							 restarting_kernel=false;
 							 active_canvas->cell_grab_focus(active_cell);
 							 }
-						// re-enable original cell
+						while (gtk_events_pending ())
+							 gtk_main_iteration ();
+						active_canvas->scroll_into_view(active_cell);
+						// re-enable original cell (mark it non-running)
 						if(origcell!=0) {
-							origcell->running=false;
-							origcell=0;
-							}
-						}
+							 origcell->running=false;
+							 origcell=0;
+							 }
+						 }
 					else { // still more cells below
 						if(restarting_kernel) {
 							 restarting_kernel=false;

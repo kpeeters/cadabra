@@ -9,8 +9,8 @@
 
 /** \mainpage tree.hh
     \author   Kasper Peeters
-    \version  2.54
-    \date     11-Jul-2008
+    \version  2.55
+    \date     20-Jul-2008
     \see      http://www.aei.mpg.de/~peekas/tree/
     \see      http://www.aei.mpg.de/~peekas/tree/ChangeLog
 
@@ -406,9 +406,9 @@ class tree {
 	   void     swap(iterator, iterator);
 		
 		/// Count the total number of nodes.
-		int      size() const;
+		size_t   size() const;
 		/// Count the total number of nodes below the indicated node (plus one).
-		int      size(const iterator_base&) const;
+		size_t   size(const iterator_base&) const;
 		/// Check if tree is empty.
 		bool     empty() const;
 		/// Compute the depth to the root or to a fixed other iterator.
@@ -1618,9 +1618,9 @@ void tree<T, tree_node_allocator>::subtree(tree& tmp, sibling_iterator from, sib
 	}
 
 template <class T, class tree_node_allocator>
-int tree<T, tree_node_allocator>::size() const
+size_t tree<T, tree_node_allocator>::size() const
 	{
-	int i=0;
+	size_t i=0;
 	pre_order_iterator it=begin(), eit=end();
 	while(it!=eit) {
 		++i;
@@ -1630,9 +1630,9 @@ int tree<T, tree_node_allocator>::size() const
 	}
 
 template <class T, class tree_node_allocator>
-int tree<T, tree_node_allocator>::size(const iterator_base& top) const
+size_t tree<T, tree_node_allocator>::size(const iterator_base& top) const
 	{
-	int i=0;
+	size_t i=0;
 	pre_order_iterator it=top, eit=top;
 	eit.skip_children();
 	++eit;

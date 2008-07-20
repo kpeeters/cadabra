@@ -78,7 +78,7 @@ manipulator::manipulator()
 	algorithms["@prodcollectnum"] =new algo_info(&create<prodcollectnum>);
 	algorithms["@collect_terms"]  =new algo_info(&create<collect_terms>);
 	algorithms["@collect_factors"]=new algo_info(&create<collect_factors>);
-	algorithms["@factorise"]      =new algo_info(&create<factorise>);
+	algorithms["@factorise"]      =new algo_info(&create<factor_in>);
 	algorithms["@factor_in"]      =new algo_info(&create<factor_in>);
 	algorithms["@factor_out"]     =new algo_info(&create<factor_out>);
 	algorithms["@canonicalise"]   =new algo_info(&create<canonicalise>);
