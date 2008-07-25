@@ -16,6 +16,12 @@ void properties::register_properties()
 	register_property(&create_property<Symbol>);
 	register_property(&create_property<Indices>);
 	register_property(&create_property<Coordinate>);
+	register_property(&create_property<SortOrder>);
+	register_property(&create_property<ImplicitIndex>);
+
+	// commutativity
+	register_property(&create_property<CommutingAsProduct>);
+	register_property(&create_property<CommutingAsSum>);
 	}
 
 pattern::pattern()
@@ -468,5 +474,35 @@ bool Indices::parse(exptree& tr, exptree::iterator pat, exptree::iterator prop, 
 		}
 
 	return true;
+	}
+
+property_base::match_t SortOrder::equals(const property_base *) const
+	{
+	return no_match; // you can have as many of these as you like
+	}
+
+std::string SortOrder::name() const
+	{
+	return "SortOrder";
+	}
+
+std::string ImplicitIndex::name() const
+	{
+	return "ImplicitIndex";
+	}
+
+std::string CommutingAsProduct::name() const
+	{
+	return "CommutingAsProduct";
+	}
+
+std::string CommutingAsSum::name() const
+	{
+	return "CommutingAsSum";
+	}
+
+property_base::match_t CommutingBehaviour::equals(const property_base *) const
+	{
+	return no_match; // you can have as many of these as you like
 	}
 

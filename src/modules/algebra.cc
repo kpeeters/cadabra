@@ -41,10 +41,7 @@ extern "C" {
 
 void algebra::register_properties()
 	{
-	properties::register_property(&create_property<ImplicitIndex>);
 	properties::register_property(&create_property<Matrix>);
-	properties::register_property(&create_property<CommutingAsProduct>);
-	properties::register_property(&create_property<CommutingAsSum>);
 	properties::register_property(&create_property<Commuting>);
 	properties::register_property(&create_property<AntiCommuting>);
 	properties::register_property(&create_property<NonCommuting>);
@@ -63,7 +60,6 @@ void algebra::register_properties()
 	properties::register_property(&create_property<DAntiSymmetric>);
 	properties::register_property(&create_property<KroneckerDelta>);
 	properties::register_property(&create_property<EpsilonTensor>);
-	properties::register_property(&create_property<SortOrder>);
 	properties::register_property(&create_property<Derivative>);
 	properties::register_property(&create_property<PartialDerivative>);
 	}	
@@ -82,34 +78,9 @@ std::string AntiSelfDual::name() const
 	return "AntiSelfDual";
 	}
 
-std::string ImplicitIndex::name() const
-	{
-	return "ImplicitIndex";
-	}
-
 std::string Matrix::name() const
 	{
 	return "Matrix";
-	}
-
-std::string CommutingAsProduct::name() const
-	{
-	return "CommutingAsProduct";
-	}
-
-std::string CommutingAsSum::name() const
-	{
-	return "CommutingAsSum";
-	}
-
-property_base::match_t CommutingBehaviour::equals(const property_base *) const
-	{
-	return no_match; // you can have as many of these as you like
-	}
-
-property_base::match_t SortOrder::equals(const property_base *) const
-	{
-	return no_match; // you can have as many of these as you like
 	}
 
 std::string Commuting::name() const
@@ -191,11 +162,6 @@ std::string KroneckerDelta::name() const
 std::string EpsilonTensor::name() const
 	{
 	return "EpsilonTensor";
-	}
-
-std::string SortOrder::name() const
-	{
-	return "SortOrder";
 	}
 
 bool EpsilonTensor::parse(exptree& tr, exptree::iterator pat, exptree::iterator prop, keyval_t& keyvals)
@@ -1325,236 +1291,6 @@ bool prodsort::can_apply(iterator st)
 	}
 
 
-// Should obj and obj+1 be swapped, according to the SortOrder
-// properties?
-//
-bool prodsort::should_swap(iterator obj, int subtree_comparison) const
-	{
-	sibling_iterator one=obj, two=obj;
-	++two;
-
-	// Find a SortOrder property which contains both one and two.
-	int num1, num2;
-	const SortOrder *so1=properties::get_composite<SortOrder>(one,num1);
-	const SortOrder *so2=properties::get_composite<SortOrder>(two,num2);
-	
-	if(so1==0 || so2==0) { // No sort order known
-		if(subtree_comparison<0) return true;
-		return false;
-		}
-	else if(abs(subtree_comparison)<=1) { // Identical up to index names
-		if(subtree_comparison==-1) return true;
-		return false;
-		}
-	else {
-		if(so1==so2) {
-			if(num1>num2) return true;
-			return false;
-			}
-		}
-
-	return false;
-	}
-
-// Various tests about whether two non-elementary objects can be swapped.
-//
-int prodsort::can_swap_prod_obj(iterator prod, iterator obj) const
-	{
-//	txtout << "prod obj" << std::endl;
-	// Warning: no check is made that prod is actually a product!
-	int sign=1;
-	sibling_iterator sib=tr.begin(prod);
-	while(sib!=tr.end(prod)) {
-		if(sib->fl.parent_rel!=str_node::p_sub && sib->fl.parent_rel!=str_node::p_super) {
-			int es=subtree_compare(sib, obj);
-			sign*=can_swap(sib, obj, es);
-			if(sign==0) break;
-			}
-		++sib;
-		}
-	return sign;
-	}
-
-int prodsort::can_swap_prod_prod(iterator prod1, iterator prod2)  const
-	{
-//	txtout << "prod prod" << std::endl;
-	// Warning: no check is made that prod1,2 are actually products!
-	int sign=1;
-	sibling_iterator sib=tr.begin(prod2);
-	while(sib!=tr.end(prod2)) {
-		if(sib->fl.parent_rel!=str_node::p_sub && sib->fl.parent_rel!=str_node::p_super) {
-			sign*=can_swap_prod_obj(prod1, sib);
-			if(sign==0) break;
-			}
-		++sib;
-		}
-	return sign;
-	}
-
-int prodsort::can_swap_sum_obj(iterator sum, iterator obj) const
-	{
-//	txtout << "sum obj" << std::endl;
-	// Warning: no check is made that sum is actually a sum!
-	int sofar=2;
-	sibling_iterator sib=tr.begin(sum);
-	while(sib!=tr.end(sum)) {
-		int es=subtree_compare(sib, obj);
-		int thissign=can_swap(sib, obj, es);
-		if(sofar==2) sofar=thissign;
-		else if(thissign!=sofar) {
-			sofar=0;
-			break;
-			}
-		++sib;
-		}
-	return sofar;
-	}
-
-int prodsort::can_swap_prod_sum(iterator prod, iterator sum) const
-	{
-	// Warning: no check is made that sum is actually a sum or prod is a prod!
-	int sign=1;
-	sibling_iterator sib=tr.begin(prod);
-	while(sib!=tr.end(prod)) {
-		if(sib->fl.parent_rel!=str_node::p_sub && sib->fl.parent_rel!=str_node::p_super) {
-			sign*=can_swap_sum_obj(sum, sib);
-			if(sign==0) break;
-			}
-		++sib;
-		}
-	return sign;
-	}
-
-int prodsort::can_swap_sum_sum(iterator sum1, iterator sum2) const
-	{
-	int sofar=2;
-	sibling_iterator sib=tr.begin(sum1);
-	while(sib!=tr.end(sum1)) {
-		int thissign=can_swap_sum_obj(sum2, sib);
-		if(sofar==2) sofar=thissign;
-		else if(thissign!=sofar) {
-			sofar=0;
-			break;
-			}
-		++sib;
-		}
-	return sofar;
-	}
-
-
-// Can obj and obj+1 be exchanged? If yes, return the sign,
-// if no return zero. This is the general entry point for 
-// two arbitrary nodes (which may be a product or sum). 
-// Do not call the functions above directly!
-//
-int prodsort::can_swap(iterator one, iterator two, int subtree_comparison) const
-	{
-	// Do we need to use Self* properties?
-	if(abs(subtree_comparison)<=1) { 
-		// Two implicit-index objects cannot move through eachother.
-		const ImplicitIndex          *ii =properties::get_composite<ImplicitIndex>(one);
-		if(ii) return 0;
-
-		const SelfCommutingBehaviour *sc =properties::get_composite<SelfCommutingBehaviour>(one);
-		if(sc)
-			return sc->sign();
-		
-		// If the trees are the same but there is no property, it maybe that we have
-		// to deduce the behaviour by treating the objects as products or sums.
-		const CommutingAsProduct *cap = properties::get_composite<CommutingAsProduct>(one);
-		const CommutingAsSum     *sum = properties::get_composite<CommutingAsSum>(one);
-		if(cap) {
-//			return can_swap_prod_prod(one, two);
-//			txtout << "two products" << std::endl;
-			return 0;
-			}
-		else if(sum) {
-//			txtout << "two sums" << std::endl;
-			return 0;
-			}
-//		else return 1; // default: commuting
-		}
-	else {
-		// Two implicit-index objects cannot move through eachother.
-		const ImplicitIndex *ii1=properties::get_composite<ImplicitIndex>(one);
-		const ImplicitIndex *ii2=properties::get_composite<ImplicitIndex>(two);
-		if(ii1 && ii2) return 0;
-
-		// It is still possible that the two objects have different numbers of indices,
-		// yet match the same pattern in a SelfCommuting etal property. In this case,
-		// the property should be matched by both 'one' and 'two';
-		const SelfCommutingBehaviour *sc1 =properties::get_composite<SelfCommutingBehaviour>(one);
-		const SelfCommutingBehaviour *sc2 =properties::get_composite<SelfCommutingBehaviour>(two);
-		if( (sc1!=0 && sc1==sc2) ) { 
-			return sc1->sign();
-			}
-		}
-	
-	// Really different objects. Try to find them in a list first.
-	const CommutingBehaviour *com1 =properties::get_composite<CommutingBehaviour>(one);
-	const CommutingBehaviour *com2 =properties::get_composite<CommutingBehaviour>(two);
-	
-	if(com1!=0  &&  com1== com2) return com1->sign();
-	
-	// One or both of the objects are not in an explicit list. Check for
-	// product-like and sum-like behaviour.
-	const CommutingAsProduct *comap1 = properties::get_composite<CommutingAsProduct>(one);
-	const CommutingAsProduct *comap2 = properties::get_composite<CommutingAsProduct>(two);
-	const CommutingAsSum     *comas1 = properties::get_composite<CommutingAsSum>(one);
-	const CommutingAsSum     *comas2 = properties::get_composite<CommutingAsSum>(two);
-	
-	if(comap1 && comap2) return can_swap_prod_prod(one,two);
-	if(comap1 && comas2) return can_swap_prod_sum(one,two);
-	if(comap2 && comas1) return can_swap_prod_sum(two,one);
-	if(comas1 && comas2) return can_swap_sum_sum(one,two);
-	if(comap1)           return can_swap_prod_obj(one,two);
-	if(comap2)           return can_swap_prod_obj(two,one);
-	if(comas1)           return can_swap_sum_obj(one,two);
-	if(comas2)           return can_swap_sum_obj(two,one);
-	
-	return 1; // default: commuting.
-	}
-
-// Determine whether the two objects can be moved next to each other,
-// with 'one' to the left of 'two'. Return the sign, or zero.
-//
-int prodsort::can_move_adjacent(iterator prod, sibling_iterator one, sibling_iterator two) const
-	{
-	assert(tr.parent(one)==tr.parent(two));
-	assert(tr.parent(one)==prod);
-
-	// Make sure that 'one' points to the object which occurs first in 'prod'.
-	bool onefirst=false;
-	sibling_iterator probe=one;
-	while(probe!=tr.end(prod)) {
-		if(probe==two) {
-			onefirst=true;
-			break;
-			}
-		++probe;
-		}
-	int sign=1;
-	if(!onefirst) {
-		std::swap(one,two);
-		int es=subtree_compare(one,two);
-		sign*=can_swap(one,two,es);
-//		txtout << "swapping one and two: " << sign << std::endl;
-		}
-
-	if(sign!=0) {
-		// Loop over all pair flips which are necessary to move one to the left of two.
-		probe=one;
-		++probe;
-		while(probe!=two) {
-			assert(probe!=tr.end(prod));
-			int es=subtree_compare(one,probe);
-			sign*=can_swap(one,probe,es);
-			if(sign==0) break;
-			++probe;
-			}
-		}
-	return sign;
-	}
 
 algorithm::result_t prodsort::apply(iterator& st) 
 	{
@@ -1570,8 +1306,8 @@ algorithm::result_t prodsort::apply(iterator& st)
 		two=one; ++two;
 		for(unsigned int j=i+1; j<=num; ++j) { // this loops too many times, no?
 			int es=subtree_compare(one, two);
-			if(should_swap(one, es)) {
-				int canswap=can_swap(one, two, es);
+			if(exptree_ordering::should_swap(one, es)) {
+				int canswap=exptree_ordering::can_swap(one, two, es);
 				if(canswap!=0) {
 					tr.swap(one);
 					std::swap(one,two);  // put the iterators back in order
@@ -2275,7 +2011,6 @@ algorithm::result_t factor_out::apply(iterator& it)
 		 ++st;
 		 }
 	if(collector.size()==0) return l_no_action;
-	txtout << collector.size() << std::endl;
 
 	// Now generate all new, factorised terms.
 	collector_t::iterator ci=collector.begin();

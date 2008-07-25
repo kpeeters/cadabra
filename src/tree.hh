@@ -9,8 +9,8 @@
 
 /** \mainpage tree.hh
     \author   Kasper Peeters
-    \version  2.55
-    \date     20-Jul-2008
+    \version  2.56
+    \date     25-Jul-2008
     \see      http://www.aei.mpg.de/~peekas/tree/
     \see      http://www.aei.mpg.de/~peekas/tree/ChangeLog
 
@@ -431,7 +431,7 @@ class tree {
 		/// Determine the index of a node in the range of siblings to which it belongs.
 		unsigned int index(sibling_iterator it) const;
 		/// Inverse of 'index': return the n-th child of the node at position.
-		sibling_iterator  child(const iterator_base& position, unsigned int) const;
+		static sibling_iterator  child(const iterator_base& position, unsigned int);
 		
 		/// Comparator class for iterators (compares pointer values; why doesn't this work automatically?)
 		class iterator_base_less {
@@ -1857,7 +1857,7 @@ unsigned int tree<T, tree_node_allocator>::index(sibling_iterator it) const
 
 
 template <class T, class tree_node_allocator>
-typename tree<T, tree_node_allocator>::sibling_iterator tree<T, tree_node_allocator>::child(const iterator_base& it, unsigned int num) const
+typename tree<T, tree_node_allocator>::sibling_iterator tree<T, tree_node_allocator>::child(const iterator_base& it, unsigned int num) 
 	{
 	tree_node *tmp=it.node->first_child;
 	while(num--) {

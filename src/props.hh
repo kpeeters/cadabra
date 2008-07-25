@@ -440,5 +440,37 @@ class Indices : public list_property {
 		bool        position_free;
 };
 
+class SortOrder : public list_property {
+	public:
+		virtual std::string name() const;
+		virtual match_t equals(const property_base *) const;
+};
+
+class ImplicitIndex : virtual public property {
+	public:
+		virtual std::string name() const;
+};
+
+class CommutingAsProduct : virtual public property {
+	public:
+		virtual std::string name() const;
+};
+
+class CommutingAsSum : virtual public property {
+	public:
+		virtual std::string name() const;
+};
+
+class CommutingBehaviour : virtual public list_property {
+	public:
+		virtual int sign() const=0;
+		virtual match_t equals(const property_base *) const;
+};
+
+class SelfCommutingBehaviour : virtual public property {
+	public:
+		virtual int sign() const=0;
+};
+
 
 #endif

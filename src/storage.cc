@@ -30,6 +30,8 @@
 #include "props.hh"
 #include <iomanip>
 #include <sstream>
+#include <pcrecpp.h>
+
 //#include "modules/dummies.hh"
 
 nset_t    name_set;
@@ -216,18 +218,18 @@ hashval_t exptree::calc_hash(iterator it) const
 	return ret;
 	}
 
-exptree::sibling_iterator exptree::arg(iterator it, unsigned int num) const
+exptree::sibling_iterator exptree::arg(iterator it, unsigned int num) 
 	{
 	if(*it->name=="\\comma") {
-		assert(number_of_children(it)>num);
-		return child(it,num);
+		assert(exptree::number_of_children(it)>num);
+		return exptree::child(it,num);
 		}
 	else return it;
 	}
 
-unsigned int exptree::arg_size(sibling_iterator sib) const
+unsigned int exptree::arg_size(sibling_iterator sib) 
 	{
-	if(*sib->name=="\\comma") return number_of_children(sib);
+	if(*sib->name=="\\comma") return exptree::number_of_children(sib);
 	else return 1;
 	}
 
@@ -1245,3 +1247,525 @@ bool operator==(const exptree& first, const exptree& second)
 	{
 	return tree_exact_equal(first, second, 0, true, -2, true);
 	}
+
+
+void exptree_comparator::clear()
+	{
+	replacement_map.clear();
+	subtree_replacement_map.clear();
+	factor_locations.clear();
+	factor_moving_signs.clear();
+	}
+
+bool exptree_comparator::equal_subtree(exptree::iterator i1, exptree::iterator i2)
+	{
+	exptree::sibling_iterator i1end(i1);
+	exptree::sibling_iterator i2end(i2);
+	++i1end;
+	++i2end;
+
+	bool first_call=true;
+	while(i1!=i1end && i2!=i2end) {
+		match_t mm=compare(i1,i2,first_call);
+		first_call=false;
+		switch(mm) {
+			case no_match:
+				return false;
+			case node_match:
+				if(exptree::number_of_children(i1)!=exptree::number_of_children(i2)) 
+					return false;
+				break;
+			case subtree_match:
+				i1.skip_children();
+				i2.skip_children();
+				break;
+			}
+		++i1;
+		++i2;
+		}
+	return true;
+	}
+
+exptree_comparator::match_t exptree_comparator::compare(exptree::iterator& one, exptree::iterator& two, 
+																		  bool nobrackets) 
+	{
+	// nobrackets also implies 'no multiplier', i.e. 'toplevel'.
+
+	// one is the substitute pattern, two the expression under consideration
+	if(one->fl.bracket==two->fl.bracket || nobrackets)
+		if(one->fl.parent_rel==two->fl.parent_rel) {
+			bool pattern=false;
+			bool objectpattern=false;
+			bool implicit_pattern=false;
+			bool is_index=false;
+			if(one->fl.bracket==str_node::b_none && one->is_index() )
+				is_index=true;
+			if(one->is_name_wildcard())
+				pattern=true;
+			else if(one->is_object_wildcard())
+				objectpattern=true;
+			else if(is_index && one->is_integer()==false) 
+				implicit_pattern=true;
+
+			if(pattern || (implicit_pattern && two->is_integer()==false)) { // never match integers to implicit patterns!
+				if(lhs_contains_dummies) {
+					replacement_map_t::iterator loc=replacement_map.find(one);
+					if(loc!=replacement_map.end()) {
+						// If this is an index, try to match the whole index.
+						// We want to make sure that a pattern k1_a k2_a does not match an expression k1_c k2_d.
+						if(is_index) {
+							if(subtree_exact_equal((*loc).second.begin(), two, 0)) return subtree_match;
+							else                                                   return no_match;
+							}
+						else {
+							if((*loc).second.begin()->name == two->name)        return node_match;
+							else                                                return no_match;
+							}
+						}
+					else {
+						// check that the index types agree (if known, otherwise assume they match)
+						const Indices *t1=properties::get<Indices>(one);
+						const Indices *t2=properties::get<Indices>(two);
+						if( (t1 || t2) && implicit_pattern ) {
+							if(t1 && t2) {
+								if((*t1).set_name != (*t2).set_name)
+									return no_match;
+								}
+							else return no_match;
+							 }
+						replacement_map[one]=two;
+						// if this is a pattern and the pattern has a non-zero number of children,
+						// also add the pattern without the children
+						if(exptree::number_of_children(one)!=0) {
+							 exptree tmp1(one), tmp2(two);
+							 tmp1.erase_children(tmp1.begin());
+							 tmp2.erase_children(tmp2.begin());
+							 replacement_map[tmp1]=tmp2;
+							 }
+						}
+					}
+				else {
+					const Indices *t1=properties::get<Indices>(one);
+					const Indices *t2=properties::get<Indices>(two);
+					if( (t1 || t2) && implicit_pattern ) {
+						if(t1 && t2) {
+							if((*t1).set_name != (*t2).set_name)
+								return no_match;
+							}
+						else return no_match;
+						}
+					replacement_map[one]=two;
+					// if this is a pattern and the pattern has a non-zero number of children,
+					// also add the pattern without the children
+					if(exptree::number_of_children(one)!=0) {
+						 exptree tmp1(one), tmp2(two);
+						 tmp1.erase_children(tmp1.begin());
+						 tmp2.erase_children(tmp2.begin());
+						 replacement_map[tmp1]=tmp2;
+						 }
+					}
+				if(is_index) return subtree_match;
+				else         return node_match;
+				}
+			else if(objectpattern) {
+				subtree_replacement_map_t::iterator loc=subtree_replacement_map.find(one->name);
+				if(loc!=subtree_replacement_map.end()) {
+					if(equal_subtree((*loc).second,two))
+						return subtree_match;
+					else return no_match;
+					}
+				else subtree_replacement_map[one->name]=two;
+
+				return subtree_match;
+				}
+			else { // object is not dummy
+				 if(one->is_rational() && two->is_rational() && one->multiplier!=two->multiplier) return no_match;
+				 if(one->name==two->name) {
+					  if(nobrackets || (one->multiplier == two->multiplier) )
+							return node_match;
+					  }
+				}
+			}
+	return no_match;
+	}
+
+
+// Find a subproduct in a product. The 'lhs' iterator points to the product which
+// we want to find, the 'tofind' iterator to the current factor which we are looking
+// for. The product in which to search is pointed to by 'st'.
+//
+// Once 'tofind' is found, this routine calls itself to find the next factor in
+// 'lhs'. If the next factor cannot be found, we backtrack and try to find the
+// previous factor again (it may have appeared multiple times).
+//
+bool exptree_comparator::match_subproduct(exptree::sibling_iterator lhs, 
+														exptree::sibling_iterator tofind, 
+														exptree::sibling_iterator st)
+	{
+	replacement_map_t         backup_replacements(replacement_map);
+	subtree_replacement_map_t backup_subtree_replacements(subtree_replacement_map);
+
+	exptree::sibling_iterator start=st.begin();
+	while(start!=st.end()) {
+		if(std::find(factor_locations.begin(), factor_locations.end(), start)==factor_locations.end()) {  
+//			txtout << tofind.node << "number = " << backup_replacements.size() << std::endl;
+//			txtout << *tofind->name << " vs " << *start->name << std::endl;
+			if(equal_subtree(tofind, start)) { // found factor
+				// If a previous factor was found, verify that the factor found now can be
+				// moved next to the previous factor (nontrivial if factors do not commute).
+				int sign=1;
+				if(factor_locations.size()>0) {
+					sign=exptree_ordering::can_move_adjacent(st, factor_locations.back(), start);
+					}
+				if(sign==0) { // object found, but we cannot move it in the right order
+					replacement_map=backup_replacements;
+					subtree_replacement_map=backup_subtree_replacements;
+					}
+				else {
+					factor_locations.push_back(start);
+					factor_moving_signs.push_back(sign);
+					
+					exptree::sibling_iterator nxt=tofind; 
+					++nxt;
+					if(nxt!=lhs.end()) {
+						bool res=match_subproduct(lhs, nxt, st);
+						if(res) return true;
+						else {
+//						txtout << tofind.node << "found factor useless " << start.node << std::endl;
+							factor_locations.pop_back();
+							factor_moving_signs.pop_back();
+							replacement_map=backup_replacements;
+							subtree_replacement_map=backup_subtree_replacements;
+							}
+						}
+					else return true;
+					}
+				}
+			else {
+//				txtout << tofind.node << "does not match" << std::endl;
+				replacement_map=backup_replacements;
+				subtree_replacement_map=backup_subtree_replacements;
+				}
+			}
+		++start;
+		}
+	return false;
+	}
+
+
+// Determine whether the two objects can be moved next to each other,
+// with 'one' to the left of 'two'. Return the sign, or zero.
+//
+int exptree_ordering::can_move_adjacent(exptree::iterator prod,
+													 exptree::sibling_iterator one, exptree::sibling_iterator two) 
+	{
+	assert(exptree::parent(one)==exptree::parent(two));
+	assert(exptree::parent(one)==prod);
+
+	// Make sure that 'one' points to the object which occurs first in 'prod'.
+	bool onefirst=false;
+	exptree::sibling_iterator probe=one;
+	while(probe!=prod.end()) {
+		if(probe==two) {
+			onefirst=true;
+			break;
+			}
+		++probe;
+		}
+	int sign=1;
+	if(!onefirst) {
+		std::swap(one,two);
+		int es=subtree_compare(one,two);
+		sign*=can_swap(one,two,es);
+//		txtout << "swapping one and two: " << sign << std::endl;
+		}
+
+	if(sign!=0) {
+		// Loop over all pair flips which are necessary to move one to the left of two.
+		probe=one;
+		++probe;
+		while(probe!=two) {
+			assert(probe!=prod.end());
+			int es=subtree_compare(one,probe);
+			sign*=can_swap(one,probe,es);
+			if(sign==0) break;
+			++probe;
+			}
+		}
+	return sign;
+	}
+
+
+
+// Should obj and obj+1 be swapped, according to the SortOrder
+// properties?
+//
+bool exptree_ordering::should_swap(exptree::iterator obj, int subtree_comparison) 
+	{
+	exptree::sibling_iterator one=obj, two=obj;
+	++two;
+
+	// Find a SortOrder property which contains both one and two.
+	int num1, num2;
+	const SortOrder *so1=properties::get_composite<SortOrder>(one,num1);
+	const SortOrder *so2=properties::get_composite<SortOrder>(two,num2);
+	
+	if(so1==0 || so2==0) { // No sort order known
+		if(subtree_comparison<0) return true;
+		return false;
+		}
+	else if(abs(subtree_comparison)<=1) { // Identical up to index names
+		if(subtree_comparison==-1) return true;
+		return false;
+		}
+	else {
+		if(so1==so2) {
+			if(num1>num2) return true;
+			return false;
+			}
+		}
+
+	return false;
+	}
+
+// Various tests about whether two non-elementary objects can be swapped.
+//
+int exptree_ordering::can_swap_prod_obj(exptree::iterator prod, exptree::iterator obj) 
+	{
+//	txtout << "prod obj" << std::endl;
+	// Warning: no check is made that prod is actually a product!
+	int sign=1;
+	exptree::sibling_iterator sib=prod.begin();
+	while(sib!=prod.end()) {
+		if(sib->fl.parent_rel!=str_node::p_sub && sib->fl.parent_rel!=str_node::p_super) {
+			int es=subtree_compare(sib, obj);
+			sign*=can_swap(sib, obj, es);
+			if(sign==0) break;
+			}
+		++sib;
+		}
+	return sign;
+	}
+
+int exptree_ordering::can_swap_prod_prod(exptree::iterator prod1, exptree::iterator prod2)  
+	{
+//	txtout << "prod prod" << std::endl;
+	// Warning: no check is made that prod1,2 are actually products!
+	int sign=1;
+	exptree::sibling_iterator sib=prod2.begin();
+	while(sib!=prod2.end()) {
+		if(sib->fl.parent_rel!=str_node::p_sub && sib->fl.parent_rel!=str_node::p_super) {
+			sign*=can_swap_prod_obj(prod1, sib);
+			if(sign==0) break;
+			}
+		++sib;
+		}
+	return sign;
+	}
+
+int exptree_ordering::can_swap_sum_obj(exptree::iterator sum, exptree::iterator obj) 
+	{
+//	txtout << "sum obj" << std::endl;
+	// Warning: no check is made that sum is actually a sum!
+	int sofar=2;
+	exptree::sibling_iterator sib=sum.begin();
+	while(sib!=sum.end()) {
+		int es=subtree_compare(sib, obj);
+		int thissign=can_swap(sib, obj, es);
+		if(sofar==2) sofar=thissign;
+		else if(thissign!=sofar) {
+			sofar=0;
+			break;
+			}
+		++sib;
+		}
+	return sofar;
+	}
+
+int exptree_ordering::can_swap_prod_sum(exptree::iterator prod, exptree::iterator sum) 
+	{
+	// Warning: no check is made that sum is actually a sum or prod is a prod!
+	int sign=1;
+	exptree::sibling_iterator sib=prod.begin();
+	while(sib!=prod.end()) {
+		if(sib->fl.parent_rel!=str_node::p_sub && sib->fl.parent_rel!=str_node::p_super) {
+			sign*=can_swap_sum_obj(sum, sib);
+			if(sign==0) break;
+			}
+		++sib;
+		}
+	return sign;
+	}
+
+int exptree_ordering::can_swap_sum_sum(exptree::iterator sum1, exptree::iterator sum2) 
+	{
+	int sofar=2;
+	exptree::sibling_iterator sib=sum1.begin();
+	while(sib!=sum1.end()) {
+		int thissign=can_swap_sum_obj(sum2, sib);
+		if(sofar==2) sofar=thissign;
+		else if(thissign!=sofar) {
+			sofar=0;
+			break;
+			}
+		++sib;
+		}
+	return sofar;
+	}
+
+
+// Can obj and obj+1 be exchanged? If yes, return the sign,
+// if no return zero. This is the general entry point for 
+// two arbitrary nodes (which may be a product or sum). 
+// Do not call the functions above directly!
+//
+int exptree_ordering::can_swap(exptree::iterator one, exptree::iterator two, int subtree_comparison) 
+	{
+	// Do we need to use Self* properties?
+	if(abs(subtree_comparison)<=1) { 
+		// Two implicit-index objects cannot move through eachother.
+		const ImplicitIndex          *ii =properties::get_composite<ImplicitIndex>(one);
+		if(ii) return 0;
+
+		const SelfCommutingBehaviour *sc =properties::get_composite<SelfCommutingBehaviour>(one);
+		if(sc)
+			return sc->sign();
+		
+		// If the trees are the same but there is no property, it maybe that we have
+		// to deduce the behaviour by treating the objects as products or sums.
+		const CommutingAsProduct *cap = properties::get_composite<CommutingAsProduct>(one);
+		const CommutingAsSum     *sum = properties::get_composite<CommutingAsSum>(one);
+		if(cap) {
+//			return can_swap_prod_prod(one, two);
+//			txtout << "two products" << std::endl;
+			return 0;
+			}
+		else if(sum) {
+//			txtout << "two sums" << std::endl;
+			return 0;
+			}
+//		else return 1; // default: commuting
+		}
+	else {
+		// Two implicit-index objects cannot move through eachother.
+		const ImplicitIndex *ii1=properties::get_composite<ImplicitIndex>(one);
+		const ImplicitIndex *ii2=properties::get_composite<ImplicitIndex>(two);
+		if(ii1 && ii2) return 0;
+
+		// It is still possible that the two objects have different numbers of indices,
+		// yet match the same pattern in a SelfCommuting etal property. In this case,
+		// the property should be matched by both 'one' and 'two';
+		const SelfCommutingBehaviour *sc1 =properties::get_composite<SelfCommutingBehaviour>(one);
+		const SelfCommutingBehaviour *sc2 =properties::get_composite<SelfCommutingBehaviour>(two);
+		if( (sc1!=0 && sc1==sc2) ) { 
+			return sc1->sign();
+			}
+		}
+	
+	// Really different objects. Try to find them in a list first.
+	const CommutingBehaviour *com1 =properties::get_composite<CommutingBehaviour>(one);
+	const CommutingBehaviour *com2 =properties::get_composite<CommutingBehaviour>(two);
+	
+	if(com1!=0  &&  com1== com2) return com1->sign();
+	
+	// One or both of the objects are not in an explicit list. Check for
+	// product-like and sum-like behaviour.
+	const CommutingAsProduct *comap1 = properties::get_composite<CommutingAsProduct>(one);
+	const CommutingAsProduct *comap2 = properties::get_composite<CommutingAsProduct>(two);
+	const CommutingAsSum     *comas1 = properties::get_composite<CommutingAsSum>(one);
+	const CommutingAsSum     *comas2 = properties::get_composite<CommutingAsSum>(two);
+	
+	if(comap1 && comap2) return can_swap_prod_prod(one,two);
+	if(comap1 && comas2) return can_swap_prod_sum(one,two);
+	if(comap2 && comas1) return can_swap_prod_sum(two,one);
+	if(comas1 && comas2) return can_swap_sum_sum(one,two);
+	if(comap1)           return can_swap_prod_obj(one,two);
+	if(comap2)           return can_swap_prod_obj(two,one);
+	if(comas1)           return can_swap_sum_obj(one,two);
+	if(comas2)           return can_swap_sum_obj(two,one);
+	
+	return 1; // default: commuting.
+	}
+
+bool exptree_comparator::satisfies_conditions(exptree::iterator conditions) 
+	{
+	for(unsigned int i=0; i<exptree::arg_size(conditions); ++i) {
+		exptree::iterator cond=exptree::arg(conditions, i);
+		if(*cond->name=="\\unequals") {
+			exptree::sibling_iterator lhs=cond.begin();
+			exptree::sibling_iterator rhs=lhs;
+			++rhs;
+			// If we have a match, all indices have replacement rules.
+			if(tree_exact_equal(replacement_map[exptree(lhs)], replacement_map[exptree(rhs)])) {
+//				txtout << *lhs->name  << " = " << *rhs->name << std::endl;
+				return false;
+				}
+			}
+		else if(*cond->name=="\\indexpairs") {
+			int countpairs=0;
+			replacement_map_t::const_iterator it=replacement_map.begin(),it2;
+			while(it!=replacement_map.end()) {
+				it2=it;
+				++it2;
+				while(it2!=replacement_map.end()) {
+					if(tree_exact_equal(it->second, it2->second)) {
+						++countpairs;
+						break;
+						}
+					++it2;
+					}
+				++it;
+				}
+//			txtout << countpairs << " pairs" << std::endl;
+			if(countpairs!=*(cond.begin()->multiplier))
+				return false;
+			}
+		else if(*cond->name=="\\regex") {
+//			txtout << "regex matching..." << std::endl;
+			exptree::sibling_iterator lhs=prod.begin();
+			exptree::sibling_iterator rhs=lhs;
+			++rhs;
+			// If we have a match, all indices have replacement rules.
+			std::string pat=(*rhs->name).substr(1,(*rhs->name).size()-2);
+//			txtout << "matching " << *comp.replacement_map[lhs->name]
+//					 << " with pattern " << pat << std::endl;
+			pcrecpp::RE reg(pat);
+			if(reg.FullMatch(*(replacement_map[exptree(lhs)].begin()->name))==false)
+				return false;
+			}
+		else if(*cond->name=="\\hasprop") {
+			exptree::sibling_iterator lhs=cond.begin();
+			exptree::sibling_iterator rhs=lhs;
+			++rhs;
+			properties::registered_property_map_t::iterator pit=
+				properties::registered_properties.find(*rhs->name);
+			if(pit==properties::registered_properties.end()) {
+				txtout << "Property \"" << *rhs->name << "\" not registered." << std::endl;
+				return false;
+				}
+			const property_base *aprop=pit->second();
+
+			subtree_replacement_map_t::iterator subfind=subtree_replacement_map.find(lhs->name);
+			replacement_map_t::iterator         patfind=replacement_map.find(exptree(lhs));
+
+			if(subfind==subtree_replacement_map.end() && patfind==replacement_map.end()) {
+				 txtout << "Pattern " << *lhs->name << " in \\hasprop did not occur in match." << std::endl;
+				 delete aprop;
+				 return false;
+				 }
+			
+			bool ret=false;
+			if(subfind==subtree_replacement_map.end()) 
+				 ret=properties::has(aprop, (*patfind).second.begin());
+			else
+				 ret=properties::has(aprop, (*subfind).second);
+			delete aprop;
+			return ret;
+			}
+		else {
+			txtout << "substitute: condition involving " << *cond->name << " not understood." << std::endl;
+			}
+		}
+	return true;
+	}
+

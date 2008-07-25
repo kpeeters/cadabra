@@ -1676,7 +1676,6 @@ bool unwrap::can_apply(iterator it)
 
 algorithm::result_t unwrap::apply(iterator& it) 
 	{
-	prodsort prs(tr, tr.end());
 	bool is_accent=properties::get<Accent>(it);
 
 	iterator prodwrap=tr.wrap(it, str_node("\\prod"));
@@ -1761,7 +1760,7 @@ algorithm::result_t unwrap::apply(iterator& it)
 					// commutativity property of the index wrt. the derivative is taken.
 					int sign=1;
 					if(factor!=tr.begin(derarg)) 
-						sign=prs.can_swap(tr.begin(derarg),factor,2);
+						sign=exptree_ordering::can_swap(tr.begin(derarg),factor,2);
 					
 					expression_modified=true;
 					tr.move_before(it, factor);

@@ -1,3 +1,7 @@
+2008-07-25  Kasper Peeters  <kasper.peeters@aei.mpg.de>
+
+	* Made 'child()' static.
+
 2008-07-20  Kasper Peeters  <kasper.peeters@aei.mpg.de>
 
 	* Released 2.54

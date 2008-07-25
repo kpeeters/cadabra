@@ -44,25 +44,11 @@ class substitute : public algorithm {
 		virtual result_t apply(iterator&);
 	private:
 		unsigned int    use_rule;
-		std::vector<sibling_iterator> factor_locations;
-		std::vector<int>              factor_moving_signs;
 
-		bool match_subproduct(sibling_iterator lhs, sibling_iterator tofind, sibling_iterator st);
-		bool satisfies_conditions();
-		bool equal_subtree(exptree::iterator i1, exptree::iterator i2);
 		iterator        conditions;
 
-		// Comparator:
-		enum match_t { node_match, subtree_match, no_match };
-		match_t compare(exptree::iterator&, exptree::iterator&, bool nobrackets=false);
-
-		// Maps for replacement of nodes (indices, patterns) and subtrees (object patterns) respectively.
-		typedef std::map<exptree, exptree, tree_exact_less_no_wildcards_mod_prel_obj>  replacement_map_t;
-		typedef std::map<nset_t::iterator, exptree::iterator, nset_it_less> subtree_replacement_map_t;
-		replacement_map_t         replacement_map;
-		subtree_replacement_map_t subtree_replacement_map;
-
-		std::vector<bool> lhs_contains_dummies, rhs_contains_dummies;
+		exptree_comparator comparator;
+		std::vector<bool>  lhs_contains_dummies, rhs_contains_dummies;
 
 		stopwatch tmr;
 		bool start_reporting_outside;

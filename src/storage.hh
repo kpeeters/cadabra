@@ -130,22 +130,13 @@ class exptree : public tree<str_node> {
 		hashval_t    calc_hash(iterator it) const;
 
 		// Quick access to arguments or argument lists for A(B)(C,D) type nodes.
-		sibling_iterator arg(iterator, unsigned int) const;
-		unsigned int     arg_size(sibling_iterator) const;
+		static sibling_iterator arg(iterator, unsigned int);
+		static unsigned int     arg_size(sibling_iterator);
+
 		multiplier_t     arg_to_num(sibling_iterator, unsigned int) const; // shorthand for numerical arguments
 
 		// Like 'child', but using index iterators instead.
 		sibling_iterator tensor_index(const iterator_base& position, unsigned int) const;
-
-//		void select(unsigned int node, unsigned int mark);
-//		void select(iterator node, unsigned int mark);
-//		void unselect(unsigned int node);
-//		void unselect(iterator node, bool deep=true);
-//		void select_all(unsigned int mark);
-//		void unselect_all(unsigned int mark);
-//		void unselect_all();
-//
-//	   void marked_nodes(std::vector<iterator>&) const;
 
 		iterator         active_expression(iterator it) const;
 		// Number of \\history nodes in an expression
@@ -203,9 +194,6 @@ class exptree : public tree<str_node> {
 		static index_iterator begin_index(iterator it);
 		static index_iterator end_index(iterator it);
 };
-
-//void serialise_exptree(std::ostream&, const exptree&, exptree::iterator);
-//void unserialise_exptree(const exptree&, exptree::iterator, std::ostream&);
 
 
 // literal_wildcards: if true, treat wildcard names as ordinary names.
@@ -307,127 +295,54 @@ class tree_exact_less_no_wildcards_mod_prel_obj {
 
 /// This operator does an exact comparison, with no symbols interpreted
 /// as wildcards or patterns.
+
 bool operator==(const exptree& first, const exptree& second);
 
-// Adjacency matrix representation of a (a subtree of) an exptree,
-// for purposes of canonicalisation.
 
-// The numerical indices denoting the factors in a product always refer
-// to the factors in the original (i.e. we keep the location of the 
-// factors fixed and only move indices around).
+/// A generic tree comparison class which will take into account index
+/// contractions and will also keep track of a replacement list for
+/// all types of cadabra wildcards.
 
-//   class unnamed_expmat {
-//   	public:
-//   		unnamed_expmat();
-//   
-//   		typedef unsigned int                             tensor_singlet;
-//   		typedef unsigned int                             index_singlet;
-//   		typedef std::pair<tensor_singlet,tensor_singlet> tensor_doublet;
-//   		typedef std::pair<index_singlet, index_singlet>  index_doublet;
-//   
-//   		unsigned int sym_mat_offset(unsigned int one, unsigned int two) const;
-//   
-//   //		% number of open indices:             4 bits
-//   //      % number of intra-tens contractions:  4 bits
-//   //      % number of inter-tens contractions:  4 bits  =  2 bytes is plenty
-//   
-//   		struct index_pointer {   // for free indices
-//   				index_singlet    ind;
-//   				nset_t::iterator nm;
-//   				bool operator==(const index_pointer&) const;
-//   		};
-//   		struct two_tens_t {		// the off-diagonal blocks
-//   				std::vector<index_doublet> contractions;
-//   				bool operator==(const two_tens_t&) const;
-//   		};
-//   		struct one_tens_t {		// the diagonal blocks
-//   				std::vector<index_doublet> contractions; // stored sorted: .first <= .second
-//   				std::vector<index_pointer> free_indices;
-//   				bool operator==(const one_tens_t&) const;
-//   		};
-//   
-//   		std::vector<two_tens_t> inter_tens;
-//   		std::vector<one_tens_t> intra_tens;
-//   		void sort();
-//   
-//   		bool operator==(const unnamed_expmat&) const;
-//   
-//   		struct less_index_doublet : public std::binary_function<index_doublet, index_doublet, bool> {
-//   				bool operator()(const index_doublet& x, const index_doublet& y) { return (x.first < y.first); };
-//   		};
-//   		struct less_index_pointer : public std::binary_function<index_pointer, index_pointer, bool> {
-//   				bool operator()(const index_pointer& x, const index_pointer& y) { return (x.ind < y.ind); };
-//   		};
-//   
-//   	private:
-//   };
-//   
-//   class expmat : public unnamed_expmat {
-//   	public:
-//   		expmat();
-//   		expmat(exptree&, exptree::iterator);
-//   
-//   		std::vector<nset_t::iterator>            tensor_names;
-//   		std::set<nset_t::iterator, nset_it_less> used_dummies; // so we use the same set again after canonicalisation
-//   
-//   	private:
-//   		struct index_loc_t {    // used to convert tree -> adj matrix
-//   				index_loc_t(tensor_singlet, index_singlet);
-//   				tensor_singlet   tn;
-//   				index_singlet    ind;
-//   		};
-//   		typedef std::multimap<nset_t::iterator, index_loc_t, nset_it_less> index_bridge_map;
-//   };
-//   
-//   // class product {
-//   // 	public:
-//   // 		std::vector<nset_t::iterator> names;
-//   // 		
-//   // };
-//   // 
-//   // class any_node {
-//   // 	public:
-//   // 		union elms {
-//   // 				str_node str;
-//   // 				product  pr;
-//   // 		} ell;
-//   // };
-//   
-//   class expgraph {
-//   	public:
-//   		expgraph(exptree&, exptree::iterator, exptree::iterator nopermute);
-//   
-//   		void          debug_output_one(const unnamed_expmat&, std::ostream&) const;
-//   		void          debug_output(std::ostream&) const;
-//   		void          canonicalise();
-//   		const unnamed_expmat& canonicalised() const;
-//   		bool          canonicalised_positive() const;
-//   		bool          is_already_canonical() const;
-//   
-//   	private:
-//   		void         create_mat(const unnamed_expmat&, unsigned int, const std::vector<unsigned int>&);
-//   		void         create_mat(const unnamed_expmat&, const std::vector<unsigned int>&, 
-//   										const std::vector<unsigned int>&);
-//   		void         tensor_permute(exptree::sibling_iterator from, exptree::sibling_iterator to,
-//   											 unsigned int currnum);
-//   		void         create_index_permutations();
-//   		void         create_tensor_permutations();
-//   		bool         tensor_structures_match(exptree::iterator i1, exptree::iterator i2) const;
-//   		void         determine_preferred_form();
-//   
-//   		exptree&                    tr;
-//   		exptree::iterator           topnode;
-//   		exptree::iterator           nopermute;
-//   		expmat                      orig;
-//   		std::vector<unnamed_expmat> equivs;
-//   		std::vector<bool>           positive_sign;
-//   		unsigned int                preferred_form;
-//   		bool                        identically_zero;
-//   
-//   		std::vector<expmat::tensor_doublet>      id_tensor_ranges;
-//   
-//   		stopwatch sw_tensor, sw_index, sw_preferred, sw_setup;
-//   };
+class exptree_comparator {
+	public:
+		enum match_t { node_match, subtree_match, no_match };
+
+		void    clear();
+
+		match_t compare(exptree::iterator&, exptree::iterator&, bool nobrackets=false);
+		bool    equal_subtree(exptree::iterator i1, exptree::iterator i2);
+		bool    match_subproduct(exptree::sibling_iterator lhs, exptree::sibling_iterator tofind, 
+										 exptree::sibling_iterator st);
+		bool    satisfies_conditions(exptree::iterator conditions);
+
+		// Maps for replacement of nodes (indices, patterns) and subtrees (object patterns) respectively.
+		typedef std::map<exptree, exptree, tree_exact_less_no_wildcards_mod_prel_obj>  replacement_map_t;
+		typedef std::map<nset_t::iterator, exptree::iterator, nset_it_less> subtree_replacement_map_t;
+
+		replacement_map_t                      replacement_map;
+		subtree_replacement_map_t              subtree_replacement_map;
+
+		std::vector<exptree::sibling_iterator> factor_locations;
+		std::vector<int>                       factor_moving_signs;
+
+		bool lhs_contains_dummies;
+};
+
+/// A set of routines to determine natural orders of factors in products.
+
+class exptree_ordering {
+	public:
+		static bool should_swap(exptree::iterator obj, int subtree_comparison) ;
+		static int  can_swap_prod_obj(exptree::iterator prod, exptree::iterator obj) ;
+		static int  can_swap_prod_prod(exptree::iterator prod1, exptree::iterator prod2) ;
+		static int  can_swap_sum_obj(exptree::iterator sum, exptree::iterator obj) ;
+		static int  can_swap_prod_sum(exptree::iterator prod, exptree::iterator sum) ;
+		static int  can_swap_sum_sum(exptree::iterator sum1, exptree::iterator sum2) ;
+		static int  can_swap(exptree::iterator one, exptree::iterator two, int subtree_comparison) ;
+		static int  can_move_adjacent(exptree::iterator prod, 
+												exptree::sibling_iterator one, exptree::sibling_iterator two) ;
+};
+
 
 #endif
 

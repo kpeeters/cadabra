@@ -41,31 +41,10 @@ namespace algebra {
 	void register_algorithms();
 };
 
-class ImplicitIndex : virtual public property {
-	public:
-		virtual std::string name() const;
-};
-
 class Matrix : public ImplicitIndex, virtual public property {
 	public: 
 		virtual ~Matrix() {};
 		virtual std::string name() const;
-};
-
-class CommutingAsProduct : virtual public property {
-	public:
-		virtual std::string name() const;
-};
-
-class CommutingAsSum : virtual public property {
-	public:
-		virtual std::string name() const;
-};
-
-class CommutingBehaviour : virtual public list_property {
-	public:
-		virtual int sign() const=0;
-		virtual match_t equals(const property_base *) const;
 };
 
 class Commuting : virtual public CommutingBehaviour {
@@ -86,11 +65,6 @@ class NonCommuting : virtual public CommutingBehaviour {
 		virtual int sign() const { return 0; }
 };
 
-
-class SelfCommutingBehaviour : virtual public property {
-	public:
-		virtual int sign() const=0;
-};
 
 class SelfCommuting : virtual public SelfCommutingBehaviour {
 	public:
@@ -242,12 +216,6 @@ class EpsilonTensor : public AntiSymmetric, virtual public property {
 		exptree metric, krdelta;
 };
 
-class SortOrder : public list_property {
-	public:
-		virtual std::string name() const;
-		virtual match_t equals(const property_base *) const;
-};
-
 class Derivative : public IndexInherit, 
 						 public Inherit<CommutingBehaviour>,
 						 public Inherit<DependsBase>,
@@ -323,16 +291,6 @@ class prodsort : public algorithm {
 		virtual void     description() const;
 		virtual bool     can_apply(iterator);
 		virtual result_t apply(iterator&);
-
-//		int  subtree_compare(iterator one, iterator two) const;
-		bool should_swap(iterator obj, int subtree_comparison) const;
-		int  can_swap_prod_obj(iterator prod, iterator obj) const;
-		int  can_swap_prod_prod(iterator prod1, iterator prod2) const;
-		int  can_swap_sum_obj(iterator sum, iterator obj) const;
-		int  can_swap_prod_sum(iterator prod, iterator sum) const;
-		int  can_swap_sum_sum(iterator sum1, iterator sum2) const;
-		int  can_swap(iterator one, iterator two, int subtree_comparison) const;
-		int  can_move_adjacent(iterator prod, sibling_iterator one, sibling_iterator two) const;
 
 	private:
 		bool ignore_numbers_;

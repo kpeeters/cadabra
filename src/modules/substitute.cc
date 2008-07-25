@@ -23,7 +23,6 @@
 
 #include <sstream>
 #include "substitute.hh"
-#include <pcrecpp.h>
 #include "algebra.hh"
 #include "dummies.hh"
 
@@ -117,76 +116,14 @@ void substitute::description() const
 	}
 
 
-// Find a subproduct in a product. The 'lhs' iterator points to the product which
-// we want to find, the 'tofind' iterator to the current factor which we are looking
-// for. The product in which to search is pointed to by 'st'.
-//
-// Once 'tofind' is found, this routine calls itself to find the next factor in
-// 'lhs'. If the next factor cannot be found, we backtrack and try to find the
-// previous factor again (it may have appeared multiple times).
-//
-bool substitute::match_subproduct(sibling_iterator lhs, sibling_iterator tofind, sibling_iterator st)
-	{
-	replacement_map_t         backup_replacements(replacement_map);
-	subtree_replacement_map_t backup_subtree_replacements(subtree_replacement_map);
-
-	sibling_iterator start=tr.begin(st);
-	while(start!=tr.end(st)) {
-		if(std::find(factor_locations.begin(), factor_locations.end(), start)==factor_locations.end()) {  
-//			txtout << tofind.node << "number = " << backup_replacements.size() << std::endl;
-//			txtout << *tofind->name << " vs " << *start->name << std::endl;
-			if(equal_subtree(tofind, start)) { // found factor
-				// If a previous factor was found, verify that the factor found now can be
-				// moved next to the previous factor (nontrivial if factors do not commute).
-				int sign=1;
-				if(factor_locations.size()>0) {
-					sign=prodsort_.can_move_adjacent(st, factor_locations.back(), start);
-					}
-				if(sign==0) { // object found, but we cannot move it in the right order
-					replacement_map=backup_replacements;
-					subtree_replacement_map=backup_subtree_replacements;
-					}
-				else {
-					factor_locations.push_back(start);
-					factor_moving_signs.push_back(sign);
-					
-					sibling_iterator nxt=tofind; 
-					++nxt;
-					if(nxt!=tr.end(lhs)) {
-						bool res=match_subproduct(lhs, nxt, st);
-						if(res) return true;
-						else {
-//						txtout << tofind.node << "found factor useless " << start.node << std::endl;
-							factor_locations.pop_back();
-							factor_moving_signs.pop_back();
-							replacement_map=backup_replacements;
-							subtree_replacement_map=backup_subtree_replacements;
-							}
-						}
-					else return true;
-					}
-				}
-			else {
-//				txtout << tofind.node << "does not match" << std::endl;
-				replacement_map=backup_replacements;
-				subtree_replacement_map=backup_subtree_replacements;
-				}
-			}
-		++start;
-		}
-	return false;
-	}
-
 bool substitute::can_apply(iterator st)
 	{
 	tmr.start();
 	sibling_iterator subslist=args_begin();
 	for(unsigned int i=0; i<tr.arg_size(subslist); ++i) {
 		use_rule=i;
-		replacement_map.clear();
-		subtree_replacement_map.clear();
-		factor_locations.clear();
-		factor_moving_signs.clear();
+
+		comparator.clear();
 
 		iterator arrow=tr.arg(subslist, i);
 		iterator lhs=tr.begin(arrow);
@@ -202,228 +139,14 @@ bool substitute::can_apply(iterator st)
 			continue;
 
 		bool ret=false;
-		if(*lhs->name=="\\prod") ret=match_subproduct(lhs, tr.begin(lhs), st);
-		else                     ret=equal_subtree(lhs, st);
+		if(*lhs->name=="\\prod") ret=comparator.match_subproduct(lhs, tr.begin(lhs), st);
+		else                     ret=comparator.equal_subtree(lhs, st);
 
 		if(ret) 
 			if(satisfies_conditions())
 				return true;
 		}
  	return false;
-	}
-
-substitute::match_t substitute::compare(exptree::iterator& one, exptree::iterator& two, bool nobrackets) 
-	{
-	// nobrackets also implies 'no multiplier', i.e. 'toplevel'.
-
-	// one is the substitute pattern, two the expression under consideration
-	if(one->fl.bracket==two->fl.bracket || nobrackets)
-		if(one->fl.parent_rel==two->fl.parent_rel) {
-			bool pattern=false;
-			bool objectpattern=false;
-			bool implicit_pattern=false;
-			bool is_index=false;
-			if(one->fl.bracket==str_node::b_none && one->is_index() )
-				is_index=true;
-			if(one->is_name_wildcard())
-				pattern=true;
-			else if(one->is_object_wildcard())
-				objectpattern=true;
-			else if(is_index && one->is_integer()==false) 
-				implicit_pattern=true;
-
-			if(pattern || (implicit_pattern && two->is_integer()==false)) { // never match integers to implicit patterns!
-				if(lhs_contains_dummies[use_rule]) {
-					replacement_map_t::iterator loc=replacement_map.find(one);
-					if(loc!=replacement_map.end()) {
-						// If this is an index, try to match the whole index.
-						// We want to make sure that a pattern k1_a k2_a does not match an expression k1_c k2_d.
-						if(is_index) {
-							if(subtree_exact_equal((*loc).second.begin(), two, 0)) return subtree_match;
-							else                                                   return no_match;
-							}
-						else {
-							if((*loc).second.begin()->name == two->name)        return node_match;
-							else                                                return no_match;
-							}
-						}
-					else {
-						// check that the index types agree (if known, otherwise assume they match)
-						const Indices *t1=properties::get<Indices>(one);
-						const Indices *t2=properties::get<Indices>(two);
-						if( (t1 || t2) && implicit_pattern ) {
-							if(t1 && t2) {
-								if((*t1).set_name != (*t2).set_name)
-									return no_match;
-								}
-							else return no_match;
-							 }
-						replacement_map[one]=two;
-						// if this is a pattern and the pattern has a non-zero number of children,
-						// also add the pattern without the children
-						if(tr.number_of_children(one)!=0) {
-							 exptree tmp1(one), tmp2(two);
-							 tmp1.erase_children(tmp1.begin());
-							 tmp2.erase_children(tmp2.begin());
-							 replacement_map[tmp1]=tmp2;
-							 }
-						}
-					}
-				else {
-					const Indices *t1=properties::get<Indices>(one);
-					const Indices *t2=properties::get<Indices>(two);
-					if( (t1 || t2) && implicit_pattern ) {
-						if(t1 && t2) {
-							if((*t1).set_name != (*t2).set_name)
-								return no_match;
-							}
-						else return no_match;
-						}
-					replacement_map[one]=two;
-					// if this is a pattern and the pattern has a non-zero number of children,
-					// also add the pattern without the children
-					if(tr.number_of_children(one)!=0) {
-						 exptree tmp1(one), tmp2(two);
-						 tmp1.erase_children(tmp1.begin());
-						 tmp2.erase_children(tmp2.begin());
-						 replacement_map[tmp1]=tmp2;
-						 }
-					}
-				if(is_index) return subtree_match;
-				else         return node_match;
-				}
-			else if(objectpattern) {
-				subtree_replacement_map_t::iterator loc=subtree_replacement_map.find(one->name);
-				if(loc!=subtree_replacement_map.end()) {
-					if(tr.equal_subtree((*loc).second,two))
-						return subtree_match;
-					else return no_match;
-					}
-				else subtree_replacement_map[one->name]=two;
-
-				return subtree_match;
-				}
-			else { // object is not dummy
-				 if(one->is_rational() && two->is_rational() && one->multiplier!=two->multiplier) return no_match;
-				 if(one->name==two->name) {
-					  if(nobrackets || (one->multiplier == two->multiplier) )
-							return node_match;
-					  }
-				}
-			}
-	return no_match;
-	}
-
-bool substitute::equal_subtree(exptree::iterator i1, exptree::iterator i2)
-	{
-	sibling_iterator i1end(i1);
-	sibling_iterator i2end(i2);
-	++i1end;
-	++i2end;
-
-	bool first_call=true;
-	while(i1!=i1end && i2!=i2end) {
-		match_t mm=compare(i1,i2,first_call);
-		first_call=false;
-		switch(mm) {
-			case no_match:
-				return false;
-			case node_match:
-				if(tr.number_of_children(i1)!=tr.number_of_children(i2)) 
-					return false;
-				break;
-			case subtree_match:
-				i1.skip_children();
-				i2.skip_children();
-				break;
-			}
-		++i1;
-		++i2;
-		}
-	return true;
-	}
-
-bool substitute::satisfies_conditions() 
-	{
-	if(conditions==tr.end()) return true;
-	for(unsigned int i=0; i<tr.arg_size(conditions); ++i) {
-		iterator cond=tr.arg(conditions, i);
-		if(*cond->name=="\\unequals") {
-			sibling_iterator lhs=tr.begin(cond);
-			sibling_iterator rhs=lhs;
-			++rhs;
-			// If we have a match, all indices have replacement rules.
-			if(tree_exact_equal(replacement_map[exptree(lhs)], replacement_map[exptree(rhs)])) {
-//				txtout << *lhs->name  << " = " << *rhs->name << std::endl;
-				return false;
-				}
-			}
-		else if(*cond->name=="\\indexpairs") {
-			int countpairs=0;
-			replacement_map_t::const_iterator it=replacement_map.begin(),it2;
-			while(it!=replacement_map.end()) {
-				it2=it;
-				++it2;
-				while(it2!=replacement_map.end()) {
-					if(tree_exact_equal(it->second, it2->second)) {
-						++countpairs;
-						break;
-						}
-					++it2;
-					}
-				++it;
-				}
-//			txtout << countpairs << " pairs" << std::endl;
-			if(countpairs!=*(tr.begin(cond)->multiplier))
-				return false;
-			}
-		else if(*cond->name=="\\regex") {
-//			txtout << "regex matching..." << std::endl;
-			sibling_iterator lhs=tr.begin(cond);
-			sibling_iterator rhs=lhs;
-			++rhs;
-			// If we have a match, all indices have replacement rules.
-			std::string pat=(*rhs->name).substr(1,(*rhs->name).size()-2);
-//			txtout << "matching " << *comp.replacement_map[lhs->name]
-//					 << " with pattern " << pat << std::endl;
-			pcrecpp::RE reg(pat);
-			if(reg.FullMatch(*(replacement_map[exptree(lhs)].begin()->name))==false)
-				return false;
-			}
-		else if(*cond->name=="\\hasprop") {
-			sibling_iterator lhs=tr.begin(cond);
-			sibling_iterator rhs=lhs;
-			++rhs;
-			properties::registered_property_map_t::iterator pit=
-				properties::registered_properties.find(*rhs->name);
-			if(pit==properties::registered_properties.end()) {
-				txtout << "Property \"" << *rhs->name << "\" not registered." << std::endl;
-				return false;
-				}
-			const property_base *aprop=pit->second();
-
-			subtree_replacement_map_t::iterator subfind=subtree_replacement_map.find(lhs->name);
-			replacement_map_t::iterator         patfind=replacement_map.find(exptree(lhs));
-
-			if(subfind==subtree_replacement_map.end() && patfind==replacement_map.end()) {
-				 txtout << "Pattern " << *lhs->name << " in \\hasprop did not occur in match." << std::endl;
-				 delete aprop;
-				 return false;
-				 }
-			
-			bool ret=false;
-			if(subfind==subtree_replacement_map.end()) 
-				 ret=properties::has(aprop, (*patfind).second.begin());
-			else
-				 ret=properties::has(aprop, (*subfind).second);
-			delete aprop;
-			return ret;
-			}
-		else {
-			txtout << "substitute: condition involving " << *cond->name << " not understood." << std::endl;
-			}
-		}
-	return true;
 	}
 
 algorithm::result_t substitute::apply(iterator& st)
