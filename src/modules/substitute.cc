@@ -138,13 +138,18 @@ bool substitute::can_apply(iterator st)
 		if(lhs->name!=st->name && lhs->name->size()>0) 
 			continue;
 
-		bool ret=false;
+		exptree_comparator::match_t ret;
+		comparator.lhs_contains_dummies=lhs_contains_dummies[i];
 		if(*lhs->name=="\\prod") ret=comparator.match_subproduct(lhs, tr.begin(lhs), st);
 		else                     ret=comparator.equal_subtree(lhs, st);
 
-		if(ret) 
-			if(satisfies_conditions())
+		if(ret == exptree_comparator::subtree_match) {
+			if(conditions==tr.end()) return true;
+			std::string error;
+			if(comparator.satisfies_conditions(conditions, error))
 				return true;
+			else txtout << error;
+			}
 		}
  	return false;
 	}
@@ -194,21 +199,21 @@ algorithm::result_t substitute::apply(iterator& st)
 	// Keep track of all indices which _have_ to stay what they are, in ind_forced.
 	// Keep track of insertion points of subtrees.
 	iterator it=repl.begin();
-	replacement_map_t::iterator loc;
-	subtree_replacement_map_t::iterator sloc;
+	exptree_comparator::replacement_map_t::iterator loc;
+	exptree_comparator::subtree_replacement_map_t::iterator sloc;
 	std::vector<iterator> subtree_insertion_points;
 	while(it!=repl.end()) { 
 //		debugout << "attempting to find " << *it->name << std::endl;
 		bool is_stripped=false;
-		loc=replacement_map.find(exptree(it));
-		if(loc==replacement_map.end() && it->is_name_wildcard() && tr.number_of_children(it)!=0) {
+		loc=comparator.replacement_map.find(exptree(it));
+		if(loc==comparator.replacement_map.end() && it->is_name_wildcard() && tr.number_of_children(it)!=0) {
 			 exptree tmp(it);
 			 tmp.erase_children(tmp.begin());
-			 loc=replacement_map.find(tmp);
+			 loc=comparator.replacement_map.find(tmp);
 			 is_stripped=true;
 			 }
 
-		if(loc!=replacement_map.end()) { // name wildcards
+		if(loc!=comparator.replacement_map.end()) { // name wildcards
 //			debugout << "rule : " << *((*loc).first.begin()->name) << " -> " << std::endl;
 //			debugout << "going to replace " << *it->name << " with " << *((*loc).second.begin()->name) << std::endl;
 
@@ -233,7 +238,8 @@ algorithm::result_t substitute::apply(iterator& st)
 			++it;
 
 			}
-		else if( (sloc=subtree_replacement_map.find(it->name))!=subtree_replacement_map.end()) { // object wildcards
+		else if( (sloc=comparator.subtree_replacement_map.find(it->name)) 
+					!=comparator.subtree_replacement_map.end()) { // object wildcards
 			multiplier_t tmpmult=*it->multiplier; // remember target multiplier
 			iterator tmp= tr.insert_subtree(it, (*sloc).second);
 			tmp->fl.bracket=it->fl.bracket;
@@ -289,10 +295,11 @@ algorithm::result_t substitute::apply(iterator& st)
 	// dummy indices in the replacement which clash with indices in other factors
 	// in the product.
 	if(*lhs->name=="\\prod") {
-		for(unsigned int i=1; i<factor_locations.size(); ++i)
-			tr.erase(factor_locations[i]);
+		for(unsigned int i=1; i<comparator.factor_locations.size(); ++i)
+			tr.erase(comparator.factor_locations[i]);
 //		if(*rhs->name=="\\prod") {
-			iterator newtr=tr.move_ontop(iterator(factor_locations[0]),repl.begin()); // no need to keep repl
+         // no need to keep repl
+			iterator newtr=tr.move_ontop(iterator(comparator.factor_locations[0]),repl.begin()); 
 			multiply(st->multiplier, *newtr->multiplier);
 			one(newtr->multiplier);
 			pushup_multiplier(st);
@@ -337,8 +344,8 @@ algorithm::result_t substitute::apply(iterator& st)
 	// The replacement is done now.  What is left is to take into
 	// account any signs caused by moving factors through each other.
 	int totsign=1;
-	for(unsigned int i=0; i<factor_moving_signs.size(); ++i)
-		totsign*=factor_moving_signs[i];
+	for(unsigned int i=0; i<comparator.factor_moving_signs.size(); ++i)
+		totsign*=comparator.factor_moving_signs[i];
 	multiply(st->multiplier, totsign);
 
 	// Get rid of numerical '1' factors inside products (this will not clean up

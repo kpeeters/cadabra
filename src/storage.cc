@@ -1257,7 +1257,7 @@ void exptree_comparator::clear()
 	factor_moving_signs.clear();
 	}
 
-bool exptree_comparator::equal_subtree(exptree::iterator i1, exptree::iterator i2)
+exptree_comparator::match_t exptree_comparator::equal_subtree(exptree::iterator i1, exptree::iterator i2)
 	{
 	exptree::sibling_iterator i1end(i1);
 	exptree::sibling_iterator i2end(i2);
@@ -1269,12 +1269,16 @@ bool exptree_comparator::equal_subtree(exptree::iterator i1, exptree::iterator i
 		match_t mm=compare(i1,i2,first_call);
 		first_call=false;
 		switch(mm) {
-			case no_match:
-				return false;
-			case node_match:
-				if(exptree::number_of_children(i1)!=exptree::number_of_children(i2)) 
-					return false;
-				break;
+			case no_match_less:
+			case no_match_greater:
+				return mm;
+			case node_match: {
+				size_t num1=exptree::number_of_children(i1);
+				size_t num2=exptree::number_of_children(i2);
+				if(num1 == num2)     return subtree_match;
+				else if(num1 < num2) return no_match_less;
+				else                 return no_match_greater;
+				}
 			case subtree_match:
 				i1.skip_children();
 				i2.skip_children();
@@ -1283,10 +1287,12 @@ bool exptree_comparator::equal_subtree(exptree::iterator i1, exptree::iterator i
 		++i1;
 		++i2;
 		}
-	return true;
+
+	return subtree_match;
 	}
 
-exptree_comparator::match_t exptree_comparator::compare(exptree::iterator& one, exptree::iterator& two, 
+exptree_comparator::match_t exptree_comparator::compare(const exptree::iterator& one, 
+																		  const exptree::iterator& two, 
 																		  bool nobrackets) 
 	{
 	// nobrackets also implies 'no multiplier', i.e. 'toplevel'.
@@ -1308,18 +1314,23 @@ exptree_comparator::match_t exptree_comparator::compare(exptree::iterator& one, 
 				implicit_pattern=true;
 
 			if(pattern || (implicit_pattern && two->is_integer()==false)) { // never match integers to implicit patterns!
+					std::cerr << "$ " << *one->name << ", " << *two->name << std::endl << std::flush;
 				if(lhs_contains_dummies) {
+					std::cerr << "* " << *one->name << ", " << *two->name << std::endl << std::flush;
 					replacement_map_t::iterator loc=replacement_map.find(one);
 					if(loc!=replacement_map.end()) {
 						// If this is an index, try to match the whole index.
 						// We want to make sure that a pattern k1_a k2_a does not match an expression k1_c k2_d.
 						if(is_index) {
-							if(subtree_exact_equal((*loc).second.begin(), two, 0)) return subtree_match;
-							else                                                   return no_match;
+							int cmp=subtree_compare((*loc).second.begin(), two, 0);
+							if(cmp==0)      return subtree_match;
+							else if(cmp>0)  return no_match_less;
+							else            return no_match_greater;
 							}
 						else {
 							if((*loc).second.begin()->name == two->name)        return node_match;
-							else                                                return no_match;
+							else if(*(*loc).second.begin()->name < *two->name)  return no_match_less;
+							else                                                return no_match_greater;
 							}
 						}
 					else {
@@ -1328,11 +1339,16 @@ exptree_comparator::match_t exptree_comparator::compare(exptree::iterator& one, 
 						const Indices *t2=properties::get<Indices>(two);
 						if( (t1 || t2) && implicit_pattern ) {
 							if(t1 && t2) {
-								if((*t1).set_name != (*t2).set_name)
-									return no_match;
+								if((*t1).set_name != (*t2).set_name) {
+									if((*t1).set_name < (*t2).set_name) return no_match_less;
+									else                                return no_match_greater;
+									}
 								}
-							else return no_match;
-							 }
+							else {
+								if(t1) return no_match_less;
+								else   return no_match_greater;
+								}
+							}
 						replacement_map[one]=two;
 						// if this is a pattern and the pattern has a non-zero number of children,
 						// also add the pattern without the children
@@ -1344,16 +1360,23 @@ exptree_comparator::match_t exptree_comparator::compare(exptree::iterator& one, 
 							 }
 						}
 					}
-				else {
+				else { // lhs_contains_dummies==false
+					std::cerr << "** " << *one->name << ", " << *two->name << std::endl << std::flush;
 					const Indices *t1=properties::get<Indices>(one);
 					const Indices *t2=properties::get<Indices>(two);
 					if( (t1 || t2) && implicit_pattern ) {
 						if(t1 && t2) {
-							if((*t1).set_name != (*t2).set_name)
-								return no_match;
+							if((*t1).set_name != (*t2).set_name) {
+								if((*t1).set_name < (*t2).set_name) return no_match_less;
+								else                                return no_match_greater;
+								}
 							}
-						else return no_match;
+						else {
+							if(t1) return no_match_less;
+							else   return no_match_greater;
+							}
 						}
+					std::cerr << "replacing " << *one->name << " -> " << *two->name << std::endl;
 					replacement_map[one]=two;
 					// if this is a pattern and the pattern has a non-zero number of children,
 					// also add the pattern without the children
@@ -1370,23 +1393,29 @@ exptree_comparator::match_t exptree_comparator::compare(exptree::iterator& one, 
 			else if(objectpattern) {
 				subtree_replacement_map_t::iterator loc=subtree_replacement_map.find(one->name);
 				if(loc!=subtree_replacement_map.end()) {
-					if(equal_subtree((*loc).second,two))
-						return subtree_match;
-					else return no_match;
+					return equal_subtree((*loc).second,two);
+//						return subtree_match;
+//					else return no_match;
 					}
 				else subtree_replacement_map[one->name]=two;
 
 				return subtree_match;
 				}
 			else { // object is not dummy
-				 if(one->is_rational() && two->is_rational() && one->multiplier!=two->multiplier) return no_match;
-				 if(one->name==two->name) {
-					  if(nobrackets || (one->multiplier == two->multiplier) )
-							return node_match;
-					  }
+				if(one->is_rational() && two->is_rational() && one->multiplier!=two->multiplier) {
+					if(*one->multiplier < *two->multiplier) return no_match_less;
+					else                                    return no_match_greater;
+					}
+				if(one->name==two->name) {
+					if(nobrackets || (one->multiplier == two->multiplier) ) {
+					std::cerr << "*** " << *one->name << ", " << *two->name << std::endl << std::flush;
+						return node_match;
+						}
+					}
 				}
 			}
-	return no_match;
+
+	return no_match_less; // FIXME: not entirely correct!
 	}
 
 
@@ -1398,9 +1427,9 @@ exptree_comparator::match_t exptree_comparator::compare(exptree::iterator& one, 
 // 'lhs'. If the next factor cannot be found, we backtrack and try to find the
 // previous factor again (it may have appeared multiple times).
 //
-bool exptree_comparator::match_subproduct(exptree::sibling_iterator lhs, 
-														exptree::sibling_iterator tofind, 
-														exptree::sibling_iterator st)
+exptree_comparator::match_t exptree_comparator::match_subproduct(exptree::sibling_iterator lhs, 
+																					  exptree::sibling_iterator tofind, 
+																					  exptree::sibling_iterator st)
 	{
 	replacement_map_t         backup_replacements(replacement_map);
 	subtree_replacement_map_t backup_subtree_replacements(subtree_replacement_map);
@@ -1409,7 +1438,7 @@ bool exptree_comparator::match_subproduct(exptree::sibling_iterator lhs,
 	while(start!=st.end()) {
 		if(std::find(factor_locations.begin(), factor_locations.end(), start)==factor_locations.end()) {  
 //			txtout << tofind.node << "number = " << backup_replacements.size() << std::endl;
-//			txtout << *tofind->name << " vs " << *start->name << std::endl;
+			std::cerr << *tofind->name << " vs " << *start->name << std::endl;
 			if(equal_subtree(tofind, start)) { // found factor
 				// If a previous factor was found, verify that the factor found now can be
 				// moved next to the previous factor (nontrivial if factors do not commute).
@@ -1428,8 +1457,8 @@ bool exptree_comparator::match_subproduct(exptree::sibling_iterator lhs,
 					exptree::sibling_iterator nxt=tofind; 
 					++nxt;
 					if(nxt!=lhs.end()) {
-						bool res=match_subproduct(lhs, nxt, st);
-						if(res) return true;
+						match_t res=match_subproduct(lhs, nxt, st);
+						if(res==subtree_match) return res;
 						else {
 //						txtout << tofind.node << "found factor useless " << start.node << std::endl;
 							factor_locations.pop_back();
@@ -1438,7 +1467,7 @@ bool exptree_comparator::match_subproduct(exptree::sibling_iterator lhs,
 							subtree_replacement_map=backup_subtree_replacements;
 							}
 						}
-					else return true;
+					else return subtree_match;
 					}
 				}
 			else {
@@ -1449,7 +1478,7 @@ bool exptree_comparator::match_subproduct(exptree::sibling_iterator lhs,
 			}
 		++start;
 		}
-	return false;
+	return no_match_less; // FIXME not entirely true
 	}
 
 
@@ -1687,7 +1716,7 @@ int exptree_ordering::can_swap(exptree::iterator one, exptree::iterator two, int
 	return 1; // default: commuting.
 	}
 
-bool exptree_comparator::satisfies_conditions(exptree::iterator conditions) 
+bool exptree_comparator::satisfies_conditions(exptree::iterator conditions, std::string& error) 
 	{
 	for(unsigned int i=0; i<exptree::arg_size(conditions); ++i) {
 		exptree::iterator cond=exptree::arg(conditions, i);
@@ -1722,7 +1751,7 @@ bool exptree_comparator::satisfies_conditions(exptree::iterator conditions)
 			}
 		else if(*cond->name=="\\regex") {
 //			txtout << "regex matching..." << std::endl;
-			exptree::sibling_iterator lhs=prod.begin();
+			exptree::sibling_iterator lhs=cond.begin();
 			exptree::sibling_iterator rhs=lhs;
 			++rhs;
 			// If we have a match, all indices have replacement rules.
@@ -1740,7 +1769,9 @@ bool exptree_comparator::satisfies_conditions(exptree::iterator conditions)
 			properties::registered_property_map_t::iterator pit=
 				properties::registered_properties.find(*rhs->name);
 			if(pit==properties::registered_properties.end()) {
-				txtout << "Property \"" << *rhs->name << "\" not registered." << std::endl;
+				std::ostringstream str;
+				str << "Property \"" << *rhs->name << "\" not registered." << std::endl;
+				error=str.str();
 				return false;
 				}
 			const property_base *aprop=pit->second();
@@ -1749,10 +1780,12 @@ bool exptree_comparator::satisfies_conditions(exptree::iterator conditions)
 			replacement_map_t::iterator         patfind=replacement_map.find(exptree(lhs));
 
 			if(subfind==subtree_replacement_map.end() && patfind==replacement_map.end()) {
-				 txtout << "Pattern " << *lhs->name << " in \\hasprop did not occur in match." << std::endl;
-				 delete aprop;
-				 return false;
-				 }
+				std::ostringstream str;
+				str << "Pattern " << *lhs->name << " in \\hasprop did not occur in match." << std::endl;
+				delete aprop;
+				error=str.str();
+				return false;
+				}
 			
 			bool ret=false;
 			if(subfind==subtree_replacement_map.end()) 
@@ -1763,9 +1796,41 @@ bool exptree_comparator::satisfies_conditions(exptree::iterator conditions)
 			return ret;
 			}
 		else {
-			txtout << "substitute: condition involving " << *cond->name << " not understood." << std::endl;
+			std::ostringstream str;
+			str << "substitute: condition involving " << *cond->name << " not understood." << std::endl;
+			error=str.str();
+			return false;
 			}
 		}
 	return true;
 	}
 
+bool exptree_is_equivalent::operator()(const exptree& one, const exptree& two)
+	{
+	exptree_comparator comparator;
+	
+	comparator.lhs_contains_dummies=true;
+	exptree_comparator::match_t ret;
+	if(*one.begin()->name=="\\prod") 
+		ret=comparator.match_subproduct(one.begin(), one.begin().begin(), two.begin());
+	else                             
+		ret=comparator.equal_subtree(one.begin(), two.begin());
+
+	if(ret==exptree_comparator::subtree_match) return true;
+	else                                       return false;
+	}
+
+bool exptree_is_less::operator()(const exptree& one, const exptree& two)
+	{
+	exptree_comparator comparator;
+	
+	comparator.lhs_contains_dummies=true;
+	exptree_comparator::match_t ret;
+	if(*one.begin()->name=="\\prod") 
+		ret=comparator.match_subproduct(one.begin(), one.begin().begin(), two.begin());
+	else                             
+		ret=comparator.equal_subtree(one.begin(), two.begin());
+
+	if(ret==exptree_comparator::no_match_less) return true;
+	else                                       return false;
+	}

@@ -391,7 +391,6 @@ class collect_factors : public algorithm {
 		virtual bool     can_apply(iterator);
 		virtual result_t apply(iterator&);
 	private:
-//		static bool compare_without_exponent(const str_node&, const str_node&);
 		void fill_hash_map(iterator);
 
 		typedef std::multimap<hashval_t, sibling_iterator> factor_hash_t;
@@ -409,7 +408,6 @@ class collect_terms : public algorithm {
 		virtual result_t apply(iterator&);
 		virtual result_t apply(sibling_iterator&, sibling_iterator&);
 
-//		bool  check_index_consistency(iterator);
 		void  fill_hash_map(iterator);
 		void  fill_hash_map(sibling_iterator, sibling_iterator);
 	private:

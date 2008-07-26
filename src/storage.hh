@@ -305,15 +305,16 @@ bool operator==(const exptree& first, const exptree& second);
 
 class exptree_comparator {
 	public:
-		enum match_t { node_match, subtree_match, no_match };
+		enum match_t { node_match, subtree_match, no_match_less, no_match_greater };
 
 		void    clear();
 
-		match_t compare(exptree::iterator&, exptree::iterator&, bool nobrackets=false);
-		bool    equal_subtree(exptree::iterator i1, exptree::iterator i2);
-		bool    match_subproduct(exptree::sibling_iterator lhs, exptree::sibling_iterator tofind, 
+		// Subtree and subproduct match; return subtree_match or one of the no_match results.
+		// You need to fill lhs_contains_dummies before calling!
+		match_t equal_subtree(exptree::iterator i1, exptree::iterator i2);
+		match_t match_subproduct(exptree::sibling_iterator lhs, exptree::sibling_iterator tofind, 
 										 exptree::sibling_iterator st);
-		bool    satisfies_conditions(exptree::iterator conditions);
+		bool    satisfies_conditions(exptree::iterator conditions, std::string& error);
 
 		// Maps for replacement of nodes (indices, patterns) and subtrees (object patterns) respectively.
 		typedef std::map<exptree, exptree, tree_exact_less_no_wildcards_mod_prel_obj>  replacement_map_t;
@@ -326,7 +327,21 @@ class exptree_comparator {
 		std::vector<int>                       factor_moving_signs;
 
 		bool lhs_contains_dummies;
+
+		// Internal entry point. 
+		match_t compare(const exptree::iterator&, const exptree::iterator&, bool nobrackets=false);
 };
+
+class exptree_is_equivalent {
+	public:
+		bool operator()(const exptree&, const exptree&);
+};
+
+class exptree_is_less {
+	public:
+		bool operator()(const exptree&, const exptree&);
+};
+
 
 /// A set of routines to determine natural orders of factors in products.
 

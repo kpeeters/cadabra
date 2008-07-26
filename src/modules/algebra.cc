@@ -1948,7 +1948,7 @@ bool factor_out::can_apply(iterator st)
 
 algorithm::result_t factor_out::apply(iterator& it)
 	{
-	typedef std::multimap<exptree, sibling_iterator, tree_less_obj> collector_t;
+	typedef std::multimap<exptree, sibling_iterator, exptree_is_less> collector_t;
 	collector_t collector;
 
 	// Find all terms in the sum which contain one or more factors of 
@@ -1968,7 +1968,8 @@ algorithm::result_t factor_out::apply(iterator& it)
 					bool firstfactor=true;
 					bool foundfactor=false;
 					while(psi!=tr.end(st)) {
-						 if(subtree_equal(psi, to_factor_out[tfo].begin(), -2, true, 0))  {
+						exptree_comparator comparator;
+						if(comparator.compare(static_cast<iterator>(psi), to_factor_out[tfo].begin()))  {
 							  powers.append_child(powers.begin(), static_cast<iterator>(psi));
 							  psi=tr.erase(psi);
 							  foundfactor=true;
@@ -1995,7 +1996,8 @@ algorithm::result_t factor_out::apply(iterator& it)
 						 }
 					}
 			  else {
-					if(subtree_equal(st, to_factor_out[tfo].begin(), -2, true, 0)) {
+				   exptree_comparator comparator;
+					if(comparator.compare(static_cast<iterator>(st), to_factor_out[tfo].begin())) {
 						 iterator tmp=powers.append_child(powers.begin(), static_cast<iterator>(st));
 						 one(tmp->multiplier);
 						 rset_t::iterator mtmp=st->multiplier;
