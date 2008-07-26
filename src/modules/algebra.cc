@@ -1969,7 +1969,8 @@ algorithm::result_t factor_out::apply(iterator& it)
 					bool foundfactor=false;
 					while(psi!=tr.end(st)) {
 						exptree_comparator comparator;
-						if(comparator.compare(static_cast<iterator>(psi), to_factor_out[tfo].begin()))  {
+						if(comparator.equal_subtree(static_cast<iterator>(psi), 
+													 to_factor_out[tfo].begin()) ==exptree_comparator::subtree_match)  {
 							  powers.append_child(powers.begin(), static_cast<iterator>(psi));
 							  psi=tr.erase(psi);
 							  foundfactor=true;
@@ -1997,7 +1998,8 @@ algorithm::result_t factor_out::apply(iterator& it)
 					}
 			  else {
 				   exptree_comparator comparator;
-					if(comparator.compare(static_cast<iterator>(st), to_factor_out[tfo].begin())) {
+					if(comparator.equal_subtree(static_cast<iterator>(st), 
+														 to_factor_out[tfo].begin())==exptree_comparator::subtree_match) {
 						 iterator tmp=powers.append_child(powers.begin(), static_cast<iterator>(st));
 						 one(tmp->multiplier);
 						 rset_t::iterator mtmp=st->multiplier;

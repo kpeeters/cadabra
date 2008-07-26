@@ -1275,9 +1275,9 @@ exptree_comparator::match_t exptree_comparator::equal_subtree(exptree::iterator 
 			case node_match: {
 				size_t num1=exptree::number_of_children(i1);
 				size_t num2=exptree::number_of_children(i2);
-				if(num1 == num2)     return subtree_match;
-				else if(num1 < num2) return no_match_less;
-				else                 return no_match_greater;
+				if(num1 < num2)      return no_match_less;
+				else if(num1 > num2) return no_match_greater;
+				break;
 				}
 			case subtree_match:
 				i1.skip_children();
@@ -1314,9 +1314,7 @@ exptree_comparator::match_t exptree_comparator::compare(const exptree::iterator&
 				implicit_pattern=true;
 
 			if(pattern || (implicit_pattern && two->is_integer()==false)) { // never match integers to implicit patterns!
-					std::cerr << "$ " << *one->name << ", " << *two->name << std::endl << std::flush;
 				if(lhs_contains_dummies) {
-					std::cerr << "* " << *one->name << ", " << *two->name << std::endl << std::flush;
 					replacement_map_t::iterator loc=replacement_map.find(one);
 					if(loc!=replacement_map.end()) {
 						// If this is an index, try to match the whole index.
@@ -1361,7 +1359,6 @@ exptree_comparator::match_t exptree_comparator::compare(const exptree::iterator&
 						}
 					}
 				else { // lhs_contains_dummies==false
-					std::cerr << "** " << *one->name << ", " << *two->name << std::endl << std::flush;
 					const Indices *t1=properties::get<Indices>(one);
 					const Indices *t2=properties::get<Indices>(two);
 					if( (t1 || t2) && implicit_pattern ) {
@@ -1376,7 +1373,6 @@ exptree_comparator::match_t exptree_comparator::compare(const exptree::iterator&
 							else   return no_match_greater;
 							}
 						}
-					std::cerr << "replacing " << *one->name << " -> " << *two->name << std::endl;
 					replacement_map[one]=two;
 					// if this is a pattern and the pattern has a non-zero number of children,
 					// also add the pattern without the children
@@ -1408,7 +1404,6 @@ exptree_comparator::match_t exptree_comparator::compare(const exptree::iterator&
 					}
 				if(one->name==two->name) {
 					if(nobrackets || (one->multiplier == two->multiplier) ) {
-					std::cerr << "*** " << *one->name << ", " << *two->name << std::endl << std::flush;
 						return node_match;
 						}
 					}
@@ -1438,8 +1433,7 @@ exptree_comparator::match_t exptree_comparator::match_subproduct(exptree::siblin
 	while(start!=st.end()) {
 		if(std::find(factor_locations.begin(), factor_locations.end(), start)==factor_locations.end()) {  
 //			txtout << tofind.node << "number = " << backup_replacements.size() << std::endl;
-			std::cerr << *tofind->name << " vs " << *start->name << std::endl;
-			if(equal_subtree(tofind, start)) { // found factor
+			if(equal_subtree(tofind, start)==subtree_match) { // found factor
 				// If a previous factor was found, verify that the factor found now can be
 				// moved next to the previous factor (nontrivial if factors do not commute).
 				int sign=1;

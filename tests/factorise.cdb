@@ -27,6 +27,11 @@ tst4:= a ( b + c e + d - 1 ) - @(obj4);
 @assert(tst4);
 
 @reset.
+obj4b:= c - a;
+@factor_out!(%){a};
+# FIXME: leads to \prod{a}{-1}.
+
+@reset.
 obj5:= 3 a b + 2 a c e + 5 a c + 7 e f - 2 c e + c d - a d + a - c:
 @factor_out!(%){a,c};
 @factor_out!(%){a,c};
@@ -38,3 +43,5 @@ tst5:=  a * c * (2 * e + 5) + c * ( - 2 * e + d - 1) + a * (3 * b - d + 1) + 7 *
 {a,b,m,n,p,q}::Indices.
 obj6:= A_{m n} C_{m n} D_{p q} + A_{p m} C_{m n} D_{n q} + A_{m n} C_{m n} E_{p q} Q;
 @factor_out!(%){ A_{a b}, C_{a b} };
+
+
