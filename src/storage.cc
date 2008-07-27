@@ -1296,121 +1296,141 @@ exptree_comparator::match_t exptree_comparator::compare(const exptree::iterator&
 																		  bool nobrackets) 
 	{
 	// nobrackets also implies 'no multiplier', i.e. 'toplevel'.
-
 	// one is the substitute pattern, two the expression under consideration
-	if(one->fl.bracket==two->fl.bracket || nobrackets)
-		if(one->fl.parent_rel==two->fl.parent_rel) {
-			bool pattern=false;
-			bool objectpattern=false;
-			bool implicit_pattern=false;
-			bool is_index=false;
-			if(one->fl.bracket==str_node::b_none && one->is_index() )
-				is_index=true;
-			if(one->is_name_wildcard())
-				pattern=true;
-			else if(one->is_object_wildcard())
-				objectpattern=true;
-			else if(is_index && one->is_integer()==false) 
-				implicit_pattern=true;
+	
+	if(nobrackets==false && one->fl.bracket != two->fl.bracket) 
+		return (one->fl.bracket < two->fl.bracket)?no_match_less:no_match_greater;
 
-			if(pattern || (implicit_pattern && two->is_integer()==false)) { // never match integers to implicit patterns!
-				if(lhs_contains_dummies) {
-					replacement_map_t::iterator loc=replacement_map.find(one);
-					if(loc!=replacement_map.end()) {
-						// If this is an index, try to match the whole index.
-						// We want to make sure that a pattern k1_a k2_a does not match an expression k1_c k2_d.
-						if(is_index) {
-							int cmp=subtree_compare((*loc).second.begin(), two, 0);
-							if(cmp==0)      return subtree_match;
-							else if(cmp>0)  return no_match_less;
-							else            return no_match_greater;
-							}
-						else {
-							if((*loc).second.begin()->name == two->name)        return node_match;
-							else if(*(*loc).second.begin()->name < *two->name)  return no_match_less;
-							else                                                return no_match_greater;
+	if(one->fl.parent_rel != two->fl.parent_rel)                
+		return (one->fl.parent_rel < two->fl.parent_rel)?no_match_less:no_match_greater;
+
+
+	// Determine whether we are dealing with one of the pattern types.
+	bool pattern=false;
+	bool objectpattern=false;
+	bool implicit_pattern=false;
+	bool is_index=false;
+	
+	if(one->fl.bracket==str_node::b_none && one->is_index() )
+		is_index=true;
+	if(one->is_name_wildcard())
+		pattern=true;
+	else if(one->is_object_wildcard())
+		objectpattern=true;
+	else if(is_index && one->is_integer()==false) 
+		implicit_pattern=true;
+	
+	
+	if(pattern || (implicit_pattern && two->is_integer()==false)) { 
+		// The above is to ensure that we never match integers to implicit patterns.
+		if(lhs_contains_dummies) {
+			replacement_map_t::iterator loc=replacement_map.find(one);
+			if(loc!=replacement_map.end()) {
+				// If this is an index, try to match the whole index.
+				// We want to make sure that a pattern k1_a k2_a does not match an expression k1_c k2_d.
+				if(is_index) {
+					int cmp=subtree_compare((*loc).second.begin(), two, 0);
+					if(cmp==0)      return subtree_match;
+					else if(cmp>0)  return no_match_less;
+					else            return no_match_greater;
+					}
+				else {
+					if((*loc).second.begin()->name == two->name)        return node_match;
+					else if(*(*loc).second.begin()->name < *two->name)  return no_match_less;
+					else                                                return no_match_greater;
+					}
+				}
+			else {
+				// This index was not encountered earlier. Check that the index types in pattern
+				// and object agree (if known, otherwise assume they match)
+				const Indices *t1=properties::get<Indices>(one);
+				const Indices *t2=properties::get<Indices>(two);
+				if( (t1 || t2) && implicit_pattern ) {
+					if(t1 && t2) {
+						if((*t1).set_name != (*t2).set_name) {
+							if((*t1).set_name < (*t2).set_name) return no_match_less;
+							else                                return no_match_greater;
 							}
 						}
 					else {
-						// check that the index types agree (if known, otherwise assume they match)
-						const Indices *t1=properties::get<Indices>(one);
-						const Indices *t2=properties::get<Indices>(two);
-						if( (t1 || t2) && implicit_pattern ) {
-							if(t1 && t2) {
-								if((*t1).set_name != (*t2).set_name) {
-									if((*t1).set_name < (*t2).set_name) return no_match_less;
-									else                                return no_match_greater;
-									}
-								}
-							else {
-								if(t1) return no_match_less;
-								else   return no_match_greater;
-								}
-							}
-						replacement_map[one]=two;
-						// if this is a pattern and the pattern has a non-zero number of children,
-						// also add the pattern without the children
-						if(exptree::number_of_children(one)!=0) {
-							 exptree tmp1(one), tmp2(two);
-							 tmp1.erase_children(tmp1.begin());
-							 tmp2.erase_children(tmp2.begin());
-							 replacement_map[tmp1]=tmp2;
-							 }
+						if(t1) return no_match_less;
+						else   return no_match_greater;
 						}
 					}
-				else { // lhs_contains_dummies==false
-					const Indices *t1=properties::get<Indices>(one);
-					const Indices *t2=properties::get<Indices>(two);
-					if( (t1 || t2) && implicit_pattern ) {
-						if(t1 && t2) {
-							if((*t1).set_name != (*t2).set_name) {
-								if((*t1).set_name < (*t2).set_name) return no_match_less;
-								else                                return no_match_greater;
-								}
-							}
-						else {
-							if(t1) return no_match_less;
-							else   return no_match_greater;
-							}
-						}
-					replacement_map[one]=two;
-					// if this is a pattern and the pattern has a non-zero number of children,
-					// also add the pattern without the children
-					if(exptree::number_of_children(one)!=0) {
-						 exptree tmp1(one), tmp2(two);
-						 tmp1.erase_children(tmp1.begin());
-						 tmp2.erase_children(tmp2.begin());
-						 replacement_map[tmp1]=tmp2;
-						 }
-					}
-				if(is_index) return subtree_match;
-				else         return node_match;
-				}
-			else if(objectpattern) {
-				subtree_replacement_map_t::iterator loc=subtree_replacement_map.find(one->name);
-				if(loc!=subtree_replacement_map.end()) {
-					return equal_subtree((*loc).second,two);
-//						return subtree_match;
-//					else return no_match;
-					}
-				else subtree_replacement_map[one->name]=two;
-
-				return subtree_match;
-				}
-			else { // object is not dummy
-				if(one->is_rational() && two->is_rational() && one->multiplier!=two->multiplier) {
-					if(*one->multiplier < *two->multiplier) return no_match_less;
-					else                                    return no_match_greater;
-					}
-				if(one->name==two->name) {
-					if(nobrackets || (one->multiplier == two->multiplier) ) {
-						return node_match;
-						}
+				// The index types match, so register this replacement rule.
+				replacement_map[one]=two;
+				
+				// if this is a pattern and the pattern has a non-zero number of children,
+				// also add the pattern without the children
+				if(exptree::number_of_children(one)!=0) {
+					exptree tmp1(one), tmp2(two);
+					tmp1.erase_children(tmp1.begin());
+					tmp2.erase_children(tmp2.begin());
+					replacement_map[tmp1]=tmp2;
 					}
 				}
 			}
+		else { // lhs_contains_dummies==false
+			const Indices *t1=properties::get<Indices>(one);
+			const Indices *t2=properties::get<Indices>(two);
+			if( (t1 || t2) && implicit_pattern ) {
+				if(t1 && t2) {
+					if((*t1).set_name != (*t2).set_name) {
+						if((*t1).set_name < (*t2).set_name) return no_match_less;
+						else                                return no_match_greater;
+						}
+					}
+				else {
+					if(t1) return no_match_less;
+					else   return no_match_greater;
+					}
+				}
+			replacement_map[one]=two;
+			// if this is a pattern and the pattern has a non-zero number of children,
+			// also add the pattern without the children
+			if(exptree::number_of_children(one)!=0) {
+				exptree tmp1(one), tmp2(two);
+				tmp1.erase_children(tmp1.begin());
+				tmp2.erase_children(tmp2.begin());
+				replacement_map[tmp1]=tmp2;
+				}
+			}
+		
+		// Return a match of the appropriate type
+		if(is_index) return subtree_match;
+		else         return node_match;
+		}
+	else if(objectpattern) {
+		subtree_replacement_map_t::iterator loc=subtree_replacement_map.find(one->name);
+		if(loc!=subtree_replacement_map.end()) {
+			return equal_subtree((*loc).second,two);
+			}
+		else subtree_replacement_map[one->name]=two;
+		
+		return subtree_match;
+		}
+	else { // object is not dummy
+		if(one->is_rational() && two->is_rational() && one->multiplier!=two->multiplier) {
+			if(*one->multiplier < *two->multiplier) return no_match_less;
+			else                                    return no_match_greater;
+			}
+		
+		if(one->name==two->name) {
+			if(nobrackets || (one->multiplier == two->multiplier) ) 
+				return node_match;
 
-	return no_match_less; // FIXME: not entirely correct!
+			if(*one->multiplier < *two->multiplier) return no_match_less;
+			else                                    return no_match_greater;
+			}
+		else {
+			if( *one->name < *two->name ) return no_match_less;
+			else                          return no_match_greater;
+			}
+		}
+	
+	assert(1==0); // should never be reached
+
+	return no_match_less; 
 	}
 
 
@@ -1432,7 +1452,6 @@ exptree_comparator::match_t exptree_comparator::match_subproduct(exptree::siblin
 	exptree::sibling_iterator start=st.begin();
 	while(start!=st.end()) {
 		if(std::find(factor_locations.begin(), factor_locations.end(), start)==factor_locations.end()) {  
-//			txtout << tofind.node << "number = " << backup_replacements.size() << std::endl;
 			if(equal_subtree(tofind, start)==subtree_match) { // found factor
 				// If a previous factor was found, verify that the factor found now can be
 				// moved next to the previous factor (nontrivial if factors do not commute).
@@ -1805,9 +1824,9 @@ bool exptree_is_equivalent::operator()(const exptree& one, const exptree& two)
 	
 	comparator.lhs_contains_dummies=true;
 	exptree_comparator::match_t ret;
-	if(*one.begin()->name=="\\prod") 
-		ret=comparator.match_subproduct(one.begin(), one.begin().begin(), two.begin());
-	else                             
+//	if(*one.begin()->name=="\\prod") 
+//		ret=comparator.match_subproduct(one.begin(), one.begin().begin(), two.begin());
+//	else                             
 		ret=comparator.equal_subtree(one.begin(), two.begin());
 
 	if(ret==exptree_comparator::subtree_match) return true;
@@ -1820,9 +1839,9 @@ bool exptree_is_less::operator()(const exptree& one, const exptree& two)
 	
 	comparator.lhs_contains_dummies=true;
 	exptree_comparator::match_t ret;
-	if(*one.begin()->name=="\\prod") 
-		ret=comparator.match_subproduct(one.begin(), one.begin().begin(), two.begin());
-	else                             
+//	if(*one.begin()->name=="\\prod") 
+//		ret=comparator.match_subproduct(one.begin(), one.begin().begin(), two.begin());
+//	else                             
 		ret=comparator.equal_subtree(one.begin(), two.begin());
 
 	if(ret==exptree_comparator::no_match_less) return true;

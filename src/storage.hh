@@ -328,6 +328,7 @@ class exptree_comparator {
 
 		bool lhs_contains_dummies;
 
+	protected:
 		// Internal entry point. 
 		match_t compare(const exptree::iterator&, const exptree::iterator&, bool nobrackets=false);
 };
