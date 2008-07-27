@@ -2028,12 +2028,14 @@ algorithm::result_t factor_out::apply(iterator& it)
 
 		 sibling_iterator sumit=term.append_child(term.begin(),str_node("\\sum"));
 		 size_t terms=0;
-		 while(ci!=collector.end() && tree_equal((*ci).first, oldkey)) {
+		 exptree_is_equivalent cmp;
+		 while(ci!=collector.end() && cmp((*ci).first, oldkey)) {
 			  term.append_child(sumit, (*ci).second);
 			  tr.erase((*ci).second);
 			  ++terms;
 			  ++ci;
 			  }
+		 std::cerr << "terms=" << terms << std::endl;
 		 if(terms>1) 
 			  expression_modified=true;
 
