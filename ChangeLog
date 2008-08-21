@@ -1,6 +1,11 @@
+2008-08-07  Kasper Peeters  <kasper.peeters@aei.mpg.de>
+
+	* Fixed a bug which would corrupt the notebook upon removing the
+	last cell.
+
 2008-07-20  Kasper Peeters  <kasper.peeters@aei.mpg.de>
 
-	* Added @factor_out.
+	* Added @factor_out (not yet completed).
 
 2008-07-19  Kasper Peeters  <kasper.peeters@aei.mpg.de>
 

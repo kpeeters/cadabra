@@ -1309,7 +1309,7 @@ sums to prefix notation.
 %section~\ref{s:objprop} for more details.
 
 % TODO: - dX for differentials perhaps?
-%       - dX.Psi for inner products?
+%       - dX.Psi for inner products? (already implemented)
 
 \subsection{Active nodes or ``commands''}
 
@@ -1709,16 +1709,13 @@ vector?) \cdb requires all powers to be entered with a double-star
 a**2;
 a**(2 + 3b);
 \end{screen}
-In addition, 
-%\item All superscripts that are enclosed in \emph{round}
-%brackets denote exponents, i.e.~\verb|a^(-c)| means $a$ raised to the
-%power $-c$.
-all sub- or superscripts with \emph{curly} braces indicate indices, to
-which the summation convention applies. In particular, there are not
-allowed to be more than two identical indices in a single product. The
-summation convention does not apply to arguments with any other
-bracket types. In particular, sub- or superscripts with \emph{square}
-or \emph{pointy} brackets have (as of yet) no fixed meaning.
+In addition, all sub- or superscripts with \emph{curly} braces
+indicate indices, to which the summation convention applies. In
+particular, there are not allowed to be more than two identical
+indices in a single product. The summation convention does not apply
+to arguments with any other bracket types. In particular, sub- or
+superscripts with \emph{square} or \emph{pointy} brackets have (as of
+yet) no fixed meaning.
 
 
 \subsection{Spacing and brackets}
@@ -2170,8 +2167,6 @@ A_{m n} + B_{m n};
 Note that it does not make sense to add arguments or indices to object
 patterns; a construction of the type ``\verb|A??_{\mu}(x)|'' is
 meaningless and will be flagged as an error.
-
-% There are many situations in which 
 
 There is a special handling of objects which are dummy objects in the
 classification of section~\ref{s:automaticdummies} (see

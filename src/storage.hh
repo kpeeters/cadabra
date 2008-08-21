@@ -196,6 +196,25 @@ class exptree : public tree<str_node> {
 };
 
 
+// Generic subtree comparison class, which determines whether two tensor
+// subtrees are equal in the sense of e.g. "SelfCommuting", that is
+// up to the names of indices. E.g.,
+//
+//   A_m                        equals  A_n
+//   \diff{A*B_g*\diff{C}_k}_m  equals  \diff{A*B_h*\diff{C}_r}_s
+//
+//  0: structure equal, and all indices the same name
+//  1: structure equal, index names of one < two
+// -1: structure equal, index names of one > two
+//  2: structure different, one < two
+// -2: structure different, one > two
+//
+// Note that this routine does not handle the more complicated case in
+// which there are dummy indices inside the subtrees; for those cases
+// you need to use "exptree_compare" (which in turn uses subtree_compare
+// to do the simpler cases).
+//
+// Parameters:
 // literal_wildcards: if true, treat wildcard names as ordinary names.
 
 int subtree_compare(exptree::iterator one, exptree::iterator two, 
@@ -305,7 +324,7 @@ bool operator==(const exptree& first, const exptree& second);
 
 class exptree_comparator {
 	public:
-		enum match_t { node_match, subtree_match, no_match_less, no_match_greater };
+		enum match_t { node_match=0, subtree_match=1, no_match_less=2, no_match_greater=3 };
 
 		void    clear();
 

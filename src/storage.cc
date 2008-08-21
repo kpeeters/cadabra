@@ -995,18 +995,6 @@ void half(rset_t::iterator& num)
 	num=rat_set.insert((*num)/2).first;
 	}
 
-// Are the two tensor subtrees equal in the sense of "SelfCommuting", i.e
-// up to the names of indices? E.g.,
-//
-//   A_m                        equals  A_n
-//   \diff{A*B_g*\diff{C}_k}_m  equals  \diff{A*B_h*\diff{C}_r}_s
-//
-//  0: structure equal, and all indices the same name
-//  1: structure equal, index names of one < two
-// -1: structure equal, index names of one > two
-//  2: structure different, one < two
-// -2: structure different, one > two
-//
 int subtree_compare(exptree::iterator one, exptree::iterator two, 
 						  int mod_prel, bool checksets, int compare_multiplier, bool literal_wildcards) 
 	{
@@ -1329,7 +1317,11 @@ exptree_comparator::match_t exptree_comparator::compare(const exptree::iterator&
 				// If this is an index, try to match the whole index.
 				// We want to make sure that a pattern k1_a k2_a does not match an expression k1_c k2_d.
 				if(is_index) {
-					int cmp=subtree_compare((*loc).second.begin(), two, 0); // uses patterns! FIXME
+					int cmp=subtree_compare((*loc).second.begin(), two, 0); 
+					std::cerr << " index " << *two->name
+								 << " should be " << *((*loc).second.begin()->name)  
+								 << " because that's what " << *one->name 
+								 << " was set to previously; result " << cmp << std::endl;
 					if(cmp==0)      return subtree_match;
 					else if(cmp>0)  return no_match_less;
 					else            return no_match_greater;
@@ -1831,7 +1823,7 @@ bool exptree_is_equivalent::operator()(const exptree& one, const exptree& two)
 
 	ret=comparator.equal_subtree(one.begin(), two.begin());
 
-	std::cerr << (ret==exptree_comparator::subtree_match) << std::endl;
+	std::cerr << "==? " << (ret==exptree_comparator::subtree_match) << " " << ret << std::endl;
 
 	if(ret==exptree_comparator::subtree_match) return true;
 	else                                       return false;
@@ -1844,15 +1836,13 @@ bool exptree_is_less::operator()(const exptree& one, const exptree& two)
 	comparator.lhs_contains_dummies=true;
 	exptree_comparator::match_t ret;
 
-	ret=comparator.equal_subtree(one.begin(), two.begin());
-
 	std::cerr << "-------" << std::endl;
 	exptree::print_recursive_treeform(std::cerr, one.begin());
 	exptree::print_recursive_treeform(std::cerr, two.begin());
 
 	ret=comparator.equal_subtree(one.begin(), two.begin());
 
-	std::cerr << "<? " << (ret==exptree_comparator::no_match_less) << std::endl;
+	std::cerr << "<? " << (ret==exptree_comparator::no_match_less) << " " << ret << std::endl;
 
 	if(ret==exptree_comparator::no_match_less) return true;
 	else                                       return false;

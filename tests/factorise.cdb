@@ -44,4 +44,35 @@ tst5:=  a * c * (2 * e + 5) + c * ( - 2 * e + d - 1) + a * (3 * b - d + 1) + 7 *
 obj6:= A_{m n} C_{m n} D_{p q} + A_{p m} C_{m n} D_{n q} + A_{m n} C_{m n} E_{p q} Q;
 @factor_out!(%){ A_{a b}, C_{a b} };
 
+# This is very subtle. Consider
+#
+#   A_{m n} C_{n p} D_{m p} + A_{q r} C_{r s} E_{q t} F_{t s}
+#
+# This can clearly factor_out A & C. Standard comparison of the two prefactors
+# would give a match, since  A_{m n} C_{n p} and A_{q r} C_{r s}  are equivalent.
+# But we would need to relabel indices along the way.
+#
+# However, @collect_terms does not do this type of collecting either: it requires
+# you to rename dummies first. If we do that, our problem goes away here too.
 
+{m,n,p,q,r,s,t}::Indices.
+A_{m n} C_{n p} D_{m p} + A_{q r} C_{r s} E_{q t} F_{t s};
+@rename_dummies!(%);
+
+# So the conclusion is that we would prefer to stick to a simpler matching, in which
+# we only allow for dummy index names to differ. But what do we then do with
+
+{m,n,p,q,r,s,t}::Indices.
+A_{m n} D_{m p} Q_{n p} + A_{q r} E_{q t} F_{t s} Q_{r s} ;
+@rename_dummies!(%);
+
+# -> A_{m n} * D_{m p} * Q_{n p} + A_{m n} * E_{m p} * F_{p q} * Q_{n q};
+
+# This does not lead to equal A*Q factors. So it seems that we are forced
+# to do a comparison in which we flag
+#
+#    A_{m n} Q_{m n}  and  A_{m n} Q_{n q} as un-equal 
+#
+#    A_{m n} Q_{n q}  and  A_{m n} Q_{n p} as equal
+#
+#

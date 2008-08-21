@@ -21,6 +21,8 @@
 	
 */
 
+//#define DEBUG 1
+
 #include <modglue/pipe.hh>
 #include <modglue/process.hh>
 #include <gdk/gdkkeysyms.h>
@@ -1782,7 +1784,14 @@ bool XCadabra::receive(modglue::ipipe& p)
 			 md.run();
 			 name="";
 			 }
-		else name=tmp;
+		else {
+			name=tmp;
+			DataCell *newcell=new DataCell(DataCell::c_input);
+			add_cell(newcell);
+			while (gtk_events_pending ())
+				gtk_main_iteration ();
+			active_canvas->cell_grab_focus(newcell);
+			}
 		modified=false;
 		update_title();
 		}
@@ -2434,8 +2443,8 @@ void XCadabra::on_edit_remove_cell()
 		std::cerr << "adding new cell" << std::endl;
 #endif
 		DataCell *newcell=new DataCell(DataCell::c_input);
-		active_canvas->cell_grab_focus(
-			add_cell(newcell, active_cell->datacell) );
+		add_cell(newcell);
+		active_canvas->cell_grab_focus(newcell);
 		}
 	}
 
