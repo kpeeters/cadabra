@@ -1162,7 +1162,6 @@ bool manipulator::handle_external_commands_(exptree::iterator& original_expressi
 		 if(level.size()>0) 
 			  act_at_level=atoi(level.c_str());
 		 }
-	debugout << "action: " << act_until_nochange << " " << act_multiple << std::endl;
 
 	if(it->is_inert_command())  // turn inert command into
 		node_name=node_name.substr(1);

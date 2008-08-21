@@ -8,7 +8,7 @@ a b + a c e + a d:
 @factor_out!(%){a};
 a ( b + c e + d );
 \end{screen}
-In case you are familiar with FORM, {\tt factor\_in} is like its {\tt
+In case you are familiar with FORM, {\tt factor\_out} is like its {\tt
 bracket} statement. If you add more factors to factor out, it works as
 in
 \begin{screen}{1,2}
@@ -25,6 +25,6 @@ A_{m} B_{m} + C_{m} A_{m};
 @factor_out!(%){A_{m}};
 A_{m} (B_{m} + C_{m}) ;
 \end{screen}
-~
+(this is still work in progress).
 
 \cdbseealgo{factor_in}

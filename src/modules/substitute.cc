@@ -302,7 +302,7 @@ algorithm::result_t substitute::apply(iterator& st)
 			iterator newtr=tr.move_ontop(iterator(comparator.factor_locations[0]),repl.begin()); 
 			multiply(st->multiplier, *newtr->multiplier);
 			one(newtr->multiplier);
-			pushup_multiplier(st);
+//			pushup_multiplier(st); WORK
 			if(ind_dummy.size()>0) {
 				rename_replacement_dummies(newtr); // do NOW, otherwise the replacement cannot be isolated anymore
 				rename_replacement_dummies_called=true;
@@ -334,7 +334,7 @@ algorithm::result_t substitute::apply(iterator& st)
 	else {
 		multiply(repl.begin()->multiplier, *st->multiplier);
 		st=tr.move_ontop(st, repl.begin()); // no need to keep the original repl tree
-		pushup_multiplier(st);
+//		pushup_multiplier(st); WORK
 		}
 	if(ind_dummy.size()>0 && !rename_replacement_dummies_called) {
 		rename_replacement_dummies(st);

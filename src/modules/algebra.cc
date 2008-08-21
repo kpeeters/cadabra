@@ -2035,7 +2035,7 @@ algorithm::result_t factor_out::apply(iterator& it)
 			  ++terms;
 			  ++ci;
 			  }
-		 std::cerr << "terms=" << terms << std::endl;
+//		 std::cerr << "terms=" << terms << std::endl;
 		 if(terms>1) 
 			  expression_modified=true;
 

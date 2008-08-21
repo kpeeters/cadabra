@@ -1,11 +1,20 @@
+2008-08-21  Kasper Peeters  <kasper.peeters@aei.mpg.de>
+
+	* Released 0.141
+
+	* Fixed a bug in the main loop related to handling of multipliers.
+
+	* Fixed a bug in @substitute which would touch the tree above the
+	entry point, thereby disabling clean-up routines. 
+
 2008-08-07  Kasper Peeters  <kasper.peeters@aei.mpg.de>
 
-	* Fixed a bug which would corrupt the notebook upon removing the
-	last cell.
+	* Fixed a bug in the GUI which would corrupt the notebook upon
+	removing the last cell.
 
 2008-07-20  Kasper Peeters  <kasper.peeters@aei.mpg.de>
 
-	* Added @factor_out (not yet completed).
+	* Started adding @factor_out (not yet completed).
 
 2008-07-19  Kasper Peeters  <kasper.peeters@aei.mpg.de>
 

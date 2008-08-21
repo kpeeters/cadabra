@@ -456,6 +456,7 @@ bool algorithm::apply_recursive(exptree::iterator& st, bool check_cons, int act_
 				result_t res=apply(start);
 //				debugout << "after apply: " << *(start->multiplier) << std::endl;
 //				exptree::print_recursive_treeform(debugout, start);
+//				exptree::print_recursive_treeform(debugout, tr.begin());
 				wit=start; // this copying back and forth is needed because wit has different type
 				switch(res) {
 					case l_no_action:
@@ -474,50 +475,55 @@ bool algorithm::apply_recursive(exptree::iterator& st, bool check_cons, int act_
 							atleastoneglobal=true;
 							}
 						// Handle zeroes and ones.
-//						std::cerr << "handling zeroes and ones. Full tree:" << std::endl;
-//						exptree::print_recursive_treeform(debugout, tr.begin());
-//						std::cerr << "start tree:" << std::endl;
+//						debugout << "handling zeroes and ones." << std::endl;
+//						debugout << "start tree:" << std::endl;
+//						debugout << *start->multiplier << std::endl;
 //						exptree::print_recursive_treeform(debugout, start);
 						if(wit!=tr.end() && *wit->multiplier==0) { 
-							 propagate_zeroes(wit,st);
-							 if(*wit->multiplier==0) { // a top-level zero 
-								  ++wit;       
-								  }
-							 else if(act_at_level!=-1) wit=nextone; // do not follow post_order sequence
-							 }
+							propagate_zeroes(wit,st);
+							if(*wit->multiplier==0) { // a top-level zero 
+								++wit;       
+								}
+							else if(act_at_level!=-1) wit=nextone; // do not follow post_order sequence
+							}
 						else if(wit!=tr.end() && wit->is_identity()) {
-							 bool tryprod=false;
-							 bool ispow=true;
-							 sibling_iterator tmpact=wit;
-							 if( *tr.parent(tmpact)->name=="\\pow" ) {
-								  iterator par=tr.parent(tmpact);
-								  if( tmpact==tr.begin(par) ) { // 1**x = 1
-										node_one(par);
-										tmpact=par;
-										tryprod=true;
-										}
-								  else { // x**1 = x
-										tr.erase(tmpact);
-										tr.flatten(par);
-										tr.erase(par);
-										wit=nextone;
-										}
-								  }
-							 else ispow=false;
-
-							 if( (!ispow || tryprod) && *tr.parent(tmpact)->name=="\\prod") {
-								  iterator tmp=tr.parent(tmpact);
-								  tr.erase(tmpact); // may leave us with 0 or 1 children
-								  cleanup_anomalous_products(tr,tmp);
-								  if(tryprod) wit=tmp;
-								  else        wit=nextone;
-								  }
-							 else {
-								  if(tryprod) wit=tmpact;
-								  else        wit=nextone;
-								  }
-							 }
-						else wit=nextone;
+							bool tryprod=false;
+							bool ispow=true;
+							sibling_iterator tmpact=wit;
+							if( *tr.parent(tmpact)->name=="\\pow" ) {
+								iterator par=tr.parent(tmpact);
+								if( tmpact==tr.begin(par) ) { // 1**x = 1
+									node_one(par);
+									tmpact=par;
+									tryprod=true;
+									}
+								else { // x**1 = x
+									tr.erase(tmpact);
+									tr.flatten(par);
+									tr.erase(par);
+									wit=nextone;
+									}
+								}
+							else ispow=false;
+							
+							if( (!ispow || tryprod) && *tr.parent(tmpact)->name=="\\prod") {
+								iterator tmp=tr.parent(tmpact);
+								tr.erase(tmpact); // may leave us with 0 or 1 children
+								cleanup_anomalous_products(tr,tmp);
+								if(tryprod) wit=tmp;
+								else        wit=nextone;
+								}
+							else {
+								if(tryprod) wit=tmpact;
+								else        wit=nextone;
+								}
+							}
+						
+						else {
+							if(wit!=tr.end()) 
+								pushup_multiplier(wit); // Ensure a valid tree wrt. multipliers.
+							wit=nextone;
+							}
 						break;
 					case l_error: 
 						global_success=g_apply_failed;

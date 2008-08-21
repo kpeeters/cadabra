@@ -1318,10 +1318,10 @@ exptree_comparator::match_t exptree_comparator::compare(const exptree::iterator&
 				// We want to make sure that a pattern k1_a k2_a does not match an expression k1_c k2_d.
 				if(is_index) {
 					int cmp=subtree_compare((*loc).second.begin(), two, 0); 
-					std::cerr << " index " << *two->name
-								 << " should be " << *((*loc).second.begin()->name)  
-								 << " because that's what " << *one->name 
-								 << " was set to previously; result " << cmp << std::endl;
+//					std::cerr << " index " << *two->name
+//								 << " should be " << *((*loc).second.begin()->name)  
+//								 << " because that's what " << *one->name 
+//								 << " was set to previously; result " << cmp << std::endl;
 					if(cmp==0)      return subtree_match;
 					else if(cmp>0)  return no_match_less;
 					else            return no_match_greater;
@@ -1817,13 +1817,13 @@ bool exptree_is_equivalent::operator()(const exptree& one, const exptree& two)
 	comparator.lhs_contains_dummies=true;
 	exptree_comparator::match_t ret;
 
-	std::cerr << "-------" << std::endl;
-	exptree::print_recursive_treeform(std::cerr, one.begin());
-	exptree::print_recursive_treeform(std::cerr, two.begin());
+//	std::cerr << "-------" << std::endl;
+//	exptree::print_recursive_treeform(std::cerr, one.begin());
+//	exptree::print_recursive_treeform(std::cerr, two.begin());
 
 	ret=comparator.equal_subtree(one.begin(), two.begin());
 
-	std::cerr << "==? " << (ret==exptree_comparator::subtree_match) << " " << ret << std::endl;
+//	std::cerr << "==? " << (ret==exptree_comparator::subtree_match) << " " << ret << std::endl;
 
 	if(ret==exptree_comparator::subtree_match) return true;
 	else                                       return false;
@@ -1836,13 +1836,13 @@ bool exptree_is_less::operator()(const exptree& one, const exptree& two)
 	comparator.lhs_contains_dummies=true;
 	exptree_comparator::match_t ret;
 
-	std::cerr << "-------" << std::endl;
-	exptree::print_recursive_treeform(std::cerr, one.begin());
-	exptree::print_recursive_treeform(std::cerr, two.begin());
+//	std::cerr << "-------" << std::endl;
+//	exptree::print_recursive_treeform(std::cerr, one.begin());
+//	exptree::print_recursive_treeform(std::cerr, two.begin());
 
 	ret=comparator.equal_subtree(one.begin(), two.begin());
 
-	std::cerr << "<? " << (ret==exptree_comparator::no_match_less) << " " << ret << std::endl;
+//	std::cerr << "<? " << (ret==exptree_comparator::no_match_less) << " " << ret << std::endl;
 
 	if(ret==exptree_comparator::no_match_less) return true;
 	else                                       return false;
