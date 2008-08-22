@@ -14,11 +14,11 @@
    id="svg2"
    sodipodi:version="0.32"
    inkscape:version="0.46"
-   sodipodi:docname="logo.svg"
+   sodipodi:docname="cadabra.svg"
    inkscape:output_extension="org.inkscape.output.svg.inkscape"
-   inkscape:export-filename="/home/kasper/projects/cadabra/web/images/logo.png"
-   inkscape:export-xdpi="32.416103"
-   inkscape:export-ydpi="32.416103">
+   inkscape:export-filename="/home/kasper/projects/cadabra/web/cadabra.png"
+   inkscape:export-xdpi="10.34"
+   inkscape:export-ydpi="10.34">
   <sodipodi:namedview
      id="base"
      pagecolor="#ffffff"
@@ -29,16 +29,16 @@
      objecttolerance="10"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="0.7"
+     inkscape:zoom="0.5"
      inkscape:cx="375"
      inkscape:cy="520"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="false"
-     inkscape:window-width="641"
+     inkscape:window-width="1141"
      inkscape:window-height="715"
-     inkscape:window-x="592"
-     inkscape:window-y="138" />
+     inkscape:window-x="339"
+     inkscape:window-y="151" />
   <defs
      id="defs4">
     <linearGradient
@@ -67,7 +67,18 @@
        x1="251.42857"
        id="linearGradient2391"
        xlink:href="#linearGradient2385"
-       inkscape:collect="always" />
+       inkscape:collect="always"
+       gradientTransform="matrix(0.9720098,0,0,1.3048107,4.1869506,-109.36257)" />
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient2385"
+       id="linearGradient2389"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="matrix(0.9692677,0,0,1.3657869,4.791123,-152.18261)"
+       x1="251.42857"
+       y1="323.79074"
+       x2="371.42856"
+       y2="392.36218" />
   </defs>
   <metadata
      id="metadata7">
@@ -85,12 +96,12 @@
      inkscape:groupmode="layer"
      inkscape:label="Layer 1">
     <rect
-       y="280.93362"
-       x="211.42857"
-       height="125.71429"
-       width="177.14285"
+       y="231.51273"
+       x="209.72197"
+       height="171.69885"
+       width="171.69885"
        id="rect2383"
-       style="opacity:1;fill:url(#linearGradient2391);fill-opacity:1;fill-rule:evenodd;stroke:#060000;stroke-width:2;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1" />
+       style="opacity:1;fill:url(#linearGradient2389);fill-opacity:1;fill-rule:evenodd;stroke:#060000;stroke-width:2.30114079;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1" />
     <g
        id="g2404"
        transform="matrix(1.9658162,0,0,1.989588,-372.475,-344.17177)">

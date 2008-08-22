@@ -104,7 +104,7 @@ distclean:
 	( cd gui && $(MAKE) distclean );
 	( cd doc && $(MAKE) distclean );
 	rm -f Makefile config.cache config.log config.status cdb.log aclocal.m4
-	rm -f cdb*.log tst
+	rm -f cdb*.log tst *~
 	rm -Rf autom4te.cache 
 
 depend:
