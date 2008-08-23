@@ -1,5 +1,8 @@
 2008-08-23  Kasper Peeters  <kasper.peeters@aei.mpg.de>
 
+	* Fixed a bug in tree.hh which would sometimes lead to a failure
+	when acting with an algorithm at fixed depth.
+
 	* Streamlined the pattern matching engine, removing along the way
 	a bug which would misbehave with
 

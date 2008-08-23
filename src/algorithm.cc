@@ -395,6 +395,7 @@ bool algorithm::apply_recursive(exptree::iterator& st, bool check_cons, int act_
 	bool atleastoneglobal=false;
 	post_order_iterator cit=st;
 	post_order_iterator wit;
+	exptree::fixed_depth_iterator fdi; // used when iterating at fixed depth
 	int worked=0;
 	int failed=0;
 
@@ -404,7 +405,8 @@ bool algorithm::apply_recursive(exptree::iterator& st, bool check_cons, int act_
 	do { // loop which keeps iterating until the expression no longer changes
 		post_order_iterator end;
 		if(act_at_level!=-1) {
-			wit=tr.begin_fixed(st, act_at_level);
+			fdi=tr.begin_fixed(st, act_at_level);
+			wit=fdi;
 			end=tr.end();
 			}
 		else {
@@ -447,7 +449,9 @@ bool algorithm::apply_recursive(exptree::iterator& st, bool check_cons, int act_
                //	txtout << "applying at " << *wit->name << " next is " << *nextone->name << std::endl;
 					}
 				else { 
-					nextone=tr.next_at_same_depth(wit);
+					++fdi;
+					if(tr.is_valid(fdi)) nextone=fdi;
+					else                 nextone=end;
                // txtout << "applying at " << *wit->name << " next is " << *nextone->name << std::endl;
 					}
 				count++;
@@ -533,8 +537,11 @@ bool algorithm::apply_recursive(exptree::iterator& st, bool check_cons, int act_
 				}
 			else {
 				if(act_at_level==-1) ++wit;
-				else                 {
-					wit=tr.next_at_same_depth(wit);
+				else {
+					++fdi;
+					if(tr.is_valid(fdi)) wit=fdi;
+					else wit=end;
+//					wit=tr.next_at_same_depth(wit);
 					}
 				}
 			

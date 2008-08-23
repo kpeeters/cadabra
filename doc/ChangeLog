@@ -1,3 +1,10 @@
+2008-08-23  Kasper Peeters  <kasper.peeters@aei.mpg.de>
+
+	* Released 2.60
+
+	* Fixed several problems with fixed_depth iterators: iterating
+	beyond the top node now disabled and operator-- fixed.
+
 2008-07-25  Kasper Peeters  <kasper.peeters@aei.mpg.de>
 
 	* Made 'child()' static.

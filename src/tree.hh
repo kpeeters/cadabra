@@ -9,8 +9,8 @@
 
 /** \mainpage tree.hh
     \author   Kasper Peeters
-    \version  2.56
-    \date     25-Jul-2008
+    \version  2.60
+    \date     23-Aug-2008
     \see      http://www.aei.mpg.de/~peekas/tree/
     \see      http://www.aei.mpg.de/~peekas/tree/ChangeLog
 
@@ -234,10 +234,7 @@ class tree {
 				fixed_depth_iterator&  operator+=(unsigned int);
 				fixed_depth_iterator&  operator-=(unsigned int);
 
-				tree_node *first_parent_;
-			private:
-				void set_first_parent_();
-				void find_leftmost_parent_();
+				tree_node *top_node;
 		};
 
 		/// Iterator which traverses only the nodes which are siblings of each other.
@@ -689,6 +686,9 @@ typename tree<T, tree_node_allocator>::post_order_iterator tree<T, tree_node_all
 template <class T, class tree_node_allocator>
 typename tree<T, tree_node_allocator>::fixed_depth_iterator tree<T, tree_node_allocator>::begin_fixed(const iterator_base& pos, unsigned int dp) const
 	{
+	typename tree<T, tree_node_allocator>::fixed_depth_iterator ret;
+	ret.top_node=pos.node;
+
 	tree_node *tmp=pos.node;
 	unsigned int curdepth=0;
 	while(curdepth<dp) { // go down one level
@@ -696,6 +696,8 @@ typename tree<T, tree_node_allocator>::fixed_depth_iterator tree<T, tree_node_al
 			if(tmp->next_sibling==0) {
 				// try to walk up and then right again
 				do {
+					if(tmp==ret.top_node)
+					   throw std::range_error("tree: begin_fixed out of range");
 					tmp=tmp->parent;
                if(tmp==0) 
 					   throw std::range_error("tree: begin_fixed out of range");
@@ -707,7 +709,9 @@ typename tree<T, tree_node_allocator>::fixed_depth_iterator tree<T, tree_node_al
 		tmp=tmp->first_child;
 		++curdepth;
 		}
-	return tmp;
+
+	ret.node=tmp;
+	return ret;
 	}
 
 template <class T, class tree_node_allocator>
@@ -810,38 +814,45 @@ template <class T, class tree_node_allocator>
 template <typename iter>
 iter tree<T, tree_node_allocator>::next_at_same_depth(iter position) const
 	{
-	assert(position.node!=0);
-	iter ret(position);
+	// We make use of a temporary fixed_depth iterator to implement this.
 
-	if(position.node->next_sibling) {
-		ret.node=position.node->next_sibling;
-		}
-	else { 
-		int relative_depth=0;
-	   upper:
-		do {
-			ret.node=ret.node->parent;
-			if(ret.node==0) return ret;
-			--relative_depth;
-			} while(ret.node->next_sibling==0);
-	   lower:
-		ret.node=ret.node->next_sibling;
-		while(ret.node->first_child==0) {
-			if(ret.node->next_sibling==0)
-				goto upper;
-			ret.node=ret.node->next_sibling;
-			if(ret.node==0) return ret;
-			}
-		while(relative_depth<0 && ret.node->first_child!=0) {
-			ret.node=ret.node->first_child;
-			++relative_depth;
-			}
-		if(relative_depth<0) {
-			if(ret.node->next_sibling==0) goto upper;
-			else                          goto lower;
-			}
-		}
-	return ret;
+	typename tree<T, tree_node_allocator>::fixed_depth_iterator tmp(position.node);
+
+	++tmp;
+	return iter(tmp);
+
+//	assert(position.node!=0);
+//	iter ret(position);
+//
+//	if(position.node->next_sibling) {
+//		ret.node=position.node->next_sibling;
+//		}
+//	else { 
+//		int relative_depth=0;
+//	   upper:
+//		do {
+//			ret.node=ret.node->parent;
+//			if(ret.node==0) return ret;
+//			--relative_depth;
+//			} while(ret.node->next_sibling==0);
+//	   lower:
+//		ret.node=ret.node->next_sibling;
+//		while(ret.node->first_child==0) {
+//			if(ret.node->next_sibling==0)
+//				goto upper;
+//			ret.node=ret.node->next_sibling;
+//			if(ret.node==0) return ret;
+//			}
+//		while(relative_depth<0 && ret.node->first_child!=0) {
+//			ret.node=ret.node->first_child;
+//			++relative_depth;
+//			}
+//		if(relative_depth<0) {
+//			if(ret.node->next_sibling==0) goto upper;
+//			else                          goto lower;
+//			}
+//		}
+//	return ret;
 	}
 
 template <class T, class tree_node_allocator>
@@ -2299,73 +2310,44 @@ template <class T, class tree_node_allocator>
 tree<T, tree_node_allocator>::fixed_depth_iterator::fixed_depth_iterator()
 	: iterator_base()
 	{
-	set_first_parent_();
 	}
 
 template <class T, class tree_node_allocator>
 tree<T, tree_node_allocator>::fixed_depth_iterator::fixed_depth_iterator(tree_node *tn)
-	: iterator_base(tn)
+	: iterator_base(tn), top_node(0)
 	{
-	set_first_parent_();
 	}
 
 template <class T, class tree_node_allocator>
 tree<T, tree_node_allocator>::fixed_depth_iterator::fixed_depth_iterator(const iterator_base& other)
-	: iterator_base(other.node)
+	: iterator_base(other.node), top_node(0)
 	{
-	set_first_parent_();
 	}
 
 template <class T, class tree_node_allocator>
 tree<T, tree_node_allocator>::fixed_depth_iterator::fixed_depth_iterator(const sibling_iterator& other)
-	: iterator_base(other.node), first_parent_(other.parent_)
+	: iterator_base(other.node), top_node(0)
 	{
-	find_leftmost_parent_();
 	}
 
 template <class T, class tree_node_allocator>
 tree<T, tree_node_allocator>::fixed_depth_iterator::fixed_depth_iterator(const fixed_depth_iterator& other)
-	: iterator_base(other.node), first_parent_(other.first_parent_)
+	: iterator_base(other.node), top_node(other.top_node)
 	{
 	}
 
 template <class T, class tree_node_allocator>
 bool tree<T, tree_node_allocator>::fixed_depth_iterator::operator==(const fixed_depth_iterator& other) const
 	{
-	if(other.node==this->node && other.first_parent_==first_parent_) return true;
+	if(other.node==this->node && other.top_node==top_node) return true;
 	else return false;
 	}
 
 template <class T, class tree_node_allocator>
 bool tree<T, tree_node_allocator>::fixed_depth_iterator::operator!=(const fixed_depth_iterator& other) const
 	{
-	if(other.node!=this->node || other.first_parent_!=first_parent_) return true;
+	if(other.node!=this->node || other.top_node!=top_node) return true;
 	else return false;
-	}
-
-template <class T, class tree_node_allocator>
-void tree<T, tree_node_allocator>::fixed_depth_iterator::set_first_parent_()
-	{
-	return; // FIXME: we do not use first_parent_ yet, and it actually needs some serious reworking if
-           // it is ever to work at the 'head' level.
-	first_parent_=0;
-	if(this->node==0) return;
-	if(this->node->parent!=0)
-		first_parent_=this->node->parent;
-	if(first_parent_)
-		find_leftmost_parent_();
-	}
-
-template <class T, class tree_node_allocator>
-void tree<T, tree_node_allocator>::fixed_depth_iterator::find_leftmost_parent_()
-	{
-	return; // FIXME: see 'set_first_parent()'
-	tree_node *tmppar=first_parent_;
-	while(tmppar->prev_sibling) {
-		tmppar=tmppar->prev_sibling;
-		if(tmppar->first_child)
-			first_parent_=tmppar;
-		}
 	}
 
 template <class T, class tree_node_allocator>
@@ -2380,6 +2362,10 @@ typename tree<T, tree_node_allocator>::fixed_depth_iterator& tree<T, tree_node_a
 		int relative_depth=0;
 	   upper:
 		do {
+			if(this->node==this->top_node) {
+				this->node=0; // FIXME: return a proper fixed_depth end iterator once implemented
+				return *this;
+				}
 			this->node=this->node->parent;
 			if(this->node==0) return *this;
 			--relative_depth;
@@ -2402,50 +2388,69 @@ typename tree<T, tree_node_allocator>::fixed_depth_iterator& tree<T, tree_node_a
 			}
 		}
 	return *this;
-
-//	if(this->node->next_sibling!=0) {
-//		this->node=this->node->next_sibling;
-//		assert(this->node!=0);
-//		if(this->node->parent==0 && this->node->next_sibling==0) // feet element
-//			this->node=0;
-//		}
-//	else {
-//		tree_node *par=this->node->parent;
-//		do {
-//			par=par->next_sibling;
-//			if(par==0) { // FIXME: need to keep track of this!
-//				this->node=0;
-//				return *this;
-//				}
-//			} while(par->first_child==0);
-//		this->node=par->first_child;
-//		}
-	return *this;
 	}
 
 template <class T, class tree_node_allocator>
 typename tree<T, tree_node_allocator>::fixed_depth_iterator& tree<T, tree_node_allocator>::fixed_depth_iterator::operator--()
 	{
 	assert(this->node!=0);
-	if(this->node->prev_sibling!=0) {
+
+	if(this->node->prev_sibling) {
 		this->node=this->node->prev_sibling;
-		assert(this->node!=0);
-		if(this->node->parent==0 && this->node->prev_sibling==0) // head element
-			this->node=0;
 		}
-	else {
-		tree_node *par=this->node->parent;
+	else { 
+		int relative_depth=0;
+	   upper:
 		do {
-			par=par->prev_sibling;
-			if(par==0) { // FIXME: need to keep track of this!
+			if(this->node==this->top_node) {
 				this->node=0;
 				return *this;
 				}
-			} while(par->last_child==0);
-		this->node=par->last_child;
+			this->node=this->node->parent;
+			if(this->node==0) return *this;
+			--relative_depth;
+			} while(this->node->prev_sibling==0);
+	   lower:
+		this->node=this->node->prev_sibling;
+		while(this->node->last_child==0) {
+			if(this->node->prev_sibling==0)
+				goto upper;
+			this->node=this->node->prev_sibling;
+			if(this->node==0) return *this;
+			}
+		while(relative_depth<0 && this->node->last_child!=0) {
+			this->node=this->node->last_child;
+			++relative_depth;
+			}
+		if(relative_depth<0) {
+			if(this->node->prev_sibling==0) goto upper;
+			else                            goto lower;
+			}
 		}
 	return *this;
-}
+
+//
+//
+//	assert(this->node!=0);
+//	if(this->node->prev_sibling!=0) {
+//		this->node=this->node->prev_sibling;
+//		assert(this->node!=0);
+//		if(this->node->parent==0 && this->node->prev_sibling==0) // head element
+//			this->node=0;
+//		}
+//	else {
+//		tree_node *par=this->node->parent;
+//		do {
+//			par=par->prev_sibling;
+//			if(par==0) { // FIXME: need to keep track of this!
+//				this->node=0;
+//				return *this;
+//				}
+//			} while(par->last_child==0);
+//		this->node=par->last_child;
+//		}
+//	return *this;
+	}
 
 template <class T, class tree_node_allocator>
 typename tree<T, tree_node_allocator>::fixed_depth_iterator tree<T, tree_node_allocator>::fixed_depth_iterator::operator++(int)
@@ -2457,11 +2462,11 @@ typename tree<T, tree_node_allocator>::fixed_depth_iterator tree<T, tree_node_al
 
 template <class T, class tree_node_allocator>
 typename tree<T, tree_node_allocator>::fixed_depth_iterator tree<T, tree_node_allocator>::fixed_depth_iterator::operator--(int)
-{
-  fixed_depth_iterator copy = *this;
-  --(*this);
-  return copy;
-}
+   {
+	fixed_depth_iterator copy = *this;
+	--(*this);
+	return copy;
+	}
 
 template <class T, class tree_node_allocator>
 typename tree<T, tree_node_allocator>::fixed_depth_iterator& tree<T, tree_node_allocator>::fixed_depth_iterator::operator-=(unsigned int num)
@@ -2482,8 +2487,6 @@ typename tree<T, tree_node_allocator>::fixed_depth_iterator& tree<T, tree_node_a
 		}
 	return *this;
 	}
-
-// FIXME: add the other members of fixed_depth_iterator.
 
 
 // Sibling iterator

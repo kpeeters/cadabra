@@ -1357,32 +1357,6 @@ exptree_comparator::match_t exptree_comparator::compare(const exptree::iterator&
 				replacement_map[tmp1]=tmp2;
 				}
 			}
-
-//		else { // lhs_contains_dummies==false
-//			const Indices *t1=properties::get<Indices>(one);
-//			const Indices *t2=properties::get<Indices>(two);
-//			if( (t1 || t2) && implicit_pattern ) {
-//				if(t1 && t2) {
-//					if((*t1).set_name != (*t2).set_name) {
-//						if((*t1).set_name < (*t2).set_name) return no_match_less;
-//						else                                return no_match_greater;
-//						}
-//					}
-//				else {
-//					if(t1) return no_match_less;
-//					else   return no_match_greater;
-//					}
-//				}
-//			replacement_map[one]=two;
-//			// if this is a pattern and the pattern has a non-zero number of children,
-//			// also add the pattern without the children
-//			if(exptree::number_of_children(one)!=0) {
-//				exptree tmp1(one), tmp2(two);
-//				tmp1.erase_children(tmp1.begin());
-//				tmp2.erase_children(tmp2.begin());
-//				replacement_map[tmp1]=tmp2;
-//				}
-//			}
 		
 		// Return a match of the appropriate type
 		if(is_index) return subtree_match;
