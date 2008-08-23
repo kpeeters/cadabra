@@ -615,6 +615,8 @@ bool exptree::index_iterator::operator==(const index_iterator& other) const
   @indexlist(%);
   \diff{\sin(x_\mu)}_{\nu};
   @indexlist(%);
+  \equals{A_{i}}{B_{i j} Z_{j}};
+  @indexlist(%);
 
 */
 exptree::index_iterator& exptree::index_iterator::operator+=(unsigned int num)
@@ -1311,58 +1313,24 @@ exptree_comparator::match_t exptree_comparator::compare(const exptree::iterator&
 	
 	if(pattern || (implicit_pattern && two->is_integer()==false)) { 
 		// The above is to ensure that we never match integers to implicit patterns.
-		if(lhs_contains_dummies) {
-			replacement_map_t::iterator loc=replacement_map.find(one);
-			if(loc!=replacement_map.end()) {
-				// If this is an index, try to match the whole index.
-				// We want to make sure that a pattern k1_a k2_a does not match an expression k1_c k2_d.
-				if(is_index) {
-					int cmp=subtree_compare((*loc).second.begin(), two, 0); 
+
+		replacement_map_t::iterator loc=replacement_map.find(one);
+		if(loc!=replacement_map.end()) {
+			// If this is an index/pattern, try to match the whole index/pattern.
+			// We want to make sure that e.g. a pattern k1_a k2_a does not match an expression k1_c k2_d.
+
+			int cmp=subtree_compare((*loc).second.begin(), two, 0); 
 //					std::cerr << " index " << *two->name
 //								 << " should be " << *((*loc).second.begin()->name)  
 //								 << " because that's what " << *one->name 
 //								 << " was set to previously; result " << cmp << std::endl;
-					if(cmp==0)      return subtree_match;
-					else if(cmp>0)  return no_match_less;
-					else            return no_match_greater;
-					}
-				else {
-					if((*loc).second.begin()->name == two->name)        return node_match;
-					else if(*(*loc).second.begin()->name < *two->name)  return no_match_less;
-					else                                                return no_match_greater;
-					}
-				}
-			else {
-				// This index was not encountered earlier. Check that the index types in pattern
-				// and object agree (if known, otherwise assume they match)
-				const Indices *t1=properties::get<Indices>(one);
-				const Indices *t2=properties::get<Indices>(two);
-				if( (t1 || t2) && implicit_pattern ) {
-					if(t1 && t2) {
-						if((*t1).set_name != (*t2).set_name) {
-							if((*t1).set_name < (*t2).set_name) return no_match_less;
-							else                                return no_match_greater;
-							}
-						}
-					else {
-						if(t1) return no_match_less;
-						else   return no_match_greater;
-						}
-					}
-				// The index types match, so register this replacement rule.
-				replacement_map[one]=two;
-				
-				// if this is a pattern and the pattern has a non-zero number of children,
-				// also add the pattern without the children
-				if(exptree::number_of_children(one)!=0) {
-					exptree tmp1(one), tmp2(two);
-					tmp1.erase_children(tmp1.begin());
-					tmp2.erase_children(tmp2.begin());
-					replacement_map[tmp1]=tmp2;
-					}
-				}
+			if(cmp==0)      return subtree_match;
+			else if(cmp>0)  return no_match_less;
+			else            return no_match_greater;
 			}
-		else { // lhs_contains_dummies==false
+		else {
+			// This index was not encountered earlier. Check that the index types in pattern
+			// and object agree (if known, otherwise assume they match)
 			const Indices *t1=properties::get<Indices>(one);
 			const Indices *t2=properties::get<Indices>(two);
 			if( (t1 || t2) && implicit_pattern ) {
@@ -1377,7 +1345,9 @@ exptree_comparator::match_t exptree_comparator::compare(const exptree::iterator&
 					else   return no_match_greater;
 					}
 				}
+			// The index types match, so register this replacement rule.
 			replacement_map[one]=two;
+			
 			// if this is a pattern and the pattern has a non-zero number of children,
 			// also add the pattern without the children
 			if(exptree::number_of_children(one)!=0) {
@@ -1387,6 +1357,32 @@ exptree_comparator::match_t exptree_comparator::compare(const exptree::iterator&
 				replacement_map[tmp1]=tmp2;
 				}
 			}
+
+//		else { // lhs_contains_dummies==false
+//			const Indices *t1=properties::get<Indices>(one);
+//			const Indices *t2=properties::get<Indices>(two);
+//			if( (t1 || t2) && implicit_pattern ) {
+//				if(t1 && t2) {
+//					if((*t1).set_name != (*t2).set_name) {
+//						if((*t1).set_name < (*t2).set_name) return no_match_less;
+//						else                                return no_match_greater;
+//						}
+//					}
+//				else {
+//					if(t1) return no_match_less;
+//					else   return no_match_greater;
+//					}
+//				}
+//			replacement_map[one]=two;
+//			// if this is a pattern and the pattern has a non-zero number of children,
+//			// also add the pattern without the children
+//			if(exptree::number_of_children(one)!=0) {
+//				exptree tmp1(one), tmp2(two);
+//				tmp1.erase_children(tmp1.begin());
+//				tmp2.erase_children(tmp2.begin());
+//				replacement_map[tmp1]=tmp2;
+//				}
+//			}
 		
 		// Return a match of the appropriate type
 		if(is_index) return subtree_match;

@@ -2,7 +2,7 @@
 # Sorting can be done with or without taking into account the 
 # numbers used to label dummy indices. 
 
-A_{?}::Commuting.
+A_{?}::SelfCommuting.
 
 obj:=  A_{d3 d2 d1} A_{d7 d8 a1};
 # @prodsort!(%){IgnoreNumbers};

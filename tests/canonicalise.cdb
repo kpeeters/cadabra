@@ -446,3 +446,9 @@ J_{\mu\nu}::AntiSymmetric.
 obj39:= \eta_{#1? #3?} J_{#2? #4?} - \eta_{#1? #4?} J_{#2? #3?} - \eta_{#2? #3?} J_{#1? #4?} + \eta_{#2? #4?} J_{#1? #3?};
 @canonicalise!(%);
 
+# Test 40: equality signs involved (used to crash)
+@reset.
+Y_{i j}::AntiSymmetric.
+obj40:= X_{i} = Y_{j i} Z_{j};
+@canonicalise!(%);
+

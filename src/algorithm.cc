@@ -228,7 +228,7 @@ void algorithm::apply(unsigned int lue, bool multiple, bool until_nochange, bool
 					++number_of_modifications;
 					global_success=g_applied;
 //					debugout << "**** " << std::endl;
-					tr.print_recursive_treeform(debugout, tr.begin());
+//					tr.print_recursive_treeform(debugout, tr.begin());
 //					debugout << "==== " << std::endl;
 					if(getenv("CDB_PARANOID")) 					
 						check_consistency(tr.named_parent(subtree,"\\expression"));
@@ -1163,6 +1163,9 @@ void algorithm::fill_index_position_map(iterator prodnode, const index_map_t& im
 			++current_pos;
 			++indexit;
 			}
+		if(!found) 
+			throw consistency_error("Internal error in fill_index_position_map; cannot find index "
+											+ *(imit->first.begin()->name)+".");
 		++imit;
 		}
 	}
@@ -1598,7 +1601,8 @@ algorithm::range_vector_t::iterator algorithm::find_arg_superset(range_vector_t&
 
 bool algorithm::is_single_term(iterator it)
 	{
-	if(*it->name!="\\prod" && *it->name!="\\sum" && *it->name!="\\asymimplicit" && *it->name!="\\comma") {
+	if(*it->name!="\\prod" && *it->name!="\\sum" && *it->name!="\\asymimplicit" && *it->name!="\\comma" 
+		&& *it->name!="\\equals") {
 		if(tr.is_valid(tr.parent(it))) {
 			if(*tr.parent(it)->name=="\\sum" || *tr.parent(it)->name=="\\expression" || tr.parent(it)->is_command())
 				return true;

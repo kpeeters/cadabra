@@ -1,3 +1,14 @@
+2008-08-23  Kasper Peeters  <kasper.peeters@aei.mpg.de>
+
+	* Streamlined the pattern matching engine, removing along the way
+	a bug which would misbehave with
+
+	    X Y + Z Z
+	    @substitute!(%)( A? A? -> Q );
+
+	* Made property initialisation produce proper error messages
+	instead of just textual output.
+
 2008-08-21  Kasper Peeters  <kasper.peeters@aei.mpg.de>
 
 	* Released 0.141

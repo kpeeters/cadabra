@@ -56,10 +56,9 @@ algorithm::result_t extract_properties::apply(iterator& st)
 				exptree proptree(it);
 				tr.erase(it);
 				keyval_t keyvals;
-				if(thepropbase->preparse_arguments(proptree.begin(), keyvals)==false) {
-					txtout << "Failure parsing arguments of property " << *it->name << std::endl;
-					return l_error;
-					}
+				if(thepropbase->preparse_arguments(proptree.begin(), keyvals)==false) 
+					throw consistency_error("Failure parsing arguments of property "+*it->name+".");
+
 				if(thepropbase->parse(tr,st,proptree.begin(), keyvals)) {
 					list_property *thelistprop=dynamic_cast<list_property *>(thepropbase);
 					if(thelistprop) {                   // a list property
@@ -77,10 +76,9 @@ algorithm::result_t extract_properties::apply(iterator& st)
 								else txtout << "." << std::endl;
 								}
 							}
-						if(objs.size()<2) {
-							txtout << "A list property cannot be assigned to a single object." << std::endl;
-							return l_error;
-							}
+						if(objs.size()<2) 
+							throw consistency_error("A list property cannot be assigned to a single object.");
+
 						properties::insert_list_prop(objs, thelistprop);
 						}
 					else {                              // a normal property

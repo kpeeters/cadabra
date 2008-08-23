@@ -187,6 +187,13 @@ tst18:= m - @(obj18);
 @collect_terms!(%);
 @assert(tst18);
 
+@reset.
+obj18b:= X Y + Z Z;
+@substitute!(%)( A? A? -> Q );
+tst18b:= X Y + Q - @(obj18b);
+@collect_terms!(%);
+@assert(tst18b); 
+
 
 # Test 19: Regular expressions
 
@@ -635,3 +642,5 @@ obj63:= P_{i} Q_{j};
 tst63:= P_{i} Q_{j} - @(obj63);
 @collect_terms!(%);
 @assert(tst63);
+
+
