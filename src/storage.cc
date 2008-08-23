@@ -1314,23 +1314,43 @@ exptree_comparator::match_t exptree_comparator::compare(const exptree::iterator&
 	if(pattern || (implicit_pattern && two->is_integer()==false)) { 
 		// The above is to ensure that we never match integers to implicit patterns.
 
+		bool tested_full=true;
 		replacement_map_t::iterator loc=replacement_map.find(one);
+
+		// If this is a pattern with a non-zero number of children, 
+		// also search the pattern without the children.
+		if(loc == replacement_map.end() && exptree::number_of_children(one)!=0) {
+			exptree tmp1(one);
+			tmp1.erase_children(tmp1.begin());
+			loc = replacement_map.find(tmp1);
+			tested_full=false;
+			}
+
 		if(loc!=replacement_map.end()) {
 			// If this is an index/pattern, try to match the whole index/pattern.
 			// We want to make sure that e.g. a pattern k1_a k2_a does not match an expression k1_c k2_d.
 
-			int cmp=subtree_compare((*loc).second.begin(), two, 0); 
-//					std::cerr << " index " << *two->name
-//								 << " should be " << *((*loc).second.begin()->name)  
-//								 << " because that's what " << *one->name 
-//								 << " was set to previously; result " << cmp << std::endl;
+			int cmp;
+			if(tested_full) 
+				cmp=subtree_compare((*loc).second.begin(), two, 0); 
+			else {
+				exptree tmp2(two);
+				tmp2.erase_children(tmp2.begin());
+				cmp=subtree_compare((*loc).second.begin(), tmp2.begin(), 0); 
+				}
+//			std::cerr << " pattern " << *two->name
+//						 << " should be " << *((*loc).second.begin()->name)  
+//						 << " because that's what " << *one->name 
+//						 << " was set to previously; result " << cmp << std::endl;
+
 			if(cmp==0)      return subtree_match;
 			else if(cmp>0)  return no_match_less;
 			else            return no_match_greater;
 			}
 		else {
-			// This index was not encountered earlier. Check that the index types in pattern
+			// This index/pattern was not encountered earlier. Check that the index types in pattern
 			// and object agree (if known, otherwise assume they match)
+
 			const Indices *t1=properties::get<Indices>(one);
 			const Indices *t2=properties::get<Indices>(two);
 			if( (t1 || t2) && implicit_pattern ) {

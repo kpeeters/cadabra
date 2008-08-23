@@ -643,4 +643,21 @@ tst63:= P_{i} Q_{j} - @(obj63);
 @collect_terms!(%);
 @assert(tst63);
 
+# Test 64: Pattern matching like in test 18, but now with indices.
+#
+@reset.
+obj64:= \epsilon_{i j k} X_{j} Y_{k}+ \epsilon_{i j k} Z_{j} Z_{k};
+@substitute!(%)(  \epsilon_{a? b? c?} A?_{b?} A?_{c?}
+                         -> \epsilon_{a? b? c?} \commutator{A?_{b?}}{A?_{c?}} / 2 );
+tst64:= \epsilon_{i j k} X_{j} Y_{k}+ 1/2 \epsilon_{i j k} \commutator{ Z_{j} }{ Z_{k} } - @(obj64);
+@collect_terms!(%);
+@assert(tst64);
 
+# Test 65: similar to 64
+@reset.
+{\mu,\nu,\rho,\sigma}::Indices(vector).
+obj65:= A^{\mu} B^{\nu};
+@substitute!!(%)( A?^{\sigma} A?^{\rho} -> Q^{\sigma\rho} );
+tst65:= A^{\mu} B^{\nu} - @(obj65);
+@collect_terms!(%);
+@assert(tst65);

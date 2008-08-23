@@ -1,5 +1,13 @@
 2008-08-23  Kasper Peeters  <kasper.peeters@aei.mpg.de>
 
+	* Released 0.142
+
+	* Another pattern matching bugfix for cases of the type
+
+	   A^{\mu} B^{\nu};
+           @substitute!(%)( A?^{\sigma} A?^{\rho} -> Q^{\sigma\rho} );
+
+
 	* Fixed a bug in tree.hh which would sometimes lead to a failure
 	when acting with an algorithm at fixed depth.
 
