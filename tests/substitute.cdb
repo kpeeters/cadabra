@@ -661,3 +661,12 @@ obj65:= A^{\mu} B^{\nu};
 tst65:= A^{\mu} B^{\nu} - @(obj65);
 @collect_terms!(%);
 @assert(tst65);
+
+# Test 66: similar to 65, now matching
+@reset.
+{\mu,\nu,\rho,\sigma}::Indices(vector).
+obj66:= A^{\mu} B^{\nu};
+@substitute!!(%)( A?^{\sigma} B?^{\rho} -> Q^{\sigma\rho} );
+tst66:= Q^{\mu\nu} - @(obj66);
+@collect_terms!(%);
+@assert(tst66);
