@@ -1,0 +1,24 @@
+--- !ditz.rubyforge.org,2008-03-06/issue 
+title: Multiple-level undo in GUI
+desc: |-
+  There is at present no undo functionality in the GUI.
+  All actions in the GUI should be undo/redo-able.
+type: :feature
+component: cadabra
+release: 
+reporter: Kasper Peeters <kasper.peeters@aei.mpg.de>
+status: :in_progress
+disposition: 
+creation_time: 2008-08-24 11:04:49.974071 Z
+references: []
+
+id: 3a0fb777111329baf741dde7dc04fd19ea4885d6
+log_events: 
+- - 2008-08-24 11:04:53.245886 Z
+  - Kasper Peeters <kasper.peeters@aei.mpg.de>
+  - created
+  - ""
+- - 2008-08-24 11:16:46.047666 Z
+  - Kasper Peeters <kasper.peeters@aei.mpg.de>
+  - changed status from unstarted to in_progress
+  - ""

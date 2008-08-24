@@ -1,0 +1,23 @@
+--- !ditz.rubyforge.org,2008-03-06/issue 
+title: "@factor_out problems with tensors"
+desc: |-
+  The @factor_out algorithm does not yet work properly with tensors.
+  This requires on-the-fly index relabelling in the pattern matcher
+  for e.g.
+  
+    A_{m n} D_{m p} Q_{n p} + A_{m n} E_{m p} F_{p q} Q_{n q}
+type: :bugfix
+component: cadabra
+release: 
+reporter: Kasper Peeters <kasper.peeters@aei.mpg.de>
+status: :unstarted
+disposition: 
+creation_time: 2008-08-24 11:14:37.655579 Z
+references: []
+
+id: dcc4c5a2bbebd03459ee53b5ebbc6132fe4f560d
+log_events: 
+- - 2008-08-24 11:14:39.511710 Z
+  - Kasper Peeters <kasper.peeters@aei.mpg.de>
+  - created
+  - ""

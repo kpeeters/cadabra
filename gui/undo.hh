@@ -2,7 +2,7 @@
 #ifndef undo_hh__
 #define undo_hh__
 
-class UndoElement {
+class Action {
 	public:
 		enum type_t { 
 			 add_cell,
@@ -15,6 +15,6 @@ class UndoElement {
 		DataCell 
 };
 
-typedef UndoStack std::stack<UndoElement>;
+typedef ActionStack std::stack<Action>;
 
 #endif

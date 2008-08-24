@@ -52,6 +52,7 @@
 
 #include "widgets.hh"
 #include "help.hh"
+#include "undo.hh"
 
 class XCadabra;
 
@@ -207,8 +208,8 @@ class XCadabra : public Gtk::Window {
 		bool current_objtype_and_name(CadabraHelp::objtype_t&, std::string&);
 		void insert_at_mark(const std::string instxt);
 
-		/// Saving and loading to disk. If the return string is non-empty, it contains
-		/// an error message.
+		/// Saving and loading to/from disk. If the return string is
+		/// non-empty, it contains an error message.
 		void clear();
 		std::string save(const std::string&) const;
 		std::string load(const std::string&, bool ignore_nonexistence=false); 
@@ -227,8 +228,8 @@ class XCadabra : public Gtk::Window {
 		/// so that they reflect the current structure of the document.
 		/// The DataCell ownership is handled by the XCadabra class once
 		/// it has been added here.
-		DataCell *add_cell(DataCell *, DataCell *ref=0, bool before=true);
-		void add_canvas();
+		DataCell    *add_cell(DataCell *, DataCell *ref=0, bool before=true);
+		void         add_canvas();
 
 		/// Signals from Gtk, such as closing windows or changing the text
 		/// of an input cell.
@@ -241,6 +242,9 @@ class XCadabra : public Gtk::Window {
 
 		int          font_step;
 	private:
+		/// Variables for the undo/redo mechanism.
+		ActionStack undo_stack, redo_stack;
+		
 		Gdk::Cursor      hglass;
 		bool             load_file; // used by main to indicate a load should occur after start
 		bool             have_received;
@@ -258,35 +262,30 @@ class XCadabra : public Gtk::Window {
 		void             remove_noninput_below(DataCell *);
 		void             kernel_idle();
 
-		std::vector<NotebookCanvas *> canvasses;   // managed by gtk
-		CadabraHelp      help_window;
-		NotebookCanvas  *active_canvas;
-		VisualCell      *active_cell;
-//		Gtk::VPaned      paned;
-		Gtk::VBox        topbox;
-		Gtk::HBox        supermainbox;
-		Gtk::VBox        mainbox;
-		Gtk::HBox        buttonbox;
-		Gtk::HBox        statusbarbox;
-		Gtk::VBox        progressbarvbox;
-		Gtk::ProgressBar progressbar1,progressbar2;
-
+		/// Boxes and widgets.
+		std::vector<NotebookCanvas *>  canvasses;   // managed by gtk
+		CadabraHelp                    help_window;
+		NotebookCanvas                *active_canvas;
+		VisualCell                    *active_cell;
+		Gtk::VBox                      topbox;
+		Gtk::HBox                      supermainbox;
+		Gtk::VBox                      mainbox;
+		Gtk::HBox                      buttonbox;
+		Gtk::HBox                      statusbarbox;
+		Gtk::VBox                      progressbarvbox;
+		Gtk::ProgressBar               progressbar1,progressbar2;
 		Glib::RefPtr<Gtk::ActionGroup> actiongroup;
 		Glib::RefPtr<Gtk::UIManager>   uimanager;
 		Glib::RefPtr<Gtk::RadioAction> font_action0, font_action1, font_action2, font_action3;
+		Gtk::HBox                      statusbox;
+		Gtk::Label                     b_cdbstatus, b_kernelversion;
+		Gtk::Button                    b_kill, b_run, b_run_to, b_run_from, b_help, b_stop;
 
-//		Gtk::MenuBar     menubar;
-//		Gtk::MenuItem    menu_file_top, menu_edit_top, menu_view_top, menu_help_top;
-//		Gtk::Menu        menu_file, menu_edit, menu_view, menu_help;
-
-		Gtk::HBox        statusbox;
-		Gtk::Label       b_cdbstatus, b_kernelversion;
-		Gtk::Button      b_kill, b_run, b_run_to, b_run_from, b_help, b_stop;
-
-		/// All data of the document is stored here. Data is not
-		/// managed and should be deleted by the XCadabra destructor.
+		/// Storage of document data. This data is not managed by smart
+		/// pointers and should thus be deleted by the XCadabra
+		/// destructor.
 		typedef std::list<DataCell *> DataCells_t;
-		DataCells_t              datacells;
+		DataCells_t                   datacells;
 
 		/// Data concerning the interaction with the externally started
 		/// cadabra process.
@@ -299,7 +298,6 @@ class XCadabra : public Gtk::Window {
 		int                       progress_todo, progress_done, progress_count;
 
 		/// Collection of all known algorithm and property names, as extracted from the kernel.
-//		std::set<std::string>     all_algorithms, all_properties;
 		void add_property_help(const std::string&);
 		void add_algorithm_help(const std::string&);
 		void add_reserved_help(const std::string&);

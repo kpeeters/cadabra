@@ -1,0 +1,20 @@
+--- !ditz.rubyforge.org,2008-03-06/issue 
+title: Cursor position after crash
+desc: |-
+  After a crash of the kernel in run-all mode of the GUI, the cursor does not
+  end up in the cell which caused the crash.
+type: :bugfix
+component: cadabra
+release: 
+reporter: Kasper Peeters <kasper.peeters@aei.mpg.de>
+status: :unstarted
+disposition: 
+creation_time: 2008-08-24 11:18:21.421745 Z
+references: []
+
+id: 15e3e1b9b66a3841c79e43937e91a0f2ada5ae2b
+log_events: 
+- - 2008-08-24 11:18:23.044185 Z
+  - Kasper Peeters <kasper.peeters@aei.mpg.de>
+  - created
+  - ""
