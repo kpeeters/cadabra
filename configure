@@ -1288,6 +1288,9 @@ if test -n "$ac_init_help"; then
 Optional Features:
   --disable-FEATURE       do not include FEATURE (same as --enable-FEATURE=no)
   --enable-FEATURE[=ARG]  include FEATURE [ARG=yes]
+  --enable-runtime-dependency-check
+                          Enable check for runtime dependencies (default is
+                          yes)
   --enable-gui            Enable building of the graphical front-end (default
                           is yes)
 
@@ -3290,7 +3293,16 @@ esac
 
 
 
-# Extract the first word of "lie", so it can be a program name with args.
+# Check whether --enable-runtime-dependency-check was given.
+if test "${enable_runtime_dependency_check+set}" = set; then
+  enableval=$enable_runtime_dependency_check;
+else
+  check_runtime_dependencies=yes
+fi
+
+
+if test "$check_runtime_dependencies" == "yes"
+   then # Extract the first word of "lie", so it can be a program name with args.
 set dummy lie; ac_word=$2
 { echo "$as_me:$LINENO: checking for $ac_word" >&5
 echo $ECHO_N "checking for $ac_word... $ECHO_C" >&6; }
@@ -3328,10 +3340,11 @@ echo "${ECHO_T}no" >&6; }
 fi
 
 
-if test "${LIE}" == "no"
-   then { { echo "$as_me:$LINENO: error: Need the LiE program; get it from http://young.sp2mi.univ-poitiers.fr/~marc/LiE/ ." >&5
+        if test "${LIE}" == "no"
+           then { { echo "$as_me:$LINENO: error: Need the LiE program; get it from http://young.sp2mi.univ-poitiers.fr/~marc/LiE/ ." >&5
 echo "$as_me: error: Need the LiE program; get it from http://young.sp2mi.univ-poitiers.fr/~marc/LiE/ ." >&2;}
    { (exit 1); exit 1; }; }
+        fi
 fi
 
 
@@ -4747,7 +4760,8 @@ else
 echo "${ECHO_T}yes" >&6; }
 	:
 fi
-# Extract the first word of "ptywrap", so it can be a program name with args.
+if test "$check_runtime_dependencies" == "yes"
+   then # Extract the first word of "ptywrap", so it can be a program name with args.
 set dummy ptywrap; ac_word=$2
 { echo "$as_me:$LINENO: checking for $ac_word" >&5
 echo $ECHO_N "checking for $ac_word... $ECHO_C" >&6; }
@@ -4785,10 +4799,11 @@ echo "${ECHO_T}no" >&6; }
 fi
 
 
-if test "${PTYWRAP}" == "no"
-   then { { echo "$as_me:$LINENO: error: You have the modglue library, but the \"ptywrap\" tool which comes with it is not installed or executable." >&5
+        if test "${PTYWRAP}" == "no"
+           then { { echo "$as_me:$LINENO: error: You have the modglue library, but the \"ptywrap\" tool which comes with it is not installed or executable." >&5
 echo "$as_me: error: You have the modglue library, but the \"ptywrap\" tool which comes with it is not installed or executable." >&2;}
    { (exit 1); exit 1; }; }
+        fi
 fi
 
 MAC_OS_X=""
@@ -5936,7 +5951,8 @@ else
 echo "${ECHO_T}yes" >&6; }
 	:
 fi
-		  # Extract the first word of "dvipng", so it can be a program name with args.
+        if test "$check_runtime_dependencies" == "yes"
+		  then # Extract the first word of "dvipng", so it can be a program name with args.
 set dummy dvipng; ac_word=$2
 { echo "$as_me:$LINENO: checking for $ac_word" >&5
 echo $ECHO_N "checking for $ac_word... $ECHO_C" >&6; }
@@ -5974,12 +5990,12 @@ echo "${ECHO_T}no" >&6; }
 fi
 
 
-		  if test "${DVIPNG}" == "no"
-		     then { { echo "$as_me:$LINENO: error: Need the dvipng program; get it from http://sourceforge.net/projects/dvipng/ ." >&5
+		       if test "${DVIPNG}" == "no"
+		          then { { echo "$as_me:$LINENO: error: Need the dvipng program; get it from http://sourceforge.net/projects/dvipng/ ." >&5
 echo "$as_me: error: Need the dvipng program; get it from http://sourceforge.net/projects/dvipng/ ." >&2;}
    { (exit 1); exit 1; }; }
-		  fi
-		  # Extract the first word of "latex", so it can be a program name with args.
+		       fi
+		       # Extract the first word of "latex", so it can be a program name with args.
 set dummy latex; ac_word=$2
 { echo "$as_me:$LINENO: checking for $ac_word" >&5
 echo $ECHO_N "checking for $ac_word... $ECHO_C" >&6; }
@@ -6017,21 +6033,22 @@ echo "${ECHO_T}no" >&6; }
 fi
 
 
-		  if test "${LATEX}" == "no"
-		     then { { echo "$as_me:$LINENO: error: Need a working LaTeX installation." >&5
+		       if test "${LATEX}" == "no"
+		          then { { echo "$as_me:$LINENO: error: Need a working LaTeX installation." >&5
 echo "$as_me: error: Need a working LaTeX installation." >&2;}
    { (exit 1); exit 1; }; }
-		  fi
-		  printf '\\nonstopmode\\documentclass{article}\\usepackage{breqn}\\begin{document}\\begin{dmath*}x^2\\end{dmath*}\\end{document}\n' > conftmp.tex
-		  printf "checking for breqn package..."
-		  if latex conftmp.tex > /dev/null 2>&1
-		     then echo " yes"
-		     else echo " no"
-		          { { echo "$as_me:$LINENO: error: Need the breqn LaTeX package; get it from ftp://ftp.ams.org/pub/tex/ ." >&5
+		       fi
+		       printf '\\nonstopmode\\documentclass{article}\\usepackage{breqn}\\begin{document}\\begin{dmath*}x^2\\end{dmath*}\\end{document}\n' > conftmp.tex
+		       printf "checking for breqn package..."
+		       if latex conftmp.tex > /dev/null 2>&1
+		          then echo " yes"
+		          else echo " no"
+		               { { echo "$as_me:$LINENO: error: Need the breqn LaTeX package; get it from ftp://ftp.ams.org/pub/tex/ ." >&5
 echo "$as_me: error: Need the breqn LaTeX package; get it from ftp://ftp.ams.org/pub/tex/ ." >&2;}
    { (exit 1); exit 1; }; }
-		  fi
-		  rm -f conftmp.tex conftmp.log conftmp.dvi conftmp.aux
+		       fi
+		       rm -f conftmp.tex conftmp.log conftmp.dvi conftmp.aux
+        fi
 fi
 
 

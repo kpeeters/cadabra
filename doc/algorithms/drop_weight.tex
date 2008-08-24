@@ -5,7 +5,7 @@ weight. Weights are computed by making use of the \subsprop{Weight}
 property of symbols. This algorithm does the opposite
 of \subscommand{keep\_weight}.
 
-As an example, consider the simple case in which we want to keep all
+As an example, consider the simple case in which we want to drop all
 terms with 3~fields. This is done using
 \begin{screen}{1,2,3}
 {A,B}::Weight(label=field).
@@ -37,3 +37,7 @@ partial derivatives,
 \phi \partial_{0}{\phi} + \partial_{0}{\lambda};
 \end{screen}
 ~
+
+\cdbseealgo{keep_weight}
+\cdbseeprop{Weight}
+\cdbseeprop{WeightInherit}
