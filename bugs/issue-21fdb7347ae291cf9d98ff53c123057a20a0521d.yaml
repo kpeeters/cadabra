@@ -1,0 +1,22 @@
+--- !ditz.rubyforge.org,2008-03-06/issue 
+title: Ask user before overwriting existing files.
+desc: |-
+  While the GUI does make backup files before saving, it does not
+  ask the user whether it is ok to overwrite an existing file.
+  That should only be skipped in case of 'Save'; all other write operations
+  should lead to a warning.
+type: :feature
+component: cadabra
+release: 
+reporter: Kasper Peeters <kasper.peeters@aei.mpg.de>
+status: :unstarted
+disposition: 
+creation_time: 2008-08-25 20:45:28.890368 Z
+references: []
+
+id: 21fdb7347ae291cf9d98ff53c123057a20a0521d
+log_events: 
+- - 2008-08-25 20:45:30.226341 Z
+  - Kasper Peeters <kasper.peeters@aei.mpg.de>
+  - created
+  - ""
