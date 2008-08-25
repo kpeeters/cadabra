@@ -50,9 +50,10 @@
 #include <modglue/pipe.hh>
 #include <modglue/ext_process.hh>
 
+#include <stack>
+
 #include "widgets.hh"
 #include "help.hh"
-#include "undo.hh"
 
 class XCadabra;
 
@@ -92,6 +93,49 @@ class VisualCell {
 		DataCell *datacell;
 };
 
+/// The Action object is used to pass user action instructions around and 
+/// store them in the undo/redo stacks. All references to cells is in terms 
+/// of a serial number from the beginning, as pointers change with a 
+/// del_cell do/undo combo.
+
+class ActionBase {
+	public:
+		ActionBase();
+
+		virtual void execute()=0;
+		virtual void revert()=0;
+
+		int cellno;
+};
+
+class ActionAddCell : public ActionBase {
+	public:
+		virtual void execute();
+		virtual void revert();
+};
+
+class ActionRemoveCell : public ActionBase {
+	public:
+		virtual void execute();
+		virtual void revert();
+};
+
+class ActionAddText : public ActionBase {
+	public:
+		virtual void execute();
+		virtual void revert();
+};
+
+class ActionRemoveText : public ActionBase {
+	public:
+		virtual void execute();
+		virtual void revert();
+};
+
+class ActionStack : std::stack<ActionBase *> {
+	public:
+		~ActionStack();
+};
 
 /// NotebookCanvas is a view on notebook data. Any number of these
 /// may be instantiated, and they all reflect the current status
@@ -243,8 +287,13 @@ class XCadabra : public Gtk::Window {
 		int          font_step;
 	private:
 		/// Variables for the undo/redo mechanism.
-		ActionStack undo_stack, redo_stack;
-		
+		ActionStack      undo_stack, redo_stack;
+		bool             action_execute(ActionBase *);
+		bool             action_revert(ActionBase *);
+		bool             action_undo();
+		bool             action_redo();
+
+		/// Various assorted other variables.
 		Gdk::Cursor      hglass;
 		bool             load_file; // used by main to indicate a load should occur after start
 		bool             have_received;

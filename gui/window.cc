@@ -117,6 +117,19 @@ const char * const XCadabra::autocomplete_strings[] = {
 //	show_all();
 //	}
 
+ActionBase::ActionBase()
+	: cellno(-1)
+	{
+	}
+
+ActionStack::~ActionStack()
+	{
+	while(size()>0) {
+		delete top();
+		pop();
+		}
+	}
+
 DataCell::DataCell(cell_t ct, const std::string& str, bool texhidden)
 	: cell_type(ct), tex_hidden(texhidden), sensitive(true), sectioning(0), running(false)
 	{
@@ -749,28 +762,40 @@ XCadabra::XCadabra(modglue::ext_process& cdbproc, const std::string& filename, m
 bool XCadabra::on_key_press_event(GdkEventKey* event)
 	{
 	switch(event->keyval) {
-		 case GDK_Home:
-			  active_canvas->scroll_to_start();
-			  return true; // if we don't return immediately, selections will go away
-		 case GDK_End:
-			  active_canvas->scroll_to_end();
-			  return true; // if we don't return immediately, selections will go away
-		 case GDK_Page_Up:
-			  active_canvas->scroll_up();
-			  return true; // if we don't return immediately, selections will go away
-		 case GDK_Page_Down:
-			  active_canvas->scroll_down();
-			  return true; // if we don't return immediately, selections will go away
-		 case 108:
-			  if( (event->state&Gdk::CONTROL_MASK) ) { // Ctrl-L: center display
-					active_canvas->scroll_into_view(active_cell, true);
-					return true; // if we don't return immediately, selections will go away
-					}
-			  break;
-		 case GDK_Tab:
-			  if(on_autocomplete())
-					return true; // prevent normal Tab action
-		 }
+		case GDK_Home:
+			active_canvas->scroll_to_start();
+			return true; // if we don't return immediately, selections will go away
+		case GDK_End:
+			active_canvas->scroll_to_end();
+			return true; // if we don't return immediately, selections will go away
+		case GDK_Page_Up:
+			active_canvas->scroll_up();
+			return true; // if we don't return immediately, selections will go away
+		case GDK_Page_Down:
+			active_canvas->scroll_down();
+			return true; // if we don't return immediately, selections will go away
+		case 108:
+			if( (event->state&Gdk::CONTROL_MASK) ) { // Ctrl-L: center display
+				active_canvas->scroll_into_view(active_cell, true);
+				return true; // if we don't return immediately, selections will go away
+				}
+			break;
+		case GDK_Tab:
+			if(on_autocomplete())
+				return true; // prevent normal Tab action
+		case '/':
+		case 'z':
+			if( (event->state&Gdk::CONTROL_MASK) ) {
+//				std::cerr << "undo" << std::endl;
+				}
+			return true;
+		case '?':
+		case 'Z':	
+			if( (event->state&Gdk::CONTROL_MASK) ) {
+//				std::cerr << "redo" << std::endl;
+				}
+			return true;
+		}
 
 	// Now first handle normal Gtk events so that we can skip to other cells 
 	// etc. After that we update the notebook position if required.
@@ -1147,6 +1172,26 @@ void XCadabra::connect_io_signals()
 			Glib::signal_io().connect(sigc::bind(sigc::mem_fun(this, &XCadabra::callmm),
 															 fds[i]), fds[i], Glib::IO_IN);
 		}
+	}
+
+bool XCadabra::action_execute(ActionBase* act) 
+	{
+	return true;
+	}
+
+bool XCadabra::action_revert(ActionBase* act) 
+	{
+	return true;
+	}
+
+bool XCadabra::action_undo()
+	{
+	return true;
+	}
+
+bool XCadabra::action_redo()
+	{
+	return true;
 	}
 
 DataCell *XCadabra::add_cell(DataCell *newcell, DataCell *ref, bool before)
