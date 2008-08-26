@@ -261,10 +261,19 @@ VisualCell *NotebookCanvas::add_cell(DataCell *dc, DataCell *ref, bool before)
 											  false, false, 0, GTK_PACK_START);
 
 //			(*newit).set_options(Gtk::PACK_SHRINK);
-
+			
+			// Connect to signal for 'ctrl-enter pressed', i.e. 'feed this cell to the kernel'.
 			newcell->inbox->edit.emitter.connect(
 				sigc::bind<NotebookCanvas *, VisualCell *>(
 					sigc::mem_fun(doc, &XCadabra::handle_editbox_output), this, newcell));
+
+			// Connect insert/delete signals to undo stack handler.
+			newcell->inbox->edit.get_buffer()->signal_insert().connect(
+				sigc::bind<VisualCell *>(sigc::mem_fun(doc, &XCadabra::on_my_insert), newcell), false);
+			newcell->inbox->edit.get_buffer()->signal_erase().connect(
+				sigc::bind<VisualCell *>(sigc::mem_fun(doc, &XCadabra::on_my_erase), newcell), false);
+
+			// Connect signals such that we can grab focus and scroll the widget into view when necessary.
 			newcell->inbox->edit.signal_grab_focus().connect(
 				sigc::bind<NotebookCanvas *, VisualCell *>(
 					sigc::mem_fun(doc, &XCadabra::handle_on_grab_focus),
@@ -300,22 +309,32 @@ VisualCell *NotebookCanvas::add_cell(DataCell *dc, DataCell *ref, bool before)
 			newcell->texbox->texview.signal_button_release_event().connect( 
 				sigc::bind<NotebookCanvas *, VisualCell *>(
 					sigc::mem_fun(doc, &XCadabra::handle_visibility_toggle), this, newcell));
+
+			// Connect signal requesting update of the TeX rendering.
 			newcell->texbox->edit.emitter.connect(
 				sigc::bind(
 					sigc::mem_fun(doc, &XCadabra::handle_tex_update_request), this, newcell));
+
+			// Connect insert/delete signals to undo/redo stack handler.
+			newcell->texbox->edit.get_buffer()->signal_insert().connect(
+				sigc::bind<VisualCell *>(sigc::mem_fun(doc, &XCadabra::on_my_insert), newcell), false);
+			newcell->texbox->edit.get_buffer()->signal_erase().connect(
+				sigc::bind<VisualCell *>(sigc::mem_fun(doc, &XCadabra::on_my_erase), newcell), false);
+
 			Gtk::VBox::BoxList::iterator newit=bl.insert(gtkit, *newcell->texbox);
 
 			gtk_box_set_child_packing(((Gtk::Box *)(&scrollbox))->gobj(), 
 											  ((Gtk::Widget *)(newcell->texbox))->gobj(),
 											  false, false, 0, GTK_PACK_START);
 
+// REPORT BUG: this sometimes segfaults
 //			(*newit).set_options(Gtk::PACK_SHRINK);
 			newcell->texbox->edit.signal_grab_focus().connect(
 				sigc::bind<NotebookCanvas *, VisualCell *>(
 					sigc::mem_fun(doc, &XCadabra::handle_on_grab_focus),
 					this, newcell));
-			// Hide source depending on setting in the datacell.
 
+			// Hide source depending on setting in the datacell.
 			newcell->texbox->texview.show_all();
 			if(newcell->datacell->tex_hidden) newcell->texbox->edit.hide_all();
 			else                              newcell->texbox->edit.show_all();
@@ -1293,6 +1312,18 @@ bool XCadabra::handle_editbox_output(std::string str, NotebookCanvas *can, Visua
 		}
 	return true;
 	}
+
+void XCadabra::on_my_insert(const Gtk::TextIter& pos, const Glib::ustring& text, int bytes, VisualCell *vis)
+	{
+//	std::cerr << "inserting " << text << std::endl;
+	}
+
+void XCadabra::on_my_erase(const Gtk::TextIter& start, const Gtk::TextIter& end, VisualCell *vis)
+	{
+//	std::cerr << "deleting " << std::endl; //get_buffer()->get_slice(start, end) << std::endl;
+	}
+
+
 
 void XCadabra::handle_on_grab_focus(NotebookCanvas *can, VisualCell *vis) 
 	{

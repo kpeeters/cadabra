@@ -204,6 +204,8 @@ class XCadabra : public Gtk::Window {
 
 		/// Data from the NotebookCanvas objects arrives here.
 		bool handle_editbox_output(std::string str, NotebookCanvas *, VisualCell *);
+		void on_my_insert(const Gtk::TextIter& pos, const Glib::ustring& text, int bytes, VisualCell *vis);
+		void on_my_erase(const Gtk::TextIter& start, const Gtk::TextIter& end, VisualCell *vis);
 
 		/// Events from the notebook cells arrive here.
 		void handle_on_grab_focus(NotebookCanvas *, VisualCell *);

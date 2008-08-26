@@ -278,8 +278,8 @@ TeXView::TeXView(Glib::RefPtr<TeXBuffer> texb, int hmargin)
 ExpressionInput::exp_input_tv::exp_input_tv(Glib::RefPtr<Gtk::TextBuffer> tb)
 	: Gtk::TextView(tb)
 	{
-	get_buffer()->signal_insert().connect(sigc::mem_fun(this, &exp_input_tv::on_my_insert), false);
-	get_buffer()->signal_erase().connect(sigc::mem_fun(this, &exp_input_tv::on_my_erase), false);
+//	get_buffer()->signal_insert().connect(sigc::mem_fun(this, &exp_input_tv::on_my_insert), false);
+//	get_buffer()->signal_erase().connect(sigc::mem_fun(this, &exp_input_tv::on_my_erase), false);
 	}
 
 ExpressionInput::ExpressionInput(Glib::RefPtr<Gtk::TextBuffer> tb, const std::string& fontname, int hmargin)
@@ -355,16 +355,6 @@ bool ExpressionInput::exp_input_tv::on_key_press_event(GdkEventKey* event)
 			 content_changed();
 		return retval;
 		}
-	}
-
-void ExpressionInput::exp_input_tv::on_my_insert(const Gtk::TextIter& pos, const Glib::ustring& text, int bytes)
-	{
-//	std::cerr << "inserting " << text << std::endl;
-	}
-
-void ExpressionInput::exp_input_tv::on_my_erase(const Gtk::TextIter& start, const Gtk::TextIter& end)
-	{
-//	std::cerr << "deleting " << get_buffer()->get_slice(start, end) << std::endl;
 	}
 
 bool ExpressionInput::handle_button_press(GdkEventButton* button)

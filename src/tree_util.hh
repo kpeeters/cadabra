@@ -45,9 +45,9 @@ void print_tree_bracketed(const tree<T>& t, std::ostream& str)
 	{
 	int headCount = t.number_of_siblings(t.begin());
 	int headNum = 0;
-	for(typename tree<T>::sibling_iterator iRoots = t.begin(); iRoots != t.end(); iRoots++) {
+	for(typename tree<T>::sibling_iterator iRoots = t.begin(); iRoots != t.end(); ++iRoots, ++headNum) {
 		print_subtree_bracketed(t,iRoots,str);
-		if (headNum <= headCount - 1) {
+		if (headNum != headCount) {
 			str << std::endl;
 			}
 		}
@@ -75,7 +75,7 @@ void print_subtree_bracketed(const tree<T>& t, typename tree<T>::iterator iRoot,
 			// recursively print child
 			print_subtree_bracketed(t,iChildren,str);
 			// comma after every child except the last one
-			if (siblingNum != siblingCount - 1 ) {
+			if (siblingNum != siblingCount ) {
 				str << ", ";
 				}
 			}

@@ -9,8 +9,8 @@
 
 /** \mainpage tree.hh
     \author   Kasper Peeters
-    \version  2.60
-    \date     23-Aug-2008
+    \version  2.61
+    \date     26-Aug-2008
     \see      http://www.aei.mpg.de/~peekas/tree/
     \see      http://www.aei.mpg.de/~peekas/tree/ChangeLog
 
@@ -417,7 +417,7 @@ class tree {
 		int      max_depth(const iterator_base&) const;
 		/// Count the number of children of node at position.
 		static unsigned int number_of_children(const iterator_base&);
-		/// Count the number of 'next' siblings of node at iterator.
+		/// Count the number of siblings (left and right) of node at iterator. Total nodes at this level is +1.
 		unsigned int number_of_siblings(const iterator_base&) const;
 		/// Determine whether node at position is in the subtrees with root in the range.
 		bool     is_in_subtree(const iterator_base& position, const iterator_base& begin, 
@@ -1690,7 +1690,18 @@ int tree<T, tree_node_allocator>::depth(const iterator_base& it, const iterator_
 template <class T, class tree_node_allocator>
 int tree<T, tree_node_allocator>::max_depth() const
 	{
-	return max_depth(begin());
+	tree_node *it=head->next_sibling;
+	assert(it!=feet);
+
+	int maxd=0;
+	while(true) {
+		maxd=std::max(maxd, max_depth(it));
+		if(it->next_sibling==feet)
+			break;
+		it=it->next_sibling;
+		}
+
+	return maxd;
 	}
 
 

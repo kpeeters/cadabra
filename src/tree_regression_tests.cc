@@ -47,8 +47,8 @@ int compare_tree(const std::string& name, const tree<std::string>& tr, const std
 		}
 	else {
 		status_message(name, false);
-		std::cout << "  expected:" << exp << std::endl
-					 << "  received:" << str.str() << std::endl;
+		std::cout << "  expected:" << std::endl << exp << std::endl
+					 << "  received:" << std::endl << str.str() << std::endl;
 		return 0;
 		}
 	}
@@ -65,7 +65,7 @@ int compare_subtree(const std::string& name, const tree<std::string>& tr, tree<s
 	else {
 		status_message(name, false);
 		std::cout << "  expected:" << exp << std::endl
-					 << "  received:" << str.str() << std::endl;
+					 << "  received:" << str.str() << std::endl << std::endl;
 		return 0;
 		}
 	}
@@ -83,7 +83,7 @@ int test2()
 	tree<std::string> tr;
 	tree<std::string>::pre_order_iterator html, body, h1, h3, bh1, mv1;
 	
-	html=tr.insert(tr.begin(), "html");
+	html=tr.set_head("html");
 	tr.insert(html,"extra");
 	body=tr.append_child(html, "body");
 	h1  =tr.append_child(body, "h1");
@@ -91,15 +91,15 @@ int test2()
 	tr.append_child(h1, "some text");
 	tree<std::string>::sibling_iterator more_text=tr.append_child(body, "more text");
 	
-	res*=compare_tree("basic algorithms", tr, "extra\nhtml(body(before h1, h1(some text), more text))\n");
+	res*=compare_tree("basic algorithms", tr, "extra\nhtml(body(before h1, h1(some text), more text))");
 
 	tr.swap(bh1);
-	res*=compare_tree("element swapping", tr, "extra\nhtml(body(h1(some text), before h1, more text))\n");
+	res*=compare_tree("element swapping", tr, "extra\nhtml(body(h1(some text), before h1, more text))");
 	tr.swap(h1);
-	res*=compare_tree("swapping back   ", tr, "extra\nhtml(body(before h1, h1(some text), more text))\n");
+	res*=compare_tree("swapping back   ", tr, "extra\nhtml(body(before h1, h1(some text), more text))");
 
 	tree<std::string> copytree(h1);
-	res*=compare_tree("copy constructor", copytree, "h1(some text)\n");
+	res*=compare_tree("copy constructor", copytree, "h1(some text)");
 
 	tree<std::string>::pre_order_iterator it;
 	it=std::find(tr.begin(),tr.end(),std::string("h1"));
@@ -115,6 +115,27 @@ int test2()
 		res=0;
 		}
 	else status_message("stl find 2         ", true);
+
+	// max_depth
+	//
+	if(tr.max_depth(tr.begin())==0)
+		status_message("max_depth 1      ", true);
+	else {
+		status_message("max_depth 1      ", false);
+		res=0;
+		}
+	if(tr.max_depth(html)==3)
+		status_message("max_depth 2      ", true);
+	else {
+		status_message("max_depth 2      ", false);
+		res=0;
+		}
+	if(tr.max_depth()==3)
+		status_message("max_depth 3      ", true);
+	else {
+		status_message("max_depth 3      ", false);
+		res=0;
+		}
 
 	return res;
 	}
@@ -137,8 +158,8 @@ int test3()
 	tr.append_child(l5,"1411");
 	tr.append_child(tr1,"bad");
 	
-	kptree::print_subtree_bracketed(tr, tr.begin(), std::cout);
-	std::cout << std::endl;
+//	kptree::print_subtree_bracketed(tr, tr.begin(), std::cout);
+//	std::cout << std::endl;
 	tree<std::string>::fixed_depth_iterator fd=tr.begin_fixed(tr.begin(),3);
 	if(tr.is_valid(fd) && *fd=="1111") status_message("fixed_depth_iterator 1", true);
 	else {
@@ -161,9 +182,17 @@ int test3()
 	return res;
 	}
 
-
 int main(int, char **)
    {
 	int result=1;
 	result*=test1()*test2()*test3();
+
+	if(result!=1) {
+		std::cout << "*** Regression tests failed ***" << std::endl;
+		return -1;
+		}
+	else {
+		std::cout << "Regression tests passed." << std::endl;
+		return 0;
+		}
 	}

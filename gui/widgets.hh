@@ -63,7 +63,6 @@ class TeXView : public Gtk::EventBox {
 
 		Gtk::VBox                 vbox;
 		Gtk::HBox                 hbox;
-//		Gtk::Button               button;
 		Gtk::Image                image;
 };
 
@@ -79,8 +78,6 @@ class ExpressionInput : public Gtk::VBox {
 			public:
 				exp_input_tv(Glib::RefPtr<Gtk::TextBuffer>);
 				virtual bool on_key_press_event(GdkEventKey*);
-				void on_my_insert(const Gtk::TextIter& pos, const Glib::ustring& text, int bytes);
-				void on_my_erase(const Gtk::TextIter& start, const Gtk::TextIter& end);
 				sigc::signal1<bool, std::string> emitter;
 				sigc::signal0<bool>              content_changed;
 		};
