@@ -62,8 +62,12 @@ class XCadabra;
 /// cell, but not the actual widget. Therefore, multiple widgets
 /// can read from the data stored in this cell; multiple notebook
 /// canvasses can therefore display the same notebook data.
+///
+/// DataCells are stored on the heap and reference counted since there
+/// are too many objects with a pointer to them to keep track of 
+/// proper de-allocation manually.
 
-class DataCell {
+class DataCell : public Glib::Object {
 	public:
 		enum cell_t { c_input, c_output, c_comment, c_tex, c_error };
 
@@ -90,52 +94,80 @@ class VisualCell {
 				TeXView         *outbox;
 				TeXInput        *texbox;
 		};
-		DataCell *datacell;
+		Glib::RefPtr<DataCell> datacell;
 };
 
-/// The Action object is used to pass user action instructions around and 
-/// store them in the undo/redo stacks. All references to cells is in terms 
-/// of a serial number from the beginning, as pointers change with a 
-/// del_cell do/undo combo.
+/// The Action object is used to pass user action instructions around
+/// and store them in the undo/redo stacks. All references to cells is
+/// in terms of smart pointers to DataCells. 
+///
+/// This requires that if we delete a cell, its data cell together
+/// with any TextBuffer and TeXBuffer objects should be kept in
+/// memory, so that the pointer remains valid.  We keep a RefPtr.
 
-class ActionBase {
+class ActionBase : public Glib::Object {
 	public:
-		ActionBase();
+		ActionBase(Glib::RefPtr<DataCell>);
 
-		virtual void execute()=0;
-		virtual void revert()=0;
+		virtual void execute(XCadabra&)=0;
+		virtual void revert(XCadabra&)=0;
 
-		int cellno;
+		Glib::RefPtr<DataCell> cell;
 };
+
+/// As a general rule, objects derived from ActionBase are friends of XCadabra, 
+/// so they really should be thought of as bits of functionality split off from
+/// that large class.
 
 class ActionAddCell : public ActionBase {
 	public:
-		virtual void execute();
-		virtual void revert();
+		ActionAddCell(Glib::RefPtr<DataCell>, Glib::RefPtr<DataCell> ref_, bool before_);
+
+		virtual void execute(XCadabra&);
+		virtual void revert(XCadabra&);
+
+	private:
+		Glib::RefPtr<DataCell> ref; 
+		bool                   before;
 };
 
 class ActionRemoveCell : public ActionBase {
 	public:
-		virtual void execute();
-		virtual void revert();
+		ActionRemoveCell(Glib::RefPtr<DataCell>);
+		~ActionRemoveCell();
+
+		virtual void execute(XCadabra&);
+		virtual void revert(XCadabra&);
+
+	private:
+		Glib::RefPtr<DataCell>               next_cell; 
+		std::vector<Glib::RefPtr<DataCell> > associated_cells; // output and comment cells
 };
 
 class ActionAddText : public ActionBase {
 	public:
-		virtual void execute();
-		virtual void revert();
+		ActionAddText(Glib::RefPtr<DataCell>, int, const std::string&);
+
+		virtual void execute(XCadabra&);
+		virtual void revert(XCadabra&);
+		
+		int         insert_pos;
+		std::string text;
 };
 
 class ActionRemoveText : public ActionBase {
 	public:
-		virtual void execute();
-		virtual void revert();
+		ActionRemoveText(Glib::RefPtr<DataCell>, int, int, const std::string&);
+
+		virtual void execute(XCadabra&);
+		virtual void revert(XCadabra&);
+
+		int from_pos, to_pos;
+		std::string removed_text;
 };
 
-class ActionStack : std::stack<ActionBase *> {
-	public:
-		~ActionStack();
-};
+typedef std::stack<Glib::RefPtr<ActionBase> > ActionStack;
+
 
 /// NotebookCanvas is a view on notebook data. Any number of these
 /// may be instantiated, and they all reflect the current status
@@ -156,14 +188,14 @@ class NotebookCanvas : public Gtk::VPaned {
 		/// Add a VisualCell corresponding to the given DataCell.
 		/// The second and third element determine the position relative
 		/// to another DataCell (or, by default, relative to the end marker).
-		VisualCell* add_cell(DataCell *, DataCell *ref=0, bool before=true);
+		VisualCell* add_cell(Glib::RefPtr<DataCell>, Glib::RefPtr<DataCell> ref, bool before=true);
 
 		/// Remove a VisualCell corresponding to the given DataCell.
-		void         remove_cell(DataCell *);
+		void         remove_cell(Glib::RefPtr<DataCell>);
 		/// Make a cell grab focus. This will trigger a run of this cell, with various
 		/// other side-effects before it returns.
 		void         cell_grab_focus(VisualCell *);
-		void         cell_grab_focus(DataCell *);
+		void         cell_grab_focus(Glib::RefPtr<DataCell>);
 		void         select_first_input_cell();
 		virtual void show();
 
@@ -171,7 +203,7 @@ class NotebookCanvas : public Gtk::VPaned {
 		void         redraw_cells();
 		bool         scroll_into_view_callback(VisualCell *);
 		bool         scroll_into_view(VisualCell *, bool center=false);
-		bool         scroll_into_view(DataCell   *, bool center=false);
+		bool         scroll_into_view(Glib::RefPtr<DataCell>, bool center=false);
 		void         scroll_to_start();
 		void         scroll_to_end();
 		void         scroll_up();
@@ -274,7 +306,7 @@ class XCadabra : public Gtk::Window {
 		/// so that they reflect the current structure of the document.
 		/// The DataCell ownership is handled by the XCadabra class once
 		/// it has been added here.
-		DataCell    *add_cell(DataCell *, DataCell *ref=0, bool before=true);
+		Glib::RefPtr<DataCell> add_cell(Glib::RefPtr<DataCell>, Glib::RefPtr<DataCell> ref, bool before=true);
 		void         add_canvas();
 
 		/// Signals from Gtk, such as closing windows or changing the text
@@ -290,28 +322,32 @@ class XCadabra : public Gtk::Window {
 	private:
 		/// Variables for the undo/redo mechanism.
 		ActionStack      undo_stack, redo_stack;
-		bool             action_execute(ActionBase *);
-		bool             action_revert(ActionBase *);
+		bool             disable_stacks; // for changes which should not be recorded on the stack
+		bool             action_add(Glib::RefPtr<ActionBase>); // takes ownership and fills the stacks 
 		bool             action_undo();
 		bool             action_redo();
 
-		/// Various assorted other variables.
+		/// Various assorted other variables related to communicating with the kernel.
 		Gdk::Cursor      hglass;
 		bool             load_file; // used by main to indicate a load should occur after start
 		bool             have_received;
 		modglue::main   *cmm;
 		std::map<int, sigc::connection> connections;
-		bool             callmm(Glib::IOCondition, int fd);
-
 		std::string      name;
 		bool             modified;
 		bool             running;
-		DataCell        *running_last;
+		Glib::RefPtr<DataCell> running_last;
 		bool             restarting_kernel;
+		bool             callmm(Glib::IOCondition, int fd);
 		void             update_title();
 		bool             make_backup(const std::string&) const;
-		void             remove_noninput_below(DataCell *);
+		void             remove_noninput_below(Glib::RefPtr<DataCell>);
 		void             kernel_idle();
+		/// A map to keep track of identifiers of input cells. These are used to associated input
+		/// data to the kernel to output data from the kernel, and hence can be used to associate
+		/// the output to the right input cell.
+		std::map<long, Glib::RefPtr<DataCell> > id_to_datacell;
+		long             last_used_id;
 
 		/// Boxes and widgets.
 		std::vector<NotebookCanvas *>  canvasses;   // managed by gtk
@@ -335,7 +371,7 @@ class XCadabra : public Gtk::Window {
 		/// Storage of document data. This data is not managed by smart
 		/// pointers and should thus be deleted by the XCadabra
 		/// destructor.
-		typedef std::list<DataCell *> DataCells_t;
+		typedef std::list<Glib::RefPtr<DataCell> > DataCells_t;
 		DataCells_t                   datacells;
 
 		/// Data concerning the interaction with the externally started
@@ -362,4 +398,7 @@ class XCadabra : public Gtk::Window {
 		/// Configuration data saving/loading
 		std::string save_config() const;
 		std::string load_config();
+
+		friend class ActionRemoveCell;
+		friend class ActionAddCell;
 };

@@ -9,8 +9,8 @@
 
 /** \mainpage tree.hh
     \author   Kasper Peeters
-    \version  2.61
-    \date     26-Aug-2008
+    \version  2.62
+    \date     28-Aug-2008
     \see      http://www.aei.mpg.de/~peekas/tree/
     \see      http://www.aei.mpg.de/~peekas/tree/ChangeLog
 
@@ -411,9 +411,9 @@ class tree {
 		/// Compute the depth to the root or to a fixed other iterator.
 		static int depth(const iterator_base&);
 		static int depth(const iterator_base&, const iterator_base&);
-		/// Determine the maximal depth of the tree.
+		/// Determine the maximal depth of the tree. An empty tree has max_depth=-1.
 		int      max_depth() const;
-		/// Determine the maximal depth of the tree below a given one.
+		/// Determine the maximal depth of the tree with top node at the given position.
 		int      max_depth(const iterator_base&) const;
 		/// Count the number of children of node at position.
 		static unsigned int number_of_children(const iterator_base&);
@@ -1690,16 +1690,9 @@ int tree<T, tree_node_allocator>::depth(const iterator_base& it, const iterator_
 template <class T, class tree_node_allocator>
 int tree<T, tree_node_allocator>::max_depth() const
 	{
-	tree_node *it=head->next_sibling;
-	assert(it!=feet);
-
-	int maxd=0;
-	while(true) {
+	int maxd=-1;
+	for(tree_node *it = head->next_sibling; it!=feet; it=it->next_sibling)
 		maxd=std::max(maxd, max_depth(it));
-		if(it->next_sibling==feet)
-			break;
-		it=it->next_sibling;
-		}
 
 	return maxd;
 	}
@@ -1709,6 +1702,9 @@ template <class T, class tree_node_allocator>
 int tree<T, tree_node_allocator>::max_depth(const iterator_base& pos) const
 	{
 	tree_node *tmp=pos.node;
+
+	if(tmp==0 || tmp==head || tmp==feet) return -1;
+
 	int curdepth=0, maxdepth=0;
 	while(true) { // try to walk the bottom of the tree
 		while(tmp->first_child==0) {

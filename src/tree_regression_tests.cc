@@ -81,14 +81,14 @@ int test2()
 	int res=1;
 
 	tree<std::string> tr;
-	tree<std::string>::pre_order_iterator html, body, h1, h3, bh1, mv1;
+	tree<std::string>::pre_order_iterator html, body, h1, h3, bh1, mv1, sometext;
 	
 	html=tr.set_head("html");
 	tr.insert(html,"extra");
 	body=tr.append_child(html, "body");
 	h1  =tr.append_child(body, "h1");
 	bh1 =tr.insert(h1,"before h1");
-	tr.append_child(h1, "some text");
+	sometext = tr.append_child(h1, "some text");
 	tree<std::string>::sibling_iterator more_text=tr.append_child(body, "more text");
 	
 	res*=compare_tree("basic algorithms", tr, "extra\nhtml(body(before h1, h1(some text), more text))");
@@ -116,8 +116,15 @@ int test2()
 		}
 	else status_message("stl find 2         ", true);
 
-	// max_depth
+	// depth & max_depth
 	//
+	if(tr.depth(sometext)==3) 
+		status_message("depth            ", true);
+	else {
+		status_message("depth            ", false);
+		res=0;
+		}
+
 	if(tr.max_depth(tr.begin())==0)
 		status_message("max_depth 1      ", true);
 	else {
@@ -136,6 +143,14 @@ int test2()
 		status_message("max_depth 3      ", false);
 		res=0;
 		}
+	tree<std::string> tr2;
+	if(tr2.max_depth()==-1)
+		status_message("max_depth 4      ", true);
+	else {
+		status_message("max_depth 4      ", false);
+		res=0;
+		}
+
 
 	return res;
 	}

@@ -1,3 +1,18 @@
+2008-08-28  Kasper Peeters  <kasper.peeters@aei.mpg.de>
+
+	* Released 2.62
+
+	* Changed the behaviour of max_depth() so that it returns -1 for
+	an empty tree, instead of bailing out with an error (strictly
+	speaking max_depth should be undefined...).
+
+2008-08-26  Kasper Peeters  <kasper.peeters@aei.mpg.de>
+
+	* Released 2.61
+
+	* Fixed a bug in max_depth() which would fail on trees with more
+	than one head node (thanks to Marc Noirot for pointing this out).
+
 2008-08-23  Kasper Peeters  <kasper.peeters@aei.mpg.de>
 
 	* Released 2.60
@@ -125,7 +140,7 @@
 2004-11-05  Kasper Peeters  <kasper.peeters@aei.mpg.de>
 
 	* Fixed a bug which shows up when inserting nodes at the top of
-	the tree (thanks to Matthias Bernt for pointing me at this one).
+	the tree (thanks to Matthias Bernt for pointing me to this one).
 
 2004-07-21  Kasper Peeters  <kasper.peeters@aei.mpg.de>
 
