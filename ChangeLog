@@ -1,3 +1,9 @@
+2008-08-29  Kasper Peeters  <kasper.peeters@aei.mpg.de>
+
+	* Released 0.144
+
+	* Added undo/redo to the GUI.
+
 2008-08-23  Kasper Peeters  <kasper.peeters@aei.mpg.de>
 
 	* Released 0.142

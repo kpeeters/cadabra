@@ -236,8 +236,8 @@ class XCadabra : public Gtk::Window {
 
 		/// Data from the NotebookCanvas objects arrives here.
 		bool handle_editbox_output(std::string str, NotebookCanvas *, VisualCell *);
-		void on_my_insert(const Gtk::TextIter& pos, const Glib::ustring& text, int bytes, VisualCell *vis);
-		void on_my_erase(const Gtk::TextIter& start, const Gtk::TextIter& end, VisualCell *vis);
+		void on_my_insert(const Gtk::TextIter& pos, const Glib::ustring& text, int bytes, Glib::RefPtr<DataCell>);
+		void on_my_erase(const Gtk::TextIter& start, const Gtk::TextIter& end, Glib::RefPtr<DataCell>);
 
 		/// Events from the notebook cells arrive here.
 		void handle_on_grab_focus(NotebookCanvas *, VisualCell *);
@@ -324,8 +324,8 @@ class XCadabra : public Gtk::Window {
 		ActionStack      undo_stack, redo_stack;
 		bool             disable_stacks; // for changes which should not be recorded on the stack
 		bool             action_add(Glib::RefPtr<ActionBase>); // takes ownership and fills the stacks 
-		bool             action_undo();
-		bool             action_redo();
+		void             action_undo();
+		void             action_redo();
 
 		/// Various assorted other variables related to communicating with the kernel.
 		Gdk::Cursor      hglass;
@@ -366,7 +366,7 @@ class XCadabra : public Gtk::Window {
 		Glib::RefPtr<Gtk::RadioAction> font_action0, font_action1, font_action2, font_action3;
 		Gtk::HBox                      statusbox;
 		Gtk::Label                     b_cdbstatus, b_kernelversion;
-		Gtk::Button                    b_kill, b_run, b_run_to, b_run_from, b_help, b_stop;
+		Gtk::Button                    b_kill, b_run, b_run_to, b_run_from, b_help, b_stop, b_undo, b_redo;
 
 		/// Storage of document data. This data is not managed by smart
 		/// pointers and should thus be deleted by the XCadabra

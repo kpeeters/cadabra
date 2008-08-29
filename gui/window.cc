@@ -302,7 +302,7 @@ void ActionRemoveCell::revert(XCadabra& xc)
 
 	// Re-insert all these cells back into the tree.
 	xc.add_cell(cell, (*fnd) );
-	std::cerr << associated_cells.size() << " cells to add" << std::endl;
+//	std::cerr << associated_cells.size() << " cells to add" << std::endl;
 	for(size_t i=0; i<associated_cells.size(); ++i)
 		xc.add_cell(associated_cells[i], (*fnd));
 	}
@@ -439,12 +439,6 @@ VisualCell *NotebookCanvas::add_cell(Glib::RefPtr<DataCell> dc, Glib::RefPtr<Dat
 				sigc::bind<NotebookCanvas *, VisualCell *>(
 					sigc::mem_fun(doc, &XCadabra::handle_editbox_output), this, newcell));
 
-			// Connect insert/delete signals to undo stack handler.
-			newcell->inbox->edit.get_buffer()->signal_insert().connect(
-				sigc::bind<VisualCell *>(sigc::mem_fun(doc, &XCadabra::on_my_insert), newcell), false);
-			newcell->inbox->edit.get_buffer()->signal_erase().connect(
-				sigc::bind<VisualCell *>(sigc::mem_fun(doc, &XCadabra::on_my_erase), newcell), false);
-
 			// Connect signals such that we can grab focus and scroll the widget into view when necessary.
 			newcell->inbox->edit.signal_grab_focus().connect(
 				sigc::bind<NotebookCanvas *, VisualCell *>(
@@ -486,12 +480,6 @@ VisualCell *NotebookCanvas::add_cell(Glib::RefPtr<DataCell> dc, Glib::RefPtr<Dat
 			newcell->texbox->edit.emitter.connect(
 				sigc::bind(
 					sigc::mem_fun(doc, &XCadabra::handle_tex_update_request), this, newcell));
-
-			// Connect insert/delete signals to undo/redo stack handler.
-			newcell->texbox->edit.get_buffer()->signal_insert().connect(
-				sigc::bind<VisualCell *>(sigc::mem_fun(doc, &XCadabra::on_my_insert), newcell), false);
-			newcell->texbox->edit.get_buffer()->signal_erase().connect(
-				sigc::bind<VisualCell *>(sigc::mem_fun(doc, &XCadabra::on_my_erase), newcell), false);
 
 			Gtk::VBox::BoxList::iterator newit=bl.insert(gtkit, *newcell->texbox);
 
@@ -718,7 +706,7 @@ XCadabra::XCadabra(modglue::ext_process& cdbproc, const std::string& filename, m
 	  last_used_id(0),
 	  active_canvas(0), active_cell(0),
 	  b_kernelversion("Kernel version: not running"),
-	  b_help(Gtk::Stock::HELP), b_stop(Gtk::Stock::STOP),
+	  b_help(Gtk::Stock::HELP), b_stop(Gtk::Stock::STOP), b_undo(Gtk::Stock::UNDO), b_redo(Gtk::Stock::REDO),
      cdb(cdbproc), selected(0)
 	{
 	std::string res=load_config();
@@ -775,6 +763,10 @@ XCadabra::XCadabra(modglue::ext_process& cdbproc, const std::string& filename, m
 								  sigc::mem_fun(*this, &XCadabra::on_file_export_text) );
 	actiongroup->add( Gtk::Action::create("Quit", Gtk::Stock::QUIT),
 								  sigc::mem_fun(*this, &XCadabra::on_file_quit) );
+	actiongroup->add( Gtk::Action::create("Undo", Gtk::Stock::UNDO), Gtk::AccelKey("<control>z"),
+								  sigc::mem_fun(*this, &XCadabra::action_undo) );
+	actiongroup->add( Gtk::Action::create("Redo", Gtk::Stock::REDO), Gtk::AccelKey("<control><shift>z"),
+								  sigc::mem_fun(*this, &XCadabra::action_redo) );
 	actiongroup->add( Gtk::Action::create("InsertTeXAbove", "Insert TeX cell above"),
 							Gtk::AccelKey("<alt><shift>Up"),
 								  sigc::mem_fun(*this, &XCadabra::on_edit_insert_tex_above) );   
@@ -860,6 +852,9 @@ XCadabra::XCadabra(modglue::ext_process& cdbproc, const std::string& filename, m
 		"      <menuitem action='Quit'/>"
 		"    </menu>"
 		"    <menu action='MenuEdit'>"
+		"      <menuitem action='Undo'/>"
+		"      <menuitem action='Redo'/>"
+		"      <separator/>"
 		"      <menuitem action='DivideCell'/>"
 		"      <separator/>"
 		"      <menuitem action='InsertTeXAbove'/>"
@@ -923,12 +918,16 @@ XCadabra::XCadabra(modglue::ext_process& cdbproc, const std::string& filename, m
 	statusbarbox.pack_start(progressbar2);
 	progressbar1.set_size_request(200,-1);
 	progressbar2.set_size_request(200,-1);
+//	buttonbox.pack_start(b_undo, Gtk::PACK_SHRINK);
+//	buttonbox.pack_start(b_redo, Gtk::PACK_SHRINK);
 	buttonbox.pack_start(b_help, Gtk::PACK_SHRINK);
 	buttonbox.pack_start(b_run, Gtk::PACK_SHRINK);
 	buttonbox.pack_start(b_run_to, Gtk::PACK_SHRINK);
 	buttonbox.pack_start(b_run_from, Gtk::PACK_SHRINK);
 	buttonbox.pack_start(b_stop, Gtk::PACK_SHRINK);
 	buttonbox.pack_start(b_kill, Gtk::PACK_SHRINK);
+//	b_undo.signal_clicked().connect(sigc::mem_fun(*this, &XCadabra::action_undo));
+//	b_redo.signal_clicked().connect(sigc::mem_fun(*this, &XCadabra::action_redo));
 	b_help.signal_clicked().connect(sigc::mem_fun(*this, &XCadabra::on_help_context));
 	b_stop.signal_clicked().connect(sigc::mem_fun(*this, &XCadabra::on_stop));
 	b_kill.signal_clicked().connect(sigc::mem_fun(*this, &XCadabra::on_kill));
@@ -1370,7 +1369,7 @@ void XCadabra::connect_io_signals()
 
 bool XCadabra::action_add(Glib::RefPtr<ActionBase> act) 
 	{
-	std::cerr << "Adding an action." << std::endl;
+//	std::cerr << "Adding an action." << std::endl;
 	while(redo_stack.size()>0)
 		redo_stack.pop();
 
@@ -1380,10 +1379,10 @@ bool XCadabra::action_add(Glib::RefPtr<ActionBase> act)
 	return true;
 	}
 
-bool XCadabra::action_undo()
+void XCadabra::action_undo()
 	{
-	std::cerr << "undo: " << undo_stack.size() 
-				 << "  redo: " << redo_stack.size() << std::endl;
+//	std::cerr << "undo: " << undo_stack.size() 
+//				 << "  redo: " << redo_stack.size() << std::endl;
 
 	if(undo_stack.size()>0) {
 		disable_stacks=true;
@@ -1392,14 +1391,12 @@ bool XCadabra::action_undo()
 		undo_stack.pop();
 		disable_stacks=false;
 		}
-
-	return true;
 	}
 
-bool XCadabra::action_redo()
+void XCadabra::action_redo()
 	{
-	std::cerr << "undo: " << undo_stack.size() 
-				 << "  redo: " << redo_stack.size() << std::endl;
+//	std::cerr << "undo: " << undo_stack.size() 
+//				 << "  redo: " << redo_stack.size() << std::endl;
 
 	if(redo_stack.size()>0) {
 		disable_stacks=true;
@@ -1408,8 +1405,6 @@ bool XCadabra::action_redo()
 		redo_stack.pop();
 		disable_stacks=false;
 		}
-
-	return true;
 	}
 
 Glib::RefPtr<DataCell> XCadabra::add_cell(Glib::RefPtr<DataCell> newcell, Glib::RefPtr<DataCell> ref, bool before)
@@ -1453,6 +1448,13 @@ Glib::RefPtr<DataCell> XCadabra::add_cell(Glib::RefPtr<DataCell> newcell, Glib::
 				break;
 			case DataCell::c_input:
 				newcell->textbuf->signal_changed().connect(sigc::mem_fun(this, &XCadabra::input_cell_modified));
+
+				// Connect insert/delete signals to undo stack handler.
+				newcell->textbuf->signal_insert().connect(
+					sigc::bind<Glib::RefPtr<DataCell> >(sigc::mem_fun(this, &XCadabra::on_my_insert), newcell), false);
+				newcell->textbuf->signal_erase().connect(
+					sigc::bind<Glib::RefPtr<DataCell> >(sigc::mem_fun(this, &XCadabra::on_my_erase), newcell), false);
+
 				break;
 			case DataCell::c_error:
 				newcell->texbuf->font_size=12+(font_step*2);
@@ -1462,6 +1464,13 @@ Glib::RefPtr<DataCell> XCadabra::add_cell(Glib::RefPtr<DataCell> newcell, Glib::
 				newcell->texbuf->font_size=12+(font_step*2);
 				newcell->texbuf->generate("","", horizontal_pixels);
 				newcell->textbuf->signal_changed().connect(sigc::mem_fun(this, &XCadabra::tex_cell_modified));
+
+				// Connect insert/delete signals to undo/redo stack handler.
+				newcell->texbuf->tex_source->signal_insert().connect(
+					sigc::bind<Glib::RefPtr<DataCell> >(sigc::mem_fun(this, &XCadabra::on_my_insert), newcell), false);
+				newcell->texbuf->tex_source->signal_erase().connect(
+					sigc::bind<Glib::RefPtr<DataCell> >(sigc::mem_fun(this, &XCadabra::on_my_erase), newcell), false);
+
 				break;
 			}
 		}
@@ -1514,14 +1523,12 @@ bool XCadabra::handle_editbox_output(std::string str, NotebookCanvas *can, Visua
 	return true;
 	}
 
-void XCadabra::on_my_insert(const Gtk::TextIter& pos, const Glib::ustring& text, int bytes, VisualCell *vis)
+void XCadabra::on_my_insert(const Gtk::TextIter& pos, const Glib::ustring& text, int bytes, Glib::RefPtr<DataCell> dc)
 	{
 	if(disable_stacks) return;
 
 	while(redo_stack.size()>0) 
 		redo_stack.pop();
-
-	Glib::RefPtr<DataCell> dc = vis->datacell;
 
 	Glib::RefPtr<Gtk::TextBuffer> buf;
 
@@ -1532,14 +1539,12 @@ void XCadabra::on_my_insert(const Gtk::TextIter& pos, const Glib::ustring& text,
 	undo_stack.push(Glib::RefPtr<ActionBase>(new ActionAddText(dc, std::distance(buf->begin(), pos), text)));
 	}
 
-void XCadabra::on_my_erase(const Gtk::TextIter& start, const Gtk::TextIter& end, VisualCell *vis)
+void XCadabra::on_my_erase(const Gtk::TextIter& start, const Gtk::TextIter& end, Glib::RefPtr<DataCell> dc)
 	{
 	if(disable_stacks) return;
 
 	while(redo_stack.size()>0) 
 		redo_stack.pop();
-
-	Glib::RefPtr<DataCell> dc = vis->datacell;
 
 	Glib::RefPtr<Gtk::TextBuffer> buf;
 
