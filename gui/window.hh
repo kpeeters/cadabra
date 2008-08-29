@@ -362,6 +362,7 @@ class XCadabra : public Gtk::Window {
 		Gtk::VBox                      progressbarvbox;
 		Gtk::ProgressBar               progressbar1,progressbar2;
 		Glib::RefPtr<Gtk::ActionGroup> actiongroup;
+		Glib::RefPtr<Gtk::Action>      undo_action_menu, redo_action_menu;
 		Glib::RefPtr<Gtk::UIManager>   uimanager;
 		Glib::RefPtr<Gtk::RadioAction> font_action0, font_action1, font_action2, font_action3;
 		Gtk::HBox                      statusbox;

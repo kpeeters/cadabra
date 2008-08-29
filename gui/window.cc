@@ -763,10 +763,16 @@ XCadabra::XCadabra(modglue::ext_process& cdbproc, const std::string& filename, m
 								  sigc::mem_fun(*this, &XCadabra::on_file_export_text) );
 	actiongroup->add( Gtk::Action::create("Quit", Gtk::Stock::QUIT),
 								  sigc::mem_fun(*this, &XCadabra::on_file_quit) );
-	actiongroup->add( Gtk::Action::create("Undo", Gtk::Stock::UNDO), Gtk::AccelKey("<control>z"),
-								  sigc::mem_fun(*this, &XCadabra::action_undo) );
-	actiongroup->add( Gtk::Action::create("Redo", Gtk::Stock::REDO), Gtk::AccelKey("<control><shift>z"),
-								  sigc::mem_fun(*this, &XCadabra::action_redo) );
+
+	undo_action_menu = Gtk::Action::create("Undo", Gtk::Stock::UNDO);
+	actiongroup->add( undo_action_menu, Gtk::AccelKey("<control>z"),
+													 sigc::mem_fun(*this, &XCadabra::action_undo) );
+	undo_action_menu->set_sensitive(false);
+	redo_action_menu = Gtk::Action::create("Redo", Gtk::Stock::REDO);
+	actiongroup->add( redo_action_menu, Gtk::AccelKey("<control><shift>z"),
+													 sigc::mem_fun(*this, &XCadabra::action_redo) );
+	redo_action_menu->set_sensitive(false);
+
 	actiongroup->add( Gtk::Action::create("InsertTeXAbove", "Insert TeX cell above"),
 							Gtk::AccelKey("<alt><shift>Up"),
 								  sigc::mem_fun(*this, &XCadabra::on_edit_insert_tex_above) );   
@@ -1372,6 +1378,8 @@ bool XCadabra::action_add(Glib::RefPtr<ActionBase> act)
 //	std::cerr << "Adding an action." << std::endl;
 	while(redo_stack.size()>0)
 		redo_stack.pop();
+	redo_action_menu->set_sensitive(false);
+	undo_action_menu->set_sensitive(true);
 
 	undo_stack.push(act);
 	act->execute(*this);
@@ -1390,6 +1398,9 @@ void XCadabra::action_undo()
 		redo_stack.push(undo_stack.top());
 		undo_stack.pop();
 		disable_stacks=false;
+		redo_action_menu->set_sensitive(true);
+		if(undo_stack.size()==0)
+			undo_action_menu->set_sensitive(false);
 		}
 	}
 
@@ -1404,6 +1415,9 @@ void XCadabra::action_redo()
 		undo_stack.push(redo_stack.top());
 		redo_stack.pop();
 		disable_stacks=false;
+		undo_action_menu->set_sensitive(true);
+		if(redo_stack.size()==0)
+			redo_action_menu->set_sensitive(false);
 		}
 	}
 
@@ -1529,6 +1543,8 @@ void XCadabra::on_my_insert(const Gtk::TextIter& pos, const Glib::ustring& text,
 
 	while(redo_stack.size()>0) 
 		redo_stack.pop();
+	redo_action_menu->set_sensitive(false);
+	undo_action_menu->set_sensitive(true);
 
 	Glib::RefPtr<Gtk::TextBuffer> buf;
 
@@ -1545,6 +1561,8 @@ void XCadabra::on_my_erase(const Gtk::TextIter& start, const Gtk::TextIter& end,
 
 	while(redo_stack.size()>0) 
 		redo_stack.pop();
+	redo_action_menu->set_sensitive(false);
+	undo_action_menu->set_sensitive(true);
 
 	Glib::RefPtr<Gtk::TextBuffer> buf;
 

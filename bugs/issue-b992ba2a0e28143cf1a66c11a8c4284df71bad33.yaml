@@ -1,0 +1,27 @@
+--- !ditz.rubyforge.org,2008-03-06/issue 
+title: Add support for differential 'd'
+desc: |-
+  While it is possible to use differential 'd' operators by declaring
+  them to be Derivatives, this is far from ideal. We need a special
+  property for this, so that we can write
+  
+  d{#}::DifferentialD.
+  d{s}**2 = -f(r) d{t}**2 + f(r)**(-1) d{r}**2 + r**2 d{\Omega}**2;
+  
+  This will only be really useful once the link to a scalar CAS is
+  added though.
+type: :feature
+component: cadabra
+release: 
+reporter: Kasper Peeters <kasper.peeters@aei.mpg.de>
+status: :unstarted
+disposition: 
+creation_time: 2008-08-29 11:37:06.073877 Z
+references: []
+
+id: b992ba2a0e28143cf1a66c11a8c4284df71bad33
+log_events: 
+- - 2008-08-29 11:37:07.897880 Z
+  - Kasper Peeters <kasper.peeters@aei.mpg.de>
+  - created
+  - ""

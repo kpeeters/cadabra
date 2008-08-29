@@ -4,5 +4,28 @@ version: "0.5"
 components: 
 - !ditz.rubyforge.org,2008-03-06/component 
   name: cadabra
-releases: []
-
+releases: 
+- !ditz.rubyforge.org,2008-03-06/release 
+  name: "0.144"
+  status: :released
+  release_time: 2008-08-29 11:39:41.850751 Z
+  log_events: 
+  - - 2008-08-29 11:38:36.334943 Z
+    - Kasper Peeters <kasper.peeters@aei.mpg.de>
+    - created
+    - This release has preliminary undo/redo support in the GUI.
+  - - 2008-08-29 11:39:41.850775 Z
+    - Kasper Peeters <kasper.peeters@aei.mpg.de>
+    - released
+    - ""
+- !ditz.rubyforge.org,2008-03-06/release 
+  name: "1.0"
+  status: :unreleased
+  release_time: 
+  log_events: 
+  - - 2008-08-29 11:41:30.088931 Z
+    - Kasper Peeters <kasper.peeters@aei.mpg.de>
+    - created
+    - |-
+      The first version with a more or less feature-complete GUI (full
+      documentation and undo/redo).
