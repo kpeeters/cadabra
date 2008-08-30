@@ -986,14 +986,16 @@ bool XCadabra::on_key_press_event(GdkEventKey* event)
 		case 'z':
 			if( (event->state&Gdk::CONTROL_MASK) ) {
 				action_undo();
+				return true;
 				}
-			return true;
+			break;
 		case '?':
 		case 'Z':	
 			if( (event->state&Gdk::CONTROL_MASK) ) {
 				action_redo();
+				return true;
 				}
-			return true;
+			break;
 		}
 
 	// Now first handle normal Gtk events so that we can skip to other cells 
