@@ -29,7 +29,7 @@ class TeXBuffer : public Glib::Object {
 	public:
 		TeXBuffer(Glib::RefPtr<Gtk::TextBuffer>, int fs=12);
 		
-		static const double  millimeter_per_inch = 25.4;
+		static double millimeter_per_inch;
 
 		void generate(const std::string& startwrap, const std::string& endwrap, int horizontal_pixels,
 						  bool nobreqn=false);

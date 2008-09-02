@@ -24,6 +24,7 @@ std::string trim(const std::string& s)
 	return std::string(s, b, e - b + 1);
 	}
 
+double TeXBuffer::millimeter_per_inch = 25.4;
 
 TeXBuffer::TeXBuffer(Glib::RefPtr<Gtk::TextBuffer> tb, int fs)
 	: tex_source(tb), foreground_colour("black"), font_size(fs)
