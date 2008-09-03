@@ -1,5 +1,5 @@
 
-export RELEASE=0.145
+export RELEASE=0.146
 
 .PHONY: static program_static test fasttest gui gui_static doc
 
@@ -81,8 +81,10 @@ install_program: program
 install_gui: gui
 	( cd gui && $(MAKE) install );
 	@INSTALL@ man/man1/xcadabra.1 ${DESTDIR}@prefix@/share/man/man1
-	install -D cadabra.desktop ${DESTDIR}@prefix@/share/applications/cadabra.desktop
-	install -D cadabra.png ${DESTDIR}@prefix@/share/pixmaps/cadabra.png
+	@INSTALL@ -d ${DESTDIR}@prefix@/share/applications/
+	@INSTALL@ -d ${DESTDIR}@prefix@/share/pixmaps/
+	@INSTALL@ -m 644 cadabra.desktop ${DESTDIR}@prefix@/share/applications/cadabra.desktop
+	@INSTALL@ -m 644 cadabra.png ${DESTDIR}@prefix@/share/pixmaps/cadabra.png
 
 uninstall:
 	( cd src && $(MAKE) uninstall );
