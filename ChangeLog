@@ -1,3 +1,9 @@
+2008-09-22  Kasper Peeters  <kasper.peeters@aei.mpg.de>
+
+	* Released 0.147
+
+	* Fixed a show-stopping brown-paper-bag bug in the GUI.
+
 2008-09-21  Kasper Peeters  <kasper.peeters@aei.mpg.de>
 
 	* Released 0.146

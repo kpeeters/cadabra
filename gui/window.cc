@@ -21,7 +21,7 @@
 	
 */
 
-//#define DEBUG 1
+// #define DEBUG 1
 
 #include <modglue/pipe.hh>
 #include <modglue/process.hh>
@@ -1614,7 +1614,10 @@ void XCadabra::handle_on_grab_focus(NotebookCanvas *can, VisualCell *vis)
 #ifdef DEBUG
 				std::cerr << "executing cell\n" << tmp << std::endl;
 #endif
-				*(cdb.output_pipe("stdin")) << "#cellstart " << active_cell->datacell << "\n"
+				// This logic also appears in handle_editbox_output; sync!
+				++last_used_id;
+				id_to_datacell[last_used_id] = active_cell->datacell;
+				*(cdb.output_pipe("stdin")) << "#cellstart " << last_used_id << "\n"
 													 << tmp << "\n"
 												 << "#cellend\n" << std::flush;
 				}
@@ -1789,7 +1792,7 @@ bool XCadabra::receive(modglue::ipipe& p)
 		if(str.substr(0,10)=="#cellstart") {
 			std::istringstream ss(str.substr(11));
 			int help;
-			ss >> std::hex >> help;
+			ss >> help;
 			assert(id_to_datacell.find(help)!=id_to_datacell.end());
 			cp=id_to_datacell[help];
 			remove_noninput_below(cp);
