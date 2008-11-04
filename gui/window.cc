@@ -713,6 +713,13 @@ XCadabra::XCadabra(modglue::ext_process& cdbproc, const std::string& filename, m
 	if(res.size()>0) 
 		 std::cerr << res << std::endl;
 
+	try {
+		set_icon_from_file(DESTDIR+std::string("/share/pixmaps/cadabra.png"));
+		}
+	catch(Glib::FileError fe) {
+		std::cerr << "cannot find cadabra.png" << std::endl;
+		}
+
 	b_stop.set_sensitive(false);
 	b_run.set_label("Run all");
 	b_run_to.set_label("Run to cursor");

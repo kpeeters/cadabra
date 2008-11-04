@@ -11,6 +11,12 @@ CadabraHelp::CadabraHelp()
 	: history_pos(-1), buttonbox(0), back(Gtk::Stock::GO_BACK), forward(Gtk::Stock::GO_FORWARD)
 	{
 	set_title("XCadabra help");
+	try {
+		set_icon_from_file(DESTDIR+std::string("/share/pixmaps/cadabra.png"));
+		}
+	catch(Glib::FileError fe) {
+		std::cerr << "cannot find cadabra.png" << std::endl;
+		}
 	set_gravity(Gdk::GRAVITY_NORTH_EAST);
 	set_default_size(std::min(Gdk::Screen::get_default()->get_width()-20,  600),
 						  std::min(Gdk::Screen::get_default()->get_height()-20, 800));

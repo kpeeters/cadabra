@@ -1,0 +1,47 @@
+Cadabra does not yet compile on Windows, but this will change in the
+near future. Below is a list of dependencies which will have to be
+sorted out for a Windows port. Many GNU tools are available for
+Windows through
+
+  http://gnuwin32.sourceforge.net/
+
+We will use MinGW and the MSYS shell
+
+  http://www.mingw.org/
+  http://mingw.org/wiki/msys
+
+to build.
+
+--------------------------------------------------------------------
+kernel only:
+
++ PCRE.
+
+  Available through gnuwin32.
+
++ GMP. 
+
+  http://fp.gladman.plus.com/computing/gmp4win.htm
+
+- Modglue.
+
+  The modglue methods will be replaced with Glib ones (not as nice but
+  more portable).
+
+- LiE.
+
+  We may decide to simply drop this, disabling a little bit of
+  cadabra functionality for the time being.
+
+--------------------------------------------------------------------
+gui:
+
++ SigC/Gtk+/Gtkmm and friends.
+
+  http://live.gnome.org/gtkmm/MSWindows
+
++ TeX & dvipng
+
+  http://www.tug.org/texlive/windows.html
+
+
