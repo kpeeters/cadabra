@@ -1,0 +1,26 @@
+--- !ditz.rubyforge.org,2008-03-06/issue 
+title: Single-factor replacements with dummy names fail.
+desc: |-
+  The following fails to substitute:
+  
+  {\mu,\nu,\rho,\sigma}::Indices(vector).
+  obj66:= A^{\mu} B^{\nu};
+  @substitute!!(%)( A?^{\sigma} -> Q^{\sigma} );
+  
+  Constructions like this do work when the substitution rule contains
+  a product on the lhs.
+type: :task
+component: cadabra
+release: 
+reporter: Kasper Peeters <kasper.peeters@aei.mpg.de>
+status: :unstarted
+disposition: 
+creation_time: 2008-11-17 12:43:27.027461 Z
+references: []
+
+id: 9bc33d2ce36bc0dd67c03d09cc1c2ab5e9eba099
+log_events: 
+- - 2008-11-17 12:43:40.099941 Z
+  - Kasper Peeters <kasper.peeters@aei.mpg.de>
+  - created
+  - ""

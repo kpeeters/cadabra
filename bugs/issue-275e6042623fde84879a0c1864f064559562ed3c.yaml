@@ -1,0 +1,20 @@
+--- !ditz.rubyforge.org,2008-03-06/issue 
+title: XCadabra breaks when a .cadabra is present
+desc: |-
+  When there is .cadabra file present in the user's home directory,
+  xcadabra will fail to start properly.
+type: :task
+component: cadabra
+release: 
+reporter: Kasper Peeters <kasper.peeters@aei.mpg.de>
+status: :unstarted
+disposition: 
+creation_time: 2008-11-14 10:09:04.301686 Z
+references: []
+
+id: 275e6042623fde84879a0c1864f064559562ed3c
+log_events: 
+- - 2008-11-14 10:09:06.640974 Z
+  - Kasper Peeters <kasper.peeters@aei.mpg.de>
+  - created
+  - ""

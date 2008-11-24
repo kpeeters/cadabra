@@ -1,0 +1,23 @@
+--- !ditz.rubyforge.org,2008-03-06/issue 
+title: "@eliminate_kr does not work on sums"
+desc: |-
+  When @eliminate_kr is called on an expression of the form
+  
+     \delta_{a b} * ( more than one term )
+  
+  the result is inconsistent.
+type: :task
+component: cadabra
+release: 
+reporter: Kasper Peeters <kasper.peeters@aei.mpg.de>
+status: :unstarted
+disposition: 
+creation_time: 2008-11-14 10:11:36.523033 Z
+references: []
+
+id: becb40c03914860dbc07ef30bb8fb898a9089a73
+log_events: 
+- - 2008-11-14 10:11:37.413111 Z
+  - Kasper Peeters <kasper.peeters@aei.mpg.de>
+  - created
+  - ""

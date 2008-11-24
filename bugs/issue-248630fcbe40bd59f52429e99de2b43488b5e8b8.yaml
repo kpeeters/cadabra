@@ -1,0 +1,21 @@
+--- !ditz.rubyforge.org,2008-03-06/issue 
+title: Nested \partial's do not always flatten automatically.
+desc: |-
+  See test 17 in derivative.cdb. Cleanup_nests is not called at input,
+  which leads to nested partial derivatives which do not automatically
+  simplify.
+type: :task
+component: cadabra
+release: 
+reporter: Kasper Peeters <kasper.peeters@aei.mpg.de>
+status: :unstarted
+disposition: 
+creation_time: 2008-11-24 22:44:58.390277 Z
+references: []
+
+id: 248630fcbe40bd59f52429e99de2b43488b5e8b8
+log_events: 
+- - 2008-11-24 22:44:59.345048 Z
+  - Kasper Peeters <kasper.peeters@aei.mpg.de>
+  - created
+  - ""

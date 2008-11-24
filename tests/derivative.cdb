@@ -193,3 +193,12 @@ tst16:= 3 a**2 \partial{a} + @(obj16);
 @collect_terms!(%);
 @assert(tst15);
 
+# Test 17: Flattening
+#
+@reset.
+\partial{#}::PartialDerivative.
+obj17:= \partial_{a}{\partial_{b c}{F}};
+test17:= \partial_{a b c}{F} - @(obj17);
+@collect_terms!(%);
+@assert(tst17);
+

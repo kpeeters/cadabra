@@ -670,3 +670,12 @@ obj66:= A^{\mu} B^{\nu};
 tst66:= Q^{\mu\nu} - @(obj66);
 @collect_terms!(%);
 @assert(tst66);
+
+# Test 67: similar to 65, but no product
+@reset.
+{\mu,\nu,\rho,\sigma}::Indices(vector).
+obj66:= A^{\mu} B^{\nu};
+@substitute!!(%)( A?^{\sigma} -> Q^{\sigma} );
+tst66:= Q^{\mu} Q^{\nu} - @(obj66);
+@collect_terms!(%);
+@assert(tst66);
