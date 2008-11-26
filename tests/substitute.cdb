@@ -350,6 +350,7 @@ tst35:= \diff{\phi}_{m2} * \diff{\phi}_{m1} * g3_{q p} * g3_{n s} * g3^{m2 m1} *
 obj35:=  (-2a -2b -2c)*Q;
 @substitute!(%)( c -> -a/2 -b/2 );
 tst35:= (-a-b)*Q - @(obj35);
+@sumflatten!(%);
 @collect_terms!(%);
 @assert(tst35);
 
@@ -674,8 +675,8 @@ tst66:= Q^{\mu\nu} - @(obj66);
 # Test 67: similar to 65, but no product
 @reset.
 {\mu,\nu,\rho,\sigma}::Indices(vector).
-obj66:= A^{\mu} B^{\nu};
-@substitute!!(%)( A?^{\sigma} -> Q^{\sigma} );
-tst66:= Q^{\mu} Q^{\nu} - @(obj66);
+obj67:= A^{\mu} B^{\nu};
+@substitute!!(%)( A?^{\sigma} | \regex{A?}{"[AB]"} -> Q^{\sigma} );
+tst67:= Q^{\mu} Q^{\nu} - @(obj67);
 @collect_terms!(%);
-@assert(tst66);
+@assert(tst67);

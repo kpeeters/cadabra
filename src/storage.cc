@@ -1288,6 +1288,8 @@ exptree_comparator::match_t exptree_comparator::compare(const exptree::iterator&
 	// nobrackets also implies 'no multiplier', i.e. 'toplevel'.
 	// one is the substitute pattern, two the expression under consideration
 	
+//	std::cerr << "matching " << *one->name << " to " << *two->name << std::endl;
+
 	if(nobrackets==false && one->fl.bracket != two->fl.bracket) 
 		return (one->fl.bracket < two->fl.bracket)?no_match_less:no_match_greater;
 

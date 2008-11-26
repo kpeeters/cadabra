@@ -1875,6 +1875,7 @@ algorithm::result_t collect_factors::apply(iterator& st)
 			// make the modification to the tree
 			if(expsum.number_of_children(expsum.begin())>1) {
 				cleanup_expression(expsum);
+				cleanup_nests_below(expsum, expsum.begin());
 				if(! (expsum.begin()->is_identity()) ) {
 					collect_terms ct(expsum, expsum.end());
 					iterator tp=expsum.begin();

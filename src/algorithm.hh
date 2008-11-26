@@ -241,6 +241,7 @@ void cleanup_expression(exptree&);
 void cleanup_expression(exptree&, exptree::iterator&); // may change the pointer!
 void cleanup_sums_products(exptree&, exptree::iterator&);
 void cleanup_nests(exptree&tr, exptree::iterator &it);
+void cleanup_nests_below(exptree&tr, exptree::iterator it);
 
 template<class T>
 std::auto_ptr<algorithm> create(exptree& tr, exptree::iterator it)

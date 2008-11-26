@@ -135,7 +135,10 @@ bool substitute::can_apply(iterator st)
 			}
 		else conditions=tr.end();
 		
-		if(lhs->name!=st->name && lhs->name->size()>0) 
+//		std::cerr << *lhs->name << " - " << *st->name << std::endl;
+
+		if(lhs->name!=st->name 
+			&& !lhs->is_object_wildcard() && !lhs->is_name_wildcard() && lhs->name->size()>0) 
 			continue;
 
 		exptree_comparator::match_t ret;

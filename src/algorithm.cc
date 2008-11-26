@@ -828,16 +828,16 @@ bool algorithm::check_consistency(iterator it) const
 						if(sumch->fl.bracket!=firstbracket)
 							throw consistency_error("Found a \\sum node with different brackets on its children.");
 						}
-					else if(*sumch->name=="\\sum") {
-						sibling_iterator sumchch=sumch.begin();
-						while(sumchch!=sumch.end()) { 
-							if(sumchch->fl.bracket==str_node::b_none) {
-								tr.print_recursive_treeform(debugout, entry);
-								throw consistency_error("Found a sum node with \\sum child without bracketed children.");
-								}
-							++sumchch;
-							}
-						}
+//					else if(*sumch->name=="\\sum") {
+//						sibling_iterator sumchch=sumch.begin();
+//						while(sumchch!=sumch.end()) { 
+//							if(sumchch->fl.bracket==str_node::b_none) {
+//								tr.print_recursive_treeform(debugout, entry);
+//								throw consistency_error("Found a sum node with \\sum child without bracketed children.");
+//								}
+//							++sumchch;
+//							}
+//						}
 					++sumch;
 					}
 				}
@@ -1401,6 +1401,7 @@ void algorithm::classify_indices(iterator it, index_map_t& ind_free, index_map_t
                   // integer, coordinate or symbol indices always ok
 						if(fri->second->is_integer()==false && !cdn && !smb) { 
 							if(term_free.count((*fri).first)==0) {
+								debugout << "check 1" << std::endl;
 								debugout << "free indices elsewhere: ";
 								dumpmap(debugout, first_free);
 								debugout << "free indices here     : ";
@@ -1420,6 +1421,7 @@ void algorithm::classify_indices(iterator it, index_map_t& ind_free, index_map_t
                   // integer, coordinate or symbol indices always ok
 						if(fri->second->is_integer()==false && !cdn && !smb) { 
 							if(first_free.count((*fri).first)==0) {
+								debugout << "check 2" << std::endl;
 								debugout << "free indices elsewhere: ";
 								dumpmap(debugout, first_free);
 								debugout << "free indices here     : ";
@@ -1668,6 +1670,7 @@ void cleanup_expression(exptree& tr, exptree::iterator& it)
 	rdiv.apply_recursive(it, false);
 
 	cleanup_sums_products(tr,it);
+//	cleanup_nests_below(tr, tr.begin());
 //	cleanup_nests(tr,it); // FIXME: enabling this is pointless as 'it' points to \expression
 	}
 
@@ -1706,6 +1709,22 @@ bool algorithm::cleanup_anomalous_products(exptree& tr, exptree::iterator& it)
 	return false;
 	}
 
+void cleanup_nests_below(exptree&tr, exptree::iterator it)
+	{
+	if(!tr.is_valid(it)) return;
+	exptree::iterator now=it;
+	if(it==tr.end()) return;
+	exptree::iterator stop=now;
+	stop.skip_children();
+	++stop;
+	++now; // We are not allowed to touch the content at 'it', only content below it.
+
+	while(now!=stop) {
+		cleanup_nests(tr, now);
+		++now;
+		}
+	}
+
 void cleanup_nests(exptree&tr, exptree::iterator &it)
 	{
 	if(!tr.is_valid(tr.parent(it))) return;
@@ -1713,7 +1732,7 @@ void cleanup_nests(exptree&tr, exptree::iterator &it)
 	if(*(it->name)=="\\prod") {
 		assert(tr.parent(it)!=tr.end());
 //		txtout << "*** " << *tr.parent(it)->name << std::endl;
-      if(*(tr.parent(it)->name)=="\\prod") {
+      if(*(tr.parent(it)->name)=="\\prod" && tr.begin(it)->fl.bracket==it->fl.bracket) {
          multiplier_t fac=*(tr.parent(it)->multiplier)*(*it->multiplier);
          tr.parent(it)->multiplier=rat_set.insert(fac).first;
          tr.flatten(it);
@@ -1724,7 +1743,8 @@ void cleanup_nests(exptree&tr, exptree::iterator &it)
 	if(*(it->name)=="\\sum") {
 		assert(tr.parent(it)!=tr.end());
 //		txtout << "*** " << *tr.parent(it)->name << std::endl;
-		if(*(tr.parent(it)->name)=="\\sum") {
+//		txtout << tr.begin(it)->fl.bracket << " " << it->fl.bracket << std::endl;
+		if(*(tr.parent(it)->name)=="\\sum" && tr.begin(it)->fl.bracket==it->fl.bracket) {
 			// WARNING, this is a copy of code in sumflatten!
 			exptree::sibling_iterator facs=tr.begin(tr.parent(it));
 			str_node::bracket_t btype_par=facs->fl.bracket;

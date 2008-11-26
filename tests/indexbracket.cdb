@@ -74,3 +74,10 @@ tst7:= A_{m p} B_{p n} - @(obj7);
 @collect_terms!(%);
 @assert(tst7);
 
+# Test 8: adding indexbrackets
+#
+@reset.
+obj8:= (A_{m} + B_{m})_{c} + (C_{m}+D_{m})_{c};
+tst8:= (A_{m} + B_{m})_{c} + (C_{m}+D_{m})_{c} - @(obj8);
+@collect_terms!(%);
+@assert(tst8);

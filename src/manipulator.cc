@@ -767,6 +767,8 @@ nset_t::iterator manipulator::collect_labels_(exptree& tr, exptree::iterator it)
 void manipulator::cleanup_new_expression_(exptree::iterator it)
 	{
 	cleanup_expression(expressions, it);
+	cleanup_nests_below(expressions, it);
+
 	generate_indexbracket gb(expressions, expressions.end());
 	gb.apply_recursive(it,false); 
 
