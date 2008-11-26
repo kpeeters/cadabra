@@ -203,3 +203,10 @@ tst17:= \partial_{a b c}{F} - @(obj17);
 @collect_terms!(%);
 @assert(tst17);
 
+# Test 18: more flattening
+#
+@reset.
+\partial{#}::PartialDerivative.
+\nabla{#}::Derivative.
+obj18:= \nabla_{a}{\nabla_{b}{F}};
+@substitute!!(%)( \nabla_{a}{A??} -> \partial_{a}{A??} );

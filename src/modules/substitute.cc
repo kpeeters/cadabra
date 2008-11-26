@@ -370,6 +370,7 @@ algorithm::result_t substitute::apply(iterator& st)
 		}
 	
 	cleanup_nests(tr, st);
+
 //	prodcollectnum pc(tr, tr.end());
 //	pc.apply(st);
 	tmr.stop();

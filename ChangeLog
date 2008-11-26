@@ -1,3 +1,9 @@
+2008-11-26  Kasper Peeters  <kasper.peeters@aei.mpg.de>
+
+	* Released 0.149
+
+	* Fixed @distribute to cleanup nests correctly.
+
 2008-11-25  Kasper Peeters  <kasper.peeters@aei.mpg.de>
 
 	* Released 0.148

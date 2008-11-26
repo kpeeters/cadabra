@@ -1709,7 +1709,7 @@ bool algorithm::cleanup_anomalous_products(exptree& tr, exptree::iterator& it)
 	return false;
 	}
 
-void cleanup_nests_below(exptree&tr, exptree::iterator it)
+void cleanup_nests_below(exptree&tr, exptree::iterator it, bool ignore_bracket_types)
 	{
 	if(!tr.is_valid(it)) return;
 	exptree::iterator now=it;
@@ -1720,19 +1720,19 @@ void cleanup_nests_below(exptree&tr, exptree::iterator it)
 	++now; // We are not allowed to touch the content at 'it', only content below it.
 
 	while(now!=stop) {
-		cleanup_nests(tr, now);
+		cleanup_nests(tr, now, ignore_bracket_types);
 		++now;
 		}
 	}
 
-void cleanup_nests(exptree&tr, exptree::iterator &it)
+void cleanup_nests(exptree&tr, exptree::iterator &it, bool ignore_bracket_types)
 	{
 	if(!tr.is_valid(tr.parent(it))) return;
 //	tr.print_recursive_treeform(txtout, tr.begin());
 	if(*(it->name)=="\\prod") {
 		assert(tr.parent(it)!=tr.end());
 //		txtout << "*** " << *tr.parent(it)->name << std::endl;
-      if(*(tr.parent(it)->name)=="\\prod" && tr.begin(it)->fl.bracket==it->fl.bracket) {
+      if(*(tr.parent(it)->name)=="\\prod" && (ignore_bracket_types || tr.begin(it)->fl.bracket==it->fl.bracket) ) {
          multiplier_t fac=*(tr.parent(it)->multiplier)*(*it->multiplier);
          tr.parent(it)->multiplier=rat_set.insert(fac).first;
          tr.flatten(it);
@@ -1744,7 +1744,7 @@ void cleanup_nests(exptree&tr, exptree::iterator &it)
 		assert(tr.parent(it)!=tr.end());
 //		txtout << "*** " << *tr.parent(it)->name << std::endl;
 //		txtout << tr.begin(it)->fl.bracket << " " << it->fl.bracket << std::endl;
-		if(*(tr.parent(it)->name)=="\\sum" && tr.begin(it)->fl.bracket==it->fl.bracket) {
+		if(*(tr.parent(it)->name)=="\\sum" && (ignore_bracket_types || tr.begin(it)->fl.bracket==it->fl.bracket) ) {
 			// WARNING, this is a copy of code in sumflatten!
 			exptree::sibling_iterator facs=tr.begin(tr.parent(it));
 			str_node::bracket_t btype_par=facs->fl.bracket;
