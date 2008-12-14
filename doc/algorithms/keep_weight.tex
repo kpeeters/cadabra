@@ -24,6 +24,21 @@ A B B + A A A + A B + A C + B:
 A B B + A A A + A C
 \end{screen}
 
+Weights also apply to tensorial expressions. Consider e.g.~a situation
+in which we have a polynomial of the type
+\begin{equation}
+c^{a} + c^{a}_{b} x^{b} + c^{a}_{b c} x^{b} x^{c} + c^{a}_{b c d}
+x^{b} x^{c} x^{d};
+\end{equation}
+and we want to keep only the quadratic term. This can be done using
+\begin{screen}{1,2,3,4}
+x^{a}::Weight(label=crd, value=1).
+c^{#}::Weight(label=crd, value=0).
+c^{a} + c^{a}_{b} x^{b} + c^{a}_{b c} x^{b} x^{c} + c^{a}_{b c d} x^{b} x^{c} x^{d};
+@keep_weight!(%){crd}{2};
+c^{a}_{b c} x^{b} x^{c};
+\end{screen}
+
 Weights can be ``inherited'' by operators by using
 the \subsprop{WeightInherit} property. Here is an example using
 partial derivatives,

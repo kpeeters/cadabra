@@ -1,3 +1,9 @@
+2008-12-14  Kasper Peeters  <kasper.peeters@aei.mpg.de>
+
+	* Fixed a bug in the pattern matcher which would result in
+	incorrect matches when matching indices with tensors of the same
+	name. 
+
 2008-11-27  Kasper Peeters  <kasper.peeters@aei.mpg.de>
 
 	* Released 1.0 (time for normal version numbers)

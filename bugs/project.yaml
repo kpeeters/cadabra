@@ -20,8 +20,8 @@ releases:
     - ""
 - !ditz.rubyforge.org,2008-03-06/release 
   name: "1.0"
-  status: :unreleased
-  release_time: 
+  status: :released
+  release_time: 2008-12-11 16:25:57.475408 Z
   log_events: 
   - - 2008-08-29 11:41:30.088931 Z
     - Kasper Peeters <kasper.peeters@aei.mpg.de>
@@ -29,3 +29,7 @@ releases:
     - |-
       The first version with a more or less feature-complete GUI (full
       documentation and undo/redo).
+  - - 2008-12-11 16:25:57.475432 Z
+    - Kasper Peeters <kasper.peeters@aei.mpg.de>
+    - released
+    - First officially stable release.

@@ -83,9 +83,9 @@ bool pattern::match(const exptree::iterator& it) const
 		}
 
 	// Cases without range wildcard.
-// txtout << "comparing " << *obj.begin()->name << " " << *it->name << std::endl;
-//	exptree::print_recursive_treeform(txtout, obj.begin());
+//	txtout << "comparing " << *it->name << " " << *obj.begin()->name << std::endl;
 //	exptree::print_recursive_treeform(txtout, it);
+//	exptree::print_recursive_treeform(txtout, obj.begin());
 	int res=subtree_compare(it, obj.begin(), 0, true, 0);
 	if(abs(res)<=1) {
 //		 txtout << "match!" << std::endl;

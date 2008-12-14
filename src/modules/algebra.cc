@@ -1640,7 +1640,10 @@ bool drop_keep_weight::can_apply(iterator st)
 	const Weight        *wghpar=properties::get_composite<Weight>(tr.parent(st), label);
 
 //	txtout << *st->name << ": " << gmn << ", " << wgh << ", " << gmnpar << std::endl;
-	if(gmn!=0 || wgh!=0) return (gmnpar==0 && wghpar==0);
+	if(gmn!=0 || wgh!=0) {
+		bool ret = (gmnpar==0 && wghpar==0);
+		return ret;
+		}
 
 	return false;
 	}

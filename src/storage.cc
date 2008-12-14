@@ -1074,8 +1074,10 @@ int subtree_compare(exptree::iterator one, exptree::iterator two,
 					}
 				}
 			else {
-				if(numch1 < numch2) return mult;
-				else                return -mult;
+				// One is an index, but the number of children on one and two does not match,
+				// so the structure is different.
+				if(numch1 < numch2) return 2; //mult;
+				else                return -2; //mult;
 				}
 			}
 		// If the names are not equal but they come from the same index set,

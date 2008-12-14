@@ -235,6 +235,17 @@ tst22e:= \chi \chi \bar{\chi} - @(obj22e);
 @collect_terms!(%);
 @assert(tst22e);
 
+@reset.
+{a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u#}::Indices.
+Q_{a b c}::Weight(label=myTerms,value=3).
+g_{a b c}::Weight(label=myTerms,value=1).
+obj22f:=Q_{f g h} Dx^{f} Dx^{g} Dx^{h};
+@keep_weight!(%){myTerms}{3};
+tst22f:=Q_{f g h} Dx^{f} Dx^{g} Dx^{h} - @(obj22f);
+@collect_terms!(%);
+@assert(tst22f);
+
+
 # Test 23:= spinor sort
 #
 @reset;
