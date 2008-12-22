@@ -1,1 +1,2 @@
 #define GTKMM_VER <empty>
+#define GLIBMM_VER <empty>

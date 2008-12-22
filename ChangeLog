@@ -1,3 +1,16 @@
+2008-12-22  Kasper Peeters  <kasper.peeters@aei.mpg.de>
+
+	* Released 1.03 to limited audience.
+
+	* Weight values can now be arbitrary rational numbers, not just
+	positive integers.
+
+	* Fixed a bug in @keep_weight and @drop_weight related to negative
+	weights. 
+
+	* Fixed a bug in @keep_weight and @drop_weight which would make
+	the algorithms ignore terms without any weight.
+
 2008-12-14  Kasper Peeters  <kasper.peeters@aei.mpg.de>
 
 	* Fixed a bug in the pattern matcher which would result in

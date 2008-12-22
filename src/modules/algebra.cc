@@ -1620,26 +1620,25 @@ drop_keep_weight::drop_keep_weight(exptree& tr, iterator it)
 	}
 
 
-// This algorithm acts on nodes which inherit Weights.
-// Moreover, it only acts when the parent of the product or sum 
-// does _not_ have or inherit weight.
-//
-// It also acts on nodes which have an explicit Weight property,
-// again provided that the parent does not have or inherit weight.
+// This algorithm acts on nodes which have Weight or inherit Weight.
+// It only acts when the parent does _not_ have or inherit weight.
+// This makes sure that we act on sums and products, not on individual
+// terms or factors (or generalisations thereof).
+
 bool drop_keep_weight::can_apply(iterator st)
 	{
 	if(number_of_args()!=2) return false;
 	sibling_iterator argit=args_begin();
 	label=*argit->name;
 	++argit;
-	weight=to_long(*argit->multiplier);
+	weight=*argit->multiplier;
 
 	gmn=properties::get_composite<WeightInherit>(st, label);
 	wgh=properties::get_composite<Weight>(st, label);
 	const WeightInherit *gmnpar=properties::get_composite<WeightInherit>(tr.parent(st), label);
 	const Weight        *wghpar=properties::get_composite<Weight>(tr.parent(st), label);
 
-//	txtout << *st->name << ": " << gmn << ", " << wgh << ", " << gmnpar << std::endl;
+//	txtout << *st->name << ": " << gmn << ", " << wgh << ", " << gmnpar << " " << std::endl;
 	if(gmn!=0 || wgh!=0) {
 		bool ret = (gmnpar==0 && wghpar==0);
 		return ret;
@@ -1662,14 +1661,20 @@ algorithm::result_t drop_keep_weight::apply(iterator& it, bool keepthem)
 			while(sib!=tr.end(it)) {
 				const WeightBase *gnb=properties::get_composite<WeightBase>(sib, label);
 				if(gnb) {
-					int val=gnb->value(sib, label);
+					multiplier_t val=gnb->value(sib, label);
 					if((keepthem==true && weight!=val) || (keepthem==false && weight==val)) {
 						expression_modified=true;
 						sib=tr.erase(sib);
 						}
 					else ++sib;
 					}
-				else ++sib;
+				else {
+					if( (keepthem==true && weight!=0) || (keepthem==false && weight==0) ) {
+						expression_modified=true;
+						sib=tr.erase(sib);
+						}
+					else ++sib;
+					}
 				}
 			if(tr.number_of_children(it)==0)
 				zero(it->multiplier);

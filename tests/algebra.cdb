@@ -245,8 +245,35 @@ tst22f:=Q_{f g h} Dx^{f} Dx^{g} Dx^{h} - @(obj22f);
 @collect_terms!(%);
 @assert(tst22f);
 
+@reset.
+{A,B}::Weight(label=field, value=1).
+obj22g:= C + A + A B;
+@keep_weight!(%){field}{2};
+tst22g:= A B - @(obj22g);
+@collect_terms!(%);
+@assert(tst22g);
 
-# Test 23:= spinor sort
+@reset.
+A::Weight(label=field, value=1).
+B::Weight(label=field, value=-1).
+obj22h:= C + A + A B;
+@keep_weight!(%){field}{0};
+tst22h:= C + A B - @(obj22h);
+@collect_terms!(%);
+@assert(tst22h);
+
+@reset.
+A::Weight(label=field, value=3/2).
+B::Weight(label=field, value=-1).
+C::Weight(label=field, value=1/2).
+obj22i:= C + A + A B;
+@keep_weight!(%){field}{1/2};
+tst22i:= C + A B - @(obj22i);
+@collect_terms!(%);
+@assert(tst22i);
+
+
+# Test 23: spinor sort
 #
 @reset;
 {\chi, \psi, \psi_{m}}::Spinor(dimension=10, type=MajoranaWeyl).

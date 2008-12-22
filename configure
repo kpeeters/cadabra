@@ -683,6 +683,8 @@ pango_CFLAGS
 pango_LIBS
 GTKMM_CFLAGS
 GTKMM_LIBS
+GLIBMM_CFLAGS
+GLIBMM_LIBS
 pangomm_CFLAGS
 pangomm_LIBS
 DVIPNG
@@ -692,6 +694,7 @@ MAC_OS_X
 pcrecpp
 NESTED
 GTKMM_VER
+GLIBMM_VER
 LIBOBJS
 LTLIBOBJS'
 ac_subst_files=''
@@ -718,6 +721,8 @@ pango_CFLAGS
 pango_LIBS
 GTKMM_CFLAGS
 GTKMM_LIBS
+GLIBMM_CFLAGS
+GLIBMM_LIBS
 pangomm_CFLAGS
 pangomm_LIBS'
 
@@ -1320,6 +1325,9 @@ Some influential environment variables:
   GTKMM_CFLAGS
               C compiler flags for GTKMM, overriding pkg-config
   GTKMM_LIBS  linker flags for GTKMM, overriding pkg-config
+  GLIBMM_CFLAGS
+              C compiler flags for GLIBMM, overriding pkg-config
+  GLIBMM_LIBS linker flags for GLIBMM, overriding pkg-config
   pangomm_CFLAGS
               C compiler flags for pangomm, overriding pkg-config
   pangomm_LIBS
@@ -5841,6 +5849,121 @@ _ACEOF
 
 fi
 
+
+pkg_failed=no
+{ echo "$as_me:$LINENO: checking for GLIBMM" >&5
+echo $ECHO_N "checking for GLIBMM... $ECHO_C" >&6; }
+
+if test -n "$PKG_CONFIG"; then
+    if test -n "$GLIBMM_CFLAGS"; then
+        pkg_cv_GLIBMM_CFLAGS="$GLIBMM_CFLAGS"
+    else
+        if test -n "$PKG_CONFIG" && \
+    { (echo "$as_me:$LINENO: \$PKG_CONFIG --exists --print-errors \"glibmm-2.4 >= 2.16.0\"") >&5
+  ($PKG_CONFIG --exists --print-errors "glibmm-2.4 >= 2.16.0") 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; then
+  pkg_cv_GLIBMM_CFLAGS=`$PKG_CONFIG --cflags "glibmm-2.4 >= 2.16.0" 2>/dev/null`
+else
+  pkg_failed=yes
+fi
+    fi
+else
+	pkg_failed=untried
+fi
+if test -n "$PKG_CONFIG"; then
+    if test -n "$GLIBMM_LIBS"; then
+        pkg_cv_GLIBMM_LIBS="$GLIBMM_LIBS"
+    else
+        if test -n "$PKG_CONFIG" && \
+    { (echo "$as_me:$LINENO: \$PKG_CONFIG --exists --print-errors \"glibmm-2.4 >= 2.16.0\"") >&5
+  ($PKG_CONFIG --exists --print-errors "glibmm-2.4 >= 2.16.0") 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; then
+  pkg_cv_GLIBMM_LIBS=`$PKG_CONFIG --libs "glibmm-2.4 >= 2.16.0" 2>/dev/null`
+else
+  pkg_failed=yes
+fi
+    fi
+else
+	pkg_failed=untried
+fi
+
+
+
+if test $pkg_failed = yes; then
+
+if $PKG_CONFIG --atleast-pkgconfig-version 0.20; then
+        _pkg_short_errors_supported=yes
+else
+        _pkg_short_errors_supported=no
+fi
+        if test $_pkg_short_errors_supported = yes; then
+	        GLIBMM_PKG_ERRORS=`$PKG_CONFIG --short-errors --errors-to-stdout --print-errors "glibmm-2.4 >= 2.16.0"`
+        else
+	        GLIBMM_PKG_ERRORS=`$PKG_CONFIG --errors-to-stdout --print-errors "glibmm-2.4 >= 2.16.0"`
+        fi
+	# Put the nasty error message in config.log where it belongs
+	echo "$GLIBMM_PKG_ERRORS" >&5
+
+	{ { echo "$as_me:$LINENO: error: Package requirements (glibmm-2.4 >= 2.16.0) were not met:
+
+$GLIBMM_PKG_ERRORS
+
+Consider adjusting the PKG_CONFIG_PATH environment variable if you
+installed software in a non-standard prefix.
+
+Alternatively, you may set the environment variables GLIBMM_CFLAGS
+and GLIBMM_LIBS to avoid the need to call pkg-config.
+See the pkg-config man page for more details.
+" >&5
+echo "$as_me: error: Package requirements (glibmm-2.4 >= 2.16.0) were not met:
+
+$GLIBMM_PKG_ERRORS
+
+Consider adjusting the PKG_CONFIG_PATH environment variable if you
+installed software in a non-standard prefix.
+
+Alternatively, you may set the environment variables GLIBMM_CFLAGS
+and GLIBMM_LIBS to avoid the need to call pkg-config.
+See the pkg-config man page for more details.
+" >&2;}
+   { (exit 1); exit 1; }; }
+elif test $pkg_failed = untried; then
+	{ { echo "$as_me:$LINENO: error: The pkg-config script could not be found or is too old.  Make sure it
+is in your PATH or set the PKG_CONFIG environment variable to the full
+path to pkg-config.
+
+Alternatively, you may set the environment variables GLIBMM_CFLAGS
+and GLIBMM_LIBS to avoid the need to call pkg-config.
+See the pkg-config man page for more details.
+
+To get pkg-config, see <http://pkg-config.freedesktop.org/>.
+See \`config.log' for more details." >&5
+echo "$as_me: error: The pkg-config script could not be found or is too old.  Make sure it
+is in your PATH or set the PKG_CONFIG environment variable to the full
+path to pkg-config.
+
+Alternatively, you may set the environment variables GLIBMM_CFLAGS
+and GLIBMM_LIBS to avoid the need to call pkg-config.
+See the pkg-config man page for more details.
+
+To get pkg-config, see <http://pkg-config.freedesktop.org/>.
+See \`config.log' for more details." >&2;}
+   { (exit 1); exit 1; }; }
+else
+	GLIBMM_CFLAGS=$pkg_cv_GLIBMM_CFLAGS
+	GLIBMM_LIBS=$pkg_cv_GLIBMM_LIBS
+        { echo "$as_me:$LINENO: result: yes" >&5
+echo "${ECHO_T}yes" >&6; }
+	cat >>confdefs.h <<\_ACEOF
+#define GLIBMM_VER 216
+_ACEOF
+
+fi
+
 pkg_failed=no
 { echo "$as_me:$LINENO: checking for pangomm" >&5
 echo $ECHO_N "checking for pangomm... $ECHO_C" >&6; }
@@ -6050,6 +6173,7 @@ echo "$as_me: error: Need the breqn LaTeX package; get it from ftp://ftp.ams.org
 		       rm -f conftmp.tex conftmp.log conftmp.dvi conftmp.aux
         fi
 fi
+
 
 
 
@@ -6750,6 +6874,8 @@ pango_CFLAGS!$pango_CFLAGS$ac_delim
 pango_LIBS!$pango_LIBS$ac_delim
 GTKMM_CFLAGS!$GTKMM_CFLAGS$ac_delim
 GTKMM_LIBS!$GTKMM_LIBS$ac_delim
+GLIBMM_CFLAGS!$GLIBMM_CFLAGS$ac_delim
+GLIBMM_LIBS!$GLIBMM_LIBS$ac_delim
 pangomm_CFLAGS!$pangomm_CFLAGS$ac_delim
 pangomm_LIBS!$pangomm_LIBS$ac_delim
 DVIPNG!$DVIPNG$ac_delim
@@ -6759,11 +6885,12 @@ MAC_OS_X!$MAC_OS_X$ac_delim
 pcrecpp!$pcrecpp$ac_delim
 NESTED!$NESTED$ac_delim
 GTKMM_VER!$GTKMM_VER$ac_delim
+GLIBMM_VER!$GLIBMM_VER$ac_delim
 LIBOBJS!$LIBOBJS$ac_delim
 LTLIBOBJS!$LTLIBOBJS$ac_delim
 _ACEOF
 
-  if test `sed -n "s/.*$ac_delim\$/X/p" conf$$subs.sed | grep -c X` = 80; then
+  if test `sed -n "s/.*$ac_delim\$/X/p" conf$$subs.sed | grep -c X` = 83; then
     break
   elif $ac_last_try; then
     { { echo "$as_me:$LINENO: error: could not make $CONFIG_STATUS" >&5

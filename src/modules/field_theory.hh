@@ -94,25 +94,25 @@ class Depends : public DependsBase, virtual public property {
 
 class WeightBase : virtual public labelled_property {
 	public:
-		virtual int  value(exptree::iterator, const std::string& forcedlabel) const=0;
+		virtual multiplier_t  value(exptree::iterator, const std::string& forcedlabel) const=0;
 };
 
 class Weight : virtual public WeightBase {
 	public: 
-		virtual int  value(exptree::iterator, const std::string& forcedlabel) const;
-		virtual bool parse(exptree&, exptree::iterator, exptree::iterator, keyval_t&);
-		virtual std::string unnamed_argument() const { return "value"; };
-		virtual std::string name() const;
+		virtual multiplier_t  value(exptree::iterator, const std::string& forcedlabel) const;
+		virtual bool          parse(exptree&, exptree::iterator, exptree::iterator, keyval_t&);
+		virtual std::string   unnamed_argument() const { return "value"; };
+		virtual std::string   name() const;
 	private:
-		int value_;
+		multiplier_t value_;
 };
 
 class WeightInherit : virtual public WeightBase {
 	public:
-		virtual bool parse(exptree&, exptree::iterator, exptree::iterator, keyval_t&);
-		virtual int  value(exptree::iterator, const std::string& forcedlabel) const;
-		virtual std::string unnamed_argument() const { return "type"; };
-		virtual std::string name() const;
+		virtual bool          parse(exptree&, exptree::iterator, exptree::iterator, keyval_t&);
+		virtual multiplier_t  value(exptree::iterator, const std::string& forcedlabel) const;
+		virtual std::string   unnamed_argument() const { return "type"; };
+		virtual std::string   name() const;
 		
 		enum { multiplicative, additive } combination_type;
 };

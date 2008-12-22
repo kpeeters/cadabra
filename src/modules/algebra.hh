@@ -503,7 +503,7 @@ class drop_keep_weight : public algorithm {
 		const WeightInherit *gmn;
 		const Weight        *wgh;
 		std::string label;
-		int weight;
+		multiplier_t weight;
 };
 
 class drop_weight : public drop_keep_weight {

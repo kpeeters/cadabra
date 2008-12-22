@@ -727,7 +727,7 @@ XCadabra::XCadabra(modglue::ext_process& cdbproc, const std::string& filename, m
 	b_kill.set_label("Restart kernel");
 	parse_mode.push_back(m_discard);
 
-#if (GTKMM_VER == 212)
+#if (GTKMM_VER == 212 || GTKMM_VER == 216)
 	b_help.set_tooltip_text("Show context-sensitive help. Your cursor needs to be over an algorithm (anything starting with '@') or a property (anything starting with '::'). For other types of help, see the help menu.");
 	b_stop.set_tooltip_text("Interrupt the kernel when it is running.");
 	b_run.set_tooltip_text("Evaluate all input cells of the notebook in turn.");
@@ -1071,7 +1071,12 @@ void XCadabra::on_run()
 	get_window()->set_cursor(hglass);
 
 	running=true;
+
+#if (GLIBMM_VER == 216)
 	running_last.reset();
+#else
+	running_last.clear();
+#endif
 	b_cdbstatus.set_text(" Status: Executing notebook.");
 	b_stop.set_sensitive(true);
 	active_canvas->select_first_input_cell();
@@ -1096,7 +1101,11 @@ void XCadabra::on_run_from()
 		get_window()->set_cursor(hglass);
 
 		running=true;
+#if (GLIBMM_VER == 216)
 		running_last.reset();
+#else
+		running_last.clear();
+#endif
 		b_cdbstatus.set_text(" Status: Executing from cursor.");
 		b_stop.set_sensitive(true);
 		active_canvas->cell_grab_focus(active_cell);
@@ -1113,7 +1122,7 @@ void XCadabra::on_help_about()
 	md.set_copyright("\xC2\xA9 2006-2008 Kasper Peeters");
 	md.set_comments("Graphical user interface for the cadabra symbolic computer algebra system.");
 	md.set_license("XCadabra and Cadabra are available under the Gnu General Public License version 2.\n\nIf you use Cadabra or even just play with it, I would like to hear about it. Please send me an email so that I can get an idea of who is interested in this program.\n\nIf you use Cadabra in your own work, please cite both\n\nKasper Peeters\n\"A field-theory motivated approach to computer algebra\"\ncs.sc/0608005\nComput. Phys. Commun 176 (2007) 550\n\nKasper Peeters\n\"Introducing Cadabra: a symbolic computer algebra system for field theory problems\"\nhep-th/0701238\n\nThank you!");
-#if (GTKMM_VER == 28 || GTKMM_VER == 212)
+#if (GTKMM_VER == 28 || GTKMM_VER == 212 || GTKMM_VER == 216)
 	md.set_wrap_license(true);
 #endif
 
@@ -1985,7 +1994,11 @@ bool XCadabra::receive(modglue::ipipe& p)
 					// re-enable original cell
 					if(origcell) {
 						origcell->running=false;
+#if (GLIBMM_VER == 216)
 						origcell.reset();
+#else
+						origcell.clear();
+#endif
 						}
 					}
 				else { // everything hunky dorey
@@ -2021,7 +2034,11 @@ bool XCadabra::receive(modglue::ipipe& p)
 						// re-enable original cell (mark it non-running)
 						if(origcell) {
 							origcell->running=false;
+#if (GLIBMM_VER == 216)
 							origcell.reset();
+#else
+							origcell.clear();
+#endif
 							}
 						}
 					else { // still more cells below
@@ -2050,7 +2067,11 @@ bool XCadabra::receive(modglue::ipipe& p)
 									// re-enable original cell
 									if(origcell) {
 										origcell->running=false;
+#if (GLIBMM_VER == 216)
 										origcell.reset();
+#else
+										origcell.clear();
+#endif
 										}
 									break;
 									}

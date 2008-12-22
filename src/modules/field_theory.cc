@@ -129,13 +129,13 @@ std::string Weight::name() const
 bool Weight::parse(exptree& tr, exptree::iterator pat, exptree::iterator prop, keyval_t& kv)
 	{
 	keyval_t::const_iterator kvit=kv.find("value");
-	if(kvit!=kv.end()) value_=to_long(*kvit->second->multiplier);
+	if(kvit!=kv.end()) value_=*kvit->second->multiplier;
 	else               value_=1;
 
 	return true;
 	}
 
-int Weight::value(exptree::iterator, const std::string& forcedlabel) const
+multiplier_t Weight::value(exptree::iterator, const std::string& forcedlabel) const
 	{
 	if(forcedlabel!=label) return -1;
 	return value_;
@@ -157,11 +157,10 @@ bool WeightInherit::parse(exptree& tr, exptree::iterator pat, exptree::iterator 
 	return true;
 	}
 
-int WeightInherit::value(exptree::iterator it, const std::string& forcedlabel) const
+multiplier_t WeightInherit::value(exptree::iterator it, const std::string& forcedlabel) const
 	{
-	int ret=0;
-	if(combination_type==additive) 
-		ret=-2;
+	multiplier_t ret=0;
+	bool first_term=true;
 
 //	txtout << "calling inherit on " << *it->name << " " << &(*it) << " " << forcedlabel << std::endl;
 	exptree::sibling_iterator sib=it.begin();
@@ -170,33 +169,26 @@ int WeightInherit::value(exptree::iterator it, const std::string& forcedlabel) c
 			  if(combination_type==multiplicative) {
 					const WeightBase *gnb=properties::get_composite<WeightBase>(sib, forcedlabel);
 					if(gnb) {
-						 int tmp=gnb->value(sib, forcedlabel);
-						 if(tmp<0) {
-							  ret=-1;
-							  break; // problems
-							  }
-						 else { 
-							  ret+=tmp;
-							  }
+						 multiplier_t tmp=gnb->value(sib, forcedlabel);
+						 ret+=tmp;
 						 }
 					}
 			  else {
-					int thisone=0;
+					multiplier_t thisone=0;
 					const WeightBase *gnb=properties::get_composite<WeightBase>(sib, forcedlabel);
 					if(gnb) thisone=gnb->value(sib, forcedlabel);
 					else    thisone=0;
-					if(ret==-2) {
-						 ret=thisone;
-						 if(ret<0) break;  // problems
-						 }
-					else if(ret!=thisone) { // not uniform
-						 ret=-1;
-						 break;
-						 }
-					}
-			  }
+					if(first_term) {
+						first_term=false;
+						ret=thisone;
+						}
+					else if(ret!=thisone) { // the weights in the sum are not uniform
+						throw consistency_error("Encountered sum with un-equal weight terms.");
+						}
+				  }
+			 }
 		 ++sib;
-		 }
+		}
 	return ret;
 	}
 
