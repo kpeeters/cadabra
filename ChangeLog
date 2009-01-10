@@ -1,3 +1,8 @@
+2009-01-07  Kasper Peeters  <kasper.peeters@aei.mpg.de>
+
+	* Fixed a bug in the configure script which would make it fail 
+	with older versions of glibmm (<2.16).
+
 2008-12-22  Kasper Peeters  <kasper.peeters@aei.mpg.de>
 
 	* Released 1.03 to limited audience.

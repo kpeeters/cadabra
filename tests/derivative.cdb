@@ -210,3 +210,13 @@ tst17:= \partial_{a b c}{F} - @(obj17);
 \nabla{#}::Derivative.
 obj18:= \nabla_{a}{\nabla_{b}{F}};
 @substitute!!(%)( \nabla_{a}{A??} -> \partial_{a}{A??} );
+
+# Test 19: Grassman derivatives
+#
+@reset.
+{\alpha,\beta,\gamma}::Indices(spinor).
+D_{\alpha}{#}::Derivative.
+D{#}::Derivative.
+{ D_{\alpha}{#}, \theta^{\beta} }::AntiCommuting.
+D_{\alpha}{\theta^\beta \theta^\gamma};
+@prodrule!(%);

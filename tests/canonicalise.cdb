@@ -287,7 +287,7 @@ tst26:= \diff{g_{m n}}_{p} \diff{g_{r s}}_{p} T^{m n r s} - @(obj26);
 # Test 27 & 28: spinors and anti-commuting objects
 #
 {m,n,p,q,r,s,t,u}::Indices(vector).
-psi10001_{m}::Spinor.
+psi10001_{m}::Spinor(type=Majorana, dimension=10).
 psi10001_{m}::SelfAntiCommuting.
 \Gamma_{#}::GammaMatrix.
 H_{m n p}::AntiSymmetric.

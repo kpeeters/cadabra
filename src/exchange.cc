@@ -14,7 +14,7 @@ int exchange::collect_identical_tensors(exptree& tr, exptree::iterator it,
 	{
 	assert(*it->name=="\\prod");
 
-	int total_number_of_indices=0;
+	int total_number_of_indices=0; // refers to number of indices on gamma matrices
 	exptree::sibling_iterator sib=it.begin();
 	while(sib!=it.end()) {
 		unsigned int i=0;
