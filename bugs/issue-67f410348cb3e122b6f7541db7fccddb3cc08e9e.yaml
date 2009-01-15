@@ -1,0 +1,28 @@
+--- !ditz.rubyforge.org,2008-03-06/issue 
+title: Introduce a notation for 'a range of objects'
+desc: |-
+  When declaring large sets of indices it would be useful to have a notation
+  which automatically takes care of declaring a range of them, e.g.
+  
+     {a..z}::Indices.
+  
+  or
+  
+     {\alpha..\zeta}::Indices.
+  
+  Since the range operator already exists this should not be too hard.
+type: :feature
+component: cadabra
+release: 
+reporter: Kasper Peeters <kasper.peeters@aei.mpg.de>
+status: :unstarted
+disposition: 
+creation_time: 2008-12-11 16:24:49.469844 Z
+references: []
+
+id: 67f410348cb3e122b6f7541db7fccddb3cc08e9e
+log_events: 
+- - 2008-12-11 16:24:50.872368 Z
+  - Kasper Peeters <kasper.peeters@aei.mpg.de>
+  - created
+  - ""

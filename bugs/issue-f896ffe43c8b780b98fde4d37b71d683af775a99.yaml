@@ -1,0 +1,29 @@
+--- !ditz.rubyforge.org,2008-03-06/issue 
+title: "@canonicalise does not honor ImplicitIndex"
+desc: |-
+  {a,b}::Indices{vector}.
+  {a,b}::Integer(0..3).
+  \Gamma_{a}::ImplicitIndex.
+  \Gamma_{a}\Gamma_{b}-\Gamma_{b}\Gamma_{a};
+  @prodsort!(%);
+  @canonicalise!(%);
+  @collect_terms!(%);
+  
+  leads to zero. This is because @canonicalise does not honor ImplicitIndex.
+  The logic behind that property is slightly skewed; the TODO file contains
+  ideas on how to fix this properly.
+type: :bugfix
+component: cadabra
+release: 
+reporter: Kasper Peeters <kasper.peeters@aei.mpg.de>
+status: :unstarted
+disposition: 
+creation_time: 2009-01-03 00:42:21.402139 Z
+references: []
+
+id: f896ffe43c8b780b98fde4d37b71d683af775a99
+log_events: 
+- - 2009-01-03 00:42:22.802075 Z
+  - Kasper Peeters <kasper.peeters@aei.mpg.de>
+  - created
+  - ""
