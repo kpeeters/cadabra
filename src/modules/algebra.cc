@@ -1436,6 +1436,7 @@ bool reduce_div::can_apply(iterator st)
 
 algorithm::result_t reduce_div::apply(iterator& st)
 	{
+	tr.print_recursive_treeform(txtout, tr.begin());
 	assert(tr.number_of_children(st)>1);
 	sibling_iterator it=tr.begin(st);
 	multiplier_t rat;
