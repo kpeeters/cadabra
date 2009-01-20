@@ -1424,49 +1424,60 @@ void reduce_div::description() const
 bool reduce_div::can_apply(iterator st)
 	{
 	if(*st->name!="\\frac") return false;
-	sibling_iterator it=tr.begin(st);
-	++it; // first argument is allowed to be non-numerical
-	while(it!=tr.end(st)) {
-		if(*it->name!="1")
-			return false;
-		++it;
-		}
+//	sibling_iterator it=tr.begin(st);
+//	++it; // first argument is allowed to be non-numerical
+//	while(it!=tr.end(st)) {
+//		if(*it->name!="1")
+//			return false;
+//		++it;
+//		}
 	return true;
 	}
 
 algorithm::result_t reduce_div::apply(iterator& st)
 	{
-	tr.print_recursive_treeform(txtout, tr.begin());
+	// Catch \frac{} nodes with one argument; those are supposed to be read as 1/(...).
+	if(tr.number_of_children(st)==1) {
+		tr.insert(tr.begin(st), str_node("1"));
+		}
+
 	assert(tr.number_of_children(st)>1);
 	sibling_iterator it=tr.begin(st);
 	multiplier_t rat;
-	bool firstnumerical=true;
-	if(*it->name=="1") rat=*(it->multiplier);
-	else               { rat=1; firstnumerical=false; }
 
+	bool allnumerical=true;
+	if(it->is_rational()) rat=*(it->multiplier);
+	else                  { rat=1; allnumerical=false; }
+
+	one(it->multiplier);
 	++it;
 	while(it!=tr.end(st)) {
 		if(*it->multiplier==0) {
 			return l_applied;
 			}
 		rat/=*it->multiplier;
+		one(it->multiplier);
+		if(it->is_rational()==false) allnumerical=false;
 		++it;
 		}
-	if(firstnumerical) {
+	if(allnumerical) { // can remove the \frac altogether
 		tr.erase_children(st);
 		st->name=name_set.insert("1").first;
 		}
-	else {
+	else { // just remove the all-numerical child nodes
 		it=tr.begin(st);
-		multiply(it->multiplier, *st->multiplier);
 		++it;
-		while(it!=tr.end(st))
-			it=tr.erase(it);
-		assert(tr.number_of_children(st)==1);
-		tr.begin(st)->fl.bracket=st->fl.bracket;
-		tr.begin(st)->fl.parent_rel=st->fl.parent_rel;
-		tr.flatten(st);
-		st=tr.erase(st);
+		while(it!=tr.end(st)) {
+			if(it->is_rational()) 
+				it=tr.erase(it);
+			else ++it;
+			}
+		if(tr.number_of_children(st)==1) {
+			tr.begin(st)->fl.bracket=st->fl.bracket;
+			tr.begin(st)->fl.parent_rel=st->fl.parent_rel;
+			tr.flatten(st);
+			st=tr.erase(st);
+			}
 		}
 	expression_modified=true;
 	multiply(st->multiplier, rat);

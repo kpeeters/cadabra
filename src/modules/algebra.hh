@@ -365,6 +365,9 @@ class prodcollectnum : public algorithm {
 		virtual result_t apply(iterator&);
 };
 
+// Move all numerical factors inside a generalised \frac into
+// the multiplier field. 
+
 class reduce_div : public algorithm {
 	public:
 		reduce_div(exptree&, iterator);

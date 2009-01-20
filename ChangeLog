@@ -1,3 +1,12 @@
+2009-01-20  Kasper Peeters  <kasper.peeters@aei.mpg.de>
+
+	* Released 1.04.
+
+	* Fixed a bug in the simplification of fractions, which would make
+	the program crash upon receiving input of the type
+
+	    x_i / (x_k x_k);
+
 2009-01-07  Kasper Peeters  <kasper.peeters@aei.mpg.de>
 
 	* Fixed a bug in the configure script which would make it fail 
