@@ -213,7 +213,7 @@ int main (int argc, char *argv[])
 
 //	modglue::ext_process ls_proc(std::string(DESTDIR)+std::string("/bin/cadabra"));
 	modglue::ext_process ls_proc("cadabra");
-	ls_proc << "--xcadabra";
+	ls_proc << "--xcadabra" << "--bare";
 	ls_proc.setup_pipes(); // FIXME: need cleaner error messages if this is forgotten
 	mm.add(&ls_proc);
 	XCadabra theiface(ls_proc, filename, &mm);
