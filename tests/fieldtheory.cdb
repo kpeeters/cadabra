@@ -350,3 +350,38 @@ obj30:=  - \commutator{J_{0 i}}{I/\hbar Q_{j} P_{0}} + \commutator{J_{0 i}}{I/\h
 tst30:=  - I/\hbar \commutator{J_{0 i}}{Q_{j} * P_{0}} + I/\hbar \commutator{J_{0 i}}{P_{0} * Q_{j}} - @(obj30);
 @collect_terms!(%);
 @assert(tst30);
+
+# Test 31: pintegrate with anti/non-commuting fields
+#
+@reset.
+{a,b}::Indices(vector).
+{a,b}::Integer(0..3).
+{\psi, \lambda}::AntiCommuting.
+\partial{#}::PartialDerivative.
+obj31a:= \psi \partial_{a}{\lambda};
+@pintegrate!(%)(\partial);
+tst31a:= \partial_{a}{\psi} \lambda + @(obj31a);
+@collect_terms!(%);
+@assert(tst31a);
+
+@reset.
+{a,b}::Indices(vector).
+{a,b}::Integer(0..3).
+{\psi, \lambda}::AntiCommuting.
+\partial{#}::PartialDerivative.
+obj31b:= \partial_{a}{\lambda} \psi;
+@pintegrate!(%)(\partial);
+tst31b:= \lambda \partial_{a}{\psi} + @(obj31b);
+@collect_terms!(%);
+@assert(tst31b);
+
+@reset.
+{a,b}::Indices(vector).
+{a,b}::Integer(0..3).
+{\psi, \lambda}::AntiCommuting.
+\partial{#}::PartialDerivative.
+obj31c:= \chi \partial_{a}{\lambda} \psi;
+@pintegrate!(%)(\partial);
+tst31c:= \partial_{a}{\chi} \lambda \psi + \chi \lambda \partial_{a}{\psi}+ @(obj31c);
+@collect_terms!(%);
+@assert(tst31c);

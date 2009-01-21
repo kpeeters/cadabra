@@ -1570,6 +1570,7 @@ void pintegrate::description() const
 
 bool pintegrate::can_apply(iterator it)
 	{
+	// Only act on products at top level, or on products inside sums at top level.
 	if(number_of_args()==1) {
 		 if(*it->name=="\\prod") {
 			  if(*(tr.parent(it)->name)=="\\sum") {
@@ -1597,32 +1598,58 @@ algorithm::result_t pintegrate::apply(iterator& it)
 			// If the number of indices of the derivative is zero or odd (implicit),
 			// there is an odd number of partial integrations, and we need
 			// a sign flip.
+
 			if( (tr.number_of_children(sib)%2) == 0 || tr.number_of_children(sib)==1)
 				multiply(it->multiplier, -1);
-			sibling_iterator newdiff=tr.insert_subtree(tr.begin(it), sib);
-			// FIXME: tree.hh does not remove the existing children of the replaced node
-			// Put a product in the new derivative.
-			sibling_iterator newdiffarg=tr.begin(newdiff);
-			while(newdiffarg->is_index()) ++newdiffarg;
-			sibling_iterator prodindiff=tr.replace(newdiffarg, str_node("\\prod"));
-			tr.erase_children(prodindiff);
-			// Put all nodes up to the derivative inside the new derivative.
-			sibling_iterator from=newdiff; ++from;
+
+			// We need to wrap the partial derivative around the other
+			// factors inside the product (that's the simplest way to
+			// keep things correct when there are anti-commuting objects
+			// present). We do this by isolating the factors before and after
+			// the derivative and wrapping them (if present). 
+
+			if(sib!=tr.begin(it)) { // there are factors before the derivative
+				txtout << "factors before" << std::endl;
+				sibling_iterator newdiff=tr.insert_subtree(tr.begin(it), sib);
+				sibling_iterator newdiffarg=tr.begin(newdiff);
+				while(newdiffarg->is_index()) ++newdiffarg;
+				sibling_iterator prodindiff=tr.replace(newdiffarg, str_node("\\prod"));
+				tr.erase_children(prodindiff);
+
+				// Put all nodes up to the derivative inside the new derivative.
+				sibling_iterator from=newdiff; ++from;
+				sibling_iterator to=sib;
+				tr.reparent(prodindiff, from, to);
+				if(tr.number_of_children(prodindiff)==1) {
+					tr.flatten(prodindiff);
+					tr.erase(prodindiff);
+					}
+				}
+
 			sibling_iterator nxt=sib;
-			tr.reparent(prodindiff, from, nxt);
 			++nxt;
-			// and also do so for all nodes after the derivative, if any.
-			if(nxt!=tr.end(sib))
-				tr.reparent(prodindiff, nxt, tr.end(it));
+			if(nxt!=tr.end(it)) { // there are factors after the derivative
+				txtout << "factors after" << std::endl;
+				sibling_iterator newdiff=tr.insert_subtree(nxt, sib);
+				sibling_iterator newdiffarg=tr.begin(newdiff);
+				while(newdiffarg->is_index()) ++newdiffarg;
+				sibling_iterator prodindiff=tr.replace(newdiffarg, str_node("\\prod"));
+				tr.erase_children(prodindiff);
+
+				// Put all nodes coming after the derivative inside the new derivative.
+				sibling_iterator from=nxt;
+				tr.reparent(prodindiff, from, tr.end(it));
+				if(tr.number_of_children(prodindiff)==1) {
+					tr.flatten(prodindiff);
+					tr.erase(prodindiff);
+					}
+				}
+
 			// Finally, move the old nodes out of the derivative.
 			sibling_iterator oldarg=tr.begin(sib);
 			while(oldarg->is_index()) ++oldarg;
-			tr.append_child(it, (iterator)(oldarg));
+			tr.move_before(sib, (iterator)(oldarg));
 			tr.erase(sib);
-			if(tr.number_of_children(prodindiff)==1) {
-				tr.flatten(prodindiff);
-				tr.erase(prodindiff);
-				}
 			return l_applied;
 			}
 		++sib;
