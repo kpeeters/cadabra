@@ -1581,6 +1581,7 @@ bool pintegrate::can_apply(iterator it)
 					return true;
 			  }
 		 }
+	// FIXME: need to make sure that this derivative occurs only once in the product.
 	return false;
 	}
 
@@ -1589,6 +1590,7 @@ algorithm::result_t pintegrate::apply(iterator& it)
 	nset_t::iterator opname=args_begin()->name;
 
 	sibling_iterator sib=tr.begin(it);
+	size_t number_of_derivative_node=0;
 	while(sib!=tr.end(it)) {
 		if(sib->name==opname) {
 //			if(tr.number_of_children(it)==1) { // total derivative
@@ -1608,8 +1610,10 @@ algorithm::result_t pintegrate::apply(iterator& it)
 			// present). We do this by isolating the factors before and after
 			// the derivative and wrapping them (if present). 
 
+			bool factors_before=false;
+			exptree original(it);
 			if(sib!=tr.begin(it)) { // there are factors before the derivative
-				txtout << "factors before" << std::endl;
+				factors_before=true;
 				sibling_iterator newdiff=tr.insert_subtree(tr.begin(it), sib);
 				sibling_iterator newdiffarg=tr.begin(newdiff);
 				while(newdiffarg->is_index()) ++newdiffarg;
@@ -1624,35 +1628,65 @@ algorithm::result_t pintegrate::apply(iterator& it)
 					tr.flatten(prodindiff);
 					tr.erase(prodindiff);
 					}
+
+				// Move the old nodes out of the derivative.
+				sibling_iterator oldarg=tr.begin(sib);
+				while(oldarg->is_index()) ++oldarg;
+				tr.move_before(sib, (iterator)(oldarg));
+				tr.erase(sib);
 				}
 
 			sibling_iterator nxt=sib;
 			++nxt;
+
 			if(nxt!=tr.end(it)) { // there are factors after the derivative
-				txtout << "factors after" << std::endl;
+				iterator prodnode=it;
+				if(factors_before) { // have to wrap the whole lot in a \sum since there are now two terms
+					iterator sumnode = tr.wrap(it, str_node("\\sum"));
+					sumnode->fl.bracket=sib->fl.bracket;
+					iterator newprod=tr.insert_subtree_after(tr.begin(sumnode), original.begin());
+					it=sumnode;
+					sib=tr.begin(newprod);
+					while((number_of_derivative_node--)>0) {
+						++sib;
+						assert(sib!=tr.end(newprod));
+						}
+					nxt=sib;
+					++nxt;
+					assert(sib->name==opname);
+					prodnode=newprod;
+					// tree ok here
+					}
 				sibling_iterator newdiff=tr.insert_subtree(nxt, sib);
 				sibling_iterator newdiffarg=tr.begin(newdiff);
 				while(newdiffarg->is_index()) ++newdiffarg;
 				sibling_iterator prodindiff=tr.replace(newdiffarg, str_node("\\prod"));
 				tr.erase_children(prodindiff);
 
+				tr.print_recursive_treeform(txtout, tr.begin());
+
 				// Put all nodes coming after the derivative inside the new derivative.
 				sibling_iterator from=nxt;
-				tr.reparent(prodindiff, from, tr.end(it));
+				tr.reparent(prodindiff, from, tr.end(prodnode));
 				if(tr.number_of_children(prodindiff)==1) {
 					tr.flatten(prodindiff);
 					tr.erase(prodindiff);
 					}
+				
+
+				tr.print_recursive_treeform(txtout, tr.begin());
+
+				// Move the old nodes out of the derivative.
+				sibling_iterator oldarg=tr.begin(sib);
+				while(oldarg->is_index()) ++oldarg;
+				tr.move_before(sib, (iterator)(oldarg));
+				tr.erase(sib);
 				}
 
-			// Finally, move the old nodes out of the derivative.
-			sibling_iterator oldarg=tr.begin(sib);
-			while(oldarg->is_index()) ++oldarg;
-			tr.move_before(sib, (iterator)(oldarg));
-			tr.erase(sib);
 			return l_applied;
 			}
 		++sib;
+		++number_of_derivative_node;
 		}
 	return l_no_action;
 	}

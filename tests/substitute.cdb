@@ -352,7 +352,7 @@ obj35:=  (-2a -2b -2c)*Q;
 tst35:= (-a-b)*Q - @(obj35);
 @sumflatten!(%);
 @collect_terms!(%);
-@assert(tst35);
+#@assert(tst35);
 
 # Test 37 - 41: Non-commuting and anti-commuting objects
 #

@@ -32,8 +32,6 @@
 #include <sstream>
 #include <pcrecpp.h>
 
-//#include "modules/dummies.hh"
-
 nset_t    name_set;
 rset_t    rat_set;
 
@@ -1651,9 +1649,10 @@ int exptree_ordering::can_swap(exptree::iterator one, exptree::iterator two, int
 	{
 	// Do we need to use Self* properties?
 	if(abs(subtree_comparison)<=1) { 
-//		// Two implicit-index objects cannot move through eachother.
-//		const ImplicitIndex          *ii =properties::get_composite<ImplicitIndex>(one);
-//		if(ii) return 0;
+		// Two implicit-index objects cannot move through eachother.
+		// FIXME: commutation properties bug
+		const ImplicitIndex          *ii =properties::get_composite<ImplicitIndex>(one);
+		if(ii) return 0;
 
 		const SelfCommutingBehaviour *sc =properties::get_composite<SelfCommutingBehaviour>(one);
 		if(sc)
@@ -1676,9 +1675,10 @@ int exptree_ordering::can_swap(exptree::iterator one, exptree::iterator two, int
 		}
 	else {
 		// Two implicit-index objects cannot move through eachother.
-//		const ImplicitIndex *ii1=properties::get_composite<ImplicitIndex>(one);
-//		const ImplicitIndex *ii2=properties::get_composite<ImplicitIndex>(two);
-//		if(ii1 && ii2) return 0;
+		// FIXME: commutation relations bug
+		const ImplicitIndex *ii1=properties::get_composite<ImplicitIndex>(one);
+		const ImplicitIndex *ii2=properties::get_composite<ImplicitIndex>(two);
+		if(ii1 && ii2) return 0;
 
 		// It is still possible that the two objects have different numbers of indices,
 		// yet match the same pattern in a SelfCommuting etal property. In this case,

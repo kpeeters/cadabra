@@ -128,18 +128,21 @@ tst9:= DF_{a b c d} DG_{m a b c d};
 obj10:= a*b_{m} + \diff{e}_{m}*c*d*f + g*h*\diff{k}_{m};
 @pintegrate!(%){\diff};
 tst10:= a*b_{m} - \diff{c*d*f}_{m}*e - \diff{g*h}_{m}*k - @(obj10);
+@prodsort!(%);
 @collect_terms!(%);
 @assert(tst10);
 
 obj11:= g*h*\diff{k}_{m n};
 @pintegrate!(%){\diff};
 tst11:= \diff{g*h}_{m n} * k - @(obj11);
+@prodsort!(%);
 @collect_terms!(%);
 @assert(tst11);
 
 obj12:= Q * \diff{A_{m}}_{p};
 @pintegrate!(%){\diff};
 tst12:= \diff{Q}_{p} A_{m} + @(obj12);
+@prodsort!(%);
 @collect_terms!(%);
 @assert(tst12);
 
