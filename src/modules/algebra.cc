@@ -1446,13 +1446,15 @@ algorithm::result_t reduce_div::apply(iterator& st)
 	multiplier_t rat;
 
 	bool allnumerical=true;
-	if(it->is_rational()) rat=*(it->multiplier);
-	else                  { rat=1; allnumerical=false; }
+	rat=*(it->multiplier);
+	if(it->is_rational()==false) 
+		allnumerical=false;
 
 	one(it->multiplier);
 	++it;
 	while(it!=tr.end(st)) {
 		if(*it->multiplier==0) {
+			// CHECK: do these zeroes get handled correctly elsewhere?
 			return l_applied;
 			}
 		rat/=*it->multiplier;
@@ -1475,6 +1477,7 @@ algorithm::result_t reduce_div::apply(iterator& st)
 		if(tr.number_of_children(st)==1) {
 			tr.begin(st)->fl.bracket=st->fl.bracket;
 			tr.begin(st)->fl.parent_rel=st->fl.parent_rel;
+			multiply(tr.begin(st)->multiplier, *st->multiplier);
 			tr.flatten(st);
 			st=tr.erase(st);
 			}
