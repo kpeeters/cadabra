@@ -1663,8 +1663,6 @@ algorithm::result_t pintegrate::apply(iterator& it)
 				sibling_iterator prodindiff=tr.replace(newdiffarg, str_node("\\prod"));
 				tr.erase_children(prodindiff);
 
-				tr.print_recursive_treeform(txtout, tr.begin());
-
 				// Put all nodes coming after the derivative inside the new derivative.
 				sibling_iterator from=nxt;
 				tr.reparent(prodindiff, from, tr.end(prodnode));
@@ -1673,9 +1671,6 @@ algorithm::result_t pintegrate::apply(iterator& it)
 					tr.erase(prodindiff);
 					}
 				
-
-				tr.print_recursive_treeform(txtout, tr.begin());
-
 				// Move the old nodes out of the derivative.
 				sibling_iterator oldarg=tr.begin(sib);
 				while(oldarg->is_index()) ++oldarg;
