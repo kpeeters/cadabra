@@ -203,7 +203,7 @@ algorithm::result_t frommath::apply(sibling_iterator& st, sibling_iterator& nd)
 	st=tr.erase(st);
 	nd=tr.erase(nd);
 
-	tr.print_recursive_treeform(debugout, st) << std::endl;
+//	tr.print_recursive_treeform(debugout, st) << std::endl;
 
 	return l_applied;
 	}

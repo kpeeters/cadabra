@@ -1,3 +1,15 @@
+2009-01-23  Kasper Peeters  <kasper.peeters@aei.mpg.de>
+
+	* Released 1.06
+
+	* Removed leftover print_recursive_treeform debugging output.
+
+2009-01-22  Kasper Peeters  <kasper.peeters@aei.mpg.de>
+
+	* Released 1.05
+
+	* Fixed a bug in @pintegrate.
+
 2009-01-20  Kasper Peeters  <kasper.peeters@aei.mpg.de>
 
 	* Released 1.04.
