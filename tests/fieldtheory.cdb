@@ -388,3 +388,23 @@ obj31c:= \chi \partial_{a}{\lambda} \psi;
 tst31c:= \partial_{a}{\chi} \lambda \psi + \chi \lambda \partial_{a}{\psi}+ @(obj31c);
 @collect_terms!(%);
 @assert(tst31c);
+
+# Test 32: unwrap bug
+#
+@reset.
+{a,b,c,d,e}::Indices{vector}.
+{a,b,c,d,e}::Integer(0..3).
+\partial{#}::PartialDerivative.
+{G, G_{a}, \psi}::Depends(\partial).
+\delta{#}::KroneckerDelta.
+\eta_{a b}::Metric(signature=1).
+\epsilon{#}::EpsilonTensor(delta=\delta, metric=\eta_{a b}).
+
+obj32:= \epsilon_{a b c d} \partial_{a}{G} \partial_{b}{\psi};
+@substitute!(%)(\partial_{a?}{G} -> G_{a?}):
+@pintegrate!(%)(\partial);
+@substitute!(%)( G_{a?} -> \partial_{a?}{G});
+@unwrap!(%):
+@canonicalise!(%);
+@assert(obj32);
+

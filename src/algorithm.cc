@@ -1736,7 +1736,8 @@ void cleanup_nests(exptree&tr, exptree::iterator &it, bool ignore_bracket_types)
          multiplier_t fac=*(tr.parent(it)->multiplier)*(*it->multiplier);
          tr.parent(it)->multiplier=rat_set.insert(fac).first;
          tr.flatten(it);
-         it=tr.erase(it);
+			it=tr.erase(it);
+//         it=tr.parent(tr.erase(it)); // CHECK: OK?
          }
       return;
 		}
@@ -1760,7 +1761,7 @@ void cleanup_nests(exptree&tr, exptree::iterator &it, bool ignore_bracket_types)
 			}
 		return;
 		}
-	const Derivative *der=properties::get<PartialDerivative>(it);
+	const PartialDerivative *der=properties::get<PartialDerivative>(it);
 	if(der) {
 		// take constants outside
 		multiply(it->multiplier, *(tr.begin()->multiplier));
@@ -1773,6 +1774,7 @@ void cleanup_nests(exptree&tr, exptree::iterator &it, bool ignore_bracket_types)
 			tr.parent(it)->multiplier=rat_set.insert(fac).first;
 			tr.flatten(it);
 			it=tr.erase(it);
+//			it=tr.parent(it); // CHECK: OK?
 			}
 		return;
 		}

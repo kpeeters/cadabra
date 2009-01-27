@@ -1726,6 +1726,9 @@ algorithm::result_t unwrap::apply(iterator& it)
 	{
 	bool is_accent=properties::get<Accent>(it);
 
+	// Wrap the 'derivative' in a product node so we can take
+	// child nodes out and stuff them inside the product.
+
 	iterator prodwrap=tr.wrap(it, str_node("\\prod"));
 
 	bool all_arguments_moved_out=true;
@@ -1853,12 +1856,23 @@ algorithm::result_t unwrap::apply(iterator& it)
 			 if(pc.can_apply(prodwrap))
 				  pc.apply(prodwrap);
 
+
+			 // If the derivative acts on another derivative, we need
+			 // to un-nest the argument of the outer (and this situation
+			 // can only happen if there is only one non-index child node)
+			 iterator itarg=tr.begin(it);
+			 while(itarg->is_index()) 
+				 ++itarg;
+			 cleanup_nests(tr, itarg);
+
 			 // Unnest products if necessary.
-			 if(*prodwrap->name=="\\prod" && *tr.parent(prodwrap)->name=="\\prod") {
-				  tr.flatten(prodwrap);
-				  prodwrap=tr.erase(prodwrap);
-				  prodwrap=tr.parent(prodwrap);
-				  }
+			 cleanup_nests(tr, prodwrap);
+
+//			 if(*prodwrap->name=="\\prod" && *tr.parent(prodwrap)->name=="\\prod") {
+//				  tr.flatten(prodwrap);
+//				  prodwrap=tr.erase(prodwrap);
+//				  prodwrap=tr.parent(prodwrap);
+//				  }
 			 }
 		it=prodwrap;
 		}

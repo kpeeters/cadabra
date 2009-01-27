@@ -683,7 +683,7 @@ tst67:= Q^{\mu} Q^{\nu} - @(obj67);
 
 # Test 68: product on lhs; similar to 65 or 66.
 #
-@reset.
-{\mu,\nu,\rho,\sigma}::Indices(vector).
-obj68:= A^{\mu} B^{\nu};
-@substitute!!(%)( A?^{\sigma} -> Q^{\sigma} );
+# @reset.
+# {\mu,\nu,\rho,\sigma}::Indices(vector).
+# obj68:= A^{\mu} B^{\nu};
+# @substitute!!(%)( A?^{\sigma} -> Q^{\sigma} );
