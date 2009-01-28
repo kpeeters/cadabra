@@ -1634,6 +1634,10 @@ algorithm::result_t pintegrate::apply(iterator& it)
 				while(oldarg->is_index()) ++oldarg;
 				tr.move_before(sib, (iterator)(oldarg));
 				tr.erase(sib);
+
+				// Clean up nests of \partial if present.
+//				iterator tmpit=tr.begin(newdiff);
+				cleanup_nests_below(tr, (iterator)newdiff);
 				}
 
 			sibling_iterator nxt=sib;
@@ -1676,6 +1680,11 @@ algorithm::result_t pintegrate::apply(iterator& it)
 				while(oldarg->is_index()) ++oldarg;
 				tr.move_before(sib, (iterator)(oldarg));
 				tr.erase(sib);
+
+				// Clean up nests of \partial if present.
+				cleanup_nests_below(tr, (iterator)newdiff);
+//				sibling_iterator tmpit=tr.begin(newdiff);
+//				cleanup_nests(tr, tmpit);
 				}
 
 			return l_applied;

@@ -1,3 +1,7 @@
+2009-01-28  Kasper Peeters  <kasper.peeters@aei.mpg.de>
+
+	* Fixed another nested partial derivative bug, now in @pintegrate.
+
 2009-01-27  Kasper Peeters  <kasper.peeters@aei.mpg.de>
 
 	* Released 1.07

@@ -408,3 +408,18 @@ obj32:= \epsilon_{a b c d} \partial_{a}{G} \partial_{b}{\psi};
 @canonicalise!(%);
 @assert(obj32);
 
+# Test 33: pintegrate cleanup nests
+#
+@reset.
+{a,b,c,d,e}::Indices{vector}.
+{a,b,c,d,e}::Integer(0..3).
+\partial{#}::PartialDerivative.
+{G, G_{a}, \psi}::Depends(\partial).
+\delta{#}::KroneckerDelta.
+\epsilon{#}::EpsilonTensor(delta=\delta).
+obj33:= \epsilon_{a b c d} \partial_{a}{G} \partial_{b}{\psi};
+@pintegrate!(%)(\partial);
+@unwrap!(%):
+@rename_dummies!(%):
+@canonicalise!(%);
+@assert(obj33);
