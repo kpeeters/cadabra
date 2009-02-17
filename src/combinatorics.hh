@@ -1,15 +1,24 @@
+/* 
+
+	Cadabra: a field-theory motivated computer algebra system.
+	Copyright (C) 2001-2009  Kasper Peeters <kasper.peeters@aei.mpg.de>
+
+   This program is free software: you can redistribute it and/or
+   modify it under the terms of the GNU General Public License as
+   published by the Free Software Foundation, either version 3 of the
+   License, or (at your option) any later version.
+
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+   General Public License for more details.
+
+   You should have received a copy of the GNU General Public License
+   along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ 
+*/
+
 /*
-
-   $Id: combinatorics.hh,v 1.47 2007/04/27 10:40:13 peekas Exp $
-
-   Initialised with a total length and sublengths, it produces
-   a list of arrays of ints of given length of combinations. 
-
-   Sublength is a vector of group lengths. Within a group, indices can only
-   increase in value (ie. we take combinations of elements from the total set).
-	Among groups, the order can be anything (ie. we take permutations of elements
-   from the total set).
-
                                   length vector
    normal combinations:     one element, value=total length.
 	normal permutations:     n elements, each equal to 1.

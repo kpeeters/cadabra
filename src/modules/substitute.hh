@@ -1,24 +1,21 @@
 /* 
 
-   $Id: substitute.hh,v 1.26 2007/04/23 16:18:17 peekas Exp $
+	Cadabra: a field-theory motivated computer algebra system.
+	Copyright (C) 2001-2009  Kasper Peeters <kasper.peeters@aei.mpg.de>
 
-	Cadabra: an extendable open-source symbolic tensor algebra system.
-	Copyright (C) 2001-2006  Kasper Peeters <kasper.peeters@aei.mpg.de>
+   This program is free software: you can redistribute it and/or
+   modify it under the terms of the GNU General Public License as
+   published by the Free Software Foundation, either version 3 of the
+   License, or (at your option) any later version.
 
-	This program is free software; you can redistribute it and/or modify
-	it under the terms of the GNU General Public License as published by
-	the Free Software Foundation, version 2.
-	 
-	
-	This program is distributed in the hope that it will be useful,
-	but WITHOUT ANY WARRANTY; without even the implied warranty of
-	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-	GNU General Public License for more details.
-	
-	You should have received a copy of the GNU General Public License
-	along with this program; if not, write to the Free Software
-	Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-	
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+   General Public License for more details.
+
+   You should have received a copy of the GNU General Public License
+   along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ 
 */
 
 #ifndef substitute_hh_
