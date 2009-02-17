@@ -64,12 +64,12 @@ advtest: program
 install_program: program
 	( cd src && $(MAKE) install );
 	@INSTALL@ -d ${DESTDIR}@prefix@/share/man/man1
-	@INSTALL@ man/man1/cadabra.1 ${DESTDIR}@prefix@/share/man/man1
+	@INSTALL@ -m 644 man/man1/cadabra.1 ${DESTDIR}@prefix@/share/man/man1
 	@INSTALL@ -d ${DESTDIR}@prefix@/bin
 	@INSTALL@ -d ${DESTDIR}@prefix@/share/TeXmacs/plugins/cadabra/progs
 	@INSTALL@ -m 644 texmacs/init-cadabra.scm ${DESTDIR}@prefix@/share/TeXmacs/plugins/cadabra/progs
 	@INSTALL@ -d ${DESTDIR}@prefix@/share/texmf/tex/latex/cadabra
-	@INSTALL@ doc/cadabra.sty $(DESTDIR)@prefix@/share/texmf/tex/latex/cadabra/cadabra.sty
+	@INSTALL@ -m 644 doc/cadabra.sty $(DESTDIR)@prefix@/share/texmf/tex/latex/cadabra/cadabra.sty
 	@INSTALL@ -d ${DESTDIR}@prefix@/share/doc/cadabra/properties
 	@INSTALL@ -d ${DESTDIR}@prefix@/share/doc/cadabra/algorithms
 	@INSTALL@ -d ${DESTDIR}@prefix@/share/doc/cadabra/reserved
@@ -80,7 +80,7 @@ install_program: program
 
 install_gui: gui
 	( cd gui && $(MAKE) install );
-	@INSTALL@ man/man1/xcadabra.1 ${DESTDIR}@prefix@/share/man/man1
+	@INSTALL@ -m 644 man/man1/xcadabra.1 ${DESTDIR}@prefix@/share/man/man1
 	@INSTALL@ -d ${DESTDIR}@prefix@/share/applications/
 	@INSTALL@ -d ${DESTDIR}@prefix@/share/pixmaps/
 	@INSTALL@ -m 644 cadabra.desktop ${DESTDIR}@prefix@/share/applications/cadabra.desktop

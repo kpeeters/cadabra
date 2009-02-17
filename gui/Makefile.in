@@ -36,7 +36,7 @@ endif
 	install -d ${DESTDIR}@prefix@/bin
 	install -m 0755 xcadabra ${DESTDIR}@prefix@/bin
 	install -d ${DESTDIR}@prefix@/share/texmf/tex/latex/cadabra
-	install tableaux.sty $(DESTDIR)@prefix@/share/texmf/tex/latex/cadabra/tableaux.sty
+	install -m 644 tableaux.sty $(DESTDIR)@prefix@/share/texmf/tex/latex/cadabra/tableaux.sty
 
 uninstall:
 	rm -f ${DESTDIR}@prefix@/bin/xcadabra
