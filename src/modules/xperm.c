@@ -1,10 +1,10 @@
 /*
 
   xperm.c
+  Copyright (C) 2001-2006  Jose M. Martin-Garcia
 
-  (C) Jose M. Martin-Garcia 2003-2006.
-      See http://metric.iem.csic.es/Martin-Garcia/xAct/
-      Modifications by Kasper Peeters <kasper.peeters@aei.mpg.de>
+  See http://metric.iem.csic.es/Martin-Garcia/xAct/
+  Modifications by Kasper Peeters <kasper.peeters@aei.mpg.de>
 
   This program is free software: you can redistribute it and/or
   modify it under the terms of the GNU General Public License as
