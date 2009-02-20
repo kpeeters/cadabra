@@ -396,3 +396,10 @@ tst33:= \commutator{B??}{\commutator{C??}{A??}} + \commutator{C??}{\commutator{B
 @collect_terms!(%);
 @assert(tst33);
 
+# Test34: canonicalorder
+#
+@reset.
+obj34:= A_{a b c} + A_{b a c};
+@acanonicalorder!(%)(_{a}, _{b});
+@collect_terms!(%);
+@assert(obj34);

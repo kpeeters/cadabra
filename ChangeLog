@@ -1,5 +1,8 @@
 2009-02-20  Kasper Peeters  <kasper.peeters@aei.mpg.de>
 
+	* Made @canonicalorder and @acanonicalorder act on single-factor
+	terms as well.
+
 	* Made '%' to label comments when it occurs at the beginning of a
 	line.
 

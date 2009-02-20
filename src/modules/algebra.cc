@@ -2776,13 +2776,15 @@ order::order(exptree& tr, iterator it)
 
 bool order::can_apply(iterator st)
 	{
-	if(*st->name=="\\prod") return true;
-	// FIXME: do something for single non-product terms
-	return false;
+	if(*(st->name)!="\\prod")
+		return(is_single_term(st));
+	return true;
 	}
 
 algorithm::result_t order::doit(iterator& st, bool sign)
 	{
+	prod_wrap_single_term(st);
+
 	std::vector<unsigned int> locs;
 	if(locate_(tr.begin(st), tr.end(st), locs)) {
 		if(!(::is_sorted(locs.begin(), locs.end()))) {
@@ -2811,13 +2813,7 @@ algorithm::result_t order::doit(iterator& st, bool sign)
 				}
 			}
 		}
-//	txtout << "acanonicalorder: collecting terms..." << std::endl;
-//	collect_terms ct(tr, tr.end());
-//	exptree::iterator ret=ct.apply(st,nd);
-
-	// FIXME: this is messy stuff.
-//	if(ret!=tr.end()) return ret;
-//	else              return st;
+	prod_unwrap_single_term(st);
 
 	return l_applied;
 	}
