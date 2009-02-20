@@ -1,3 +1,8 @@
+2009-02-20  Kasper Peeters  <kasper.peeters@aei.mpg.de>
+
+	* Made '%' to label comments when it occurs at the beginning of a
+	line.
+
 2009-01-28  Kasper Peeters  <kasper.peeters@aei.mpg.de>
 
 	* Fixed another nested partial derivative bug, now in @pintegrate.

@@ -279,7 +279,7 @@ bool manipulator::getline_precut(std::istream& str, std::string& buf)
 			return false;
 		}
 
-	if(getline_precut_buffer[0]=='#') {
+	if(getline_precut_buffer[0]=='#' || getline_precut_buffer[0]=='%') {
 		buf=getline_precut_buffer;
 		getline_precut_buffer="";
 		return true;
@@ -369,7 +369,7 @@ bool manipulator::handle_input()
 		if(oneline.substr(0,10)=="#cellstart" || oneline.substr(0,8)=="#cellend") {
 			txtout << "\n" << oneline << "\n";
 			}
-		else if(!is_whitespace_(oneline) && oneline.size()>0 && oneline[0]!='#') {
+		else if(!is_whitespace_(oneline) && oneline.size()>0 && oneline[0]!='#' && oneline[0]!='%') {
 		   display_result=true;
 			keep_result=true;
 			if(!reading_procedure) {
@@ -481,7 +481,7 @@ bool manipulator::handle_input()
 					goto anotherline;
 				}
 			input_buffer=input_buffer+oneline;
-			if(is_whitespace_(input_buffer) || input_buffer.size()==0 || input_buffer[0]=='#') {
+			if(is_whitespace_(input_buffer) || input_buffer.size()==0 || input_buffer[0]=='#' || input_buffer[0]=='%') {
 				input_buffer.clear();
 				goto anotherline;
 				}

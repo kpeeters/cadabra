@@ -115,7 +115,7 @@ unsigned char parser::get_token(unsigned int i)
 
 bool parser::string2tree(const std::string& inp)
 	{
-	if(inp.size()==0 || inp[0]=='#') 
+	if(inp.size()==0 || inp[0]=='#' || inp[0]=='%') 
 		return true;
 
 	if(preprocess_) {
