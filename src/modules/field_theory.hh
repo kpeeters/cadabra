@@ -106,6 +106,13 @@ class Weight : virtual public WeightBase {
 
 class WeightInherit : virtual public WeightBase {
 	public:
+		// The following exception class is thrown when 'value' cannot figure out the 
+		// weight because a sum contains terms of different weight. 
+		class weight_error : public consistency_error { 
+			public:
+				weight_error(const std::string&);
+		};
+
 		virtual bool          parse(exptree&, exptree::iterator, exptree::iterator, keyval_t&);
 		virtual multiplier_t  value(exptree::iterator, const std::string& forcedlabel) const;
 		virtual std::string   unnamed_argument() const { return "type"; };

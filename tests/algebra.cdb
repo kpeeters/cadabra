@@ -381,12 +381,38 @@ tst:= \phi \partial_{0}{\phi} + \partial_{0}{\lambda} - @(obj);
 @collect_terms!(%);
 @assert(tst);
 
-# @reset.
-# {\phi,\chi}::Weight(label=small, weight=1).
-# \lambda::Weight(label=small, weight=2).
-# obj:= \phi \chi + \lambda;
-# @drop_weight!(%){small}{2};
-# @assert(tst);
+@reset.
+{\phi,\chi}::Weight(label=small, value=1).
+\lambda::Weight(label=small, value=3).
+obj:= \phi \chi + \lambda;
+@drop_weight!(%){small}{2};
+tst:= \lambda - @(obj);
+@collect_terms!(%);
+@assert(tst);
+
+@reset.
+{\phi,\chi}::Weight(label=small, value=2).
+\lambda::Weight(label=small, value=2).
+obj:= ( \phi \chi + \lambda ) + ( \phi + \chi );
+#           4          2           2       2
+#             undefined                2
+@drop_weight!(%){small}{2};
+tst:= ( \phi \chi + \lambda ) - @(obj);
+@sumflatten!(%);
+@collect_terms!(%);
+@assert(tst);
+
+@reset.
+{\phi,\chi}::Weight(label=small, value=2).
+\lambda::Weight(label=small, value=2).
+obj:= ( \phi \chi + \lambda ) + ( \phi + \chi );
+#           4          2           2       2
+#             undefined                2
+@keep_weight!(%){small}{2};
+tst:= (\phi + \chi) - @(obj);
+@sumflatten!(%);
+@collect_terms!(%);
+@assert(tst);
 
 # Test 33: collect_terms and wildcards at deeper levels
 @reset.

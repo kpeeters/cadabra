@@ -1634,8 +1634,8 @@ drop_keep_weight::drop_keep_weight(exptree& tr, iterator it)
 
 // This algorithm acts on nodes which have Weight or inherit Weight.
 // It only acts when the parent does _not_ have or inherit weight.
-// This makes sure that we act on sums and products, not on individual
-// terms or factors (or generalisations thereof).
+// This makes sure that we act on sums and products which are not
+// themselves terms or factors in a sum or product.
 
 bool drop_keep_weight::can_apply(iterator st)
 	{
@@ -1645,10 +1645,14 @@ bool drop_keep_weight::can_apply(iterator st)
 	++argit;
 	weight=*argit->multiplier;
 
+
+	const WeightInherit *gmnpar=0;
+	const Weight        *wghpar=0;
+
 	gmn=properties::get_composite<WeightInherit>(st, label);
 	wgh=properties::get_composite<Weight>(st, label);
-	const WeightInherit *gmnpar=properties::get_composite<WeightInherit>(tr.parent(st), label);
-	const Weight        *wghpar=properties::get_composite<Weight>(tr.parent(st), label);
+	gmnpar=properties::get_composite<WeightInherit>(tr.parent(st), label);
+	wghpar=properties::get_composite<Weight>(tr.parent(st), label);
 
 //	txtout << *st->name << ": " << gmn << ", " << wgh << ", " << gmnpar << " " << std::endl;
 	if(gmn!=0 || wgh!=0) {
@@ -1673,8 +1677,20 @@ algorithm::result_t drop_keep_weight::apply(iterator& it, bool keepthem)
 			while(sib!=tr.end(it)) {
 				const WeightBase *gnb=properties::get_composite<WeightBase>(sib, label);
 				if(gnb) {
-					multiplier_t val=gnb->value(sib, label);
-					if((keepthem==true && weight!=val) || (keepthem==false && weight==val)) {
+					multiplier_t val;
+					bool no_val=false;
+					try {
+						val=gnb->value(sib, label);
+//						txtout << *sib->name << " has weight " << val << std::endl;
+						}
+					catch(WeightInherit::weight_error& we) {
+//						txtout << *sib->name << " has undeterminable weight " << std::endl;
+						// If we cannot determine the weight of this term because this is a sum of
+						// terms with different weights: keep when in @drop, drop when in @keep.
+						no_val=true;
+						}
+					if( (no_val==false && ( (keepthem==true && weight!=val) || (keepthem==false && weight==val) ) ) 
+						 || (no_val==true && keepthem==true) ) {
 						expression_modified=true;
 						sib=tr.erase(sib);
 						}
