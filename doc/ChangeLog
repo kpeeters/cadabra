@@ -1,3 +1,8 @@
+2009-03-06  Kasper Peeters  <kasper.peeters@aei.mpg.de>
+
+	* Fixed an old bug in compare_nodes (pointed out to me in 2005 but
+	never fixed properly...)
+
 2008-08-28  Kasper Peeters  <kasper.peeters@aei.mpg.de>
 
 	* Released 2.62

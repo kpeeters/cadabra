@@ -9,8 +9,8 @@
 
 /** \mainpage tree.hh
     \author   Kasper Peeters
-    \version  2.62
-    \date     28-Aug-2008
+    \version  2.63
+    \date     06-mar-2009
     \see      http://www.aei.mpg.de/~peekas/tree/
     \see      http://www.aei.mpg.de/~peekas/tree/ChangeLog
 
@@ -458,8 +458,7 @@ class tree {
 				
 				bool operator()(const tree_node *a, const tree_node *b) 
 					{
-					static StrictWeakOrdering comp;
-					return comp(a->data, b->data);
+					return comp_(a->data, b->data);
 					}
 			private:
 				StrictWeakOrdering comp_;
