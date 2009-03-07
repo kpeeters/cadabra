@@ -28,6 +28,7 @@
 #include "field_theory.hh"
 #include "numerical.hh"
 extern "C" {
+//#include "xperm_new.h"
 #include "xperm.h"
 }
 #include <utility>
@@ -3199,7 +3200,7 @@ algorithm::result_t canonicalise::apply(iterator& it)
 							ind_free.size(),
 							dummies,
 							ind_dummy.size()/2,
-							dummysetlabels,
+/* 							dummysetlabels, */
 							1,               // use an ordered base (what does this mean?)
 							1,               // symmetric metric
 							cperm);
