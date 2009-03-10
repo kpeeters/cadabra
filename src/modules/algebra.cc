@@ -3200,7 +3200,7 @@ algorithm::result_t canonicalise::apply(iterator& it)
 							ind_free.size(),
 							dummies,
 							ind_dummy.size()/2,
-/* 							dummysetlabels, */
+ 							dummysetlabels, 
 							1,               // use an ordered base (what does this mean?)
 							1,               // symmetric metric
 							cperm);
