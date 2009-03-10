@@ -213,7 +213,7 @@ int main(int argc, char **argv)
 			txtout << "static, ";
 #endif		 
 			txtout << "built on " << DATETIME << ")\\\\" << std::endl;
-			txtout << "Copyright (c) 2001-2008  Kasper Peeters <kasper.peeters@aei.mpg.de>\\\\" << std::endl; 
+			txtout << "Copyright (c) 2001-2009  Kasper Peeters <kasper.peeters@aei.mpg.de>\\\\" << std::endl; 
 			txtout << "Available under the terms of the GNU General Public License.\\\\" << std::endl;
 			}
 		else {
@@ -222,7 +222,7 @@ int main(int argc, char **argv)
 			txtout << "static, ";
 #endif
 			txtout  << "built on " << DATETIME /* << " on " << HOSTNAME */ << ")" << std::endl
-					  << "Copyright (C) 2001-2008  Kasper Peeters <kasper.peeters@aei.mpg.de>" << std::endl
+					  << "Copyright (C) 2001-2009  Kasper Peeters <kasper.peeters@aei.mpg.de>" << std::endl
 					  << "Info at http://www.aei.mpg.de/~peekas/cadabra/" << std::endl
 					  << "Available under the terms of the GNU General Public License." << std::endl << std::endl;
 			}

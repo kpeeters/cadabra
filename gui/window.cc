@@ -1115,7 +1115,7 @@ void XCadabra::on_help_about()
 	md.set_website("http://www.aei.mpg.de/~peekas/cadabra/");
 	md.set_website_label("cadabra website");
 	md.set_version(RELEASE);
-	md.set_copyright("\xC2\xA9 2006-2008 Kasper Peeters");
+	md.set_copyright("\xC2\xA9 2006-2009 Kasper Peeters");
 	md.set_comments("Graphical user interface for the cadabra symbolic computer algebra system.");
 	md.set_license("XCadabra and Cadabra are available under the Gnu General Public License version 2.\n\nIf you use Cadabra or even just play with it, I would like to hear about it. Please send me an email so that I can get an idea of who is interested in this program.\n\nIf you use Cadabra in your own work, please cite both\n\nKasper Peeters\n\"A field-theory motivated approach to computer algebra\"\ncs.sc/0608005\nComput. Phys. Commun 176 (2007) 550\n\nKasper Peeters\n\"Introducing Cadabra: a symbolic computer algebra system for field theory problems\"\nhep-th/0701238\n\nThank you!");
 #if (GTKMM_VER == 28 || GTKMM_VER == 212 || GTKMM_VER == 216)
