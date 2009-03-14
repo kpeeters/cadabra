@@ -53,7 +53,8 @@
 #include <signal.h>
 #include <termios.h>
 #include <sys/ioctl.h>
-//#include <termio.h>
+#include <unistd.h>
+#include <errno.h>
 #include <iomanip>
 #include <stdlib.h>
 #include <sys/types.h>
@@ -265,7 +266,19 @@ int main(int argc, char **argv)
 					char buffer[8192];
 					ssize_t read_len;
 					while((read_len=read(orig_fd, buffer, 8192))!=0) {
-						write(temp_fd, buffer, read_len);
+						ssize_t start=0;
+						do {
+							ssize_t written=write(temp_fd, &(buffer[start]), read_len);
+							if(written>=0) {
+								start-=written;
+								read_len-=written;
+								}
+							if(written<0 && errno!=EINTR) {
+								close(orig_fd);
+								close(temp_fd);
+								txtout << "Failure while writing temporary copy of the input file." << std::endl;
+								}
+							} while(read_len>0);
 						}
 					close(orig_fd);
 					close(temp_fd);
@@ -305,8 +318,11 @@ int main(int argc, char **argv)
 				commands.clear();
 				assert(reading_input_file==false);
 				// We were reading a redirected stdin, we have to reopen the tty.
-				freopen("/dev/tty","r",stdin);
-				goto mainloop;
+				if(freopen("/dev/tty","r",stdin)==NULL) {
+					txtout << "Failed to reopen tty." << std::endl;
+					return_value=-1;
+					}
+				else goto mainloop;
 				}
 			else return_value=-2;
 			}
@@ -331,12 +347,13 @@ int main(int argc, char **argv)
 			}
 		if(reading_input_file) {
 			txtout << "Input file ended" << std::endl;
-			reading_input_file="";
+			reading_input_file=false;
 			if(continue_interactive) {
 				txtout << "Continuing interactively" << std::endl;
 				commands.clear();
-//				freopen("/dev/tty","r",stdin);
-				goto mainloop;
+				if(freopen("/dev/tty","r",stdin)==NULL)
+					txtout << "Failed to re-open stdin.";
+				else goto mainloop;
 				}
 			}
 		else if(isatty(0)==0) {
@@ -347,9 +364,10 @@ int main(int argc, char **argv)
 				assert(reading_input_file==false);
 				// We were reading a redirected stdin, we have to reopen the tty.
 				// FIXME: this fails, though it used to work.
-				if(freopen("/dev/tty","r",stdin)==0)
+				if(freopen("/dev/tty","r",stdin)==NULL) {
 					txtout << "Failed to re-open stdin.";
-				goto mainloop;
+					}
+				else goto mainloop;
 				}
 			}
 		debugout << "-----" << std::endl;
