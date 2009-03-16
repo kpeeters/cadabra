@@ -52,6 +52,17 @@ class run : public algorithm {
 		result_t         apply(iterator&, std::string program_name, bool mapleout);
 };
 
+class maxima : public algorithm {
+	public:
+		maxima(exptree&, iterator);
+
+		virtual void     description() const;
+		virtual bool     can_apply(iterator);
+		virtual result_t apply(iterator&);
+
+		result_t         apply(iterator&, std::string program_name, bool mapleout);
+};
+
 /*
 class tomath : public algorithm {
 	public:

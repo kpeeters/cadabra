@@ -1,0 +1,45 @@
+# Testing of component evaluation.
+#
+
+@reset.
+\alpha::Integer(0..3).
+obj:= C_{\alpha};
+rul:= { C_{0} -> r**2,
+        C_{1} -> f(r),
+		  C_{2} -> r**(-2),
+		  C_{3} -> r };
+evl:= @eval![@(obj)]( @(rul) );
+tst:= { C_{0} -> r**2, C_{1} -> f(r), C_{2} -> r**(-2), C_{3} -> r } - @(evl);
+@collect_terms!(%);
+@assert(tst);
+
+@reset.
+\alpha::Integer(0..3).
+obj:= C_{\alpha} C_{\alpha};
+rul:= { C_{0} -> r**2,
+        C_{1} -> f(r),
+		  C_{2} -> r**(-2),
+		  C_{3} -> r };
+evl:= @eval![@(obj)]( @(rul) );
+tst:= r**2 * r**2 + f(r) * f(r) + r**(-2) * r**(-2) + r * r - @(evl);
+@collect_terms!(%);
+@assert(tst);
+
+@reset.
+{\alpha,\beta}::Indices("vector", position=fixed).
+{\alpha,\beta}::Integer(0..3).
+g_{\alpha\beta}::Metric.
+obj:= C_{\alpha} C^{\alpha};
+@rewrite_indices!(%)( C_{\alpha} )( g^{\alpha\beta} );
+rul:= { C_{0} -> r**2,
+        C_{1} -> f(r),
+		  C_{2} -> r**(-2),
+		  C_{3} -> r,
+        g^{0 0} -> -1,
+        g^{1 1} -> 1,
+        g^{2 2} -> 1,
+        g^{3 3} -> 1 };
+evl:= @eval![@(obj)]( @(rul) );
+tst:= -r**2 * r**2 + f(r) * f(r) + r**(-2) * r**(-2) + r * r - @(evl);
+@collect_terms!(%);
+@assert(tst);

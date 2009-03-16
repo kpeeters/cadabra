@@ -105,7 +105,8 @@ void TeXBuffer::regenerate(bool nobreqn)
 	char olddir[1024];
 	if(getcwd(olddir, 1023)==NULL)
 		 olddir[0]=0;
-	chdir("/tmp");
+	if(chdir("/tmp")==-1)
+		throw std::logic_error("Failed to chdir to /tmp.");
 
 	char templ[]="/tmp/cdbXXXXXX";
 
@@ -168,7 +169,18 @@ void TeXBuffer::regenerate(bool nobreqn)
 		}
 	total << "\\end{document}\n";
 
-	write(fd, total.str().c_str(), total.str().size());
+	ssize_t start=0;
+	do {
+		ssize_t written=write(fd, &(total.str().c_str()[start]), total.str().size()-start);
+		if(written>=0)
+			start+=written;
+		else {
+			if(errno != EINTR) {
+				close(fd);
+				throw std::logic_error("Failed to write LaTeX temporary file.");
+				}
+			} 
+		} while(start<static_cast<ssize_t>(total.str().size()));
 	close(fd);
 #ifdef DEBUG
 	std::cerr  << templ << std::endl;
@@ -198,7 +210,8 @@ void TeXBuffer::regenerate(bool nobreqn)
 		std::string err=handle_latex_errors(result);
 		if(err.size()>0) {
 			 erase_file(std::string(templ)+".dvi");
-			 chdir(olddir);
+			 if(chdir(olddir)==-1)
+				 throw std::logic_error(err+" (and cannot chdir back to original "+olddir+")");
 			 throw std::logic_error(err); 
 			 }
 		}
@@ -210,13 +223,15 @@ void TeXBuffer::regenerate(bool nobreqn)
 		
 		std::string err=handle_latex_errors(result);
 		if(err.size()>0) {
-			 chdir(olddir);
+			 if(chdir(olddir)==-1)
+				 throw std::logic_error(err+" (and cannot chdir back to original "+olddir+")");
 			 throw std::logic_error(err); 
 			 }
 
 		// Even if we cannot find an explicit error in the output, we have to terminate
 		// since LaTeX has thrown an exception.
-		chdir(olddir);
+		if(chdir(olddir)==-1)
+			throw std::logic_error("Cannot start LaTeX, is it installed? (and cannot chdir back to original)");
 		throw std::logic_error("Cannot start LaTeX, is it installed?");
 		}
 
@@ -238,7 +253,8 @@ void TeXBuffer::regenerate(bool nobreqn)
 	int ret=system(cmdstr.str().c_str());
 	if(ret==-1 && errno!=10) {
 		 erase_file(std::string(templ)+".dvi");
-		 chdir(olddir);
+		 if(chdir(olddir)==-1)
+			 throw std::logic_error("Cannot start dvipng, is it installed? (and cannot chdir back to original)");
 		 throw std::logic_error("Cannot start dvipng, is it installed?");
 		 }
 	if(ret!=0 && errno!=10) {
@@ -247,7 +263,8 @@ void TeXBuffer::regenerate(bool nobreqn)
 		 erase_file(std::string(templ)+"3.png");
 		 erase_file(std::string(templ)+"4.png");
 		 erase_file(std::string(templ)+".dvi");
-		 chdir(olddir);
+		 if(chdir(olddir)==-1)
+			 throw std::logic_error("The dvipng stage failed, ignoring output. (and cannot chdir back to original)");
 		 throw std::logic_error("The dvipng stage failed, ignoring output.");
 		 }
 	erase_file(std::string(templ)+".dvi");
@@ -277,7 +294,8 @@ void TeXBuffer::regenerate(bool nobreqn)
 #ifdef DEBUG
 	std::cerr << "generating done" << std::endl;
 #endif
-	chdir(olddir);
+	if(chdir(olddir)==-1)
+		throw std::logic_error("Failed to chdir back to " +std::string(olddir)+".");
 
 //	tex_stopwatch.stop();
 //	std::cerr << "Tex_Stopwatch so far " << tex_stopwatch << std::endl;

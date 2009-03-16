@@ -413,6 +413,8 @@ algorithm::result_t rewrite_indices::apply(iterator& it)
 		}
 
 	// Determine which conversion types are possible.
+	// itype1 and itype2 are the index types of the 1st and 2nd index of the 
+	// converter (i.e. vielbein or metric).
 	
 	sibling_iterator vbind=tr.begin(vielb);
 	const Indices *itype1=properties::get<Indices>(vbind);
@@ -430,6 +432,7 @@ algorithm::result_t rewrite_indices::apply(iterator& it)
 	// and see if that object appears in the list of preferred-form
 	// objects. If so, take appropriate action.
 
+	// 'dit' is the index under consideration for a rewrite.
 	index_map_t::const_iterator dit=ind_dummy.begin();
 	while(dit!=ind_dummy.end()) {
 		sibling_iterator par=tr.parent(dit->second);
@@ -447,6 +450,10 @@ algorithm::result_t rewrite_indices::apply(iterator& it)
 					}
 //				txtout << "index " << *dit->second->name << "(" << num << ") has type " 
 //						 << origtype->set_name << std::endl;
+
+				// 'walk' is the index on the preferred form of the tensor, corresponding
+				// to the index on the original tensor which is currently under consideration 
+				// for change.
 				sibling_iterator walk=tr.begin_index(prefit);
 				while(num-- > 0)
 					++walk;
@@ -465,6 +472,7 @@ algorithm::result_t rewrite_indices::apply(iterator& it)
 //						txtout << "and position is also already fine" << std::endl;
 						continue; // already fine
 						}
+//					txtout << "need to raise/lower" << std::endl;
 					}
 
 				exptree repvb(vielb);
@@ -472,8 +480,10 @@ algorithm::result_t rewrite_indices::apply(iterator& it)
 				sibling_iterator vbi2=vbi1; ++vbi2;
 
 				if(origtype->set_name == itype1->set_name && newtype->set_name == itype2->set_name) {
+//					txtout << "hit 1" << std::endl;
 					if( itype1->position_free || dit->second->fl.parent_rel == pr1 ) {
 						if( itype2->position_free || walk->fl.parent_rel != pr2 ) {
+//							txtout << "activate" << std::endl;
 							tr.replace_index(vbi1, dit->second);
 							exptree nd=get_dummy(itype2, par);
 							tr.replace_index(vbi2, nd.begin());
@@ -484,6 +494,7 @@ algorithm::result_t rewrite_indices::apply(iterator& it)
 					else continue;
 					}
 				else if(origtype->set_name == itype2->set_name && newtype->set_name == itype1->set_name) {
+//					txtout << "hit 2" << std::endl;
 					if( itype2->position_free || dit->second->fl.parent_rel == pr2 ) {
 						if( itype1->position_free || walk->fl.parent_rel != pr1 ) {
 							tr.replace_index(vbi2, dit->second);

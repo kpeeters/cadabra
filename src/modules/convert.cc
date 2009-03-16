@@ -380,3 +380,37 @@ R_{a b c d}::WeylTensor.
 
 
 */
+
+maxima::maxima(exptree& tr, iterator it)
+	: algorithm(tr, it)
+	{
+	}
+
+void maxima::description() const
+	{
+	txtout << "Write an expression to maxima and read it back in." << std::endl;
+	}
+
+bool maxima::can_apply(iterator it)
+	{
+	// Check that the expression contains no indices, neither free nor dummy.
+	// In other words, only act if the expression is a scalar built from scalars.
+
+	index_map_t ind_free, ind_dummy;
+	classify_indices(it, ind_free, ind_dummy);
+	if(ind_free.size()>0 || ind_dummy.size()>0) return false;
+
+	return true;
+	}
+
+algorithm::result_t maxima::apply(iterator& it)
+	{
+	txtout << "writing to maxima " << *it->name << std::endl;
+
+	std::string result;
+	modglue::child_process proc("maxima");
+	proc.call("a+b;\nquit();\n", result);
+	txtout << "received " << result << std::endl;
+	
+	return l_no_action;
+	}
