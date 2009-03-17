@@ -43,3 +43,22 @@ evl:= @eval![@(obj)]( @(rul) );
 tst:= -r**2 * r**2 + f(r) * f(r) + r**(-2) * r**(-2) + r * r - @(evl);
 @collect_terms!(%);
 @assert(tst);
+
+
+@reset.
+{t, r, \phi, \theta}::Coordinate.
+{m,n,p,q}::Indices(values={t,r,\phi,\theta}).
+g_{m n}::Metric.
+
+SSrule:= { g_{t t}          -> -f(r),
+           g_{r r}          -> 1/f(r),
+           g_{\theta\theta} -> r**2,
+           g_{\phi\phi}     -> r**2 \sin(\theta)**2,
+           g_{m n} -> 0 };
+
+obj:= det(g_{m n});
+@eval(%)( @(SSrule) );
+@maxima(%);
+tst:= - r**2 \sin(\theta)**2 - @(obj);
+@collect_terms!(%);
+@assert(tst);

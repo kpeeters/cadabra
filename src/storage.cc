@@ -1037,10 +1037,17 @@ int subtree_compare(exptree::iterator one, exptree::iterator two,
 	if(one->is_index()) {
 //		 std::cerr << "is index" << std::endl;
 		if(literal_wildcards==false && (one->is_object_wildcard() || two->is_object_wildcard())) return 0;
-		const Coordinate *cdn1=0; //properties::get<Coordinate>(one);
-		const Coordinate *cdn2=0; //properties::get<Coordinate>(two);
-		bool wildcard=(one->is_name_wildcard() || two->is_name_wildcard()) && 
-                                      			(literal_wildcards==false && cdn1==0 && cdn2==0);
+		bool wildcard=(one->is_name_wildcard() || two->is_name_wildcard()) && (literal_wildcards==false);
+//		if(mod_prel2) {
+		std::cout << *one->name << " vs " << *two->name << " " << mod_prel << " " << checksets << std::endl;
+		if(checksets) {
+			// We can only do this match if 
+			const Coordinate *cdn1=properties::get<Coordinate>(one);
+			const Coordinate *cdn2=properties::get<Coordinate>(two);
+			if(cdn1!=0 || cdn2!=0)
+				wildcard=false;
+			}
+
 		if(one->name == two->name || wildcard ) {
 			int numch1=exptree::number_of_children(one);
 			int numch2=exptree::number_of_children(two);
@@ -1327,11 +1334,11 @@ exptree_comparator::match_t exptree_comparator::compare(const exptree::iterator&
 
 			int cmp;
 			if(tested_full) 
-				cmp=subtree_compare((*loc).second.begin(), two, 0); 
+				cmp=subtree_compare((*loc).second.begin(), two, -2 /* KP */); 
 			else {
 				exptree tmp2(two);
 				tmp2.erase_children(tmp2.begin());
-				cmp=subtree_compare((*loc).second.begin(), tmp2.begin(), 0); 
+				cmp=subtree_compare((*loc).second.begin(), tmp2.begin(), -2 /* KP */); 
 				}
 //			std::cerr << " pattern " << *two->name
 //						 << " should be " << *((*loc).second.begin()->name)  

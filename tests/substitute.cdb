@@ -687,3 +687,20 @@ tst67:= Q^{\mu} Q^{\nu} - @(obj67);
 # {\mu,\nu,\rho,\sigma}::Indices(vector).
 # obj68:= A^{\mu} B^{\nu};
 # @substitute!!(%)( A?^{\sigma} -> Q^{\sigma} );
+
+# Test 69: coordinate indices
+#
+@reset.
+{t, r, \phi, \theta}::Coordinate.
+SSrule:= { g_{t t}          -> -f(r),
+           g_{r r}          -> 1/f(r),
+           g_{\theta\theta} -> r**2,
+           g_{\phi\phi}     -> r**2 \sin(\theta)**2,
+           g_{m n} -> 0 };
+
+obj69:= g_{r r} + g_{\phi\phi};
+@substitute!(%)( @(SSrule) );
+tst69:= 1/f(r) - @(obj69);
+@collect_terms!(%);
+@assert(tst69);
+
