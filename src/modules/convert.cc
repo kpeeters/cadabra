@@ -23,6 +23,7 @@
 #include "parser.hh"
 #include <modglue/process.hh>
 #include <sstream>
+#include <pcrecpp.h>
 
 frommath::frommath(exptree& tr, iterator it)
 	: algorithm(tr, it)
@@ -405,12 +406,44 @@ bool maxima::can_apply(iterator it)
 
 algorithm::result_t maxima::apply(iterator& it)
 	{
-	txtout << "writing to maxima " << *it->name << std::endl;
-
+	std::ostringstream argstr;
+	exptree_output eo(tr, argstr);
+	eo.output_format=exptree_output::out_plain;
+	eo.print_infix(it);
+	
 	std::string result;
 	modglue::child_process proc("maxima");
-	proc.call("a+b;\nquit();\n", result);
-	txtout << "received " << result << std::endl;
-	
+	proc.call("display2d:false$\n"+argstr.str()+";\nquit();\n", result);
+
+	std::stringstream str(result);
+	std::string line;
+	parser pa(true);
+	std::string store;
+	while(std::getline(str, line)) {
+		pcrecpp::RE reg(".*\\(%o[0-9]+\\) *(.*)");
+		if(reg.FullMatch(line,&store)) {
+//			txtout << store << std::endl;
+			break;
+			}
+		}
+	if(store.size()>0) {
+		pcrecpp::RE("\\^").GlobalReplace("**", &store);
+//		txtout << "after preparse: " << store << std::endl;
+
+		try {
+			std::stringstream str2(store);
+			str2 >> pa;
+			}
+		catch(std::exception& ex) {
+			txtout << ex.what() << std::endl;
+			return l_error;
+			}
+		it=tr.replace(it,pa.tree.begin().begin());
+		cleanup_expression(tr,it);
+		expression_modified=true;
+		return l_applied;
+		}
+
 	return l_no_action;
+	
 	}

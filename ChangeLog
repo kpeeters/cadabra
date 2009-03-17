@@ -1,3 +1,8 @@
+2009-03-17  Kasper Peeters  <kasper.peeters@aei.mpg.de>
+
+	* Added primitive interface to Maxima in the form of the @maxima
+	command. 
+
 2009-03-10  Kasper Peeters  <kasper.peeters@aei.mpg.de>
 
 	* Fixed copyright notice.
