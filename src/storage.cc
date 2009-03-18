@@ -1008,23 +1008,22 @@ int subtree_compare(exptree::iterator one, exptree::iterator two,
 
 	bool position_free=true;
 	if(one->is_index() && two->is_index() && checksets) {
-//		txtout << "checksets" << std::endl;
-		 const Indices *ind1=properties::get<Indices>(one);
-		 const Indices *ind2=properties::get<Indices>(two);
-		 if(ind1!=ind2) { 
-			  // It may still be that one set is a subset of the other, i.e that the
-			  // parent argument of Indices has been used.
-			  mult=2;
+		const Indices *ind1=properties::get<Indices>(one);
+		const Indices *ind2=properties::get<Indices>(two);
+		if(ind1!=ind2) { 
+			// It may still be that one set is a subset of the other, i.e that the
+			// parent argument of Indices has been used.
+			mult=2;
 // FIXME: this is required for implicit symmetry patterns on split_index objects
 //			if(ind1!=0 && ind2!=0) 
 //				if(ind1->parent_name==ind2->set_name || ind2->parent_name==ind1->set_name)
 //					mult=1;
-			  }
-//		else txtout << "same set" << std::endl;
-		 if(ind1!=0 && ind1==ind2) 
-			  position_free=ind1->position_free;
-		 }
-
+			}
+//		else std::cout << *one->name << " and " << *two->name << " in same set" << std::endl;
+		if(ind1!=0 && ind1==ind2) 
+			position_free=ind1->position_free;
+		}
+	
 	// Compare sub/superscript relations.
 	if((mod_prel==-2 && !position_free) && one->is_index()) {
 		if(one->fl.parent_rel!=two->fl.parent_rel) {
@@ -1039,14 +1038,13 @@ int subtree_compare(exptree::iterator one, exptree::iterator two,
 		if(literal_wildcards==false && (one->is_object_wildcard() || two->is_object_wildcard())) return 0;
 		bool wildcard=(one->is_name_wildcard() || two->is_name_wildcard()) && (literal_wildcards==false);
 //		if(mod_prel2) {
-		std::cout << *one->name << " vs " << *two->name << " " << mod_prel << " " << checksets << std::endl;
-		if(checksets) {
-			// We can only do this match if 
-			const Coordinate *cdn1=properties::get<Coordinate>(one);
-			const Coordinate *cdn2=properties::get<Coordinate>(two);
-			if(cdn1!=0 || cdn2!=0)
-				wildcard=false;
-			}
+//		std::cout << *one->name << " vs " << *two->name << " " << mod_prel << " " << checksets << std::endl;
+//		if(mod_prel==-2) {
+//			const Coordinate *cdn1=properties::get<Coordinate>(one);
+//			const Coordinate *cdn2=properties::get<Coordinate>(two);
+//			if(cdn1!=0 || cdn2!=0)
+//				wildcard=false;
+//			}
 
 		if(one->name == two->name || wildcard ) {
 			int numch1=exptree::number_of_children(one);
@@ -1127,7 +1125,7 @@ int subtree_compare(exptree::iterator one, exptree::iterator two,
 	else if(compare_multiplier>0)  --compare_multiplier;
 
 	while(sib1!=one.end()) {
-//		 std::cerr << *sib1->name << "??" << *sib2->name << std::endl;
+//		 std::cout << *sib1->name << "??" << *sib2->name << std::endl;
 		 int ret=subtree_compare(sib1,sib2, mod_prel, checksets, compare_multiplier, literal_wildcards);
 //		std::cerr << ret << std::endl;
 		if(abs(ret)>1)
@@ -1303,16 +1301,18 @@ exptree_comparator::match_t exptree_comparator::compare(const exptree::iterator&
 	bool implicit_pattern=false;
 	bool is_index=false;
 	
-	if(one->fl.bracket==str_node::b_none && one->is_index() )
+	if(one->fl.bracket==str_node::b_none && one->is_index() ) 
 		is_index=true;
 	if(one->is_name_wildcard())
 		pattern=true;
 	else if(one->is_object_wildcard())
 		objectpattern=true;
-	else if(is_index && one->is_integer()==false) 
-		implicit_pattern=true;
-	
-	
+	else if(is_index && one->is_integer()==false) {
+		const Coordinate *cdn1=properties::get<Coordinate>(one);
+		if(cdn1==0)
+			implicit_pattern=true;
+		}
+		
 	if(pattern || (implicit_pattern && two->is_integer()==false)) { 
 		// The above is to ensure that we never match integers to implicit patterns.
 
@@ -1334,11 +1334,11 @@ exptree_comparator::match_t exptree_comparator::compare(const exptree::iterator&
 
 			int cmp;
 			if(tested_full) 
-				cmp=subtree_compare((*loc).second.begin(), two, -2 /* KP */); 
+				cmp=subtree_compare((*loc).second.begin(), two, 0 /* KP: do not switch this to -2 (kk.cdb fails) */); 
 			else {
 				exptree tmp2(two);
 				tmp2.erase_children(tmp2.begin());
-				cmp=subtree_compare((*loc).second.begin(), tmp2.begin(), -2 /* KP */); 
+				cmp=subtree_compare((*loc).second.begin(), tmp2.begin(), 0 /* KP: see above */); 
 				}
 //			std::cerr << " pattern " << *two->name
 //						 << " should be " << *((*loc).second.begin()->name)  

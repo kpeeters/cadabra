@@ -690,6 +690,7 @@ tst67:= Q^{\mu} Q^{\nu} - @(obj67);
 
 # Test 69: coordinate indices
 #
+
 @reset.
 {t, r, \phi, \theta}::Coordinate.
 SSrule:= { g_{t t}          -> -f(r),
@@ -698,9 +699,9 @@ SSrule:= { g_{t t}          -> -f(r),
            g_{\phi\phi}     -> r**2 \sin(\theta)**2,
            g_{m n} -> 0 };
 
-obj69:= g_{r r} + g_{\phi\phi};
+obj69:= g_{r r} + g_{\phi\phi} + g_{r \phi};
 @substitute!(%)( @(SSrule) );
-tst69:= 1/f(r) - @(obj69);
+tst69:= 1/f(r) + r**2 * \sin(\theta)**2 - @(obj69);
 @collect_terms!(%);
 @assert(tst69);
 
