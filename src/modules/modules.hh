@@ -36,3 +36,5 @@
 #include "combinat.hh"
 #include "lie.hh"
 #include "lists.hh"
+#include "eval.hh"
+

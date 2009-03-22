@@ -14,7 +14,7 @@ tst:= { C_{0} -> r**2, C_{1} -> f(r), C_{2} -> r**(-2), C_{3} -> r } - @(evl);
 @assert(tst);
 
 @reset.
-\alpha::Integer(0..3).
+{\alpha,\beta}::Indices(values={0,1,2,3}).
 obj:= C_{\alpha} C_{\alpha};
 rul:= { C_{0} -> r**2,
         C_{1} -> f(r),
@@ -24,6 +24,33 @@ evl:= @eval![@(obj)]( @(rul) );
 tst:= r**2 * r**2 + f(r) * f(r) + r**(-2) * r**(-2) + r * r - @(evl);
 @collect_terms!(%);
 @assert(tst);
+
+# algorithm:
+#
+# - need to cache information because there are potentially many operations
+# - need to canonicalise indices 
+#
+# Eval first works at C_{\alpha} level. 
+#
+#
+# Estimates:
+#
+#   Kretschmann in 10d: 10^4 values to sum over. So we need to be able to cut
+#   this down to the non-zero ones early: as soon as a zero combination is found
+#   for one of the factors, remove this branch of the search tree.
+#   Need to:
+#        a) make the algorithm work at the top, recursively down, since
+            we need to keep memory/cache of already evaluated objects.
+#        b) for all levels recursively visited, determine whether substitution
+#           rules fix the value (hence allowing D_1 + E_1 -> 3 even if E_1 is 
+#           not known as a component.
+#        c) use a 'base n' type notation to map an index value combination for 
+#           an n-valent tensor to an integer, so that we can make a map from
+#           integers to expressions for any tensor, avoiding repeated substitutions.
+#
+#  A_m ( B_m + C_m ) D_n Q_n:
+#
+#      
 
 @reset.
 {\alpha,\beta}::Indices("vector", position=fixed).

@@ -15,7 +15,8 @@ MOBJS=modules/algebra.o modules/pertstring.o modules/convert.o modules/gamma.o \
       modules/field_theory.o modules/select.o modules/dummies.o modules/output.o \
       modules/properties.o modules/relativity.o modules/substitute.o \
       modules/tableaux.o modules/diff_geometry.o modules/numerical.o \
-      modules/linear.o modules/combinat.o modules/xperm.o modules/lie.o modules/lists.o
+      modules/linear.o modules/combinat.o modules/xperm.o modules/lie.o modules/lists.o \
+      modules/eval.o
 
 #modules/xperm_no_nests.o 
 

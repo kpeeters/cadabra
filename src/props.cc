@@ -473,23 +473,29 @@ property_base::match_t Indices::equals(const property_base *other) const
 
 bool Indices::parse(exptree& tr, exptree::iterator pat, exptree::iterator prop, keyval_t& keyvals)
 	{
-	keyval_t::const_iterator ki=keyvals.find("name");
-	if(ki!=keyvals.end()) {
-		 if(*ki->second->multiplier!=1) {
-			  txtout << "Indices: use quotes to label names when they start with a number." << std::endl;
-			  return false;
-			  }
-		set_name=*ki->second->name;
-		}
-
-	ki=keyvals.find("parent");
-	if(ki!=keyvals.end()) 
-		parent_name=*ki->second->name;
-
-	ki=keyvals.find("position");
-	if(ki!=keyvals.end()) {
-		if(*ki->second->name!="free")
-			position_free=false;
+	keyval_t::const_iterator ki=keyvals.begin();
+	while(ki!=keyvals.end()) {
+		if(ki->first=="name") {
+			if(*ki->second->multiplier!=1) {
+				txtout << "Indices: use quotes to label names when they start with a number." << std::endl;
+				return false;
+				}
+			set_name=*ki->second->name;
+			}
+		else if(ki->first=="parent") {
+			parent_name=*ki->second->name;
+			}
+		else if(ki->first=="position") {
+			if(*ki->second->name!="free")
+				position_free=false;
+			}
+		else if(ki->first=="values") {
+			values=*ki->second;
+			if(*values.begin()->name!="\\comma") 
+				throw consistency_error("Key 'values' of property 'Indices' needs a list as value.");
+			}
+		else throw consistency_error("Property 'Indices' does not accept key '"+ki->first+"'.");
+		++ki;
 		}
 
 	return true;

@@ -435,6 +435,7 @@ class Indices : public list_property {
 		
 		std::string set_name, parent_name;
 		bool        position_free;
+		exptree     values;
 };
 
 class SortOrder : public list_property {

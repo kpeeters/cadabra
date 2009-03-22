@@ -202,6 +202,9 @@ manipulator::manipulator()
 	algorithms["@inner"]          =new algo_info(&create<inner>);
 	algorithms["@list_sum"]       =new algo_info(&create<list_sum>);
 	algorithms["@coefficients"]   =new algo_info(&create<coefficients>); // not documented yet; unfinished!
+
+	// component evaluation
+	algorithms["@eval"]           =new algo_info(&create<eval>);
 	}
 
 manipulator::~manipulator()

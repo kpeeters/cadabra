@@ -18,3 +18,24 @@
  
 */
 
+#include "eval.hh"
+
+eval::eval(exptree& tr, iterator it)
+	: algorithm(tr, it)
+	{
+	}
+
+void eval::description() const
+	{
+	txtout << "Evaluate the components of an expression." << std::endl;
+	}
+
+bool eval::can_apply(iterator)
+	{
+	return true;
+	}
+
+algorithm::result_t eval::apply(iterator& it)
+	{
+	return l_no_action;
+	}
