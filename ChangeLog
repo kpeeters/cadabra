@@ -1,3 +1,9 @@
+2009-03-22  Kasper Peeters  <kasper.peeters@aei.mpg.de>
+
+	* Fixed handling of brackets in @expand_powers.
+
+	* Fixed segfault in @expand_powers.
+
 2009-03-18  Kasper Peeters  <kasper.peeters@aei.mpg.de>
 
 	* Fixed a bug which would treat indices with Coordinate property

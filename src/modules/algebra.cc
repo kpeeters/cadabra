@@ -3944,6 +3944,12 @@ algorithm::result_t expand_power::apply(iterator& it)
 		return l_no_action;
 
 	iterator prodn=tr.insert(argument,str_node("\\prod"));
+
+	// If the current \pow is inside a sum, do not discard the bracket
+	// type on \pow but copy it onto each generated \prod element.
+	if(*tr.parent(it)->name=="\\sum") 
+		prodn->fl.bracket=it->fl.bracket;
+	
 	sibling_iterator beg=argument;
 	sibling_iterator nd=beg;
 	++nd;
@@ -3953,17 +3959,14 @@ algorithm::result_t expand_power::apply(iterator& it)
 	multiply(prodn->multiplier, *it->multiplier);
 	it=tr.erase(it);
 
+	// Now duplicate the factor num-1 times.
 	// FIXME: handle symbolic and rational exponents gracefully.
 	for(int i=0; i<num-1; ++i) {
 		iterator tmp=tr.append_child(prodn);
 		iterator ins=tr.replace(tmp, argument);
-//		sibling_iterator prodargs=tr.begin(ins);
-//		while(prodargs!=tr.end(ins)) {
-//			prodargs->fl.bracket=str_node::b_none;
-//			++prodargs;
-//			}
 		rename_replacement_dummies(ins);
 		}
+
 	sibling_iterator sib=tr.begin(prodn);
 	while(sib!=tr.end(prodn)) {
 		 sibling_iterator nxt=sib;
@@ -3972,8 +3975,16 @@ algorithm::result_t expand_power::apply(iterator& it)
 		 cleanup_nests(tr, tmp);
 		 sib=nxt;
 		 }
-	cleanup_nests(tr,prodn);
-	cleanup_expression(tr,it);
+
+//	cleanup_nests(tr,prodn);
+//	txtout << "point 5 -----------------------------" << std::endl;
+
+//	tr.print_entire_tree(txtout);
+//	txtout << *it->name << std::endl;
+//	cleanup_expression(tr,it);
+//	txtout << "point 6 -----------------------------" << std::endl;
+
+//	tr.print_entire_tree(txtout);
 
 	expression_modified=true;
 	return l_applied;

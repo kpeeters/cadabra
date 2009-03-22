@@ -258,7 +258,7 @@ int main(int argc, char **argv)
 		// Process input file, if any.
 		if(inputfile.size()>0) {
 			int orig_fd=open(inputfile.c_str(), O_RDONLY);
-			if(orig_fd!=1) {
+			if(orig_fd!=-1) {
 				// make a temporary copy
 				char temp_name[]="/tmp/cdbtmp_XXXXXX";
 				int temp_fd=mkstemp(temp_name);
@@ -276,7 +276,10 @@ int main(int argc, char **argv)
 							if(written<0 && errno!=EINTR) {
 								close(orig_fd);
 								close(temp_fd);
-								txtout << "Failure while writing temporary copy of the input file." << std::endl;
+								txtout << "Failure while writing temporary copy of the input file to " << temp_name << std::endl;
+								close(orig_fd);
+								close(temp_fd);
+								return(-1);
 								}
 							} while(read_len>0);
 						}
@@ -290,7 +293,10 @@ int main(int argc, char **argv)
 					 return -1;
 					 }
 				}
-			else txtout << "Input file " << inputfile << " not found." << std::endl;
+			else {
+				txtout << "Input file " << inputfile << " not found." << std::endl;
+				return -1;
+				}
 			}
 
 //		int oldin;
