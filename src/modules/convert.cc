@@ -428,7 +428,6 @@ algorithm::result_t maxima::apply(iterator& it)
 		}
 	if(store.size()>0) {
 		pcrecpp::RE("\\^").GlobalReplace("**", &store);
-//		txtout << "after preparse: " << store << std::endl;
 
 		try {
 			std::stringstream str2(store);

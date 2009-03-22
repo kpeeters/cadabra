@@ -3967,33 +3967,10 @@ algorithm::result_t expand_power::apply(iterator& it)
 		rename_replacement_dummies(ins);
 		}
 
-	sibling_iterator sib=tr.begin(prodn);
-	while(sib!=tr.end(prodn)) {
-		 sibling_iterator nxt=sib;
-		 ++nxt;
-		 iterator tmp=sib;
-		 cleanup_nests(tr, tmp);
-		 sib=nxt;
-		 }
-
-//	cleanup_nests(tr,prodn);
-//	txtout << "point 5 -----------------------------" << std::endl;
-
-//	tr.print_entire_tree(txtout);
-//	txtout << *it->name << std::endl;
-//	cleanup_expression(tr,it);
-//	txtout << "point 6 -----------------------------" << std::endl;
-
-//	tr.print_entire_tree(txtout);
+	cleanup_nests_below(tr,it);
+	cleanup_nests(tr,it);
 
 	expression_modified=true;
 	return l_applied;
 	}
 
-/*
-
-  @dummies{vector{a,b,c,d,e,f,g}}.
-  C_a D^a (A_c B^c)**4;
-  @expand_power!(%);
- 
-*/

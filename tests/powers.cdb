@@ -52,3 +52,18 @@ tst8:= A**(-1) - @(obj8);
 @assert(tst8);
 
 
+# Test 9: nested powers and so on
+#
+@reset.
+obj9:= b**2 c**3 e;
+@substitute!(%)(b -> 2*B*C, c -> (2*A*C + B**2), e -> A**2 );
+max9:= expand( @(obj9) );
+@expand_power!(obj9);
+@distribute!(%);
+@prodsort!(%);
+@collect_terms!(%);
+@collect_factors!(%);
+@maxima(max9);
+tst9:= @(max9) - @(obj9);
+@collect_terms!(%);
+@assert(tst9);
