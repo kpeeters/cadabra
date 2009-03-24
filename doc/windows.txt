@@ -44,4 +44,8 @@ gui:
 
   http://www.tug.org/texlive/windows.html
 
+--------------------------------------------------------------------
+build tools:
 
++ libtool
++ pkg-config
