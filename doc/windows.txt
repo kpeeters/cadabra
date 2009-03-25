@@ -1,3 +1,28 @@
+
+
+- install cygwin plus a bunch of its packages (see list)
+- install libsigc++
+- fetch, compile and install modglue
+- install libgmp NEW: is in cygwin now
+
+At this stage cadabra builds without GUI.
+
+- install latest glib
+- install latest pixman
+- install latest cairo (--enable-xlib=no)
+- install latest pango with cairo backend
+
+- install latest atk
+- install latest gtk
+- install latest gtkmm
+
+=========================================================================
+OLD:
+
+
+
+
+
 Cadabra does not yet compile on Windows, but this will change in the
 near future. Below is a list of dependencies which will have to be
 sorted out for a Windows port. Many GNU tools are available for
