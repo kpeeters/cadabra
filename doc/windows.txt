@@ -5,15 +5,24 @@
 - fetch, compile and install modglue
 - install libgmp NEW: is in cygwin now
 
-At this stage cadabra builds without GUI.
+At this stage cadabra builds without GUI, provided the autoconf test
+for LiE is disabled.
 
 - install latest glib
 - install latest pixman
-- install latest cairo (--enable-xlib=no)
-- install latest pango with cairo backend
-
+- install latest cairo (--enable-xlib=no, versions above 1.8.0 are broken)
+- install latest pango with cairo backend (--without-x
+            --disable-rebuilds --enable-static --enable-shared
+            --with-included-modules=yes )
 - install latest atk
-- install latest gtk
+
+- install latest gtk (--without-x)
+     - had to fix one WINDRES in gdk/rc/Makefile (was unset, should be
+       windres)
+     - had to kill a 'LD_EXPORT_...' flag in gdk/Makefile (chose the 
+       regex one as the ./gdk.def seems to contain all the defs)
+     - had to add a -lpango in linking gdk
+     - ditto: -lgdk and -lpango in gtk/Makefile
 - install latest gtkmm
 
 =========================================================================
