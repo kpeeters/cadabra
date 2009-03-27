@@ -8,7 +8,7 @@
 At this stage cadabra builds without GUI, provided the autoconf test
 for LiE is disabled.
 
-- install latest glib
+- install latest glibd
 - install latest pixman
 - install latest cairo (--enable-xlib=no, versions above 1.8.0 are broken)
 - install latest pango with cairo backend (--without-x
