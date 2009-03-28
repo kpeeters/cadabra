@@ -25,6 +25,19 @@
 #include <sstream>
 #include <pcrecpp.h>
 
+const char* maxima::max_to_cad[][2] = {
+	{ "%pi",      "\\\\pi" },
+	{ "%e",       "e" },
+	{ "sin",      "\\\\sin" },
+	{ "cos",      "\\\\cos" },
+	{ "tan",      "\\\\tan" },
+	{ "inf",      "\\\\infty" },
+	{ "minf",     "-\\\\infty" },
+	{ "infinity", "\\\\infty" },
+	{ "sqrt",     "\\\\sqrt" },
+	{ "%i",       "i" },
+};
+
 frommath::frommath(exptree& tr, iterator it)
 	: algorithm(tr, it)
 	{
@@ -409,11 +422,24 @@ algorithm::result_t maxima::apply(iterator& it)
 	std::ostringstream argstr;
 	exptree_output eo(tr, argstr);
 	eo.output_format=exptree_output::out_plain;
+	eo.print_star=true;
+
 	eo.print_infix(it);
 	
 	std::string result;
 	modglue::child_process proc("maxima");
-	proc.call("display2d:false$\n"+argstr.str()+";\nquit();\n", result);
+	std::string tomax="display2d:false$\n"+argstr.str()+";\nquit();\n";
+
+//	for(size_t i=0; i<sizeof(max_to_cad)/sizeof(max_to_cad[0]); ++i) 
+//		pcrecpp::RE(max_to_cad[i][1]).GlobalReplace(max_to_cad[i][0], &tomax);
+
+	debugout << "sending to maxima:" << std::endl
+				<< tomax << std::endl;
+
+	proc.call(tomax, result);
+
+	debugout << "result from maxima:" << std::endl
+				<< result << std::endl;
 
 	std::stringstream str(result);
 	std::string line;
@@ -428,6 +454,12 @@ algorithm::result_t maxima::apply(iterator& it)
 		}
 	if(store.size()>0) {
 		pcrecpp::RE("\\^").GlobalReplace("**", &store);
+
+		for(size_t i=0; i<sizeof(max_to_cad)/sizeof(max_to_cad[0]); ++i) 
+			pcrecpp::RE(max_to_cad[i][0]).GlobalReplace(max_to_cad[i][1], &store);
+		
+//		debugout << "after conversion:" << std::endl
+//					<< store << std::endl;
 
 		try {
 			std::stringstream str2(store);

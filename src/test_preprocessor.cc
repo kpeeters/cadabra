@@ -243,6 +243,14 @@ int main(int argc, char **argv)
 			"A_{\\dot{a} \\dot{b}}",
 			"A_{\\dot{a} \\dot{b}}");
 
+		regression*=testit(
+			"3..4",
+			"\\sequence{3}{4}");
+
+		regression*=testit(
+			"3.14",
+			"3.14");
+
 //		  regression*=testit(
 //			  "@substitute!(%){b_{p}->c_{p m n} A^{m n} + c_{p} }",
 //			  "@substitute!(%){\\arrow{b_{p}}{\\sum{\\prod{c_{p m n}}{A^{m n}}{c_{p}}}}}");
