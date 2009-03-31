@@ -33,7 +33,7 @@ for LiE is disabled.
 - install cairomm 1.6.4 (1.8.0 fails to build)
 - install pangomm 2.24.0
 - install gtkmm 2.14.3
-- install breqn
+
 
 drag crash:
 
