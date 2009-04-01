@@ -35,7 +35,7 @@
 #include "preprocessor.hh"
 
 const unsigned char preprocessor::orders[]     ={ '!', tok_pow, '/', '*', tok_wedge, 
-																  '-', '+', '.', '=', tok_unequals, 
+																  '-', '+', tok_sequence, '=', tok_unequals, 
 																  '<', '>', '|', tok_arrow, tok_set_option, 
 																  tok_declare, ',', '~', 0 };
 const char * const  preprocessor::order_names[]={ "\\factorial", "\\pow", "\\frac", "\\prod", "\\wedge", 
@@ -226,6 +226,12 @@ unsigned char preprocessor::get_token_(unsigned char prev_token)
 			cur_str[cur_pos]=tok_unequals;
 			c=tok_unequals; // FIXME: Another hack... (unequals)
 			}
+		if(c=='.' && cur_str[cur_pos+1]=='.') {
+			++cur_pos;
+			cur_str[cur_pos]=tok_sequence;
+			c=tok_sequence; // FIXME: Another hack... (sequence)
+			}
+
 		if(isblank(c)) {
 			if(candidate==0) candidate=' ';
 			++cur_pos;
@@ -243,10 +249,10 @@ unsigned char preprocessor::get_token_(unsigned char prev_token)
 				// FIXME: have to test whether this operator allows for missing first child.
 //				throw std::logic_error("two subsequent operators without intermediate operand");
 				}
-			if(c=='.') {
-				if(cur_str[cur_pos+1]!='.') return c; // FIXME: this disables floats... 
-				else                        ++cur_pos;
-				}
+//			if(c=='.') {
+//				if(cur_str[cur_pos+1]!='.') return c; // FIXME: this disables floats... 
+//				else                        ++cur_pos;
+//				}
 			candidate=c;
 			++cur_pos;
 			continue;
@@ -265,9 +271,10 @@ unsigned char preprocessor::get_token_(unsigned char prev_token)
 			else return candidate;
 			}
 		else {
+			std::string acplusone=cur.accu + (char)(c);
 			if( ( is_closing_bracket_(prev_token) && is_opening_bracket_(c) && cur.head_is_generated ) ||
 				 ( is_closing_bracket_(prev_token) && !is_infix_operator_(c) && !is_bracket_(c) && !is_link_(c) ) ||
-				 ( is_digits_(cur.accu) && !isdigit(c) && !is_link_(c) && !is_closing_bracket_(c) ) ||
+				 ( is_digits_(cur.accu) && !is_digits_(acplusone) && !is_link_(c) && !is_closing_bracket_(c) ) ||
 				 ( !is_infix_operator_(prev_token) && !is_opening_bracket_(prev_token) && !is_link_(prev_token) && prev_token!=' ' && c=='\\' ) ) {
 				--cur_pos;
 				if( default_is_product_() ) return '*';

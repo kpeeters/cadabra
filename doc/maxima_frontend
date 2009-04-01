@@ -1,0 +1,3 @@
+::PostDefaultRules( @@maxima(%) ).
+
+integrate(sin(x)cos(x), x);

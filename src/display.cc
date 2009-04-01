@@ -393,11 +393,13 @@ void print_sum::do_actual_print(std::ostream& str, exptree::iterator it)
 		print_multiplier(str, it);
 
 	iterator par=tr.parent(it);
-	if(*it->multiplier!=1 || (tr.is_valid(par) && *par->name!="\\expression")) {
-		// test whether we need extra brackets
-		close_bracket=!children_have_brackets(it);
-		if(close_bracket)
-			str << "(";
+	if(tr.number_of_children(par)>1) { // for a single argument, the parent already takes care of the brackets
+		if(*it->multiplier!=1 || (tr.is_valid(par) && *par->name!="\\expression")) {
+			// test whether we need extra brackets
+			close_bracket=!children_have_brackets(it);
+			if(close_bracket)
+				str << "(";
+			}
 		}
 
 	unsigned int steps=0;
@@ -409,7 +411,7 @@ void print_sum::do_actual_print(std::ostream& str, exptree::iterator it)
 	while(ch!=tr.end(it)) {
 		if(++steps==20) {
 			if(parent.output_format==exptree_output::out_xcadabra)
-				str << "%\n" << std::flush;
+				str << "%\n" << std::flush; // prevent LaTeX overflow
 			steps=0;
 			}
 		str_node::bracket_t current_bracket_=(*ch).fl.bracket;
@@ -578,7 +580,8 @@ void print_comma::print_infix(std::ostream& str, exptree::iterator it)
 	sibling_iterator ch=tr.begin(it);
 	if(! (tr.begin(it)->fl.bracket==str_node::b_none && 
 			it->fl.bracket!=str_node::b_none) ) {
-		str << "\\";
+//		if(parent.output_format==exptree_output::out_xcadabra)
+//			str << "\\";
 		print_opening_bracket(str, tr.begin(it)->fl.bracket, tr.begin(it)->fl.parent_rel);
 		}
 	while(ch!=tr.end(it)) {
@@ -599,7 +602,8 @@ void print_comma::print_infix(std::ostream& str, exptree::iterator it)
 		}
 	if(! (tr.begin(it)->fl.bracket==str_node::b_none && 
 			it->fl.bracket!=str_node::b_none) ) {
-		str << "\\";
+//		if(parent.output_format==exptree_output::out_xcadabra)
+//			str << "\\";
 		print_closing_bracket(str, tr.begin(it)->fl.bracket, tr.begin(it)->fl.parent_rel);
 		}
 	}
@@ -1007,10 +1011,11 @@ void node_printer::print_children(std::ostream& str, exptree::iterator it, int s
 					 parent.output_format==exptree_output::out_xcadabra ||
 					 parent.output_format==exptree_output::out_texmacs )
 					print_parent_rel(str, current_parent_rel_, ch==tr.begin(it));
-				if(parent.output_format!=exptree_output::out_reduce)
+				 if(parent.output_format!=exptree_output::out_reduce) {
 					print_opening_bracket(str, (number_of_nonindex_children>1 /* &&number_of_index_children>0 */ &&
 														 current_parent_rel_!=str_node::p_sub && 
 														 current_parent_rel_!=str_node::p_super ? str_node::b_round:current_bracket_), current_parent_rel_);
+					 }
 				else
 					str << zwnbsp << "(" << zwnbsp;
 				}

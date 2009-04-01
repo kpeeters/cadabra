@@ -374,7 +374,7 @@ class exptree_output {
 		const bool      tight_star;
 		const bool      tight_plus;
 		const bool      tight_brackets;
-		const bool      print_star;
+		bool            print_star;
 		output_format_t output_format;
 		bool            xml_structured;
 		bool            utf8_output;

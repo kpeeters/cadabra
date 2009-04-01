@@ -25,7 +25,7 @@
 #include <string>
 #include <vector>
 
-enum { tok_arrow=0xac, tok_unequals=0xad, tok_wedge=0xae, tok_pow=0xaf, tok_set_option=0xb0, tok_declare=0xb1 };
+enum { tok_arrow=0xac, tok_unequals=0xad, tok_wedge=0xae, tok_pow=0xaf, tok_set_option=0xb0, tok_declare=0xb1, tok_sequence=0xb2 };
 
 class preprocessor {
 	public:

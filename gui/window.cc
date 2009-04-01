@@ -1504,9 +1504,32 @@ Glib::RefPtr<DataCell> XCadabra::add_cell(Glib::RefPtr<DataCell> newcell, Glib::
 		}
 	catch(std::exception& ex) {
 		kernel_idle();
-		Gtk::MessageDialog md(ex.what());
-		md.set_type_hint(Gdk::WINDOW_TYPE_HINT_DIALOG);
-		md.run();
+		size_t lines=1;
+		std::string what=ex.what();
+		for(size_t i=0; i<what.size(); ++i)
+			if(what[i]=='\n')
+				++lines;
+		if(lines<11) {
+			Gtk::MessageDialog md(ex.what());
+			md.set_type_hint(Gdk::WINDOW_TYPE_HINT_DIALOG);
+			md.run();
+			}
+		else {
+			Gtk::Dialog md;
+			Gtk::TextView tv;
+			Glib::RefPtr<Gtk::TextBuffer> tb=Gtk::TextBuffer::create();
+			Gtk::ScrolledWindow sw;
+			Gtk::Button ok(Gtk::Stock::OK);
+			tb->set_text(ex.what());
+			md.get_vbox()->add(sw);
+			md.add_button(Gtk::Stock::OK, 1);
+			sw.add(tv);
+			tv.set_buffer(tb);
+			tv.set_editable(false);
+			md.set_size_request(400,300);
+			md.show_all();
+			md.run();
+			}
 		}
 
 	// Now we have to tell all NotebookCanvas objects to create a

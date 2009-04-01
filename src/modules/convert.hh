@@ -61,6 +61,8 @@ class maxima : public algorithm {
 		virtual result_t apply(iterator&);
 
 		result_t         apply(iterator&, std::string program_name, bool mapleout);
+
+		static const char* max_to_cad[][2];
 };
 
 /*

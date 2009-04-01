@@ -1,0 +1,124 @@
+% Cadabra notebook version 1.1
+\documentclass[11pt]{article}
+\usepackage[textwidth=460pt, textheight=660pt]{geometry}
+\usepackage[usenames]{color}
+\usepackage{amssymb}
+\usepackage[parfill]{parskip}
+\usepackage{breqn}
+\usepackage{tableaux}
+\def\specialcolon{\mathrel{\mathop{:}}\hspace{-.5em}}
+\renewcommand{\bar}[1]{\overline{#1}}
+\begin{document}
+% Begin TeX cell closed
+\section*{\bf XCadabra as a Maxima front-end}
+
+The XCadabra notebook interface can be used as a front-end for the Maxima computer algebra system, by 
+virtue of the \verb|@maxima| command. If you make this command part of the default rules, all input cells
+get evaluated by cadabra.
+% End TeX cell
+{\color[named]{Blue}\begin{verbatim}
+::PostDefaultRules( @@maxima(%) ).
+\end{verbatim}}
+\begin{verbatim}
+Assigning property PostDefaultRules to .
+\end{verbatim}
+{\color[named]{Blue}\begin{verbatim}
+integrate( sin(x), x, 0, 3.14 );
+\end{verbatim}}
+% orig
+% 1576947/788474;
+% end_orig
+\begin{dmath*}[compact, spread=2pt]
+1\specialcolon{}= \frac{1576947}{788474};
+\end{dmath*}
+{\color[named]{Blue}\begin{verbatim}
+trigsimp( sin(x)**2 + cos(x)**2 );
+\end{verbatim}}
+% orig
+% 1;
+% end_orig
+\begin{dmath*}[compact, spread=2pt]
+2\specialcolon{}= 1;
+\end{dmath*}
+{\color[named]{Blue}\begin{verbatim}
+trigexpand( cos(a+b) );
+\end{verbatim}}
+% orig
+% \cos(a) \cos(b) - \sin(a) \sin(b);
+% end_orig
+\begin{dmath*}[compact, spread=2pt]
+3\specialcolon{}= \cos(a) \cos(b) - \sin(a) \sin(b);
+\end{dmath*}
+{\color[named]{Blue}\begin{verbatim}
+trigreduce( @(%) );
+\end{verbatim}}
+% orig
+% \cos(b + a);
+% end_orig
+\begin{dmath*}[compact, spread=2pt]
+4\specialcolon{}= \cos(b + a);
+\end{dmath*}
+{\color[named]{Blue}\begin{verbatim}
+powerseries(log(sin(x)/x), x, 0);
+\end{verbatim}}
+% orig
+% 1/2 'sum((-1)**i1 2**2 i1 bern(2 i1) x**2 i1/(i1 2 i1!), i1, 1, \infty);
+% end_orig
+\begin{dmath*}[compact, spread=2pt]
+5\specialcolon{}= \frac{1}{2}\, 'sum((-1){}^{i1} 2{}^{2\, i1} bern(2\, i1) \frac{x{}^{2\, i1}}{(i1 2\, i1!)},\quad i1,\quad 1,\quad \infty);
+\end{dmath*}
+{\color[named]{Blue}\begin{verbatim}
+[1, 2, 7, x+y];
+\end{verbatim}}
+% orig
+% [1, 2, 7, (y + x)];
+% end_orig
+\begin{dmath*}[compact, spread=2pt]
+6\specialcolon{}= [1,\quad 2,\quad 7,\quad (y + x)];
+\end{dmath*}
+{\color[named]{Blue}\begin{verbatim}
+append( @(%), [4, sin(x)]);
+\end{verbatim}}
+% orig
+% [1, 2, 7, (y + x), 4, \sin(x)];
+% end_orig
+\begin{dmath*}[compact, spread=2pt]
+7\specialcolon{}= [1,\quad 2,\quad 7,\quad (y + x),\quad 4,\quad \sin(x)];
+\end{dmath*}
+{\color[named]{Blue}\begin{verbatim}
+length( @(%) );
+\end{verbatim}}
+% orig
+% 6;
+% end_orig
+\begin{dmath*}[compact, spread=2pt]
+8\specialcolon{}= 6;
+\end{dmath*}
+{\color[named]{Blue}\begin{verbatim}
+@length(7);
+\end{verbatim}}
+% orig
+% 6;
+% end_orig
+\begin{dmath*}[compact, spread=2pt]
+7\specialcolon{}= 6;
+\end{dmath*}
+{\color[named]{Blue}\begin{verbatim}
+'diff(f(x),x) = sin(x);
+\end{verbatim}}
+% orig
+% 'diff(f(x), x, 1) = \sin(x);
+% end_orig
+\begin{dmath*}[compact, spread=2pt]
+9\specialcolon{}= 'diff(f(x),\quad x,\quad 1) = \sin(x);
+\end{dmath*}
+{\color[named]{Blue}\begin{verbatim}
+desolve( @(%), f(x) );
+\end{verbatim}}
+% orig
+% f(x) = ( - \cos(x) + f(0) + 1);
+% end_orig
+\begin{dmath*}[compact, spread=2pt]
+10\specialcolon{}= f(x) = ( - \cos(x) + f(0) + 1);
+\end{dmath*}
+\end{document}
