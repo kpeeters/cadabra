@@ -28,7 +28,7 @@
 
 stopwatch tex_stopwatch;
 
-//#define DEBUG 1
+#define DEBUG 1
 #define OLDLATEX 1
 
 // General tool to strip spaces from both ends
