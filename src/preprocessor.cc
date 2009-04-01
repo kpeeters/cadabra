@@ -226,10 +226,13 @@ unsigned char preprocessor::get_token_(unsigned char prev_token)
 			cur_str[cur_pos]=tok_unequals;
 			c=tok_unequals; // FIXME: Another hack... (unequals)
 			}
-		if(c=='.' && cur_str[cur_pos+1]=='.') {
-			++cur_pos;
-			cur_str[cur_pos]=tok_sequence;
-			c=tok_sequence; // FIXME: Another hack... (sequence)
+		if(c=='.') {
+			if(cur_str[cur_pos+1]=='.') {
+				++cur_pos;
+				cur_str[cur_pos]=tok_sequence;
+				c=tok_sequence; // FIXME: Another hack... (sequence)
+				}
+			else return c;
 			}
 
 		if(isblank(c)) {

@@ -28,6 +28,11 @@ std::istream& operator>>(std::istream& str, parser& pa)
 	{
 	std::string inp;
 	while(std::getline(str, inp)) {
+		// FIXME: This should all have been done in the manipulator, but when we 
+		// read the default settings from a string the input here is more than
+		// just one line.
+		if(inp[inp.size()-1]=='.') inp=inp.substr(0,inp.size()-1);
+//		std::cout << "[" << inp << "]" << std::endl;
 		pa.string2tree(inp);
 		}
 	return str;
