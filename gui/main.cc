@@ -28,140 +28,15 @@
 #include <sstream>
 #include <stdexcept>
 
+#include <pcrecpp.h>
+#ifdef __CYGWIN__
+  #include <windows.h>
+#endif
+
 #include "window.hh"
 
 std::map<int, sigc::connection> connections;
-
 std::ofstream  debugout;
-
-//bool verify_breqn_tableaux_presence()
-//	{
-//	char templ[10]="cdbXXXXXX";
-//	std::ostringstream total;
-//
-//	// First test LaTeX without any style files.
-//	int fd = mkstemp(templ);
-//	total << "\\documentclass{article}\n"
-//			<< "\\begin{document}\n"
-//			<< "test\n"
-//			<< "\\end{document}\n";
-//	write(fd, total.str().c_str(), total.str().size());
-//	close(fd);
-//	std::string nf=std::string(templ)+".tex";
-//	rename(templ, nf.c_str());
-//
-//	std::string result;
-//
-//	modglue::child_process latex_proc("latex");
-//	latex_proc << "--interaction" << "nonstopmode" << nf;
-//	try {
-//		 latex_proc.call("", result);
-//		 unlink(nf.c_str());	
-//		 std::string cmd=std::string(templ)+".aux";
-//		 unlink(cmd.c_str());
-//		 cmd=std::string(templ)+".dvi";
-//		 unlink(cmd.c_str());
-//		 cmd=std::string(templ)+".log";
-//		 unlink(cmd.c_str());
-//		 }
-//	catch(std::logic_error& err) {
-//		 unlink(nf.c_str());	
-//		 std::string cmd=std::string(templ)+".aux";
-//		 unlink(cmd.c_str());
-//		 cmd=std::string(templ)+".dvi";
-//		 unlink(cmd.c_str());
-//		 cmd=std::string(templ)+".log";
-//		 unlink(cmd.c_str());
-//		 std::cerr << "XCadabra: LaTeX problem, see the debug log for details." << std::endl;
-//		 debugout << result << std::endl;
-//		 sleep(1);
-//		 return false;
-//		 }
-//
-//	// Then test whether breqn can be included.
-//	char templ2[10]="cdbXXXXXX";
-//	fd = mkstemp(templ2);
-//	total.str("");
-//	total << "\\documentclass{article}\n"
-//			<< "\\usepackage{breqn}\n"
-//			<< "\\begin{document}\n"
-//			<< "test\n"
-//			<< "\\end{document}\n";
-//	write(fd, total.str().c_str(), total.str().size());
-//	close(fd);
-//	nf=std::string(templ2)+".tex";
-//	rename(templ2, nf.c_str());
-//
-//	modglue::child_process latex_proc2("latex");
-//	latex_proc2 << "--interaction" << "nonstopmode" << nf;
-//	try {
-//		 latex_proc2.call("", result);
-//		 unlink(nf.c_str());	
-//		 std::string cmd=std::string(templ2)+".aux";
-//		 unlink(cmd.c_str());
-//		 cmd=std::string(templ2)+".dvi";
-//		 unlink(cmd.c_str());
-//		 cmd=std::string(templ2)+".log";
-//		 unlink(cmd.c_str());
-//		 }
-//	catch(std::logic_error& err) {
-//		 unlink(nf.c_str());	
-//		 std::string cmd=std::string(templ2)+".aux";
-//		 unlink(cmd.c_str());
-//		 cmd=std::string(templ2)+".dvi";
-//		 unlink(cmd.c_str());
-//		 cmd=std::string(templ2)+".log";
-//		 unlink(cmd.c_str());
-//		 std::cerr << "XCadabra: problem finding the breqn.sty style for LaTeX." << std::endl;
-//		 std::cerr << "Value of TEXINPUTS = " << getenv("TEXINPUTS") << std::endl;
-//		 debugout << result << std::endl;
-//		 return false;
-//		 }
-//	
-//	// Then test whether tableaux.sty can be included.
-//	char templ3[10]="cdbXXXXXX";
-//	fd = mkstemp(templ3);
-//	total.str("");
-//	total << "\\documentclass{article}\n"
-//			<< "\\usepackage{tableaux}\n"
-//			<< "\\begin{document}\n"
-//			<< "test\n"
-//			<< "\\end{document}\n";
-//	write(fd, total.str().c_str(), total.str().size());
-//	close(fd);
-//	nf=std::string(templ3)+".tex";
-//	rename(templ3, nf.c_str());
-//
-//	modglue::child_process latex_proc3("latex");
-//	latex_proc3 << "--interaction" << "nonstopmode" << nf;
-//	try {
-//		 latex_proc3.call("", result);
-//		 debugout << result << std::endl;
-//		 unlink(nf.c_str());	
-//		 std::string cmd=std::string(templ3)+".aux";
-//		 unlink(cmd.c_str());
-//		 cmd=std::string(templ3)+".dvi";
-//		 unlink(cmd.c_str());
-//		 cmd=std::string(templ3)+".log";
-//		 unlink(cmd.c_str());
-//		 }
-//	catch(std::logic_error& err) {
-//		 unlink(nf.c_str());	
-//		 std::string cmd=std::string(templ3)+".aux";
-//		 unlink(cmd.c_str());
-//		 cmd=std::string(templ3)+".dvi";
-//		 unlink(cmd.c_str());
-//		 cmd=std::string(templ3)+".log";
-//		 unlink(cmd.c_str());
-//		 std::cerr << "XCadabra: problem finding the tableaux.sty style for LaTeX." << std::endl;
-//		 std::cerr << "Value of TEXINPUTS = " << getenv("TEXINPUTS") << std::endl;
-//		 debugout << result << std::endl;
-//		 return false;
-//		 }
-//
-//	return true;
-//	}
-
 
 int main (int argc, char *argv[])
 	{
@@ -208,8 +83,22 @@ int main (int argc, char *argv[])
 	if(argc>1)
 		filename=argv[1];
 
-//	modglue::ext_process ls_proc(std::string(DESTDIR)+std::string("/bin/cadabra"));
-	modglue::ext_process ls_proc("cadabra");
+#ifdef __CYGWIN__
+	std::string cdbname;
+	TCHAR path[MAX_PATH];
+	GetModuleFileName(NULL, path, MAX_PATH);
+	cdbname=path;
+	cdbname=cdbname.substr(0,cdbname.size()
+								  -std::string("xcadabra.exe").size())
+		+ "cadabra";
+	
+	pcrecpp::RE(":\\\\").GlobalReplace("/", &cdbname);
+	pcrecpp::RE("\\\\").GlobalReplace("/", &cdbname);
+	cdbname="/cygdrive/"+cdbname;
+#else
+	std::string cdbname="cadabra";
+#endif
+	modglue::ext_process ls_proc(cdbname);
 	ls_proc << "--xcadabra" << "--bare";
 	ls_proc.setup_pipes(); // FIXME: need cleaner error messages if this is forgotten
 	mm.add(&ls_proc);

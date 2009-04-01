@@ -29,7 +29,6 @@
 stopwatch tex_stopwatch;
 
 //#define DEBUG 1
-#define OLDLATEX 1
 
 // General tool to strip spaces from both ends
 std::string trim(const std::string& s) 
@@ -134,7 +133,6 @@ void TeXBuffer::regenerate(bool nobreqn)
 	if(fd == -1) 
 		 throw std::logic_error("Failed to create temporary file in /tmp.");
 
-#ifdef OLDLATEX
 	total << "\\documentclass[12pt]{article}\n"
 			<< "\\usepackage[dvips,verbose,voffset=0pt,hoffset=0pt,textwidth="
 			<< horizontal_mm << "mm,textheight="
@@ -148,15 +146,7 @@ void TeXBuffer::regenerate(bool nobreqn)
 	total	<< "\\def\\specialcolon{\\mathrel{\\mathop{:}}\\hspace{-.5em}}\n"
 			<< "\\renewcommand{\\bar}[1]{\\overline{#1}}\n"
 			<< "\\begin{document}\n\\pagestyle{empty}\n";
-#else
-	total << "\\setlength{\\textwidth}{538.00177pt}"
-			<< "\\setlength{\\paperwidth}{600pt}"
-			<< "\\setlength{\\paperheight}{6000pt}"
-			<< "\\setlength{\\textheight}{5900pt}"
-			<< "\\setlength{\\hoffset}{0.0pt}"
-			<< "\\setlength{\\voffset}{0.0pt}\n"
-			<< "\\begin{document}\n\\pagestyle{empty}\n";
-#endif
+
 	if(tex_source->get_text().size()>100000)
 		total << "Expression too long, output suppressed.\n";
 	else {
@@ -190,12 +180,13 @@ void TeXBuffer::regenerate(bool nobreqn)
 	std::string nf=std::string(templ)+".tex";
 	rename(templ, nf.c_str());
 
-#ifdef OLDLATEX
-	modglue::child_process latex_proc("latex");
-#else
-	modglue::child_process latex_proc("tex");
-	latex_proc << "-fmt" << "cadabra";
+#ifdef __CYGWIN__
+	// MikTeX does not see /tmp, it needs \cygwin\tmp
+	nf="\\cygwin"+nf;
+	pcrecpp::RE("/").GlobalReplace("\\\\", &nf);
 #endif
+
+	modglue::child_process latex_proc("latex");
 	latex_proc << "--interaction" << "nonstopmode" << nf;
 	std::string result;
 	try {
@@ -236,37 +227,36 @@ void TeXBuffer::regenerate(bool nobreqn)
 		}
 
 	// Convert to png. 
-	std::ostringstream cmdstr;
-	cmdstr << "dvipng -v ";
-#ifndef DEBUG
-	cmdstr << "-q* 1>/dev/null 2>&1 ";
-#endif
-	cmdstr << "-T tight -bg Transparent -fg \"rgb "
-			 << foreground_colour.get_red()/65536.0 << " "
-			 << foreground_colour.get_green()/65536.0 << " "
-			 << foreground_colour.get_blue()/65536.0 << "\" -D ";
-	cmdstr << horizontal_pixels_/(1.0*horizontal_mm)*millimeter_per_inch;
-	cmdstr << " " << std::string(templ) << ".dvi" << std::ends;
+	modglue::child_process dvipng_proc("dvipng");
+	std::ostringstream rgbspec, resspec;
+	dvipng_proc << "-T" << "tight" << "-bg" << "Transparent" << "-fg";
+	rgbspec << "\"rgb "
+			  << foreground_colour.get_red()/65536.0 << " "
+			  << foreground_colour.get_green()/65536.0 << " "
+			  << foreground_colour.get_blue()/65536.0 << "\"";
+	dvipng_proc << rgbspec.str() << "-D";
+	resspec << horizontal_pixels_/(1.0*horizontal_mm)*millimeter_per_inch;
+	dvipng_proc << resspec.str() << std::string(templ)+".dvi";
+
+	try {
+		dvipng_proc.call("", result);
 #ifdef DEBUG
-	std::cerr << cmdstr.str() << std::endl;
+	std::cerr << result << std::endl;
 #endif
-	int ret=system(cmdstr.str().c_str());
-	if(ret==-1 && errno!=10) {
-		 erase_file(std::string(templ)+".dvi");
-		 if(chdir(olddir)==-1)
-			 throw std::logic_error("Cannot start dvipng, is it installed? (and cannot chdir back to original)");
-		 throw std::logic_error("Cannot start dvipng, is it installed?");
-		 }
-	if(ret!=0 && errno!=10) {
-		 erase_file(std::string(templ)+"1.png");
-		 erase_file(std::string(templ)+"2.png");
-		 erase_file(std::string(templ)+"3.png");
-		 erase_file(std::string(templ)+"4.png");
-		 erase_file(std::string(templ)+".dvi");
-		 if(chdir(olddir)==-1)
-			 throw std::logic_error("The dvipng stage failed, ignoring output. (and cannot chdir back to original)");
-		 throw std::logic_error("The dvipng stage failed, ignoring output.");
-		 }
+		}
+	catch(std::logic_error& ex) {
+		erase_file(std::string(templ)+".dvi");
+		erase_file(std::string(templ)+"1.png");
+		erase_file(std::string(templ)+"2.png");
+		erase_file(std::string(templ)+"3.png");
+		erase_file(std::string(templ)+"4.png");
+		pixbuf = Gdk::Pixbuf::create(Gdk::COLORSPACE_RGB, false, 8, 10,1);
+		if(chdir(olddir)==-1)
+			throw std::logic_error(
+				std::string("Cannot run dvipng, is it installed? (and cannot chdir back to original)\n\n")+ex.what());
+		throw std::logic_error(std::string("Cannot run dvipng, is it installed?\n\n")+ex.what());
+		}
+
 	erase_file(std::string(templ)+".dvi");
 
    // An overflow results in all info being put on page 2; check for

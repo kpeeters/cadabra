@@ -7,4 +7,4 @@ doxy:
 	doxygen doxygen_cadabra.config
 
 distclean:
-	rm -Rf doxygen
+	rm -Rf doxygen algorithms/*~ properties/*~ reserved/*~ *~

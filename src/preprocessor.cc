@@ -249,10 +249,6 @@ unsigned char preprocessor::get_token_(unsigned char prev_token)
 				// FIXME: have to test whether this operator allows for missing first child.
 //				throw std::logic_error("two subsequent operators without intermediate operand");
 				}
-//			if(c=='.') {
-//				if(cur_str[cur_pos+1]!='.') return c; // FIXME: this disables floats... 
-//				else                        ++cur_pos;
-//				}
 			candidate=c;
 			++cur_pos;
 			continue;

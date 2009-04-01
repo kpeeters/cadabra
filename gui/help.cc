@@ -22,6 +22,11 @@
 #include <fstream>
 #include <iostream>
 
+#ifdef __CYGWIN__
+  #include <windows.h>
+  #include <pcrecpp.h>
+#endif
+
 #include <gtkmm/stock.h>
 #include <gtkmm/messagedialog.h>
 
@@ -36,8 +41,8 @@ CadabraHelp::CadabraHelp()
 		std::cerr << "cannot find cadabra.png" << std::endl;
 		}
 	set_gravity(Gdk::GRAVITY_NORTH_EAST);
-	set_default_size(std::min(Gdk::Screen::get_default()->get_width()-20,  600),
-						  std::min(Gdk::Screen::get_default()->get_height()-20, 800));
+	set_default_size((std::min)(Gdk::Screen::get_default()->get_width()-20,  600),
+						  (std::min)(Gdk::Screen::get_default()->get_height()-20, 800));
 
 
 	add(topbox);
@@ -117,21 +122,38 @@ void CadabraHelp::display_help()
 	forward.set_sensitive(history_pos+1<static_cast<int>(history.size()));
 
 	std::string fname;
+	std::string prefix;
+#ifdef __CYGWIN__
+ 	TCHAR path[MAX_PATH];
+	GetModuleFileName(NULL, path, MAX_PATH);
+        prefix=path;
+	prefix=prefix.substr(0,prefix.size()
+			     -std::string("xcadabra.exe").size());
+	
+ 	pcrecpp::RE(":\\\\").GlobalReplace("/", &prefix);
+	pcrecpp::RE("\\\\").GlobalReplace("/", &prefix);
+        prefix="/cygdrive/"+prefix+"/doc";
+#else
+        prefix=DESTDIR+std::string("/share/doc/cadabra");
+#endif
+
 	switch(history[history_pos].first) {
 		 case t_property:
-			  fname=DESTDIR+std::string("/share/doc/cadabra/properties/");
+			  fname=prefix+std::string("/properties/");
 			  break;
 		 case t_algorithm:
-			  fname=DESTDIR+std::string("/share/doc/cadabra/algorithms/");
+			  fname=prefix+std::string("/algorithms/");
 			  break;
 		 case t_texcommand:
-			  fname=DESTDIR+std::string("/share/doc/cadabra/reserved/");
+			  fname=prefix+std::string("/reserved/");
 			  break;
 		 default:
-			  fname=DESTDIR+std::string("/share/doc/cadabra/general");
+			  fname=prefix+std::string("/general");
 			  break;
 		 }
 	fname+=history[history_pos].second+".tex";
+
+	std::cout << fname << std::endl;
 
 	std::string total, line;
 

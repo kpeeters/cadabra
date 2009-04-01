@@ -497,6 +497,7 @@ bool manipulator::handle_input()
 			std::stringstream str(input_buffer);
 			parser pa(true);
 
+			std::cout << "|" << input_buffer << "|" << std::endl;
 			try {
 				str >> pa;
 				}
