@@ -11,19 +11,38 @@ for LiE is disabled.
 - install latest glibd
 - install latest pixman
 - install latest cairo (--enable-xlib=no, versions above 1.8.0 are broken)
-- install latest pango with cairo backend (--without-x
-            --disable-rebuilds --enable-static --enable-shared
-            --with-included-modules=yes )
+- install latest pango with cairo backend (--without-x --with-included-modules=yes )
+
+   (in configure, add [_]* to the --export-symbols-regex for pango,
+   and export LIBS=-no-undefined too.)
+
 - install latest atk
 
 - install latest gtk (--without-x)
-     - had to fix one WINDRES in gdk/rc/Makefile (was unset, should be
+     - had to fix one WINDRES in gdk/win32/rc/Makefile (was unset, should be
        windres)
      - had to kill a 'LD_EXPORT_...' flag in gdk/Makefile (chose the 
-       regex one as the ./gdk.def seems to contain all the defs)
-     - had to add a -lpango in linking gdk
-     - ditto: -lgdk and -lpango in gtk/Makefile
-- install latest gtkmm
+       regex one as the ./gdk.def seems to contain all the defs;
+       later: regex seems safer to keep)
+     - had to fix an issue with the deprecated
+       gtk_scale_button_set_orientation, re-enable in .h file.
+
+- install a /usr/local/etc/pango/pango.aliases file
+- install latest glibmm
+
+- install cairomm 1.6.4 (1.8.0 fails to build)
+- install pangomm 2.24.0
+- install gtkmm 2.14.3
+
+
+drag crash:
+
+inner_window_procedure (hwnd=0xa6024a, message=71, wparam=0,
+lparam=2273744)
+at gdkevents-win32.c:3268
+3268 if(_sizemove_in_progress &&
+
+
 
 =========================================================================
 OLD:
