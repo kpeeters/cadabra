@@ -19,7 +19,7 @@ TIMESTAMP = -D"RELEASE=\"${RELEASE}\"" -D"DATETIME=\"`date | sed -e 's/  / /'`\"
 main.o: $(OBJS) Makefile
 
 xcadabra: $(OBJS)
-	@CXX@ -o xcadabra `pkg-config modglue --libs` `pkg-config --libs gtkmm-2.4` $+ 
+	@CXX@ -o xcadabra $+ `pkg-config modglue --libs` `pkg-config --libs gtkmm-2.4` -lpcrecpp
 
 xcadabra_static: $(OBJS)
 	@CXX@ -o xcadabra -static $+  -L@prefix@/lib `pkg-config modglue --libs` \

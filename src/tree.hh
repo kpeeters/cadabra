@@ -9,8 +9,8 @@
 
 /** \mainpage tree.hh
     \author   Kasper Peeters
-    \version  2.63
-    \date     06-mar-2009
+    \version  2.64
+    \date     03-Apr-2009
     \see      http://www.aei.mpg.de/~peekas/tree/
     \see      http://www.aei.mpg.de/~peekas/tree/ChangeLog
 
@@ -433,7 +433,9 @@ class tree {
 		/// Determine the index of a node in the range of siblings to which it belongs.
 		unsigned int index(sibling_iterator it) const;
 		/// Inverse of 'index': return the n-th child of the node at position.
-		static sibling_iterator  child(const iterator_base& position, unsigned int);
+		static sibling_iterator child(const iterator_base& position, unsigned int);
+		/// Return iterator to the sibling indicated by index
+		static sibling_iterator sibling(const iterator_base& position, unsigned int);  				
 		
 		/// Comparator class for iterators (compares pointer values; why doesn't this work automatically?)
 		class iterator_base_less {
@@ -1877,6 +1879,28 @@ unsigned int tree<T, tree_node_allocator>::index(sibling_iterator it) const
 	return ind;
 	}
 
+template <class T, class tree_node_allocator>
+typename tree<T, tree_node_allocator>::sibling_iterator tree<T, tree_node_allocator>::sibling(const iterator_base& it, unsigned int num)
+   {
+   tree_node *tmp;
+   if(it.node->parent==0) {
+      tmp=head->next_sibling;
+      while(num) {
+         tmp = tmp->next_sibling;
+         --num;
+         }
+      }
+   else {
+      tmp=it.node->parent->first_child;
+      while(num) {
+         assert(tmp!=0);
+         tmp = tmp->next_sibling;
+         --num;
+         }
+      }
+   return tmp;
+   }
+ 
 
 template <class T, class tree_node_allocator>
 typename tree<T, tree_node_allocator>::sibling_iterator tree<T, tree_node_allocator>::child(const iterator_base& it, unsigned int num) 
