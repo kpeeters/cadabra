@@ -435,7 +435,7 @@ class tree {
 		/// Inverse of 'index': return the n-th child of the node at position.
 		static sibling_iterator child(const iterator_base& position, unsigned int);
 		/// Return iterator to the sibling indicated by index
-		static sibling_iterator sibling(const iterator_base& position, unsigned int);  				
+		sibling_iterator sibling(const iterator_base& position, unsigned int);  				
 		
 		/// Comparator class for iterators (compares pointer values; why doesn't this work automatically?)
 		class iterator_base_less {
