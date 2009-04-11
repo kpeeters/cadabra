@@ -1106,10 +1106,17 @@ int subtree_compare(exptree::iterator one, exptree::iterator two,
 			return 0;
 
 	// Compare number of children.
+//	std::cout << *one->name << " " << *two->name << std::endl;
+//	iterator range_wildcard;
 	int numch1=exptree::number_of_children(one);
 	int numch2=exptree::number_of_children(two);
-	if(numch1==1 && one.begin()->is_range_wildcard()) return 0;
-	if(numch2==1 && two.begin()->is_range_wildcard()) return 0;
+
+	if(numch1>0 && one.begin()->is_range_wildcard()) {
+		
+		return 0;
+		}
+	if(numch2>0 && two.begin()->is_range_wildcard()) return 0;
+
 	if(numch1!=numch2) {
 		if(numch1<numch2) return 2;
 		else return -2;
@@ -1125,9 +1132,7 @@ int subtree_compare(exptree::iterator one, exptree::iterator two,
 	else if(compare_multiplier>0)  --compare_multiplier;
 
 	while(sib1!=one.end()) {
-//		 std::cout << *sib1->name << "??" << *sib2->name << std::endl;
-		 int ret=subtree_compare(sib1,sib2, mod_prel, checksets, compare_multiplier, literal_wildcards);
-//		std::cerr << ret << std::endl;
+		int ret=subtree_compare(sib1,sib2, mod_prel, checksets, compare_multiplier, literal_wildcards);
 		if(abs(ret)>1)
 			return ret;
 		if(ret!=0 && remember_ret==0) 

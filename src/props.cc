@@ -55,6 +55,8 @@ pattern::pattern(const exptree::iterator_base& it)
 bool pattern::match(const exptree::iterator& it) const
 	{
 	// Special case for range wildcards.
+
+/*
 	if(it->name==obj.begin()->name && children_wildcard()) {
 		exptree::iterator hm=obj.begin(obj.begin());
 		if(exptree::number_of_children(hm)==0) {
@@ -100,6 +102,7 @@ bool pattern::match(const exptree::iterator& it) const
 		
 		return true;
 		}
+*/
 
 	// Cases without range wildcard.
 //	txtout << "comparing " << *it->name << " " << *obj.begin()->name << std::endl;

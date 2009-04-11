@@ -20,3 +20,4 @@ obj3:= A_{\mu\nu\nu};
 tst3:= A_{\mu\nu\nu} - @(obj3);
 @collect_terms!(%);
 @assert(tst3);
+
