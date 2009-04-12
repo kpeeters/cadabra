@@ -1112,7 +1112,7 @@ int subtree_compare(exptree::iterator one, exptree::iterator two,
 	int numch2=exptree::number_of_children(two);
 
 	if(numch1>0 && one.begin()->is_range_wildcard()) {
-		
+		// FIXME: insert the code from props.cc here, ditto in the next if.
 		return 0;
 		}
 	if(numch2>0 && two.begin()->is_range_wildcard()) return 0;

@@ -697,6 +697,10 @@ algorithm::result_t prodrule::apply(iterator& it)
 		}
 //	tr.print_recursive_treeform(txtout, rep.begin());
 
+	// Two cases to handle now: D(A**n) -> n D(A**(n-1)) and
+	//                          D(A*B)  -> D(A)*B + A*D(B) 
+	// both suitably generalised to anti-commuting derivatives.
+
 	if(*prodnode->name=="\\pow") {
 		 sibling_iterator ar=tr.begin(prodnode);
 		 sibling_iterator pw=ar;
@@ -746,7 +750,18 @@ algorithm::result_t prodrule::apply(iterator& it)
 	else {
 		 // replace the '\diff' with a '\sum' of diffs.
 		 unsigned int num=0;
-		 sibling_iterator chl=tr.begin(prodnode);
+		 sibling_iterator chl=tr.begin(prodnode); // pointer to current factor in the product
+		 int sign=2; // keep track of a sign for anti-commuting derivatives
+
+		 // In order to figure out whether a derivative is anti-commuting with
+		 // a given object in the product on which it acts, we need to consider
+		 // a number of cases:
+		 //
+		 //    D_{a}{\theta^{b}}                    with \theta^{a} Coordinate & SelfAntiCommuting
+       //    D_{\theta^{a}}{\theta^{b}}           ditto
+		 //    D_{a}{T^{a b}}                       with 
+       //    { D{#}, \theta^{a} }::AntiCommuting  (decide on notation; not yet handled)
+
 		 while(chl!=tr.end(prodnode)) { // iterate over all factors in the product
 			  // Add the whole product node to the replacement sum.
 			  iterator dummy=rep.append_child(sm);
@@ -772,6 +787,16 @@ algorithm::result_t prodrule::apply(iterator& it)
 			  repch=tr.replace(repch,wrap);
 			  // Erase the factor which we replaced with the \diff.
 			  tr.erase(wrap);
+
+			  // Handle signs for anti-commuting derivatives.
+			  multiply(dummy->multiplier, sign);
+			  // Update sign.
+			  if(subtree_compare()) {
+				  }
+			  else {
+				  // count
+				  }
+			  
 			  
 			  // Avoid \partial_{a}{\partial_{b} ...} constructions in 
 			  // case this child is a \partial-like too.

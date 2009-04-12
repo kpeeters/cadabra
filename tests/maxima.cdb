@@ -8,9 +8,9 @@ tst1:= 1 - @(obj1);
 @assert(tst1);
 
 @reset.
-obj2:= integrate( sin(x)**2, x );
+obj2:= integrate( \sin(x)**2, x );
 @maxima(%);
-tst2:= (1/2 * x - 1/4 * sin(2 * x)) - @(obj2);
+tst2:= (1/2 x - 1/4 \sin(2 x)) - @(obj2);
 @sumflatten!(%);
 @collect_terms!(%);
 @assert(tst2);

@@ -215,8 +215,9 @@ obj18:= \nabla_{a}{\nabla_{b}{F}};
 #
 @reset.
 {\alpha,\beta,\gamma}::Indices(spinor).
-D_{\alpha}{#}::Derivative.
+\theta^{\alpha}::Coordinate.
+\theta^{\alpha}::SelfAntiCommuting.
 D{#}::Derivative.
-{ D_{\alpha}{#}, \theta^{\beta} }::AntiCommuting.
 D_{\alpha}{\theta^\beta \theta^\gamma};
 @prodrule!(%);
+

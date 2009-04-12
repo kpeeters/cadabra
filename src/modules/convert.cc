@@ -25,17 +25,19 @@
 #include <sstream>
 #include <pcrecpp.h>
 
+// FIXME: some of these probably need to be converted only when appropriate properties
+// have been set, but definitely only when a node matches, not just as random text
+// inside the final string to be sent to maxima.
 const char* maxima::max_to_cad[][2] = {
 	{ "%pi",      "\\\\pi" },
-	{ "%e",       "e" },
 	{ "sin",      "\\\\sin" },
 	{ "cos",      "\\\\cos" },
 	{ "tan",      "\\\\tan" },
 	{ "inf",      "\\\\infty" },
 	{ "minf",     "-\\\\infty" },
 	{ "infinity", "\\\\infty" },
-	{ "sqrt",     "\\\\sqrt" },
-	{ "%i",       "i" },
+	{ "sqrt",     "\\\\sqrt" } //,
+//	{ "%i",       "i" },
 };
 
 frommath::frommath(exptree& tr, iterator it)
@@ -430,8 +432,8 @@ algorithm::result_t maxima::apply(iterator& it)
 	modglue::child_process proc("maxima");
 	std::string tomax="display2d:false$\n"+argstr.str()+";\nquit();\n";
 
-//	for(size_t i=0; i<sizeof(max_to_cad)/sizeof(max_to_cad[0]); ++i) 
-//		pcrecpp::RE(max_to_cad[i][1]).GlobalReplace(max_to_cad[i][0], &tomax);
+	for(size_t i=0; i<sizeof(max_to_cad)/sizeof(max_to_cad[0]); ++i) 
+		pcrecpp::RE(max_to_cad[i][1]).GlobalReplace(max_to_cad[i][0], &tomax);
 
 	debugout << "sending to maxima:" << std::endl
 				<< tomax << std::endl;
