@@ -791,11 +791,11 @@ algorithm::result_t prodrule::apply(iterator& it)
 			  // Handle signs for anti-commuting derivatives.
 			  multiply(dummy->multiplier, sign);
 			  // Update sign.
-			  if(subtree_compare()) {
-				  }
-			  else {
-				  // count
-				  }
+//			  if(subtree_compare()) {
+//				  }
+//			  else {
+//				  // count
+//				  }
 			  
 			  
 			  // Avoid \partial_{a}{\partial_{b} ...} constructions in 

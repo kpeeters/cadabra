@@ -1,1 +1,18 @@
 
+@reset.
+{\alpha,\beta,\gamma}::Indices("spinor").
+\dot{#}::Accent.
+{\dot{\alpha},\dot{\beta},\dot{\gamma}}::Indices("conjugate spinor").
+D{#}::Derivative.
+\partial{#}::PartialDerivative.
+
+ddef:= {
+   D_{\alpha}{A??} -> \partial_{\alpha}{A??} 
+                            + i \sigma^{m}_{\alpha\dot{\alpha}} \theta^{\dot{\alpha}} \partial_{m}{A??},
+   D_{\dot{\alpha}}{A??} -> \partial_{\dot{\alpha}}{A??} 
+                            + i \theta^{\alpha} \sigma^{m}_{\alpha\dot{\alpha}} \partial_{m}{A??}
+};
+
+D_{\alpha}{ D_{\dot{\beta}}{f} } + D_{\dot{\beta}}{ D_{\alpha}{f} };
+
+@substitute!(%)( @(ddef) );

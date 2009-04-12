@@ -75,7 +75,7 @@ void exptree_output::setup_handlers(bool infix)
 				printers_["\\conditional"]  =&create<print_conditional>;
 				printers_["\\regex"]        =&create<print_regex>;
 				printers_["\\arrow"]        =&create<print_arrow>;
-				printers_["\\dot"]          =&create<print_dot>;
+				printers_["\\cdot"]         =&create<print_dot>;
 				printers_["\\comma"]   	    =&create<print_comma>;
 				printers_["\\factorial"]    =&create<print_factorial>;
 				printers_["\\sequence"]     =&create<print_sequence>;
