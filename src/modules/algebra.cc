@@ -751,7 +751,7 @@ algorithm::result_t prodrule::apply(iterator& it)
 		 // replace the '\diff' with a '\sum' of diffs.
 		 unsigned int num=0;
 		 sibling_iterator chl=tr.begin(prodnode); // pointer to current factor in the product
-		 int sign=2; // keep track of a sign for anti-commuting derivatives
+		 int sign=1; // keep track of a sign for anti-commuting derivatives
 
 		 // In order to figure out whether a derivative is anti-commuting with
 		 // a given object in the product on which it acts, we need to consider
@@ -759,7 +759,7 @@ algorithm::result_t prodrule::apply(iterator& it)
 		 //
 		 //    D_{a}{\theta^{b}}                    with \theta^{a} Coordinate & SelfAntiCommuting
        //    D_{\theta^{a}}{\theta^{b}}           ditto
-		 //    D_{a}{T^{a b}}                       with 
+		 //    D_{a}{T^{a b}}                       (decide on notation; not yet handled)
        //    { D{#}, \theta^{a} }::AntiCommuting  (decide on notation; not yet handled)
 
 		 while(chl!=tr.end(prodnode)) { // iterate over all factors in the product
@@ -791,8 +791,28 @@ algorithm::result_t prodrule::apply(iterator& it)
 			  // Handle signs for anti-commuting derivatives.
 			  multiply(dummy->multiplier, sign);
 			  // Update sign.
-//			  if(subtree_compare()) {
-//				  }
+			  if(theD.begin()->is_index()) {
+				  iterator der_wrt=theD.begin();
+				  tr.print_recursive_treeform(txtout, der_wrt);
+				  tr.print_recursive_treeform(txtout, repch);
+				  int ret=subtree_compare(der_wrt, repch, 0, true, -2, false);
+				  txtout << ret << std::endl;
+				  if(abs(ret)<=1) {
+					  txtout << "structure match" << std::endl;
+					  const SelfAntiCommuting *sac=properties::get<SelfAntiCommuting>(repch);
+					  if(sac)
+						  sign*=-1;
+					  }
+				  else {
+					  txtout << "yes?" << std::endl;
+					  const Indices *ind=properties::get<Indices>(der_wrt);
+					  if(ind) {
+						  txtout << "yes" << std::endl;
+						  if(ind->grassmann)
+							  sign*=-1;
+						  }
+					  }
+				  }
 //			  else {
 //				  // count
 //				  }

@@ -449,7 +449,7 @@ std::string Coordinate::name() const
 	}
 
 Indices::Indices()
-	: position_free(true)
+	: position_free(true), grassmann(false)
 	{
 	}
 
@@ -490,6 +490,10 @@ bool Indices::parse(exptree& tr, exptree::iterator pat, exptree::iterator prop, 
 		else if(ki->first=="position") {
 			if(*ki->second->name!="free")
 				position_free=false;
+			}
+		else if(ki->first=="type") {
+			if(*ki->second->name=="grassmann") 
+				grassmann=true;
 			}
 		else if(ki->first=="values") {
 			values=*ki->second;
