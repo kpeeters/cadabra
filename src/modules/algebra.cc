@@ -796,16 +796,32 @@ algorithm::result_t prodrule::apply(iterator& it)
 //				  tr.print_recursive_treeform(txtout, der_wrt);
 //				  tr.print_recursive_treeform(txtout, repch);
 				  int ret=subtree_compare(der_wrt, repch, 0, true, -2, false);
+//				  txtout << ret << std::endl;
 				  if(abs(ret)<=1) {
-					  const SelfAntiCommuting *sac=properties::get<SelfAntiCommuting>(repch);
+					  const SelfAntiCommuting *sac=properties::get_composite<SelfAntiCommuting>(repch);
 					  if(sac)
 						  sign*=-1;
 					  }
 				  else {
-					  const Indices *ind=properties::get<Indices>(der_wrt);
+					  const Indices *ind=properties::get_composite<Indices>(der_wrt);
 					  if(ind) {
-						  if(ind->grassmann)
-							  sign*=-1;
+						  if(ind->grassmann) {
+							  // count the number of explicit grassmann indices on the factor on which we act
+							  exptree::index_iterator ii=tr.begin_index(repch);
+							  while(ii!=tr.end_index(repch)) {
+								  const Indices *indfac=properties::get_composite<Indices>(ii);
+								  if(indfac==ind)
+									  sign*=-1;
+								  ++ii;
+								  }
+							  // ditto for implicit indices
+							  const ImplicitIndex *impindex=properties::get_composite<ImplicitIndex>(repch);
+							  if(impindex) {
+								  for(size_t n=0; n<impindex->set_names.size(); ++n)
+									  if(impindex->set_names[n]==ind->set_name)
+										  sign*=-1;
+								  }
+							  }
 						  }
 					  }
 				  }

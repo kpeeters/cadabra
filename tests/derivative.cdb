@@ -218,20 +218,55 @@ obj18:= \nabla_{a}{\nabla_{b}{F}};
 \theta^{\alpha}::Coordinate.
 \theta^{\alpha}::SelfAntiCommuting.
 D{#}::Derivative.
-obj19:= D_{\theta^{\alpha}}{\theta^\beta \theta^\gamma};
+obj19a:= D_{\theta^{\alpha}}{\theta^\beta \theta^\gamma};
 @prodrule!(%);
-tst19:= D_{\theta^{\alpha}}{\theta^{\beta}} \theta^{\gamma}  
-      - \theta^{\beta} D_{\theta^{\alpha}}{\theta^{\gamma}} - @(obj19);
+tst19a:= D_{\theta^{\alpha}}{\theta^{\beta}} \theta^{\gamma}  
+      - \theta^{\beta} D_{\theta^{\alpha}}{\theta^{\gamma}} - @(obj19a);
 @collect_terms!(%);
-@assert(tst19);
+@assert(tst19a);
 
 @reset.
 {\alpha,\beta,\gamma}::Indices(spinor,type=grassmann).
 \theta^{\alpha}::Coordinate.
 D{#}::Derivative.
-obj19:= D_{\alpha}{\theta^\beta \theta^\gamma};
+obj19b:= D_{\alpha}{\theta^\beta \theta^\gamma};
 @prodrule!(%);
-tst19:= D_{\alpha}{\theta^{\beta}} \theta^{\gamma}  
-      - \theta^{\beta} D_{\alpha}{\theta^{\gamma}} - @(obj19);
+tst19b:= D_{\alpha}{\theta^{\beta}} \theta^{\gamma}  
+      - \theta^{\beta} D_{\alpha}{\theta^{\gamma}} - @(obj19b);
 @collect_terms!(%);
-@assert(tst19);
+@assert(tst19b);
+
+@reset.
+{\alpha,\beta,\gamma}::Indices(spinor,type=grassmann).
+D{#}::Derivative.
+obj19c:= D^{\alpha}{ D_{\alpha}{T^{\beta} S^{\gamma}}};
+@prodrule!(%);
+@distribute!(%);
+@prodrule!(%);
+@sumflatten!(%);
+@collect_terms!(%);
+tst19c:= D^{\alpha}{D_{\alpha}{T^{\beta}}} * S^{\gamma} 
+       + D_{\alpha}{T^{\beta}} * D^{\alpha}{S^{\gamma}} 
+       - D^{\alpha}{T^{\beta}} * D_{\alpha}{S^{\gamma}}
+       + T^{\beta} * D^{\alpha}{D_{\alpha}{S^{\gamma}}} - @(obj19c);
+@collect_terms!(%);
+@assert(tst19c);
+
+@reset.
+{\alpha,\beta,\gamma}::Indices(spinor,type=grassmann).
+D{#}::Derivative.
+{b, c}::SelfAntiCommuting.
+{b, c}::ImplicitIndex(spinor).
+obj19d:= D^{\alpha}{D_{\alpha}{b*c}};
+@prodrule!(%);
+@distribute!(%);
+@prodrule!(%);
+@distribute!(%);
+@sumflatten!(%);
+tst19d:= D^{\alpha}{D_{\alpha}{b}} c
+       + D_{\alpha}{b} D^{\alpha}{c}
+       - D^{\alpha}{b} D_{\alpha}{c}
+       + b D^{\alpha}{D_{\alpha}{c}} - @(obj19d);
+@collect_terms!(%);
+@assert(tst19d);
+

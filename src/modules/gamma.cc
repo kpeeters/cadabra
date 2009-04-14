@@ -69,6 +69,11 @@ void SigmaMatrix::display(std::ostream& str) const
 	Matrix::display(str);
 	}
 
+bool SigmaMatrix::parse(exptree&tr, exptree::iterator pat, exptree::iterator prop, keyval_t& keyvals)
+	{
+	return Matrix::parse(tr, pat, prop, keyvals);
+	}
+
 std::string SigmaBarMatrix::name() const
 	{
 	return "SigmaBarMatrix";
@@ -77,6 +82,11 @@ std::string SigmaBarMatrix::name() const
 void SigmaBarMatrix::display(std::ostream& str) const
 	{
 	Matrix::display(str);
+	}
+
+bool SigmaBarMatrix::parse(exptree&tr, exptree::iterator pat, exptree::iterator prop, keyval_t& keyvals)
+	{
+	return Matrix::parse(tr, pat, prop, keyvals);
 	}
 
 

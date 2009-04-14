@@ -43,12 +43,14 @@ class SigmaMatrix : public AntiSymmetric, public Matrix, virtual public property
 	public:
 		virtual std::string name() const;
 		virtual void        display(std::ostream&) const;
+		virtual bool        parse(exptree&, exptree::iterator pat, exptree::iterator prop, keyval_t& keyvals);
 };
 
 class SigmaBarMatrix : public AntiSymmetric, public Matrix, virtual public property {
 	public:
 		virtual std::string name() const;
 		virtual void        display(std::ostream&) const;
+		virtual bool        parse(exptree&, exptree::iterator pat, exptree::iterator prop, keyval_t& keyvals);
 };
 
 class Spinor : public ImplicitIndex, virtual public property {

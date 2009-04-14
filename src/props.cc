@@ -522,6 +522,24 @@ std::string ImplicitIndex::name() const
 	return "ImplicitIndex";
 	}
 
+bool ImplicitIndex::parse(exptree& tr, exptree::iterator pat, exptree::iterator prop, keyval_t& keyvals)
+	{
+	keyval_t::const_iterator ki=keyvals.begin();
+	while(ki!=keyvals.end()) {
+		if(ki->first=="name") {
+			if(*ki->second->multiplier!=1) {
+				txtout << "ImplicitIndex: use quotes to label names when they start with a number." << std::endl;
+				return false;
+				}
+			set_names.push_back(*ki->second->name);
+			}
+		else throw consistency_error("Property 'ImplicitIndex' does not accept key '"+ki->first+"'.");
+		++ki;
+		}
+
+	return true;
+	}
+
 std::string CommutingAsProduct::name() const
 	{
 	return "CommutingAsProduct";

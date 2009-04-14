@@ -447,7 +447,11 @@ class SortOrder : public list_property {
 
 class ImplicitIndex : virtual public property {
 	public:
+		virtual bool parse(exptree&, exptree::iterator, exptree::iterator, keyval_t&);
 		virtual std::string name() const;
+		virtual std::string unnamed_argument() const { return "name"; };
+
+		std::vector<std::string> set_names;
 };
 
 class CommutingAsProduct : virtual public property {
