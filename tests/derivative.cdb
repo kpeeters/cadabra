@@ -231,6 +231,7 @@ tst19:= D_{\theta^{\alpha}}{\theta^{\beta}} \theta^{\gamma}
 D{#}::Derivative.
 obj19:= D_{\alpha}{\theta^\beta \theta^\gamma};
 @prodrule!(%);
+ 
 tst19:= D_{\alpha}{\theta^{\beta}} \theta^{\gamma}  
       - \theta^{\beta} D_{\alpha}{\theta^{\gamma}} - @(obj19);
 @collect_terms!(%);
