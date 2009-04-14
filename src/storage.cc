@@ -1033,12 +1033,13 @@ int subtree_compare(exptree::iterator one, exptree::iterator two,
 		}
 
 	// Once we hit an index, the comparison at a lower level goes differently. 
-	if(one->is_index()) {
+	if(one->is_index() && two->is_index()) {
 //		 std::cerr << "is index" << std::endl;
 		if(literal_wildcards==false && (one->is_object_wildcard() || two->is_object_wildcard())) return 0;
 		bool wildcard=(one->is_name_wildcard() || two->is_name_wildcard()) && (literal_wildcards==false);
 //		if(mod_prel2) {
-//		std::cout << *one->name << " vs " << *two->name << " " << mod_prel << " " << checksets << std::endl;
+//		std::cout << *one->name << " vs " << *two->name << " " << mod_prel << " " 
+//					 << checksets << " " << wildcard << std::endl;
 //		if(mod_prel==-2) {
 //			const Coordinate *cdn1=properties::get<Coordinate>(one);
 //			const Coordinate *cdn2=properties::get<Coordinate>(two);

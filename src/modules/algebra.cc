@@ -793,21 +793,17 @@ algorithm::result_t prodrule::apply(iterator& it)
 			  // Update sign.
 			  if(theD.begin()->is_index()) {
 				  iterator der_wrt=theD.begin();
-				  tr.print_recursive_treeform(txtout, der_wrt);
-				  tr.print_recursive_treeform(txtout, repch);
+//				  tr.print_recursive_treeform(txtout, der_wrt);
+//				  tr.print_recursive_treeform(txtout, repch);
 				  int ret=subtree_compare(der_wrt, repch, 0, true, -2, false);
-				  txtout << ret << std::endl;
 				  if(abs(ret)<=1) {
-					  txtout << "structure match" << std::endl;
 					  const SelfAntiCommuting *sac=properties::get<SelfAntiCommuting>(repch);
 					  if(sac)
 						  sign*=-1;
 					  }
 				  else {
-					  txtout << "yes?" << std::endl;
 					  const Indices *ind=properties::get<Indices>(der_wrt);
 					  if(ind) {
-						  txtout << "yes" << std::endl;
 						  if(ind->grassmann)
 							  sign*=-1;
 						  }

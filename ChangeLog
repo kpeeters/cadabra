@@ -1,3 +1,12 @@
+2009-04-14  Kasper Peeters  <kasper.peeters@aei.mpg.de>
+
+	* Added handling of Grassmann derivatives in @prodrule.
+
+	* Added 'type=grassmann' to the Indices property.
+
+	* Fixed a bug in the pattern matcher which would match 'a' to
+	'b^a' under some rare circumstances.
+
 2009-03-28  Kasper Peeters  <kasper.peeters@aei.mpg.de>
 
 	* Made LaTeX errors pop up in a scrollable dialog.
