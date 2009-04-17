@@ -16,3 +16,23 @@ ddef:= {
 D_{\alpha}{ D_{\dot{\beta}}{f} } + D_{\dot{\beta}}{ D_{\alpha}{f} };
 
 @substitute!(%)( @(ddef) );
+
+
+# Example from the Dill paper.
+#
+@reset.
+{\alpha,\beta,\gamma,\delta}::Indices(spinor,type=grassmann,position=fixed).
+{\dot{\alpha},\dot{\beta},\dot{\gamma},\dot{\delta}}::Indices(spinor,type=grassmann,position=fixed).
+D{#}::Derivative.
+{\theta^{\alpha}, \theta_{\alpha}}::SelfAntiCommuting.
+{\theta^{\alpha}, \theta_{\beta}}::AntiCommuting.
+i::ImaginaryI.
+
+
+drules:= { D_{\gamma}{A??} -> \partial_{\gamma}{A??} 
+                              + i \sigma^{n}_{\alpha\dot{\alpha}} \theta^{\dot{\alpha}} \partial_{m}{A??} 
+         };
+
+
+D_{\gamma}{\theta^{\delta} \theta_{\delta} F};
+@prodrule!(%);
