@@ -210,6 +210,10 @@ tst17:= \partial_{a b c}{F} - @(obj17);
 \nabla{#}::Derivative.
 obj18:= \nabla_{a}{\nabla_{b}{F}};
 @substitute!!(%)( \nabla_{a}{A??} -> \partial_{a}{A??} );
+tst18:= \partial_{a b}{F} - @(obj18);
+@collect_terms!(%);
+@assert(tst18);
+
 
 # Test 19: Grassman derivatives
 #
