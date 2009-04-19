@@ -50,6 +50,7 @@ tst:= r**2 * r**2 + f(r) * f(r) + r**(-2) * r**(-2) + r * r - @(evl);
 #
 #  A_m ( B_m + C_m ) D_n Q_n:
 #
+#   - collect free and dummy indices.
 #      
 
 @reset.
@@ -70,6 +71,10 @@ evl:= @eval![@(obj)]( @(rul) );
 tst:= -r**2 * r**2 + f(r) * f(r) + r**(-2) * r**(-2) + r * r - @(evl);
 @collect_terms!(%);
 @assert(tst);
+
+
+
+A_m (B_n C_n (D_k D_k + 1) + 3) P_m;
 
 
 @reset.
