@@ -1783,15 +1783,18 @@ and vector, leading to a meaningless expression.
 
 If you have more than one set of implicit indices, you can label them
 just like you can label explicit indices,
-\begin{screen}{1,2,3,4}
+\begin{screen}{1,2,3,4,5}
 {a,b}::ImplicitIndex(type1);
-{Q,R}::ImplicitIndex(type2);
+{c,d}::ImplicitIndex(type2);
 M::Matrix(type1).
-a = M Q b R;
+a = M d c b;
 @prodsort!(%);
-
+a = M b d c;
 \end{screen}
-
+% It is also possible to declare that an object commutes with another
+% one even though they both carry implicit indices (e.g.~to indicate
+% that two matrices are commuting). 
+% 
 \subsection{Indexbrackets}
 
 Indices can be associated to tensors, as in~$T_{\mu\nu}$, but it often
