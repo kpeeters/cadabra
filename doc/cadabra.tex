@@ -1781,6 +1781,17 @@ If you had not made the property assignment in the first two lines,
 the \subscommand{prodsort} would have incorrectly swapped the matrix
 and vector, leading to a meaningless expression.
 
+If you have more than one set of implicit indices, you can label them
+just like you can label explicit indices,
+\begin{screen}{1,2,3,4}
+{a,b}::ImplicitIndex(type1);
+{Q,R}::ImplicitIndex(type2);
+M::Matrix(type1).
+a = M Q b R;
+@prodsort!(%);
+
+\end{screen}
+
 \subsection{Indexbrackets}
 
 Indices can be associated to tensors, as in~$T_{\mu\nu}$, but it often
