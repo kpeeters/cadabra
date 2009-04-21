@@ -51,7 +51,24 @@ tst:= r**2 * r**2 + f(r) * f(r) + r**(-2) * r**(-2) + r * r - @(evl);
 #  A_m ( B_m + C_m ) D_n Q_n:
 #
 #   - collect free and dummy indices.
-#      
+#   - do a depth-first walk
+#          - for each node, determine the index values for which
+#            a rule is available
+
+@reset.
+{m,n,p}::Indices.
+{m,n,p}::Integer(0..3).
+A_{m} B_{m n} C_{n};
+rule:= { A_{0} -> 3,
+         A_{2} -> q,
+         B_{0 1} -> a,
+         B_{2 1} -> 2 a,
+         C_{1} -> c,
+         C_{2} -> d };
+@indexmatch(%)( @(rule) );
+# This should return a map
+#    {m,n} -> {0,1}, {2,1}
+# indicating for which index values there is a match.
 
 @reset.
 {\alpha,\beta}::Indices("vector", position=fixed).
