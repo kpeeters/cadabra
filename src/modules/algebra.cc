@@ -793,8 +793,17 @@ algorithm::result_t prodrule::apply(iterator& it)
 			  // Update sign.
 			  if(theD.begin()->is_index()) {
 				  iterator der_wrt=theD.begin();
-//				  tr.print_recursive_treeform(txtout, der_wrt);
+
+//				  // Bail out if the the derivative and the object on which it acts
+//				  // do not commute (in this case the algorithm cannot apply).
+//				  int canswap=exptree_ordering::can_swap(theD, repch, 2);
+//				  if(canswap==0) 
+//					  return l_no_action;
+//
+//				  tr.print_recursive_treeform(txtout, theD);
 //				  tr.print_recursive_treeform(txtout, repch);
+//				  txtout << canswap << std::endl;
+
 				  int ret=subtree_compare(der_wrt, repch, 0, true, -2, false);
 //				  txtout << ret << std::endl;
 				  if(abs(ret)<=1) {

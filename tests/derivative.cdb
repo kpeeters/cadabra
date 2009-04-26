@@ -283,3 +283,5 @@ D{#}::Derivative.
 
 D_{a}{D_{\dot{a}}{f g}};
 @prodrule!(%);
+@distribute!(%);
+@prodrule!(%);
