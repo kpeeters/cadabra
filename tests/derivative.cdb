@@ -274,3 +274,12 @@ tst19d:= D^{\alpha}{D_{\alpha}{b}} c
 @collect_terms!(%);
 @assert(tst19d);
 
+@reset.
+\dot{#}::Accent.
+{a,b,c,d}::Indices(spinor).
+{\dot{a},\dot{b},\dot{c},\dot{d}}::Indices(dspinor).
+D{#}::Derivative.
+{ D_{a}{A??}, D_{\dot{a}}{B??} }::NonCommuting.
+
+D_{a}{D_{\dot{a}}{f g}};
+@prodrule!(%);

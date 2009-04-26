@@ -1653,13 +1653,20 @@ int exptree_ordering::can_swap_sum_sum(exptree::iterator sum1, exptree::iterator
 //
 int exptree_ordering::can_swap(exptree::iterator one, exptree::iterator two, int subtree_comparison) 
 	{
+	// Two implicit-index objects cannot move through eachother if they have the
+	// same type of implicit index.
+	const ImplicitIndex *ii1 = properties::get_composite<ImplicitIndex>(one);
+	const ImplicitIndex *ii2 = properties::get_composite<ImplicitIndex>(two);
+	if(ii1 && ii2) {
+		if(ii1->set_names.size()==0 && ii2->set_names.size()==0) return 0; // empty index name
+		for(size_t n1=0; n1<ii1->set_names.size(); ++n1)
+			for(size_t n2=0; n2<ii2->set_names.size(); ++n2)
+				if(ii1->set_names[n1]==ii2->set_names[n2])
+					return 0;
+		}
+	
 	// Do we need to use Self* properties?
 	if(abs(subtree_comparison)<=1) { 
-		// Two implicit-index objects cannot move through eachother.
-		// FIXME: commutation properties bug
-		const ImplicitIndex          *ii =properties::get_composite<ImplicitIndex>(one);
-		if(ii) return 0;
-
 		const SelfCommutingBehaviour *sc =properties::get_composite<SelfCommutingBehaviour>(one);
 		if(sc)
 			return sc->sign();
@@ -1680,18 +1687,6 @@ int exptree_ordering::can_swap(exptree::iterator one, exptree::iterator two, int
 //		else return 1; // default: commuting
 		}
 	else {
-		// Two implicit-index objects cannot move through eachother if they have the
-		// same type of implicit index.
-		// FIXME: commutation relations bug
-		const ImplicitIndex *ii1=properties::get_composite<ImplicitIndex>(one);
-		const ImplicitIndex *ii2=properties::get_composite<ImplicitIndex>(two);
-		if(ii1 && ii2) {
-			for(size_t n1=0; n1<ii1->set_names.size(); ++n1)
-				for(size_t n2=0; n2<ii2->set_names.size(); ++n2)
-					if(ii1->set_names[n1]==ii2->set_names[n2])
-						return 0;
-			}
-
 		// It is still possible that the two objects have different numbers of indices,
 		// yet match the same pattern in a SelfCommuting etal property. In this case,
 		// the property should be matched by both 'one' and 'two';
