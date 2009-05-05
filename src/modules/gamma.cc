@@ -27,6 +27,7 @@
 #include "field_theory.hh"
 #include "numerical.hh"
 #include <utility>
+#include <algorithm>
 
 void gamma_algebra::register_properties()
 	{
@@ -254,12 +255,12 @@ void join::append_prod_(const std::vector<exptree>& r1, const std::vector<exptre
 			}
 
 		if(tree_exact_less(r1[j+num1-i], r2[j+num2-i]) || use_generalised_delta_) {
-			rep.append_child(delt, r1[j+num1-i].begin()); //str_node(name1, str_node::b_none, r1[j+num1-i].fl.parent_rel));
-			rep.append_child(delt, r2[j+num2-i].begin()); //str_node(name2, str_node::b_none, r2[j+num2-i].fl.parent_rel));
+			rep.append_child(delt, r1[j+num1-i].begin()); 
+			rep.append_child(delt, r2[j+num2-i].begin()); 
 			}
 		else {
-			rep.append_child(delt, r2[j+num2-i].begin()); //str_node(name2, str_node::b_none, r2[j+num2-i].fl.parent_rel));
-			rep.append_child(delt, r1[j+num1-i].begin()); //str_node(name1, str_node::b_none, r1[j+num1-i].fl.parent_rel));
+			rep.append_child(delt, r2[j+num2-i].begin()); 
+			rep.append_child(delt, r1[j+num1-i].begin()); 
 			}
 		}
 	}
@@ -327,12 +328,35 @@ algorithm::result_t join::apply(iterator& st)
 	sibling_iterator top=rep.set_head(str_node("\\sum"));
 	
 	// Figure out the dimension of the gamma matrix.
-	sibling_iterator firstind=tr.begin(gam1);
-	const Integer *ipr=properties::get<Integer>(firstind);
-	int number_of_dimensions=-1; // i.e. not known.
-	if(ipr) {
-		if(ipr->difference.begin()->is_integer()) {
-			number_of_dimensions=to_long(*ipr->difference.begin()->multiplier);
+	long number_of_dimensions=-1; // i.e. not known.
+	exptree::index_iterator firstind=tr.begin_index(gam1);
+	while(firstind!=tr.end_index(gam1)) {  // select the maximum value; FIXME: be more refined...
+		const Integer *ipr=properties::get<Integer>(firstind);
+		if(ipr) {
+			if(ipr->difference.begin()->is_integer()) {
+				number_of_dimensions=std::max(number_of_dimensions, to_long(*ipr->difference.begin()->multiplier));
+				}
+			}
+		else {
+			number_of_dimensions=-1;
+			break;
+			}
+		++firstind;
+		}
+	if(number_of_dimensions!=-1) {
+		firstind=tr.begin_index(gam2);
+		while(firstind!=tr.end_index(gam2)) {  // select the maximum value; FIXME: be more refined...
+			const Integer *ipr=properties::get<Integer>(firstind);
+			if(ipr) {
+				if(ipr->difference.begin()->is_integer()) {
+					number_of_dimensions=std::max(number_of_dimensions, to_long(*ipr->difference.begin()->multiplier));
+					}
+				}
+			else {
+				number_of_dimensions=-1;
+				break;
+				}
+			++firstind;
 			}
 		}
 

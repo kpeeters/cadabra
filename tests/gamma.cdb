@@ -279,3 +279,28 @@ obj4:= \Gamma_{\mu c d} \Gamma^{\nu \rho a b c};
 @join!(%){expand};
 
 
+# Test 4: indices and sub-indices (bug reported 5-Apr-2009)
+#
+@reset.
+{a,b,c,d, e,f, g, h#}::Indices(group).
+{M, N, P, Q#}::Indices(flat).
+{M, N, P, Q#}::Integer(1..10).
+{I,J,K,L#}::Indices(orthogonal, parent=flat).
+{I,J,K,L#}::Integer(3..10).
+{\mu, \nu, \lambda, \sigma#}::Indices(worldvolume, parent=flat).
+{\mu, \nu, \lambda, \sigma#}::Integer(0..2).
+\delta{\mu \nu}::KroneckerDelta.
+\Gamma{#}::GammaMatrix(metric=\delta).
+obj1:=\Gamma_{I J K}\Gamma_{\mu};
+@join!(%){expand};
+tst1:= \Gamma_{I J K \mu} + \Gamma_{I J} * \delta_{K \mu} - \Gamma_{I K} * \delta_{J \mu} + \Gamma_{J K} * \delta_{I \mu}
+      - @(obj1);
+@collect_terms!(%);
+@assert(tst1);
+obj2:=\Gamma_{\mu}\Gamma_{I J K};
+@join!(%){expand};
+tst2:= \Gamma_{\mu I J K} + \Gamma_{J K} * \delta_{I \mu} - \Gamma_{J I} * \delta_{K \mu} + \Gamma_{K I} * \delta_{J \mu}
+      - @(obj2);
+@collect_terms!(%);
+@assert(tst2);
+
