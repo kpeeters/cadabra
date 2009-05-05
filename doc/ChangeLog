@@ -1,3 +1,10 @@
+2009-05-05  Kasper Peeters  <kasper.peeters@aei.mpg.de>
+
+	* Released 2.65
+
+	* Added skip_children(bool), fixed post-increment/decrement
+	operators to not refer to 'n' anymore.
+
 2009-04-03  Kasper Peeters  <kasper.peeters@aei.mpg.de>
 
 	* Added a sibling member for quick access to the n-th sibling
