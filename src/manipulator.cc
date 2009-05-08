@@ -112,6 +112,7 @@ manipulator::manipulator()
 	algorithms["@from_maple"]     =new algo_info(&create<frommaple>); // not documented yet
 	algorithms["@run"]            =new algo_info(&create<run>);
 	algorithms["@maxima"]         =new algo_info(&create<maxima>);
+	algorithms["@maple"]          =new algo_info(&create<maple>);
 
 	// differential geometry
 	diff_geometry::register_properties();

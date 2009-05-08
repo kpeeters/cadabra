@@ -61,6 +61,11 @@ advtest: program
 	( export CDB_PARANOID=1 && export CDB_PRINTSTAR=1 && cd tests && $(MAKE) clean && $(MAKE) advanced);
 	@echo "==== Advanced tests passed ====="
 
+mapletest: program
+	@echo "==== Running maple dependent tests ===="
+	( export CDB_PARANOID=1 && export CDB_PRINTSTAR=1 && cd tests && $(MAKE) clean && $(MAKE) maple);
+	@echo "==== Advanced tests passed ====="
+
 install_program: program
 	( cd src && $(MAKE) install );
 	@INSTALL@ -d ${DESTDIR}@prefix@/share/man/man1

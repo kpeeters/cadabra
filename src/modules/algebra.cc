@@ -759,6 +759,8 @@ algorithm::result_t prodrule::apply(iterator& it)
 		 //
 		 //    D_{a}{\theta^{b}}                    with \theta^{a} Coordinate & SelfAntiCommuting
        //    D_{\theta^{a}}{\theta^{b}}           ditto
+		 //    D_{a}{D_{b}{G}}                      (similar to two lines below; not yet handled)
+		 //    D_{a}{D_{\dot{b}}{G}}                (ditto but now with different index sets which anti-commute; not yet)
 		 //    D_{a}{T^{a b}}                       (decide on notation; not yet handled)
        //    { D{#}, \theta^{a} }::AntiCommuting  (decide on notation; not yet handled)
 
@@ -817,6 +819,7 @@ algorithm::result_t prodrule::apply(iterator& it)
 						  if(ind->grassmann) {
 							  // count the number of explicit grassmann indices on the factor on which we act
 							  exptree::index_iterator ii=tr.begin_index(repch);
+							  txtout << "moving through " << *ii->name <<std::endl;
 							  while(ii!=tr.end_index(repch)) {
 								  const Indices *indfac=properties::get_composite<Indices>(ii);
 								  if(indfac==ind)

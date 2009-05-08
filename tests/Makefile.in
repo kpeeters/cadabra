@@ -11,6 +11,8 @@ TESTS=pre.res tree.res \
 		tutorial2.res tutorial3.res algebra.res lists.res defaults.res patterns.res tableaux.res \
       repeated.res paper.res 
 
+MAPLETESTS=maple.res
+
 ADVTESTS=r4decompose.res kk.res 
 
 .PHONY=all
@@ -21,6 +23,8 @@ all: $(TESTS) summary
 
 advanced: $(ADVTESTS) advsummary
 
+maple: $(MAPLETESTS) maplesummary
+
 summary: $(TESTS)
 ifeq ($(strip $(MACTEST)),)
 	@printf "total cpu time: "
@@ -28,6 +32,12 @@ ifeq ($(strip $(MACTEST)),)
 endif
 
 advsummary: $(ADVTESTS)
+ifeq ($(strip $(MACTEST)),)
+	@printf "total cpu time: "
+	@awk '{total+=$$0} END {print total " seconds."}' < timing.log
+endif
+
+maplesummary: $(MAPLETESTS)
 ifeq ($(strip $(MACTEST)),)
 	@printf "total cpu time: "
 	@awk '{total+=$$0} END {print total " seconds."}' < timing.log

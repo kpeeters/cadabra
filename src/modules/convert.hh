@@ -65,6 +65,19 @@ class maxima : public algorithm {
 		static const char* max_to_cad[][2];
 };
 
+class maple : public algorithm {
+	public:
+		maple(exptree&, iterator);
+
+		virtual void     description() const;
+		virtual bool     can_apply(iterator);
+		virtual result_t apply(iterator&);
+
+		result_t         apply(iterator&, std::string program_name, bool mapleout);
+
+		static const char* maple_to_cad[][2];
+};
+
 /*
 class tomath : public algorithm {
 	public:

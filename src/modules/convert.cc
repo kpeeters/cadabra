@@ -27,7 +27,7 @@
 
 // FIXME: some of these probably need to be converted only when appropriate properties
 // have been set, but definitely only when a node matches, not just as random text
-// inside the final string to be sent to maxima.
+// inside the final string to be sent to maxima/maple.
 const char* maxima::max_to_cad[][2] = {
 	{ "%pi",      "\\\\pi" },
 	{ "sin",      "\\\\sin" },
@@ -38,6 +38,15 @@ const char* maxima::max_to_cad[][2] = {
 	{ "infinity", "\\\\infty" },
 	{ "sqrt",     "\\\\sqrt" } //,
 //	{ "%i",       "i" },
+};
+
+const char* maple::maple_to_cad[][2] = {
+	{ "Pi",       "\\\\pi" },
+	{ "sin",      "\\\\sin" },
+	{ "cos",      "\\\\cos" },
+	{ "tan",      "\\\\tan" },
+	{ "infinity", "\\\\infty" },
+	{ "sqrt",     "\\\\sqrt" } //,
 };
 
 frommath::frommath(exptree& tr, iterator it)
@@ -459,6 +468,101 @@ algorithm::result_t maxima::apply(iterator& it)
 
 		for(size_t i=0; i<sizeof(max_to_cad)/sizeof(max_to_cad[0]); ++i) 
 			pcrecpp::RE(max_to_cad[i][0]).GlobalReplace(max_to_cad[i][1], &store);
+		
+//		debugout << "after conversion:" << std::endl
+//					<< store << std::endl;
+
+		try {
+			std::stringstream str2(store);
+			str2 >> pa;
+			}
+		catch(std::exception& ex) {
+			txtout << ex.what() << std::endl;
+			return l_error;
+			}
+		it=tr.replace(it,pa.tree.begin().begin());
+		cleanup_expression(tr,it);
+		expression_modified=true;
+		return l_applied;
+		}
+
+	return l_no_action;
+	
+	}
+
+maple::maple(exptree& tr, iterator it)
+	: algorithm(tr, it)
+	{
+	}
+
+void maple::description() const
+	{
+	txtout << "Write an expression to maple and read it back in." << std::endl;
+	}
+
+bool maple::can_apply(iterator it)
+	{
+	// Check that the expression contains no indices, neither free nor dummy.
+	// In other words, only act if the expression is a scalar built from scalars.
+
+	index_map_t ind_free, ind_dummy;
+	classify_indices(it, ind_free, ind_dummy);
+	if(ind_free.size()>0 || ind_dummy.size()>0) return false;
+
+	return true;
+	}
+
+algorithm::result_t maple::apply(iterator& it)
+	{
+	std::ostringstream argstr;
+	exptree_output eo(tr, argstr);
+	eo.output_format=exptree_output::out_plain;
+	eo.print_star=true;
+
+	eo.print_infix(it);
+	
+	std::string result;
+	modglue::child_process proc("maple");
+	std::string tomax="interface(prettyprint=0);\n"+argstr.str()+";\nquit;\n";
+
+	for(size_t i=0; i<sizeof(maple_to_cad)/sizeof(maple_to_cad[0]); ++i) 
+		pcrecpp::RE(maple_to_cad[i][1]).GlobalReplace(maple_to_cad[i][0], &tomax);
+
+	debugout << "sending to maple:" << std::endl
+				<< tomax << std::endl;
+
+	proc.call(tomax, result);
+
+	debugout << "result from maple:" << std::endl
+				<< result << std::endl;
+
+	std::stringstream str(result);
+	std::string line;
+	parser pa(true);
+
+	// Eat input until the second prompt appears
+	int count=0;
+	while(std::getline(str, line)) {
+		if(line[0]=='>')
+			if(++count==2)
+				break;
+		}
+
+	std::string store;
+//	while(std::getline(str, line)) {
+//		pcrecpp::RE reg(".*\\(%o[0-9]+\\) *(.*)");
+//		if(reg.FullMatch(line,&store)) {
+//			txtout << store << std::endl;
+//			break;
+//			}
+//		}
+	std::getline(str,store);
+
+	if(store.size()>0) {
+		pcrecpp::RE("\\^").GlobalReplace("**", &store);
+
+		for(size_t i=0; i<sizeof(maple_to_cad)/sizeof(maple_to_cad[0]); ++i) 
+			pcrecpp::RE(maple_to_cad[i][0]).GlobalReplace(maple_to_cad[i][1], &store);
 		
 //		debugout << "after conversion:" << std::endl
 //					<< store << std::endl;
