@@ -1,0 +1,15 @@
+# Testing the interface to maple
+#
+@reset.
+obj1:= simplify( sin(x)**2 + cos(x)**2 );
+@maple(%);
+tst1:= 1 - @(obj1);
+@collect_terms!(%);
+@assert(tst1);
+
+@reset.
+obj2:= integrate( \sin(x)**2, x );
+@maple(%);
+tst2:= 1/2 x - 1/2 \sin(x) \cos(x) - @(obj2);
+@collect_terms!(%);
+@assert(tst2);
