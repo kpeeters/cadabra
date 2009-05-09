@@ -819,7 +819,7 @@ algorithm::result_t prodrule::apply(iterator& it)
 						  if(ind->grassmann) {
 							  // count the number of explicit grassmann indices on the factor on which we act
 							  exptree::index_iterator ii=tr.begin_index(repch);
-							  txtout << "moving through " << *ii->name <<std::endl;
+							  txtout << "moving " << *der_wrt->name << " through " << *ii->name <<std::endl;
 							  while(ii!=tr.end_index(repch)) {
 								  const Indices *indfac=properties::get_composite<Indices>(ii);
 								  if(indfac==ind)
