@@ -759,10 +759,10 @@ algorithm::result_t prodrule::apply(iterator& it)
 		 //
 		 //    D_{a}{\theta^{b}}                    with \theta^{a} Coordinate & SelfAntiCommuting
        //    D_{\theta^{a}}{\theta^{b}}           ditto
-		 //    D_{a}{D_{b}{G}}                      (similar to two lines below; not yet handled)
-		 //    D_{a}{D_{\dot{b}}{G}}                (ditto but now with different index sets which anti-commute; not yet)
-		 //    D_{a}{T^{a b}}                       (decide on notation; not yet handled)
-       //    { D{#}, \theta^{a} }::AntiCommuting  (decide on notation; not yet handled)
+		 //    D_{a}{D_{b}{G}}                      handled by making indices AntiCommuting.
+		 //    D_{a}{D_{\dot{b}}{G}}                handled by making indices AntiCommuting.
+		 //    D_{a}{T^{a b}}                       handled by making indices AntiCommuting.
+		 //    D_{a}{\theta}                        with \theta having an ImplicitIndex of type 'a' (not yet handled)
 
 		 while(chl!=tr.end(prodnode)) { // iterate over all factors in the product
 			  // Add the whole product node to the replacement sum.
@@ -771,7 +771,7 @@ algorithm::result_t prodrule::apply(iterator& it)
 			  if(*tr.parent(it)->name=="\\expression") 
 					dummy->fl.bracket=str_node::b_none;
 			  else dummy->fl.bracket=str_node::b_round;
-//		dummy->fl.bracket=it->fl.bracket; 
+
 			  sibling_iterator wrap=rep.begin(dummy); 
 			  // Go to the 'num'th factor in the product.
 			  wrap+=num;    
@@ -796,18 +796,7 @@ algorithm::result_t prodrule::apply(iterator& it)
 			  if(theD.begin()->is_index()) {
 				  iterator der_wrt=theD.begin();
 
-//				  // Bail out if the the derivative and the object on which it acts
-//				  // do not commute (in this case the algorithm cannot apply).
-//				  int canswap=exptree_ordering::can_swap(theD, repch, 2);
-//				  if(canswap==0) 
-//					  return l_no_action;
-//
-//				  tr.print_recursive_treeform(txtout, theD);
-//				  tr.print_recursive_treeform(txtout, repch);
-//				  txtout << canswap << std::endl;
-
 				  int ret=subtree_compare(der_wrt, repch, 0, true, -2, false);
-//				  txtout << ret << std::endl;
 				  if(abs(ret)<=1) {
 					  const SelfAntiCommuting *sac=properties::get_composite<SelfAntiCommuting>(repch);
 					  if(sac)
@@ -816,30 +805,27 @@ algorithm::result_t prodrule::apply(iterator& it)
 				  else {
 					  const Indices *ind=properties::get_composite<Indices>(der_wrt);
 					  if(ind) {
-						  if(ind->grassmann) {
-							  // count the number of explicit grassmann indices on the factor on which we act
-							  exptree::index_iterator ii=tr.begin_index(repch);
-							  txtout << "moving " << *der_wrt->name << " through " << *ii->name <<std::endl;
-							  while(ii!=tr.end_index(repch)) {
-								  const Indices *indfac=properties::get_composite<Indices>(ii);
-								  if(indfac==ind)
-									  sign*=-1;
-								  ++ii;
-								  }
-							  // ditto for implicit indices
-							  const ImplicitIndex *impindex=properties::get_composite<ImplicitIndex>(repch);
-							  if(impindex) {
-								  for(size_t n=0; n<impindex->set_names.size(); ++n)
-									  if(impindex->set_names[n]==ind->set_name)
-										  sign*=-1;
-								  }
+						  // Determine the sign obtained by moving the derivative index through the
+						  // object on which it has just acted.
+						  exptree::index_iterator ii=tr.begin_index(repch);
+						  while(ii!=tr.end_index(repch)) {
+							  int stc=subtree_compare(ii, der_wrt);
+							  int ret=exptree_ordering::can_swap(ii, der_wrt, stc);
+							  if(ret==0) 
+								  return l_no_action;
+							  sign*=ret;
+							  ++ii;
 							  }
+
+						  // Handle explicitly declared anti-commutativity.
+						  int stc=subtree_compare(der_wrt, repch);
+						  int ret=exptree_ordering::can_swap(der_wrt, repch, stc);
+						  if(ret==0)
+							  return l_no_action;
+						  sign*=ret;
 						  }
 					  }
 				  }
-//			  else {
-//				  // count
-//				  }
 			  
 			  
 			  // Avoid \partial_{a}{\partial_{b} ...} constructions in 

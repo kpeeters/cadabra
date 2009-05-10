@@ -1653,7 +1653,7 @@ int exptree_ordering::can_swap_sum_sum(exptree::iterator sum1, exptree::iterator
 //
 int exptree_ordering::can_swap(exptree::iterator one, exptree::iterator two, int subtree_comparison) 
 	{
-	// Two implicit-index objects cannot move through eachother if they have the
+	// Two implicit-index objects cannot move through each other if they have the
 	// same type of implicit index.
 	const ImplicitIndex *ii1 = properties::get_composite<ImplicitIndex>(one);
 	const ImplicitIndex *ii2 = properties::get_composite<ImplicitIndex>(two);
