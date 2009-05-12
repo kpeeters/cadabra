@@ -283,7 +283,6 @@ tst19d:= D^{\alpha}{D_{\alpha}{b}} c
 {a,b,c,d}::Indices(spinor).
 {\dot{a},\dot{b},\dot{c},\dot{d}}::Indices(dspinor).
 {a,b,c,d,\dot{a},\dot{b},\dot{c},\dot{d}}::AntiCommuting.
-
 D{#}::Derivative.
 D_{a}{D_{\dot{a}}{f g}};
 @prodrule!(%);
