@@ -809,20 +809,26 @@ algorithm::result_t prodrule::apply(iterator& it)
 						  // object on which it has just acted.
 						  exptree::index_iterator ii=tr.begin_index(repch);
 						  while(ii!=tr.end_index(repch)) {
+							  txtout << "trying to move " << *der_wrt->name << " through " << *ii->name << std::endl;
 							  int stc=subtree_compare(ii, der_wrt);
 							  int ret=exptree_ordering::can_swap(ii, der_wrt, stc);
 							  if(ret==0) 
 								  return l_no_action;
+							  txtout << ret << std::endl;
 							  sign*=ret;
 							  ++ii;
 							  }
+						  txtout << "--" << std::endl;
 
 						  // Handle explicitly declared anti-commutativity.
 						  int stc=subtree_compare(der_wrt, repch);
+						  txtout << "trying to move " << *der_wrt->name << " through " << *repch->name 
+									<< " " << stc << std::endl;
 						  int ret=exptree_ordering::can_swap(der_wrt, repch, stc);
 						  if(ret==0)
 							  return l_no_action;
 						  sign*=ret;
+						  txtout << ret << std::endl;
 						  }
 					  }
 				  }

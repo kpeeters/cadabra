@@ -230,7 +230,8 @@ tst19a:= D_{\theta^{\alpha}}{\theta^{\beta}} \theta^{\gamma}
 @assert(tst19a);
 
 @reset.
-{\alpha,\beta,\gamma}::Indices(spinor,type=grassmann).
+{\alpha,\beta,\gamma}::Indices(spinor).
+{\alpha,\beta,\gamma}::AntiCommuting.
 \theta^{\alpha}::Coordinate.
 D{#}::Derivative.
 obj19b:= D_{\alpha}{\theta^\beta \theta^\gamma};
