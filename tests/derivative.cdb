@@ -277,6 +277,7 @@ tst19d:= D^{\alpha}{D_{\alpha}{b}} c
 @collect_terms!(%);
 @assert(tst19d);
 
+
 # Test 20: anti-commuting indices.
 #
 @reset.
@@ -285,10 +286,17 @@ tst19d:= D^{\alpha}{D_{\alpha}{b}} c
 {\dot{a},\dot{b},\dot{c},\dot{d}}::Indices(dspinor).
 {a,b,c,d,\dot{a},\dot{b},\dot{c},\dot{d}}::AntiCommuting.
 D{#}::Derivative.
-D_{a}{D_{\dot{a}}{f g}};
+obj20:= D_{a}{D_{\dot{a}}{f g}};
 @prodrule!(%);
 @distribute!(%);
 @prodrule!(%);
+@sumflatten!(%);
+tst20:= D_{a}{D_{\dot{a}}{f}} * g 
+      - D_{\dot{a}}{f} * D_{a}{g} 
+      + D_{a}{f} * D_{\dot{a}}{g} 
+      + f * D_{a}{D_{\dot{a}}{g}} - @(obj20);
+@collect_terms!(%);
+@assert(tst20);
 
 
 # Test 21: two index sets, anti-commuting
@@ -325,10 +333,16 @@ tst22:= D_{\alpha}{\theta} \lambda - \theta D_{\alpha}{\lambda} - @(obj22);
 @collect_terms!(%);
 @assert(tst22);
 
+# Test 23: multiple indices on tensors.
+#
 @reset.
 {a,b,c,d,e}::Indices.
 {a,b,c,d,e}::AntiCommuting.
 D{#}::Derivative.
-D_{a}{A^{b} T^{c d} C^{e}}; 
+obj23:= D_{a}{A^{b} T^{c d} C^{e}}; 
 @prodrule!(%);
+tst23:= D_{a}{A^{b}} * T^{c d} * C^{e} - A^{b} * D_{a}{T^{c d}} * C^{e} - A^{b} * T^{c d} * D_{a}{C^{e}}
+         - @(obj23);
+@collect_terms!(%);
+@assert(tst23);
 

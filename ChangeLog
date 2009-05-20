@@ -1,3 +1,11 @@
+2009-05-20  Kasper Peeters  <kasper.peeters@aei.mpg.de>
+
+	* Fixed a problem with derivatives not inheriting
+	CommutingBehaviour correctly.
+
+	* Removed 'type=grassmann' in Indices, in favour of a more
+	flexible use of AntiCommuting on indices.
+
 2009-04-26  Kasper Peeters  <kasper.peeters@aei.mpg.de>
 
 	* Cleaned up 'can_swap' and fixed handling of ImplicitIndex

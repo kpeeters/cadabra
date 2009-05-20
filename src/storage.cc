@@ -1701,10 +1701,12 @@ int exptree_ordering::can_swap(exptree::iterator one, exptree::iterator two, int
 	const CommutingBehaviour *com1 =properties::get_composite<CommutingBehaviour>(one);
 	const CommutingBehaviour *com2 =properties::get_composite<CommutingBehaviour>(two);
 	
+//	std::cout << "here?!" << std::endl;
 	if(com1!=0  &&  com1== com2) return com1->sign();
 	
 	// One or both of the objects are not in an explicit list. Check for
 	// product-like and sum-like behaviour.
+//	std::cout << "here?" << std::endl;
 	const CommutingAsProduct *comap1 = properties::get_composite<CommutingAsProduct>(one);
 	const CommutingAsProduct *comap2 = properties::get_composite<CommutingAsProduct>(two);
 	const CommutingAsSum     *comas1 = properties::get_composite<CommutingAsSum>(one);

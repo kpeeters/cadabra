@@ -762,7 +762,7 @@ algorithm::result_t prodrule::apply(iterator& it)
 		 //    D_{a}{D_{b}{G}}                      handled by making indices AntiCommuting.
 		 //    D_{a}{D_{\dot{b}}{G}}                handled by making indices AntiCommuting.
 		 //    D_{a}{T^{a b}}                       handled by making indices AntiCommuting.
-		 //    D_{a}{\theta}                        with \theta having an ImplicitIndex of type 'a' (not yet handled)
+		 //    D_{a}{\theta}                        with \theta having an ImplicitIndex of type 'a' 
 
 		 while(chl!=tr.end(prodnode)) { // iterate over all factors in the product
 			  // Add the whole product node to the replacement sum.
@@ -806,29 +806,31 @@ algorithm::result_t prodrule::apply(iterator& it)
 					  const Indices *ind=properties::get_composite<Indices>(der_wrt);
 					  if(ind) {
 						  // Determine the sign obtained by moving the derivative index through the
-						  // object on which it has just acted.
+						  // object on which it has just acted. First, handle indices moving through
+						  // objects with indices, e..g D_{a}{\theta^{b} \theta^{c}}.
 						  exptree::index_iterator ii=tr.begin_index(repch);
 						  while(ii!=tr.end_index(repch)) {
-							  txtout << "trying to move " << *der_wrt->name << " through " << *ii->name << std::endl;
+//							  txtout << "trying to move " << *der_wrt->name << " through " << *ii->name << std::endl;
 							  int stc=subtree_compare(ii, der_wrt);
 							  int ret=exptree_ordering::can_swap(ii, der_wrt, stc);
 							  if(ret==0) 
 								  return l_no_action;
-							  txtout << ret << std::endl;
+//							  txtout << ret << std::endl;
 							  sign*=ret;
 							  ++ii;
 							  }
-						  txtout << "--" << std::endl;
+//						  txtout << "--" << std::endl;
 
-						  // Handle explicitly declared anti-commutativity.
+						  // Then handle explicitly declared anti-commutativity, e.g.
+						  // D_{a}{
 						  int stc=subtree_compare(der_wrt, repch);
-						  txtout << "trying to move " << *der_wrt->name << " through " << *repch->name 
-									<< " " << stc << std::endl;
+//						  txtout << "trying to move " << *der_wrt->name << " through " << *repch->name 
+//									<< " " << stc << std::endl;
 						  int ret=exptree_ordering::can_swap(der_wrt, repch, stc);
 						  if(ret==0)
 							  return l_no_action;
 						  sign*=ret;
-						  txtout << ret << std::endl;
+//						  txtout << ret << std::endl;
 						  }
 					  }
 				  }

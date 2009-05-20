@@ -214,7 +214,7 @@ class EpsilonTensor : public AntiSymmetric, virtual public property {
 };
 
 class Derivative : public IndexInherit, 
-						 public Inherit<CommutingBehaviour>,
+						 public CommutingAsProduct, // Inherit<CommutingBehaviour>,
 						 public Inherit<DependsBase>,
 						 public Inherit<Spinor>,
 						 public Inherit<SortOrder>,
