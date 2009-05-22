@@ -304,3 +304,11 @@ tst2:= \Gamma_{\mu I J K} + \Gamma_{J K} * \delta_{I \mu} - \Gamma_{J I} * \delt
 @collect_terms!(%);
 @assert(tst2);
 
+# Test 5: multiple spinor lines
+#
+@reset.
+\gamma{#}::GammaMatrix(spacetime).
+\Gamma{#}::GammaMatrix(susy).
+{\psi,\lambda}::Spinor(spacetime, susy).
+
+\psi \gamma \Gamma \psi.
