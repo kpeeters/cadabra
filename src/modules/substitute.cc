@@ -394,11 +394,23 @@ void vary::description() const
 bool vary::can_apply(iterator it) 
 	{
 	if(*it->name=="\\prod") return true;
+	if(is_single_term(it)) return true;
 	return false;
 	}
 
 algorithm::result_t vary::apply(iterator& it)
 	{
+	if(is_single_term(it)) { // easy: just vary this term
+		substitute subs(tr, this_command);
+		if(subs.can_apply(it)) {
+			if(subs.apply(it)==l_applied) {
+				expression_modified=true;
+				return l_applied;
+				}
+			}
+		return l_no_action;
+		}
+
 	exptree result;
 	result.set_head(str_node("\\expression"));
 	iterator newsum=result.append_child(result.begin(), str_node("\\sum"));
@@ -420,7 +432,7 @@ algorithm::result_t vary::apply(iterator& it)
 		iterator fcit2(fcit);
 		if(subs.apply_recursive(fcit2, false)) {
 			expression_modified=true;
-			result.append_child(newsum, it);
+			iterator newterm=result.append_child(newsum, it);
 			// restore original
 			it=tr.replace(it, prodcopy.begin());
 			}
@@ -435,6 +447,7 @@ algorithm::result_t vary::apply(iterator& it)
 		zero(it->multiplier);
 		expression_modified=true;
 		}
+
 	return l_applied;
 	}
 

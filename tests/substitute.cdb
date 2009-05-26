@@ -705,3 +705,11 @@ tst69:= 1/f(r) + r**2 * \sin(\theta)**2 - @(obj69);
 @collect_terms!(%);
 @assert(tst69);
 
+# Test 70: vary on an isolated term in a sum
+#
+@reset.
+obj70:= A + B Q;
+@vary!(%)( A -> Q, B -> Z );
+tst70:= Q + Z Q - @(obj70);
+@collect_terms!(%);
+@assert(tst70);

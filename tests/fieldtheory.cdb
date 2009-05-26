@@ -423,3 +423,14 @@ obj33:= \epsilon_{a b c d} \partial_{a}{G} \partial_{b}{\psi};
 @rename_dummies!(%):
 @canonicalise!(%);
 @assert(obj33);
+
+# Test 34: another unwrap issue.
+#
+@reset.
+\bar{#}::Accent.
+obj34:= \bar{\Psi^{dA}+\chi^{dA}};
+@distribute!(%);
+@unwrap!(%);
+tst34:= \bar{\Psi^{dA}+\chi^{dA}} - @(obj34);
+@collect_terms!(%);
+@assert(tst34);

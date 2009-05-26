@@ -429,3 +429,14 @@ obj34:= A_{a b c} + A_{b a c};
 @acanonicalorder!(%)(_{a}, _{b});
 @collect_terms!(%);
 @assert(obj34);
+
+# Test 35: keep current expression pointer consistent
+#
+@reset.
+obj35a:= A B + B Q;
+obj35b:= { A -> Z };
+@vary!(obj35a)( Q -> Z );
+@substitute!(%)( @(obj35b) );
+tst35:= B Z - @(%);
+@collect_terms!(%);
+@assert(tst35);

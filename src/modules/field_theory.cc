@@ -1749,7 +1749,10 @@ algorithm::result_t unwrap::apply(iterator& it)
 			sibling_iterator derarg=acton;
 			++acton; // don't use this anymore this loop
 
-			if(*derarg->name=="\\sum") continue; // FIXME: Don't know how to handle this yet.
+			if(*derarg->name=="\\sum") {
+				all_arguments_moved_out=false;
+				continue; // FIXME: Don't know how to handle this yet.
+				}
 
 //			txtout << "doing " << *derarg->name << std::endl;
 

@@ -3625,7 +3625,11 @@ which enhance the functionality of the {\tt tree.hh} library.
 
 \subsubsection{Acting on products or single terms}
 
-use \member{is\_single\_term} and \member{prod\_wrap\_single\_term}.
+use \member{is\_single\_term} inside \member{can\_apply} to test for
+this case. Then in \member{apply} call
+\member{prod\_wrap\_single\_term} (which will be harmless for proper
+products). At the very end of \member{apply}, call
+\member{prod\_unwrap\_single\_term} to remove the product again.
 
 
 \subsection{Utility functions}

@@ -1,3 +1,10 @@
+2009-05-25  Kasper Peeters  <kasper.peeters@aei.mpg.de>
+
+	* Made @vary work on isolated non-product terms in a sum too.
+
+	* Fixed an @unwrap bug which would eliminate accents acting on
+	sums.
+
 2009-05-20  Kasper Peeters  <kasper.peeters@aei.mpg.de>
 
 	* Fixed a problem with derivatives not inheriting
