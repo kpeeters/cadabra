@@ -175,7 +175,7 @@ void algorithm::apply(unsigned int lue, bool multiple, bool until_nochange, bool
 
 	if(tr.number_of_children(this_command)>=1) {
 		iterator chld=tr.begin(this_command);
-		if(chld->fl.bracket==str_node::b_round && *this_command->name!="@") { // exception for '@(1)'
+		if(chld->fl.bracket==str_node::b_round && *this_command->name!="@") { // all normal commands
 			actold=tr.equation_by_number_or_name(chld, last_used_equation_number, equation_number);
 			global_success=g_arguments_accepted;
 			if(actold==tr.end()) {
@@ -186,7 +186,12 @@ void algorithm::apply(unsigned int lue, bool multiple, bool until_nochange, bool
 				}
 			else global_success=g_operand_determined;
 			}
-		else if(chld->fl.bracket==str_node::b_square || *this_command->name=="@") {
+		else if(chld->fl.bracket==str_node::b_round && *this_command->name=="@") { // exception for '@(1)'
+			equation_number=lue;
+			global_success=g_operand_determined;
+			acton=chld;
+			}
+		else if(chld->fl.bracket==str_node::b_square) {
 			global_success=g_operand_determined;
 			acton=chld;
 //			if(chld->fl.bracket==str_node::b_square)

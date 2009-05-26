@@ -1155,6 +1155,9 @@ bool manipulator::handle_external_commands_(exptree::iterator& original_expressi
 	bool        act_until_nochange=false;
 	std::string::size_type   excl_pos;
 
+	// Determine whether to run repeatedly (indicated by a postfix '!' to the command name)
+	// or at a fixed level (indicated by a '![num]' postfix).
+	//
 	if((excl_pos=node_name.find('!'))!=std::string::npos) {
 		 act_multiple=true;
 		 std::string level=node_name.substr(excl_pos+1);
@@ -1219,6 +1222,7 @@ bool manipulator::handle_external_commands_(exptree::iterator& original_expressi
 				case algorithm::g_applied:
 					algorithm_modified_tree=true;
 					last_used_equation_number=thealg->equation_number;
+//					txtout << "acted on " << last_used_equation_number << std::endl;
 					if(thealg->suppress_normal_output)
 						display_result=false;
 					break;
@@ -1226,7 +1230,7 @@ bool manipulator::handle_external_commands_(exptree::iterator& original_expressi
 					txtout << ait->first << ": error" << std::endl;
 					break;
 				}
-//			expressions.print_entire_tree(txtout);
+
 			if(thealg->discard_command_node && is_inert_command==false) {
 				iterator ths=expressions.erase(thealg->this_command);
 				// If there was no previous entry in the history of this expression, 
