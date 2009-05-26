@@ -31,11 +31,19 @@
 
 class DependsBase;
 class Spinor;
+class WeightInherit;
+class Weight;
+
 
 /// General algebraic manipulations and index permutation symmetries
 namespace algebra {
 	void register_properties();
 	void register_algorithms();
+};
+
+class WeightBase : virtual public labelled_property {
+	public:
+		virtual multiplier_t  value(exptree::iterator, const std::string& forcedlabel) const=0;
 };
 
 class Matrix : public ImplicitIndex, virtual public property {
@@ -214,21 +222,24 @@ class EpsilonTensor : public AntiSymmetric, virtual public property {
 };
 
 class Derivative : public IndexInherit, 
-						 public CommutingAsProduct, // Inherit<CommutingBehaviour>,
 						 public Inherit<DependsBase>,
 						 public Inherit<Spinor>,
 						 public Inherit<SortOrder>,
-						 public Inherit<AntiCommuting>,
-						 public Inherit<SelfAntiCommuting>,
+//						 public Inherit<AntiCommuting>,
+//						 public Inherit<SelfAntiCommuting>,
 						 public Inherit<ImplicitIndex>,
+						 public CommutingAsProduct, 
 						 public NumericalFlat,
-						 public Distributable, public TableauBase, virtual public property {
+						 public WeightBase,
+						 public TableauBase,
+						 public Distributable, virtual public property {
 	public :
 		virtual ~Derivative() {};
 		virtual std::string name() const;
 
 		virtual unsigned int size(exptree&, exptree::iterator) const;
 		virtual tab_t        get_tab(exptree&, exptree::iterator, unsigned int) const;
+		virtual multiplier_t value(exptree::iterator, const std::string& forcedlabel) const;
 };
 
 class PartialDerivative : public Derivative, virtual public property {
@@ -489,9 +500,6 @@ class drop : public algorithm {
 		virtual bool     can_apply(iterator);
 		virtual result_t apply(iterator&);		
 };
-
-class WeightInherit;
-class Weight;
 
 class drop_keep_weight : public algorithm {
 	public:

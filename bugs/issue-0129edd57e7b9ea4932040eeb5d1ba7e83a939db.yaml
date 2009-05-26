@@ -1,0 +1,24 @@
+--- !ditz.rubyforge.org,2008-03-06/issue 
+title: Inherit<...> is not flexible enough
+desc: |-
+  There is an Inherit<...> template which is only useful if an object
+  has a single child, since the other children will simply get ignored.
+  Since a multi-child object will almost always need some computation
+  to be done in order to compute how the multiple properties of the children
+  get converted to a single inherited property, it makes sense to deprecate
+  Inherit<...> altogether, in favour of the [...]Base properties.
+type: :feature
+component: cadabra
+release: 
+reporter: Kasper Peeters <kasper.peeters@aei.mpg.de>
+status: :unstarted
+disposition: 
+creation_time: 2009-05-26 17:41:13.764695 Z
+references: []
+
+id: 0129edd57e7b9ea4932040eeb5d1ba7e83a939db
+log_events: 
+- - 2009-05-26 17:41:15.118851 Z
+  - Kasper Peeters <kasper.peeters@aei.mpg.de>
+  - created
+  - ""

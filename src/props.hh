@@ -95,7 +95,7 @@ class property : public property_base {
 	public:
 };
 
-class labelled_property : public property {
+class labelled_property : virtual public property {
 	public:
 		virtual bool core_parse(keyval_t&);
 		std::string label;
@@ -111,6 +111,10 @@ class IndexInherit : virtual public property {
 	public: 
 		virtual std::string name() const { return std::string("IndexInherit"); };
 };
+
+// FIXME: The Inherit<...> template should be deprecated in favour of the 
+// [...]Base classes, which actually allow for a computation, instead of dumb
+// copying of the properties of the first child.
 
 template<class T>
 class Inherit {

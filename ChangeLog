@@ -1,3 +1,13 @@
+2009-05-26  Kasper Peeters  <kasper.peeters@aei.mpg.de>
+
+	* Removed auto-deletion of list properties because this messes up
+	constructions of the type
+
+	        {a,b}::AntiCommuting.
+	        {a,c}::AntiCommuting.
+
+	('a' gets taken out of the first list in that case).
+
 2009-05-25  Kasper Peeters  <kasper.peeters@aei.mpg.de>
 
 	* Made @vary work on isolated non-product terms in a sum too.

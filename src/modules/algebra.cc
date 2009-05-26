@@ -296,6 +296,25 @@ unsigned int PartialDerivative::size(exptree& tr, exptree::iterator it) const
 	return Derivative::size(tr, it)+1;
 	}
 
+multiplier_t Derivative::value(exptree::iterator it, const std::string& forcedlabel) const
+	{
+	txtout << "!?!?" << std::endl;
+	multiplier_t ret=0;
+
+	exptree::sibling_iterator sib=it.begin();
+	while(sib!=it.end()) {
+		const WeightBase *gnb=properties::get_composite<WeightBase>(sib, forcedlabel);
+		if(gnb) {
+			multiplier_t tmp=gnb->value(sib, forcedlabel);
+			if(sib->is_index()) ret-=tmp;
+			else                ret+=tmp;
+			txtout << *sib->name << " = " << tmp << std::endl;
+			}
+		++sib;
+		}
+	return ret;
+	}
+
 unsigned int SatisfiesBianchi::size(exptree& tr, exptree::iterator it) const
 	{
 	exptree::sibling_iterator chld=tr.begin(it);

@@ -16,6 +16,8 @@ obj2:= a_{3} a_{2} a_{1};
 tst2:= a_{1} a_{3} a_{2} - @(obj2);
 @collect_terms!(%);
 @assert(tst2);
+
+@reset.
 { a_{2}, a_{1}, a_{3} }::SortOrder.
 obj3:= a_{3} a_{2} a_{1};
 @prodsort!(%);
@@ -31,9 +33,44 @@ obj3:= d b a c e;
 tst3:= a b c d e + @(obj3);
 @collect_terms!(%);
 @assert(tst3);
+
+@reset.
 {a,b,c,d,e}::AntiCommuting.
 obj4:= d b a c e;
 @prodsort!(%);
 tst4:= a b c d e - @(obj4);
 @collect_terms!(%);
 @assert(tst4);
+
+# Test 5: Inherit<..> testing.
+#
+@reset.
+D{#}::Derivative.
+{A,B,C,D}::AntiCommuting.
+obj5:= D(B C) A;
+@prodsort!(%);
+tst5:= A D(B C) - @(obj5);
+@collect_terms!(%);
+@assert(tst5);
+
+# Test 6: Inherit<..> testing.
+#
+@reset.
+D{#}::Derivative.
+{A,B,C,D}::AntiCommuting.
+obj6:= D(B C D) A;
+@prodsort!(%);
+tst6:= - A D(B C D) - @(obj5);
+@collect_terms!(%);
+@assert(tst6);
+
+# Test 8: Inherit<..> testing.
+#
+@reset.
+D{#}::Derivative.
+{A,B,C,E}::AntiCommuting.
+obj8:= D_{E}(B C) A;
+@prodsort!(%);
+tst8:= - A D_{E}(B C) - @(obj8);
+@collect_terms!(%);
+@assert(tst8);

@@ -1586,10 +1586,10 @@ int exptree_ordering::can_swap_prod_prod(exptree::iterator prod1, exptree::itera
 	int sign=1;
 	exptree::sibling_iterator sib=prod2.begin();
 	while(sib!=prod2.end()) {
-		if(sib->fl.parent_rel!=str_node::p_sub && sib->fl.parent_rel!=str_node::p_super) {
+//		if(sib->fl.parent_rel!=str_node::p_sub && sib->fl.parent_rel!=str_node::p_super) {
 			sign*=can_swap_prod_obj(prod1, sib);
 			if(sign==0) break;
-			}
+//			}
 		++sib;
 		}
 	return sign;

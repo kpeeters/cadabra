@@ -440,3 +440,24 @@ obj35b:= { A -> Z };
 tst35:= B Z - @(%);
 @collect_terms!(%);
 @assert(tst35);
+
+# Test 36: two sets of anti-commuting objects
+#
+@reset.
+{a,b}::AntiCommuting.
+{a,c}::AntiCommuting.
+obj36:= b*a;
+@prodsort!(%);
+tst36:= - a b - @(obj36);
+@collect_terms!(%);
+@assert(tst36);
+
+
+# Test 37: weight inheritance
+#
+@reset.
+D{#}::Derivative.
+{a,b,c}::Symbol.
+{a,b,c}::Weight(label=grassmann, value=1).
+D_{a}( b c ) + D_{c}( d e );
+@keep_weight!(%){grassmann}{3};

@@ -51,49 +51,6 @@ class Depends : public DependsBase, virtual public property {
 		exptree dependencies_;
 };
 
-// class WeightBase : virtual public property {
-// 	public:
-// 		// A negative number indicates a non-defined weight (e.g "X + \psi \psi")
-// 		virtual int  value(exptree::iterator) const=0;
-// };
-// 
-// class Weight : virtual public WeightBase, virtual public property {
-// 	public: 
-// 		virtual int  value(exptree::iterator) const;
-// 		virtual bool parse(exptree&, exptree::iterator, exptree::iterator, keyval_t&);
-// 		virtual std::string unnamed_argument() const { return "weight"; };
-// 	private:
-// 		int value_;
-// };
-// 
-// class WeightInherit : virtual public WeightBase, virtual public property {
-// 	public:
-// 		virtual bool parse(exptree&, exptree::iterator, exptree::iterator, keyval_t&);
-// 		virtual int  value(exptree::iterator) const;
-// 		virtual std::string unnamed_argument() const { return "type"; };
-// 		
-// 		enum { multiplicative, additive } combination_type;
-// };
-// 
-// class GrassmannNumberBase : virtual public WeightBase {
-// 	public:
-// };
-// 
-// class GrassmannNumber : public GrassmannNumberBase, public Weight {
-// 	public:
-// 		virtual std::string name() const;
-// };
-// 
-// class GrassmannNumberInherit : public GrassmannNumberBase, public WeightInherit {
-// 	public:
-// 		virtual std::string name() const;
-// };
-
-class WeightBase : virtual public labelled_property {
-	public:
-		virtual multiplier_t  value(exptree::iterator, const std::string& forcedlabel) const=0;
-};
-
 class Weight : virtual public WeightBase {
 	public: 
 		virtual multiplier_t  value(exptree::iterator, const std::string& forcedlabel) const;

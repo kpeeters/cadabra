@@ -332,74 +332,81 @@ void properties::insert_list_prop(const std::vector<exptree::iterator>& its, con
 	// introducing a duplicate.
 	pattern_map_t::iterator fit=pats.begin();
 	while(fit!=pats.end()) {
-		 if(typeid(*(*fit).first)==typeid(*pr))
-			  if(pr->equals((*fit).first)==property_base::exact_match) {
-					pr=static_cast<const list_property *>( (*fit).first );
-					break;
-					}
-		 ++fit;
-		 }
-
+		if(typeid(*(*fit).first)==typeid(*pr))
+			if(pr->equals((*fit).first)==property_base::exact_match) {
+				pr=static_cast<const list_property *>( (*fit).first );
+				break;
+				}
+		++fit;
+		}
+	
 	// If 'pr' has id_match with an existing property, we need to remove all property assignments
 	// for the existing one, except when there is an exact_match.
 	const property_base *to_delete_property=0;
 	pattern_map_t::iterator pit=pats.begin();
 	while(pit!=pats.end()) {
-		 if(typeid(*(*pit).first)==typeid(*pr))
-			  if(pr->equals((*pit).first)==property_base::id_match) {
-					to_delete_property = (*pit).first;
-					break;
-					}
-		 ++pit;
-		 }
+		if(typeid(*(*pit).first)==typeid(*pr))
+			if(pr->equals((*pit).first)==property_base::id_match) {
+				to_delete_property = (*pit).first;
+				break;
+				}
+		++pit;
+		}
 	if(to_delete_property) {
-		 pats.erase(to_delete_property);
-		 property_map_t::iterator it=props.begin();
-		 while(it!=props.end()) {
-			  property_map_t::iterator nxt=it;
-			  ++nxt;
-			  if((*it).second.second==to_delete_property) props.erase(it);
-			  it=nxt;
-			  }
-		 }
+		pats.erase(to_delete_property);
+		property_map_t::iterator it=props.begin();
+		while(it!=props.end()) {
+			property_map_t::iterator nxt=it;
+			++nxt;
+			if((*it).second.second==to_delete_property) props.erase(it);
+			it=nxt;
+			}
+		}
+	
+	
+	// Now register the list property.
 
 	for(unsigned int i=0; i<its.size(); ++i) {
 		pattern *pat=new pattern(its[i]);
-		
-		// First find out if this property declaration overwrites a previous one; if so
-		// we need to remove the previous one.
-		// Pointers to properties are shared, so we need to delete them only once.
-		std::pair<property_map_t::iterator, property_map_t::iterator> pit=
-			props.equal_range(its[i]->name);
-		while(pit.first!=pit.second) {
-			 if((*pit.first).second.first->match(its[i])) { // found the pattern 'its[i]' in the property list
-				  if(typeid(*pr)==typeid(*(*pit.first).second.second)) {
-//						txtout << "found a property for " << *(its[i]->name) << std::endl;
-//						exptree::print_recursive_treeform(txtout, its[i]);
 
-						pattern  *oldpat=pit.first->second.first;
-						const property_base *oldprop=pit.first->second.second;
-						
-						props.erase(pit.first);
-						
-						// Delete only those entries in the pattern map which are related to
-						// this particular pattern _and_ this particular property
-						std::pair<pattern_map_t::iterator, pattern_map_t::iterator> patrange=
-							 pats.equal_range(oldprop);
-						while(patrange.first!=patrange.second) {
-							 if(patrange.first->first==oldprop && patrange.first->second==oldpat) {
-//								  txtout << "erasing property for " << *(oldpat->headnode) << std::endl;
-								  pats.erase(patrange.first); //oldprop);
-								  break;
-								  }
-							 ++patrange.first;
-							 }
-						delete oldpat;
-						break;
-						}
-				  }
-			 ++pit.first;
-			 }
+		// Removing properties causes more problems than it solves (the only reason
+		// for overwriting a list property is to change the SortOrder, which is 
+		// rarely useful). So we just insert the new property regardless.
+
+//		// Pointers to properties are shared, so we need to delete them only once.
+//
+//		std::pair<property_map_t::iterator, property_map_t::iterator> pit=
+//			props.equal_range(its[i]->name);
+//
+//		while(pit.first!=pit.second) {
+//			if((*pit.first).second.first->match(its[i])) { // found the pattern 'its[i]' in the property list
+//				if(typeid(*pr)==typeid(*(*pit.first).second.second)) {
+////						txtout << "found a property for " << *(its[i]->name) << std::endl;
+////						exptree::print_recursive_treeform(txtout, its[i]);
+//					
+//					pattern  *oldpat=pit.first->second.first;
+//					const property_base *oldprop=pit.first->second.second;
+//					
+////					props.erase(pit.first); THIS
+//					
+//					// Delete only those entries in the pattern map which are related to
+//					// this particular pattern _and_ this particular property
+//					std::pair<pattern_map_t::iterator, pattern_map_t::iterator> patrange=
+//						pats.equal_range(oldprop);
+//					while(patrange.first!=patrange.second) {
+//						if(patrange.first->first==oldprop && patrange.first->second==oldpat) {
+////								  txtout << "erasing property for " << *(oldpat->headnode) << std::endl;
+////							pats.erase(patrange.first); // THIS  
+//							break;
+//							}
+//						++patrange.first;
+//						}
+////					delete oldpat; THIS
+//					break;
+//					}
+//				}
+//			++pit.first;
+//			}
 		
 		// Now register the property.
 //		txtout << "registering " << *(pat->headnode) << std::endl;

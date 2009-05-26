@@ -1585,39 +1585,39 @@ Lists are ordered, although the ordering does not necessarily mean
 anything for all list properties (it is relevant for
 e.g.~\subsprop{SortOrder} but irrelevant for e.g.~\subsprop{AntiCommuting}).
 
-When you `overwrite' a list property declaration, various things can
-happen depending on the form of the list and the property used. Here
-are some examples to illustrate this. In the first example, we
-re-declare part of the objects in a previously declared set,
-\begin{screen}{1,2,3}
-{a,b,c,d,e}::Indices(vector).
-{a,b,c}::Indices(spinor).
-\end{screen}
-This makes $a,b,c$ spinor indices and keeps $d,e$ as vector indices. A
-similar example is
-\begin{screen}{1,2,3}
-{a,b,c}::Indices(vector).
-{a,b,c,d,e,f}::Indices(spinor).
-\end{screen}
-in which all six indices become spinor indices.  The next example adds
-elements to a property list,
-\begin{screen}{1,2}
-{a,b,c}::Indices(vector).
-{d,e}::Indices(vector).
-\end{screen}
-All indices are now members of a common list of vector
-indices. Finally, there are cases in which properties are declared
-with additional arguments,
-\begin{screen}{1,2}
-{a,b,c,d,e}::Indices(vector, position=free).
-{a,b,c}::Indices(vector, position=fixed).
-\end{screen}
-In this case the first line declares a set of indices with name
-`vector' with free index positions, while the second line
-re-declares this set to have fixed index positions. The result is that
-$a,b,c$ are now members of this set, while the property for $d,e$ is
-removed altogether (as it is not possible to have more than one set of
-indices with the `vector' label).
+% When you `overwrite' a list property declaration, various things can
+% happen depending on the form of the list and the property used. Here
+% are some examples to illustrate this. In the first example, we
+% re-declare part of the objects in a previously declared set,
+% \begin{screen}{1,2,3}
+% {a,b,c,d,e}::Indices(vector).
+% {a,b,c}::Indices(spinor).
+% \end{screen}
+% This makes $a,b,c$ spinor indices and keeps $d,e$ as vector indices. A
+% similar example is
+% \begin{screen}{1,2,3}
+% {a,b,c}::Indices(vector).
+% {a,b,c,d,e,f}::Indices(spinor).
+% \end{screen}
+% in which all six indices become spinor indices.  The next example adds
+% elements to a property list,
+% \begin{screen}{1,2}
+% {a,b,c}::Indices(vector).
+% {d,e}::Indices(vector).
+% \end{screen}
+% All indices are now members of a common list of vector
+% indices. Finally, there are cases in which properties are declared
+% with additional arguments,
+% \begin{screen}{1,2}
+% {a,b,c,d,e}::Indices(vector, position=free).
+% {a,b,c}::Indices(vector, position=fixed).
+% \end{screen}
+% In this case the first line declares a set of indices with name
+% `vector' with free index positions, while the second line
+% re-declares this set to have fixed index positions. The result is that
+% $a,b,c$ are now members of this set, while the property for $d,e$ is
+% removed altogether (as it is not possible to have more than one set of
+% indices with the `vector' label).
 
 
 \subsection{Indices, dummy indices and automatic index renaming}

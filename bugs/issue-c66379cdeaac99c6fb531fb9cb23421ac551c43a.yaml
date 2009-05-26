@@ -1,0 +1,21 @@
+--- !ditz.rubyforge.org,2008-03-06/issue 
+title: Unify handling of commutation signs
+desc: |-
+  There are various pieces of code which deal with commutation signs,
+  mostly in storage.cc and in the @prodrule code. Unify these to handle
+  all cases, and document them.
+type: :feature
+component: cadabra
+release: 
+reporter: Kasper Peeters <kasper.peeters@aei.mpg.de>
+status: :unstarted
+disposition: 
+creation_time: 2009-05-26 18:00:01.714835 Z
+references: []
+
+id: c66379cdeaac99c6fb531fb9cb23421ac551c43a
+log_events: 
+- - 2009-05-26 18:00:02.781437 Z
+  - Kasper Peeters <kasper.peeters@aei.mpg.de>
+  - created
+  - ""
