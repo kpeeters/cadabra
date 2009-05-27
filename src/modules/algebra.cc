@@ -298,7 +298,7 @@ unsigned int PartialDerivative::size(exptree& tr, exptree::iterator it) const
 
 multiplier_t Derivative::value(exptree::iterator it, const std::string& forcedlabel) const
 	{
-	txtout << "!?!?" << std::endl;
+//	txtout << "!?!?" << std::endl;
 	multiplier_t ret=0;
 
 	exptree::sibling_iterator sib=it.begin();
@@ -308,7 +308,7 @@ multiplier_t Derivative::value(exptree::iterator it, const std::string& forcedla
 			multiplier_t tmp=gnb->value(sib, forcedlabel);
 			if(sib->is_index()) ret-=tmp;
 			else                ret+=tmp;
-			txtout << *sib->name << " = " << tmp << std::endl;
+//			txtout << *sib->name << " = " << tmp << std::endl;
 			}
 		++sib;
 		}
@@ -827,29 +827,31 @@ algorithm::result_t prodrule::apply(iterator& it)
 						  // Determine the sign obtained by moving the derivative index through the
 						  // object on which it has just acted. First, handle indices moving through
 						  // objects with indices, e..g D_{a}{\theta^{b} \theta^{c}}.
-						  exptree::index_iterator ii=tr.begin_index(repch);
-						  while(ii!=tr.end_index(repch)) {
+//						  exptree::index_iterator ii=tr.begin_index(repch);
+//						  while(ii!=tr.end_index(repch)) {
 //							  txtout << "trying to move " << *der_wrt->name << " through " << *ii->name << std::endl;
-							  int stc=subtree_compare(ii, der_wrt);
-							  int ret=exptree_ordering::can_swap(ii, der_wrt, stc);
-							  if(ret==0) 
-								  return l_no_action;
+//							  int stc=subtree_compare(ii, der_wrt);
+//							  int ret=exptree_ordering::can_swap(ii, der_wrt, stc);
+//							  if(ret==0) 
+//								  return l_no_action;
 //							  txtout << ret << std::endl;
-							  sign*=ret;
-							  ++ii;
-							  }
+//							  sign*=ret;
+//							  ++ii;
+//							  }
 //						  txtout << "--" << std::endl;
+
+					  HERE: the above should be in can_swap generically ! Or not? A^\alpha B^\beta ? Yes!
 
 						  // Then handle explicitly declared anti-commutativity, e.g.
 						  // D_{a}{
 						  int stc=subtree_compare(der_wrt, repch);
-//						  txtout << "trying to move " << *der_wrt->name << " through " << *repch->name 
-//									<< " " << stc << std::endl;
+						  txtout << "trying to move " << *der_wrt->name << " through " << *repch->name 
+									<< " " << stc << std::endl;
 						  int ret=exptree_ordering::can_swap(der_wrt, repch, stc);
 						  if(ret==0)
 							  return l_no_action;
 						  sign*=ret;
-//						  txtout << ret << std::endl;
+						  txtout << ret << std::endl;
 						  }
 					  }
 				  }

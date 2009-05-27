@@ -250,7 +250,6 @@ obj19c:= D^{\alpha}{ D_{\alpha}{T^{\beta} S^{\gamma}}};
 @distribute!(%);
 @prodrule!(%);
 @sumflatten!(%);
-@collect_terms!(%);
 tst19c:= D^{\alpha}{D_{\alpha}{T^{\beta}}} * S^{\gamma} 
        + D_{\alpha}{T^{\beta}} * D^{\alpha}{S^{\gamma}} 
        - D^{\alpha}{T^{\beta}} * D_{\alpha}{S^{\gamma}}

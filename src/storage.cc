@@ -1569,11 +1569,11 @@ int exptree_ordering::can_swap_prod_obj(exptree::iterator prod, exptree::iterato
 	int sign=1;
 	exptree::sibling_iterator sib=prod.begin();
 	while(sib!=prod.end()) {
-		if(sib->fl.parent_rel!=str_node::p_sub && sib->fl.parent_rel!=str_node::p_super) {
+		//	if(sib->fl.parent_rel!=str_node::p_sub && sib->fl.parent_rel!=str_node::p_super) {
 			int es=subtree_compare(sib, obj);
 			sign*=can_swap(sib, obj, es);
 			if(sign==0) break;
-			}
+//			}
 		++sib;
 		}
 	return sign;
@@ -1620,10 +1620,10 @@ int exptree_ordering::can_swap_prod_sum(exptree::iterator prod, exptree::iterato
 	int sign=1;
 	exptree::sibling_iterator sib=prod.begin();
 	while(sib!=prod.end()) {
-		if(sib->fl.parent_rel!=str_node::p_sub && sib->fl.parent_rel!=str_node::p_super) {
+//		if(sib->fl.parent_rel!=str_node::p_sub && sib->fl.parent_rel!=str_node::p_super) {
 			sign*=can_swap_sum_obj(sum, sib);
 			if(sign==0) break;
-			}
+//			}
 		++sib;
 		}
 	return sign;

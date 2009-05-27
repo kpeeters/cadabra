@@ -60,7 +60,7 @@ D{#}::Derivative.
 {A,B,C,D}::AntiCommuting.
 obj6:= D(B C D) A;
 @prodsort!(%);
-tst6:= - A D(B C D) - @(obj5);
+tst6:= - A D(B C D) - @(obj6);
 @collect_terms!(%);
 @assert(tst6);
 
