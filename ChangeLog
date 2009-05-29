@@ -1,3 +1,11 @@
+2009-05-29  Kasper Peeters  <kasper.peeters@aei.mpg.de>
+
+	* Fixed lookup of list properties so that multiple list properties
+	involving the same symbol all get scanned (in progress).
+
+	* Centralised handling of commutativity properties to make them
+	more robust and uniform. 
+
 2009-05-26  Kasper Peeters  <kasper.peeters@aei.mpg.de>
 
 	* Removed auto-deletion of list properties because this messes up

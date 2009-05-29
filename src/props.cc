@@ -416,6 +416,23 @@ void properties::insert_list_prop(const std::vector<exptree::iterator>& its, con
 	}
 
 
+int properties::serial_number(const property_base *listprop, const pattern *pat)
+	{
+	int serialnum=0;
+
+	std::pair<pattern_map_t::iterator, pattern_map_t::iterator> 
+		pm=pats.equal_range(listprop);
+	serialnum=0;
+	while(pm.first!=pm.second) { 
+		if((*pm.first).second==pat)
+			break;
+		++serialnum;
+		++pm.first;
+		}
+	return serialnum;
+	}
+
+
 /*
 
   {a,b,c,d,e}::Indices(vector).

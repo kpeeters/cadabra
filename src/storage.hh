@@ -365,13 +365,14 @@ class exptree_is_less {
 class exptree_ordering {
 	public:
 		static bool should_swap(exptree::iterator obj, int subtree_comparison) ;
-		static int  can_swap_prod_obj(exptree::iterator prod, exptree::iterator obj) ;
-		static int  can_swap_prod_prod(exptree::iterator prod1, exptree::iterator prod2) ;
-		static int  can_swap_sum_obj(exptree::iterator sum, exptree::iterator obj) ;
-		static int  can_swap_prod_sum(exptree::iterator prod, exptree::iterator sum) ;
-		static int  can_swap_sum_sum(exptree::iterator sum1, exptree::iterator sum2) ;
+		static int  can_swap_prod_obj(exptree::iterator prod, exptree::iterator obj, bool) ;
+		static int  can_swap_prod_prod(exptree::iterator prod1, exptree::iterator prod2, bool) ;
+		static int  can_swap_sum_obj(exptree::iterator sum, exptree::iterator obj, bool) ;
+		static int  can_swap_prod_sum(exptree::iterator prod, exptree::iterator sum, bool) ;
+		static int  can_swap_sum_sum(exptree::iterator sum1, exptree::iterator sum2, bool) ;
 		static int  can_swap_ilist_ilist(exptree::iterator obj1, exptree::iterator obj2);
-		static int  can_swap(exptree::iterator one, exptree::iterator two, int subtree_comparison) ;
+		static int  can_swap(exptree::iterator one, exptree::iterator two, int subtree_comparison,
+									bool ignore_implicit_indices=false);
 		static int  can_move_adjacent(exptree::iterator prod, 
 												exptree::sibling_iterator one, exptree::sibling_iterator two) ;
 };

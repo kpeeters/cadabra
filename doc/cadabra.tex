@@ -1070,38 +1070,29 @@ section in this manual).
 
 \subsection{Cell types}
 
-There are two input cell types and two output cell types. Normal input
-cells contain \cdb input. \TeX{} input cells contain comments which
-you can add to the notebook but which will not be sent to \cdb. Output
-cells can be either verbatim output, such as status messages, or
-\TeX{} output of expressions. Output cells are associated to input
-cells, so if you delete an input cell all the associated output cells
-will be removed too. 
+There are \emph{two} input cell types and \emph{two} output cell
+types. Normal input cells contain \cdb input. \TeX{} input cells
+contain comments which you can add to the notebook but which will not
+be sent to \cdb. Output cells can be either verbatim output, such as
+status messages, or \TeX{} output of expressions. Output cells are
+associated to input cells, so if you delete an input cell all the
+associated output cells will be removed too.
 
-In the current version there is no visual separation between cells
-(there is only a single horizontal line at the very end of the
-notebook). When you start a new blank notebook, your cursor is in the
-first input cell. After entering an expression there and pressing
-{\tt shift-enter}, this input cell will be evaluated and all output
-will be placed below it in the first output cell. In addition, a new
-input cell will be created below the output cell.
+In the current version there is no visual separation between
+cells. When you start a new blank notebook, your cursor is in the
+first input cell. After entering an expression there and pressing {\tt
+  shift-enter}, this input cell will be evaluated and all output will
+be placed below it in the first output cell. In addition, a new input
+cell will be created below the output cell.
 
 The ``edit'' menu can be used to add input cells or delete them, and
 also shows keyboard shortcuts.
 
-\subsection{Editing, loading, saving}
+\subsection{Editing, loading, saving, printing, exporting}
 
 % Use some screenshots to illustrate this.
 The file format used by the front-end is a \LaTeX{} compatible
 file. If necessary, it can be edited by hand using a text editor.
-
-\subsection{Evaluating cells}
-
-In order to evaluate cells, press {\tt shift-enter} in an input
-cell. This will send the input to the kernel and display any results
-or informal messages below the input cell. 
-
-\subsection{Printing and exporting}
 
 As the file format which the front-end uses to save notebooks is a
 \LaTeX{} compatible file, it is simple to print a notebook: simply
@@ -1117,6 +1108,18 @@ by using
 \begin{screen}{1}
 cadabra --input [filename]
 \end{screen}
+
+The default extension for cadabra notebooks is {\tt
+  .cnb}. \index{.cnb} For cadabra input files (for the command line
+version of \cdb) it is {\tt .cdb}.\index{.cdb}
+
+\subsection{Evaluating cells}
+
+In order to evaluate cells, press {\tt shift-enter} in an input
+cell. This will send the input to the kernel and display any results
+or informal messages below the input cell. 
+
+
 
 \subsection{Algorithm and property auto-completion}
 
@@ -1210,41 +1213,6 @@ In order to make PDF output work, you have to have {\tt
 
 \vfill\eject
 \section{Reference guide}
-
-\subsection{Startup and program options}
-
-If present, a startup file {\tt \verb|~/.cadabra|}
-\index{.cadabra}\index{startup file} will be read when the program is
-started (only when running cadabra in command-line mode). This file
-can contain any \cdb input.
-\begin{description}
-\item[{\tt -{}-{}bare}] Disable reading of the startup file
-  \verb|~/.cadabra|.
-\item[{\tt -{}-{}silent}] Disable normal output (so that the only
-  remaining output is through output redirection into files).
-\item[{\tt -{}-{}input [filename]}] Before switching to interactive mode, first
-  read and process the indicated file.
-\item[{\tt -{}-{}prompt [string]}] Set the \cdb prompt to the given
-  string.
-\item[{\tt -{}-{}silentfail}] Silently fail (i.e. do not complain) if
-  an algorithm is activated which cannot be applied.
-\item[{\tt -{}-{}loginput}] Write the input into the debug file as
-  well.
-\item[{\tt -{}-{}nowarnings}] Suppress displaying of any warnings
-  which are not fatal errors.
-\item[{\tt -{}-{}texmacs}] Send output in TeXmacs format.
-\end{description}
-In order to have command-line editing functionality, the {\tt prompt}
-program is provided. So the two ways of starting \cdb are
-\begin{screen}{0}
-cadabra
-prompt cadabra
-\end{screen}
-the second of which gives cursor control and an editing history. There
-are various other settings of \cdb which can be influenced through
-environment variables; see section~\ref{s:environment_variables} for
-details.
-
 
 \subsection{Basics about the input format}
 
@@ -1795,7 +1763,8 @@ a = M b d c;
 % one even though they both carry implicit indices (e.g.~to indicate
 % that two matrices are commuting). 
 % 
-\subsection{Indexbrackets}
+
+\subsection{Index brackets}
 
 Indices can be associated to tensors, as in~$T_{\mu\nu}$, but it often
 also happens that we want to associate indices to a sum or product of
@@ -1903,6 +1872,12 @@ T^{b a} \partial_{a b}( C_{m n} D_{n m} );
 @canonicalise!(%);
 T^{a b} \partial_{a b}( C_{m n} D_{m n} );
 \end{screen}
+
+\subsection{Anti-commuting objects}
+
+
+
+
 
 \subsection{Accents}
 \label{s:accents}
@@ -2402,6 +2377,42 @@ these reserved nodes can not be changed.
 \input{reserved/sum.tex}
 \input{reserved/unequals.tex}
 \end{reserved}
+
+
+\subsection{Startup and program options}
+
+There are a few startup options for the command line version of \cdb.
+If present, a startup file {\tt \verb|~/.cadabra|}
+\index{.cadabra}\index{startup file} will be read when the program is
+started (only when running cadabra in command-line mode). This file
+can contain any \cdb input.
+\begin{description}
+\item[{\tt -{}-{}bare}] Disable reading of the startup file
+  \verb|~/.cadabra|.
+\item[{\tt -{}-{}silent}] Disable normal output (so that the only
+  remaining output is through output redirection into files).
+\item[{\tt -{}-{}input [filename]}] Before switching to interactive mode, first
+  read and process the indicated file.
+\item[{\tt -{}-{}prompt [string]}] Set the \cdb prompt to the given
+  string.
+\item[{\tt -{}-{}silentfail}] Silently fail (i.e. do not complain) if
+  an algorithm is activated which cannot be applied.
+\item[{\tt -{}-{}loginput}] Write the input into the debug file as
+  well.
+\item[{\tt -{}-{}nowarnings}] Suppress displaying of any warnings
+  which are not fatal errors.
+\item[{\tt -{}-{}texmacs}] Send output in TeXmacs format.
+\end{description}
+In order to have command-line editing functionality, the {\tt prompt}
+program is provided. So the two ways of starting \cdb are
+\begin{screen}{0}
+cadabra
+prompt cadabra
+\end{screen}
+the second of which gives cursor control and an editing history. There
+are various other settings of \cdb which can be influenced through
+environment variables; see section~\ref{s:environment_variables} for
+details.
 
 
 \subsection{Environment variables}

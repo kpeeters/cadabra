@@ -10,7 +10,6 @@
 { \lambda, \epsilon }::Spinor(dimension=4, type=Majorana).
 { \epsilon, \lambda }::SortOrder.
 { \epsilon, \lambda }::AntiCommuting.
-\lambda::SelfAntiCommuting.
 \gamma_{#}::GammaMatrix(metric=\delta).
 \delta{#}::Accent.
 f_{a b}::AntiSymmetric.

@@ -820,7 +820,6 @@ algorithm::result_t prodrule::apply(iterator& it)
 					  theDargs=tr.erase(theDargs);
 				  else ++theDargs;
 				  }
-			  tr.print_recursive_treeform(txtout, emptyD.begin());
 			  
 //			  // Now determine how 'emptyD' commutes with its argument.
 //			  if(theD.begin()->is_index()) {
@@ -840,13 +839,13 @@ algorithm::result_t prodrule::apply(iterator& it)
 //					  HERE: 
 
 			  int stc=subtree_compare(emptyD.begin(), repch);
-			  txtout << "trying to move " << *emptyD.begin()->name << " through " << *repch->name 
-						<< " " << stc << std::endl;
+//			  txtout << "trying to move " << *emptyD.begin()->name << " through " << *repch->name 
+//						<< " " << stc << std::endl;
 			  int ret=exptree_ordering::can_swap(emptyD.begin(), repch, stc);
 			  if(ret==0)
 				  return l_no_action;
 			  sign*=ret;
-			  txtout << ret << std::endl;
+//			  txtout << ret << std::endl;
 			  
 			  // Avoid \partial_{a}{\partial_{b} ...} constructions in 
 			  // case this child is a \partial-like too.
@@ -1456,8 +1455,6 @@ algorithm::result_t spinorsort::apply(iterator& it)
 	int num1, num2;
 	const SortOrder     *so1=properties::get_composite<SortOrder>(one,num1);
 	const SortOrder     *so2=properties::get_composite<SortOrder>(two,num2);
-	const AntiCommuting *ac1=properties::get_composite<AntiCommuting>(one);
-	const AntiCommuting *ac2=properties::get_composite<AntiCommuting>(two);
 	
 	if(so1!=0 && so1==so2) {
 		if(num1>num2) {
@@ -1467,9 +1464,13 @@ algorithm::result_t spinorsort::apply(iterator& it)
 			int sign=1;
 			if(((numind*(numind+1))/2)%2 == 0)
 				sign*=-1;
-			if(ac1!=0 && ac1==ac2)
-				sign*=-1;
 
+			// Are we dealing with commuting or anti-commuting spinors?
+			int cmp=subtree_compare(one, two);
+			int ordersign=exptree_ordering::can_swap(one, two, cmp, true /* ignore implicit indices */);
+			sign*=ordersign;
+
+			// Now flip the symbols and the sign, if necessary.
 			sibling_iterator tru1=tr.begin(one);
 			tr.swap(tru1, two);
 			if(sign==-1) {

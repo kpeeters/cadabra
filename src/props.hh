@@ -170,9 +170,14 @@ class properties {
 		// Ditto for labelled properties
 		template<class T> static const T*  get_composite(exptree::iterator, const std::string& label);
 		template<class T> static const T*  get_composite(exptree::iterator, int& serialnum, const std::string& label, bool doserial=true);
+		// For list properties: given two patterns, get a common property.
+		template<class T> static const T*  get_composite(exptree::iterator, exptree::iterator);
+		template<class T> static const T*  get_composite(exptree::iterator, exptree::iterator, int&, int&);
 
 		// Search through pointers
 		static bool has(const property_base *, exptree::iterator);
+		// Find serial number of a pattern in a given list property
+		static int  serial_number(const property_base *, const pattern *);
 
 		// Inverse search: given a property type, get a pattern which has this property.
 		// When given an iterator, it starts to search in the property
@@ -344,17 +349,8 @@ const T* properties::get_composite(exptree::iterator it, int& serialnum, const s
 						if(ret->label!=label && ret->label!="all") 
 							ret=0;
 						else {
-							if(doserial) {
-								std::pair<pattern_map_t::iterator, pattern_map_t::iterator> 
-									pm=pats.equal_range((*walk).second.second);
-								serialnum=0;
-								while(pm.first!=pm.second) { 
-									if((*pm.first).second==(*walk).second.first)
-										break;
-									++serialnum;
-									++pm.first;
-									}
-								}
+							if(doserial) 
+								serialnum=serial_number( (*walk).second.second, (*walk).second.first );
 							break;
 							}
 						}
@@ -383,6 +379,83 @@ const T* properties::get_composite(exptree::iterator it, int& serialnum, const s
 			}
 		}
 	return ret;
+	}
+
+template<class T>
+const T* properties::get_composite(exptree::iterator it1, exptree::iterator it2)
+	{
+	int tmp1, tmp2;
+	return get_composite<T>(it1,it2,tmp1,tmp2);
+	}
+
+template<class T>
+const T* properties::get_composite(exptree::iterator it1, exptree::iterator it2, int& serialnum1, int& serialnum2)
+	{
+	const T* ret1=0;
+	const T* ret2=0;
+	bool found=false;
+
+	bool inherits1=false, inherits2=false;
+	std::pair<property_map_t::iterator, property_map_t::iterator> pit1=props.equal_range(it1->name);
+	std::pair<property_map_t::iterator, property_map_t::iterator> pit2=props.equal_range(it2->name);
+
+	property_map_t::iterator walk1=pit1.first;
+	while(walk1!=pit1.second) {
+		if((*walk1).second.first->match(it1)) { // match for object 1 found
+			ret1=dynamic_cast<const T *>((*walk1).second.second);
+			if(ret1) { // property of the right type found for object 1
+				property_map_t::iterator walk2=pit2.first;
+				while(walk2!=pit2.second) {
+					if((*walk2).second.first->match(it2)) { // match for object 1 found
+						ret2=dynamic_cast<const T *>((*walk2).second.second);
+						if(ret2) { // property of the right type found for object 2
+							if(ret1==ret2) { 
+								serialnum1=serial_number( (*walk1).second.second, (*walk1).second.first );
+								serialnum2=serial_number( (*walk2).second.second, (*walk2).second.first );
+								found=true;
+								goto done;
+								}
+							}
+						}
+					if(dynamic_cast<const PropertyInherit *>((*walk2).second.second))
+						inherits2=true;
+					++walk2;
+					}
+				}
+			if(dynamic_cast<const PropertyInherit *>((*walk1).second.second))
+				inherits1=true;
+			}
+		++walk1;
+		}
+		
+	// If no property was found, figure out whether a property is inherited from a child node.
+	if(!found && (inherits1 || inherits2)) {
+		exptree::sibling_iterator sib1, sib2;
+		if(inherits1) sib1=it1.begin();
+		else          sib1=it1;
+		bool keepgoing1=true;
+		do {    // 1
+			bool keepgoing2=true;
+			if(inherits2) sib2=it2.begin();
+			else          sib2=it2;
+			do { // 2
+				const T* tmp=get_composite<T>((exptree::iterator)(sib1), (exptree::iterator)(sib2), serialnum1, serialnum2);
+				if(tmp) {
+					ret1=tmp;
+					found=true;
+					goto done;
+					}
+				if(!inherits2 || ++sib2==it2.end())
+					keepgoing2=false;
+				} while(keepgoing2);
+			if(!inherits1 || ++sib1==it1.end())
+				keepgoing1=false;
+			} while(keepgoing1);
+		}
+
+	done:
+	if(!found) ret1=0;
+	return ret1;
 	}
 
 template<class T>
