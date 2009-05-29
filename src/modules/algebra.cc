@@ -683,8 +683,8 @@ bool prodrule::can_apply(iterator it)
 
 algorithm::result_t prodrule::apply(iterator& it)
 	{
-	exptree rep;
-	iterator sm; // the sum node
+	exptree rep; // the subtree storing the result
+	iterator sm; // the sum node inside 'rep'
 
 	// If we are distributing a multiple derivative, take out all indices except one,
 	// and wrap things in a new derivative node which has these indices as child nodes.
@@ -714,7 +714,7 @@ algorithm::result_t prodrule::apply(iterator& it)
 		if(tr.begin(it)->is_index()==false)
 			indices_at_front=false;
 		}
-//	tr.print_recursive_treeform(txtout, rep.begin());
+
 
 	// Two cases to handle now: D(A**n) -> n D(A**(n-1)) and
 	//                          D(A*B)  -> D(A)*B + A*D(B) 
@@ -777,7 +777,7 @@ algorithm::result_t prodrule::apply(iterator& it)
 		 // a number of cases:
 		 //
 		 //    D_{a}{\theta^{b}}                    with \theta^{a} Coordinate & SelfAntiCommuting
-       //    D_{\theta^{a}}{\theta^{b}}           ditto
+       //    D_{\theta^{a}}{\theta^{b}}           not yet handled !!
 		 //    D_{a}{D_{b}{G}}                      handled by making indices AntiCommuting.
 		 //    D_{a}{D_{\dot{b}}{G}}                handled by making indices AntiCommuting.
 		 //    D_{a}{T^{a b}}                       handled by making indices AntiCommuting.
@@ -796,13 +796,13 @@ algorithm::result_t prodrule::apply(iterator& it)
 			  wrap+=num;    
 			  // Replace this num'th factor with the original expression.
 			  // We will then remove all that has to be removed.
-			  iterator theD=rep.insert_subtree(wrap, it);
+			  iterator theD=rep.insert_subtree(wrap, it);  // iterator to the Derivative node
 			  theD->fl.bracket=wrap->fl.bracket;
 			  // Go to the 'prod' child of the \diff.
 			  sibling_iterator repch=tr.begin(theD);
 			  while(*repch->name!="\\prod")
 					++repch;
-			  // Replace this child with 'just' the factor to be replaced, i.e.
+			  // Replace this 'prod' child with 'just' the factor to be replaced, i.e.
 			  // remove all the other factors which have been taken out of the derivative.
 			  wrap->fl.bracket=prodnode->fl.bracket;
 			  repch=tr.replace(repch,wrap);
@@ -811,51 +811,42 @@ algorithm::result_t prodrule::apply(iterator& it)
 
 			  // Handle signs for anti-commuting derivatives.
 			  multiply(dummy->multiplier, sign);
-			  // Update sign.
-			  if(theD.begin()->is_index()) {
-				  iterator der_wrt=theD.begin();
-
-				  int ret=subtree_compare(der_wrt, repch, 0, true, -2, false);
-				  if(abs(ret)<=1) {
-					  const SelfAntiCommuting *sac=properties::get_composite<SelfAntiCommuting>(repch);
-					  if(sac)
-						  sign*=-1;
-					  }
-				  else {
-					  const Indices *ind=properties::get_composite<Indices>(der_wrt);
-					  if(ind) {
-						  // Determine the sign obtained by moving the derivative index through the
-						  // object on which it has just acted. First, handle indices moving through
-						  // objects with indices, e..g D_{a}{\theta^{b} \theta^{c}}.
-//						  exptree::index_iterator ii=tr.begin_index(repch);
-//						  while(ii!=tr.end_index(repch)) {
-//							  txtout << "trying to move " << *der_wrt->name << " through " << *ii->name << std::endl;
-//							  int stc=subtree_compare(ii, der_wrt);
-//							  int ret=exptree_ordering::can_swap(ii, der_wrt, stc);
-//							  if(ret==0) 
-//								  return l_no_action;
-//							  txtout << ret << std::endl;
-//							  sign*=ret;
-//							  ++ii;
-//							  }
-//						  txtout << "--" << std::endl;
-
-					  HERE: the above should be in can_swap generically ! Or not? A^\alpha B^\beta ? Yes!
-
-						  // Then handle explicitly declared anti-commutativity, e.g.
-						  // D_{a}{
-						  int stc=subtree_compare(der_wrt, repch);
-						  txtout << "trying to move " << *der_wrt->name << " through " << *repch->name 
-									<< " " << stc << std::endl;
-						  int ret=exptree_ordering::can_swap(der_wrt, repch, stc);
-						  if(ret==0)
-							  return l_no_action;
-						  sign*=ret;
-						  txtout << ret << std::endl;
-						  }
-					  }
+			  // Update the sign. First create an exptree containing the derivative _without_
+			  // the object on which it acts.
+			  exptree emptyD(theD);
+			  sibling_iterator theDargs=emptyD.begin(emptyD.begin());
+			  while(theDargs!=emptyD.end(emptyD.begin())) {
+				  if(theDargs->is_index()==false) 
+					  theDargs=tr.erase(theDargs);
+				  else ++theDargs;
 				  }
+			  tr.print_recursive_treeform(txtout, emptyD.begin());
 			  
+//			  // Now determine how 'emptyD' commutes with its argument.
+//			  if(theD.begin()->is_index()) {
+//				  iterator der_wrt=theD.begin();
+//
+//				  int ret=subtree_compare(der_wrt, repch, 0, true, -2, false);
+//				  if(abs(ret)<=1) {
+//					  const SelfAntiCommuting *sac=properties::get_composite<SelfAntiCommuting>(repch);
+//					  if(sac)
+//						  sign*=-1;
+//					  }
+//				  else {
+//					  const Indices *ind=properties::get_composite<Indices>(der_wrt);
+//					  if(ind) {
+//						  // All commutation rules are now handled centrally.
+
+//					  HERE: 
+
+			  int stc=subtree_compare(emptyD.begin(), repch);
+			  txtout << "trying to move " << *emptyD.begin()->name << " through " << *repch->name 
+						<< " " << stc << std::endl;
+			  int ret=exptree_ordering::can_swap(emptyD.begin(), repch, stc);
+			  if(ret==0)
+				  return l_no_action;
+			  sign*=ret;
+			  txtout << ret << std::endl;
 			  
 			  // Avoid \partial_{a}{\partial_{b} ...} constructions in 
 			  // case this child is a \partial-like too.

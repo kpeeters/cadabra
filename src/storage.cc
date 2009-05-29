@@ -1564,16 +1564,17 @@ bool exptree_ordering::should_swap(exptree::iterator obj, int subtree_comparison
 //
 int exptree_ordering::can_swap_prod_obj(exptree::iterator prod, exptree::iterator obj) 
 	{
-//	txtout << "prod obj" << std::endl;
+	std::cout << "prod_obj " << *prod->name << " " << *obj->name << std::endl;
 	// Warning: no check is made that prod is actually a product!
 	int sign=1;
 	exptree::sibling_iterator sib=prod.begin();
 	while(sib!=prod.end()) {
-		//	if(sib->fl.parent_rel!=str_node::p_sub && sib->fl.parent_rel!=str_node::p_super) {
+		const Indices *ind=properties::get_composite<Indices>(sib);
+		if(ind==0) {
 			int es=subtree_compare(sib, obj);
 			sign*=can_swap(sib, obj, es);
 			if(sign==0) break;
-//			}
+			}
 		++sib;
 		}
 	return sign;
@@ -1581,23 +1582,24 @@ int exptree_ordering::can_swap_prod_obj(exptree::iterator prod, exptree::iterato
 
 int exptree_ordering::can_swap_prod_prod(exptree::iterator prod1, exptree::iterator prod2)  
 	{
-//	txtout << "prod prod" << std::endl;
+	std::cout << "prod_prod " << *prod1->name << " " << *prod2->name;
 	// Warning: no check is made that prod1,2 are actually products!
 	int sign=1;
 	exptree::sibling_iterator sib=prod2.begin();
 	while(sib!=prod2.end()) {
-//		if(sib->fl.parent_rel!=str_node::p_sub && sib->fl.parent_rel!=str_node::p_super) {
+		const Indices *ind=properties::get_composite<Indices>(sib);
+		if(ind==0) {
 			sign*=can_swap_prod_obj(prod1, sib);
 			if(sign==0) break;
-//			}
+			}
 		++sib;
 		}
+	std::cout << "  -> " << sign << std::endl;
 	return sign;
 	}
 
 int exptree_ordering::can_swap_sum_obj(exptree::iterator sum, exptree::iterator obj) 
 	{
-//	txtout << "sum obj" << std::endl;
 	// Warning: no check is made that sum is actually a sum!
 	int sofar=2;
 	exptree::sibling_iterator sib=sum.begin();
@@ -1620,10 +1622,11 @@ int exptree_ordering::can_swap_prod_sum(exptree::iterator prod, exptree::iterato
 	int sign=1;
 	exptree::sibling_iterator sib=prod.begin();
 	while(sib!=prod.end()) {
-//		if(sib->fl.parent_rel!=str_node::p_sub && sib->fl.parent_rel!=str_node::p_super) {
+		const Indices *ind=properties::get_composite<Indices>(sib);
+		if(ind==0) {
 			sign*=can_swap_sum_obj(sum, sib);
 			if(sign==0) break;
-//			}
+			}
 		++sib;
 		}
 	return sign;
@@ -1645,6 +1648,36 @@ int exptree_ordering::can_swap_sum_sum(exptree::iterator sum1, exptree::iterator
 	return sofar;
 	}
 
+int exptree_ordering::can_swap_ilist_ilist(exptree::iterator obj1, exptree::iterator obj2) 
+	{
+	int sign=1;
+	std::cout << "ilist " << *obj1->name << " " << *obj2->name;
+	
+	exptree::index_iterator it1=exptree::begin_index(obj1);
+	while(it1!=exptree::end_index(obj1)) {
+		exptree::index_iterator it2=exptree::begin_index(obj2);
+		while(it2!=exptree::end_index(obj2)) {
+			// Only deal with real indices here, i.e. those carrying an Indices property.
+			const Indices *ind1=properties::get_composite<Indices>(it1);
+			const Indices *ind2=properties::get_composite<Indices>(it1);
+			if(ind1!=0 && ind2!=0) {
+				const CommutingBehaviour *com1 =properties::get_composite<CommutingBehaviour>(it1);
+				const CommutingBehaviour *com2 =properties::get_composite<CommutingBehaviour>(it2);
+				
+				if(com1!=0  &&  com1 == com2) 
+					sign *= com1->sign();
+				
+				if(sign==0) break;
+				}
+			++it2;
+			}
+		if(sign==0) break;
+		++it1;
+		}
+
+	std::cout << "  -> " << sign << std::endl;
+	return sign;
+	}
 
 // Can obj and obj+1 be exchanged? If yes, return the sign,
 // if no return zero. This is the general entry point for 
@@ -1653,6 +1686,8 @@ int exptree_ordering::can_swap_sum_sum(exptree::iterator sum1, exptree::iterator
 //
 int exptree_ordering::can_swap(exptree::iterator one, exptree::iterator two, int subtree_comparison) 
 	{
+	std::cout << "can_swap " << *one->name << " " << *two->name << std::endl;
+
 	// Two implicit-index objects cannot move through each other if they have the
 	// same type of implicit index.
 	const ImplicitIndex *ii1 = properties::get_composite<ImplicitIndex>(one);
@@ -1666,60 +1701,39 @@ int exptree_ordering::can_swap(exptree::iterator one, exptree::iterator two, int
 		}
 	
 	// Do we need to use Self* properties?
-	if(abs(subtree_comparison)<=1) { 
-		const SelfCommutingBehaviour *sc =properties::get_composite<SelfCommutingBehaviour>(one);
-		if(sc)
-			return sc->sign();
-		
-		// If the trees are the same but there is no property, it maybe that we have
-		// to deduce the behaviour by treating the objects as products or sums.
-		const CommutingAsProduct *cap = properties::get_composite<CommutingAsProduct>(one);
-		const CommutingAsSum     *sum = properties::get_composite<CommutingAsSum>(one);
-		if(cap) {
-//			return can_swap_prod_prod(one, two);
-//			txtout << "two products" << std::endl;
-			return 0;
-			}
-		else if(sum) {
-//			txtout << "two sums" << std::endl;
-			return 0;
-			}
-//		else return 1; // default: commuting
-		}
-	else {
-		// It is still possible that the two objects have different numbers of indices,
-		// yet match the same pattern in a SelfCommuting etal property. In this case,
-		// the property should be matched by both 'one' and 'two';
-		const SelfCommutingBehaviour *sc1 =properties::get_composite<SelfCommutingBehaviour>(one);
-		const SelfCommutingBehaviour *sc2 =properties::get_composite<SelfCommutingBehaviour>(two);
-		if( (sc1!=0 && sc1==sc2) ) { 
-			return sc1->sign();
-			}
-		}
-	
-	// Really different objects. Try to find them in a list first.
+	const SelfCommutingBehaviour *sc1 =properties::get_composite<SelfCommutingBehaviour>(one);
+	const SelfCommutingBehaviour *sc2 =properties::get_composite<SelfCommutingBehaviour>(two);
+	if( (sc1!=0 && sc1==sc2) ) 
+		return sc1->sign();
+
+	// Is there an explicit declaration for the commutativity of these two symbols?
 	const CommutingBehaviour *com1 =properties::get_composite<CommutingBehaviour>(one);
 	const CommutingBehaviour *com2 =properties::get_composite<CommutingBehaviour>(two);
 	
-//	std::cout << "here?!" << std::endl;
 	if(com1!=0  &&  com1== com2) return com1->sign();
 	
-	// One or both of the objects are not in an explicit list. Check for
-	// product-like and sum-like behaviour.
-//	std::cout << "here?" << std::endl;
+	// One or both of the objects are not in an explicit list. So now comes the generic
+	// part. The first step is to look at all indices of the two objects and determine 
+	// their commutativity. 
+
+	int tmpsign=can_swap_ilist_ilist(one, two);
+	if(tmpsign==0) return 0;
+	
+	// The second step is to check for product-like and sum-like behaviour.
+
 	const CommutingAsProduct *comap1 = properties::get_composite<CommutingAsProduct>(one);
 	const CommutingAsProduct *comap2 = properties::get_composite<CommutingAsProduct>(two);
 	const CommutingAsSum     *comas1 = properties::get_composite<CommutingAsSum>(one);
 	const CommutingAsSum     *comas2 = properties::get_composite<CommutingAsSum>(two);
 	
-	if(comap1 && comap2) return can_swap_prod_prod(one,two);
-	if(comap1 && comas2) return can_swap_prod_sum(one,two);
-	if(comap2 && comas1) return can_swap_prod_sum(two,one);
-	if(comas1 && comas2) return can_swap_sum_sum(one,two);
-	if(comap1)           return can_swap_prod_obj(one,two);
-	if(comap2)           return can_swap_prod_obj(two,one);
-	if(comas1)           return can_swap_sum_obj(one,two);
-	if(comas2)           return can_swap_sum_obj(two,one);
+	if(comap1 && comap2) return tmpsign*can_swap_prod_prod(one,two);
+	if(comap1 && comas2) return tmpsign*can_swap_prod_sum(one,two);
+	if(comap2 && comas1) return tmpsign*can_swap_prod_sum(two,one);
+	if(comas1 && comas2) return tmpsign*can_swap_sum_sum(one,two);
+	if(comap1)           return tmpsign*can_swap_prod_obj(one,two);
+	if(comap2)           return tmpsign*can_swap_prod_obj(two,one);
+	if(comas1)           return tmpsign*can_swap_sum_obj(one,two);
+	if(comas2)           return tmpsign*can_swap_sum_obj(two,one);
 	
 	return 1; // default: commuting.
 	}
