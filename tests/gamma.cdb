@@ -310,5 +310,6 @@ tst2:= \Gamma_{\mu I J K} + \Gamma_{J K} * \delta_{I \mu} - \Gamma_{J I} * \delt
 \gamma{#}::GammaMatrix(spacetime).
 \Gamma{#}::GammaMatrix(susy).
 {\psi,\lambda}::Spinor(spacetime, susy).
+obj5:= \psi \gamma \Gamma \lambda;
+@prodsort!(%);
 
-\psi \gamma \Gamma \psi.

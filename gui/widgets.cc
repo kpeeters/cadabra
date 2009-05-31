@@ -25,6 +25,8 @@
 #include <gtkmm/messagedialog.h>
 #include <gtkmm/main.h>
 #include <stdexcept>
+#include <cairomm/cairomm.h>
+#include <gdkmm/general.h>
 
 stopwatch tex_stopwatch;
 
@@ -423,6 +425,43 @@ bool ExpressionInput::handle_button_press(GdkEventButton* button)
 		 }
 
 	return true;
+	}
+
+bool ExpressionInput::exp_input_tv::on_expose_event(GdkEventExpose *event)
+	{
+	Glib::RefPtr<Gdk::Window> win = Gtk::TextView::get_window(Gtk::TEXT_WINDOW_TEXT);
+
+	bool ret=Gtk::TextView::on_expose_event(event);
+
+	int w, h, x, y, d;
+	win->get_geometry(x,y,w,h,d);
+//	std::cout << w << ", " << h << std::endl;
+
+	Cairo::RefPtr<Cairo::Context> cr = win->create_cairo_context();
+//	if(event) {
+//		// clip to the area that needs to be re-exposed so we don't draw any
+//		// more than we need to.
+//		std::cout << event->area.width << " x " << event->area.height << std::endl;
+//		cr->rectangle(event->area.x, event->area.y,
+//						  event->area.width, event->area.height);
+//      cr->clip();
+//		}
+
+	// paint the background
+	cr->set_source_rgba(1.0, 1.0, 1.0, 1.0);
+	cr->rectangle(5,3,8,h-3);
+	cr->fill();
+
+	cr->set_source_rgba(.2, .2, .7, 1.0);
+	cr->set_line_width(1.0);
+	cr->set_antialias(Cairo::ANTIALIAS_NONE);
+	cr->move_to(8,3);
+	cr->line_to(5,3);
+	cr->line_to(5,h-3); 
+	cr->line_to(8,h-3); 
+	cr->stroke();
+	
+	return ret;
 	}
 
 //	gdouble page_inc, step_inc, upper, lower, pos;

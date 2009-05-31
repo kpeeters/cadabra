@@ -240,7 +240,7 @@ bool property_base::preparse_arguments(exptree::iterator prop, keyval_t& keyvals
 
 void property_base::display(std::ostream& str) const
 	{ 
-	str << name();
+	str << name() << "(";
 	}
 
 std::string property_base::unnamed_argument() const
@@ -473,7 +473,7 @@ std::string Coordinate::name() const
 	}
 
 Indices::Indices()
-	: position_free(true), grassmann(false)
+	: position_free(true)
 	{
 	}
 
@@ -514,10 +514,6 @@ bool Indices::parse(exptree& tr, exptree::iterator pat, exptree::iterator prop, 
 		else if(ki->first=="position") {
 			if(*ki->second->name!="free")
 				position_free=false;
-			}
-		else if(ki->first=="type") {
-			if(*ki->second->name=="grassmann") 
-				grassmann=true;
 			}
 		else if(ki->first=="values") {
 			values=*ki->second;
@@ -562,6 +558,15 @@ bool ImplicitIndex::parse(exptree& tr, exptree::iterator pat, exptree::iterator 
 		}
 
 	return true;
+	}
+
+void ImplicitIndex::display(std::ostream& str) const
+	{
+	property::display(str);
+	for(size_t n=0; n<set_names.size(); ++n) {
+		if(n>0) str << ", ";
+		str << set_names[n];
+		}
 	}
 
 std::string CommutingAsProduct::name() const

@@ -54,6 +54,8 @@ bool GammaMatrix::parse(exptree&tr, exptree::iterator pat, exptree::iterator pro
 	keyval_t::const_iterator kv=keyvals.find("metric");
 	if(kv!=keyvals.end()) metric=exptree(kv->second);
 
+	ImplicitIndex::parse(tr, pat, prop, keyvals);
+
 //	kv=keyvals.find("delta");
 //	if(kv!=keyvals.end()) delta=exptree(kv->second);
 //
@@ -101,13 +103,10 @@ std::string Spinor::name() const
 	return "Spinor";
 	}
 
-void Spinor::display(std::ostream& str) const
-	{
-	property::display(str);
-	}
-
 bool Spinor::parse(exptree& tr, exptree::iterator it, exptree::iterator prop, keyval_t& keyvals)
 	{
+	ImplicitIndex::parse(tr, it, prop, keyvals);
+	
 	keyval_t::const_iterator ki=keyvals.find("dimension");
 	if(ki!=keyvals.end()) dimension=to_long(*ki->second->multiplier);
 	else                  dimension=10;

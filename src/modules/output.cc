@@ -416,7 +416,7 @@ algorithm::result_t proplist::apply(iterator& it)
 
 		txtout << "::";
 		pit->first->display(txtout);
-		txtout << std::endl;
+		txtout << ")" << std::endl;
 		++pit;
 		}
 

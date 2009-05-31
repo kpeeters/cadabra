@@ -1,9 +1,11 @@
-% Cadabra notebook version 1.0
+% Cadabra notebook version 1.1
 \documentclass[11pt]{article}
 \usepackage[textwidth=460pt, textheight=660pt]{geometry}
 \usepackage[usenames]{color}
+\usepackage{amssymb}
 \usepackage[parfill]{parskip}
 \usepackage{breqn}
+\usepackage{tableaux}
 \def\specialcolon{\mathrel{\mathop{:}}\hspace{-.5em}}
 \renewcommand{\bar}[1]{\overline{#1}}
 \begin{document}
@@ -20,7 +22,7 @@ C_{m n p q}::WeylTensor.
 \nabla_{r}{ C_{m n p q} }::SatisfiesBianchi.
 \end{verbatim}}
 \begin{verbatim}
-Assigning property Indices to i, j, m, n, k, p, q, l, r, r#.
+Assigning list property Indices to i, j, m, n, k, p, q, l, r, r#.
 Assigning property WeylTensor to C.
 Assigning property Derivative to \nabla.
 Assigning property SatisfiesBianchi to \nabla.
@@ -48,6 +50,7 @@ First apply the product rule to write out the derivatives,
 {\color[named]{Blue}\begin{verbatim}
 @distribute!(%): @prodrule!(%):
 @distribute!(%): @prodrule!(%):
+@sumflatten!(%):
 
 @prodsort!(%): @canonicalise!(%): @rename_dummies!(%): 
 @collect_terms!(%);
@@ -56,7 +59,8 @@ First apply the product rule to write out the derivatives,
 % C_{i j m n} C_{i k m p} \nabla_{q}{\nabla_{j}{C_{n k p q}}} - C_{i j m n} \nabla_{k}{C_{i p m q}} \nabla_{p}{C_{j q n k}} - 2 C_{i j m n} \nabla_{i}{C_{m k p q}} \nabla_{p}{C_{j k n q}} - C_{i j m n} \nabla_{k}{C_{i k m p}} \nabla_{q}{C_{j p n q}} + C_{i j m n} C_{i k m p} \nabla_{j}{\nabla_{q}{C_{n k p q}}} - 2 C_{i j m n} \nabla_{i}{C_{j k m p}} \nabla_{q}{C_{n k p q}} - C_{i j m n} C_{i k p q} \nabla_{m}{\nabla_{p}{C_{j q n k}}} - 1/4 C_{i j m n} C_{i j k p} \nabla_{q}{\nabla_{m}{C_{n q k p}}} + 1/4 C_{i j m n} \nabla_{k}{C_{i j p q}} \nabla_{p}{C_{m n k q}} - 1/2 C_{i j m n} \nabla_{i}{C_{j k p q}} \nabla_{k}{C_{m n p q}} - 1/4 C_{i j m n} \nabla_{k}{C_{i j k p}} \nabla_{q}{C_{m n p q}} - 1/4 C_{i j m n} C_{i j k p} \nabla_{m}{\nabla_{q}{C_{n q k p}}} - 1/2 C_{i j m n} \nabla_{i}{C_{m n k p}} \nabla_{q}{C_{j q k p}} + 1/4 C_{i j m n} C_{i k p q} \nabla_{j}{\nabla_{k}{C_{m n p q}}} - 1/2 C_{i j m n} C_{i j m k} \nabla_{p}{\nabla_{q}{C_{n p k q}}} + C_{i j m n} \nabla_{k}{C_{i j m p}} \nabla_{q}{C_{n q k p}} - C_{i j m n} \nabla_{k}{C_{i j m p}} \nabla_{q}{C_{n k p q}} + 1/2 C_{i j m n} C_{i k p q} \nabla_{m}{\nabla_{j}{C_{n k p q}}} + 1/2 C_{i j m n} \nabla_{i}{C_{m k p q}} \nabla_{n}{C_{j k p q}} - 1/2 C_{i j m n} \nabla_{i}{C_{j k p q}} \nabla_{m}{C_{n k p q}} + 1/2 C_{i j m n} C_{i k p q} \nabla_{j}{\nabla_{m}{C_{n k p q}}} + 1/2 C_{i j m n} C_{i k m p} \nabla_{q}{\nabla_{q}{C_{j k n p}}} + C_{i j m n} \nabla_{k}{C_{i p m q}} \nabla_{k}{C_{j p n q}} - 1/4 C_{i j m n} C_{i j k p} \nabla_{q}{\nabla_{q}{C_{m n k p}}} - 1/2 C_{i j m n} \nabla_{k}{C_{i j p q}} \nabla_{k}{C_{m n p q}};
 % end_orig
 \begin{dmath*}[compact, spread=2pt]
-exp\specialcolon{}= C_{i j m n} C_{i k m p} \nabla_{q}{\nabla_{j}{C_{n k p q}}} - C_{i j m n} \nabla_{k}{C_{i p m q}} \nabla_{p}{C_{j q n k}} - 2\, C_{i j m n} \nabla_{i}{C_{m k p q}} \nabla_{p}{C_{j k n q}} - C_{i j m n} \nabla_{k}{C_{i k m p}} \nabla_{q}{C_{j p n q}} + C_{i j m n} C_{i k m p} \nabla_{j}{\nabla_{q}{C_{n k p q}}} - 2\, C_{i j m n} \nabla_{i}{C_{j k m p}} \nabla_{q}{C_{n k p q}} - C_{i j m n} C_{i k p q} \nabla_{m}{\nabla_{p}{C_{j q n k}}} - \frac{1}{4}\, C_{i j m n} C_{i j k p} \nabla_{q}{\nabla_{m}{C_{n q k p}}} + \frac{1}{4}\, C_{i j m n} \nabla_{k}{C_{i j p q}} \nabla_{p}{C_{m n k q}} - \frac{1}{2}\, C_{i j m n} \nabla_{i}{C_{j k p q}} \nabla_{k}{C_{m n p q}} - \frac{1}{4}\, C_{i j m n} \nabla_{k}{C_{i j k p}} \nabla_{q}{C_{m n p q}} - \frac{1}{4}\, C_{i j m n} C_{i j k p} \nabla_{m}{\nabla_{q}{C_{n q k p}}} - \frac{1}{2}\, C_{i j m n} \nabla_{i}{C_{m n k p}} \nabla_{q}{C_{j q k p}} + \frac{1}{4}\, C_{i j m n} C_{i k p q} \nabla_{j}{\nabla_{k}{C_{m n p q}}} - \frac{1}{2}\, C_{i j m n} C_{i j m k} \nabla_{p}{\nabla_{q}{C_{n p k q}}} + C_{i j m n} \nabla_{k}{C_{i j m p}} \nabla_{q}{C_{n q k p}} - C_{i j m n} \nabla_{k}{C_{i j m p}} \nabla_{q}{C_{n k p q}} + \frac{1}{2}\, C_{i j m n} C_{i k p q} \nabla_{m}{\nabla_{j}{C_{n k p q}}} + \frac{1}{2}\, C_{i j m n} \nabla_{i}{C_{m k p q}} \nabla_{n}{C_{j k p q}} - \frac{1}{2}\, C_{i j m n} \nabla_{i}{C_{j k p q}} \nabla_{m}{C_{n k p q}} + \frac{1}{2}\, C_{i j m n} C_{i k p q} \nabla_{j}{\nabla_{m}{C_{n k p q}}} + \frac{1}{2}\, C_{i j m n} C_{i k m p} \nabla_{q}{\nabla_{q}{C_{j k n p}}} + C_{i j m n} \nabla_{k}{C_{i p m q}} \nabla_{k}{C_{j p n q}} - \frac{1}{4}\, C_{i j m n} C_{i j k p} \nabla_{q}{\nabla_{q}{C_{m n k p}}} - \frac{1}{2}\, C_{i j m n} \nabla_{k}{C_{i j p q}} \nabla_{k}{C_{m n p q}};
+exp\specialcolon{}= C_{i j m n} C_{i k m p} \nabla_{q}{\nabla_{j}{C_{n k p q}}} - C_{i j m n} \nabla_{k}{C_{i p m q}} \nabla_{p}{C_{j q n k}} - 2\, C_{i j m n} \nabla_{i}{C_{m k p q}} \nabla_{p}{C_{j k n q}} - C_{i j m n} \nabla_{k}{C_{i k m p}} \nabla_{q}{C_{j p n q}} + C_{i j m n} C_{i k m p} \nabla_{j}{\nabla_{q}{C_{n k p q}}} - 2\, C_{i j m n} \nabla_{i}{C_{j k m p}} \nabla_{q}{C_{n k p q}} - C_{i j m n} C_{i k p q} \nabla_{m}{\nabla_{p}{C_{j q n k}}} - \frac{1}{4}\, C_{i j m n} C_{i j k p} \nabla_{q}{\nabla_{m}{C_{n q k p}}} + \frac{1}{4}\, C_{i j m n} \nabla_{k}{C_{i j p q}} \nabla_{p}{C_{m n k q}} - \frac{1}{2}\, C_{i j m n} \nabla_{i}{C_{j k p q}} \nabla_{k}{C_{m n p q}} - \frac{1}{4}\, C_{i j m n} \nabla_{k}{C_{i j k p}} \nabla_{q}{C_{m n p q}} - \frac{1}{4}\, C_{i j m n} C_{i j k p} \nabla_{m}{\nabla_{q}{C_{n q k p}}} - \frac{1}{2}\, C_{i j m n} \nabla_{i}{C_{m n k p}} \nabla_{q}{C_{j q k p}} + \frac{1}{4}\, C_{i j m n} C_{i k p q} \nabla_{j}{\nabla_{k}{C_{m n p q}}} - \frac{1}{2}\, C_{i j m n} C_{i j m k} \nabla_{p}{\nabla_{q}{C_{n p k q}}} + C_{i j m n} \nabla_{k}{C_{i j m p}} \nabla_{q}{C_{n q k p}} - C_{i j m n} \nabla_{k}{C_{i j m p}} \nabla_{q}{C_{n k p q}} + \frac{1}{2}\, C_{i j m n} C_{i k p q} \nabla_{m}{\nabla_{j}{C_{n k p q}}} + \frac{1}{2}\, C_{i j m n} \nabla_{i}{C_{m k p q}} \nabla_{n}{C_{j k p q}}%
+ - \frac{1}{2}\, C_{i j m n} \nabla_{i}{C_{j k p q}} \nabla_{m}{C_{n k p q}} + \frac{1}{2}\, C_{i j m n} C_{i k p q} \nabla_{j}{\nabla_{m}{C_{n k p q}}} + \frac{1}{2}\, C_{i j m n} C_{i k m p} \nabla_{q}{\nabla_{q}{C_{j k n p}}} + C_{i j m n} \nabla_{k}{C_{i p m q}} \nabla_{k}{C_{j p n q}} - \frac{1}{4}\, C_{i j m n} C_{i j k p} \nabla_{q}{\nabla_{q}{C_{m n k p}}} - \frac{1}{2}\, C_{i j m n} \nabla_{k}{C_{i j p q}} \nabla_{k}{C_{m n p q}};
 \end{dmath*}
 % Begin TeX cell closed
 Because the identity which we intend to prove is only supposed to hold

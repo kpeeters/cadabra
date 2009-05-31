@@ -96,11 +96,14 @@ class ExpressionInput : public Gtk::VBox {
 			public:
 				exp_input_tv(Glib::RefPtr<Gtk::TextBuffer>);
 				virtual bool on_key_press_event(GdkEventKey*);
+				virtual bool on_expose_event(GdkEventExpose* event);
+
 				sigc::signal1<bool, std::string> emitter;
 				sigc::signal0<bool>              content_changed;
 		};
 
 		bool handle_button_press(GdkEventButton *);
+
 		
 		exp_input_tv               edit;
 		Gtk::HBox                  hbox;

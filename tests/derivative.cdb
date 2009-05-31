@@ -135,7 +135,7 @@ tst12:= \Omega_{a}(A)(C) * D * B + C * \Omega_{a}(A)(D) * B + A * \Omega_{a}(B)(
 @reset.
 \nabla{#}::Derivative.
 A_{m n}::Traceless.
-obj13: \nabla_{m}{A_{p p}}*Q_{m};
+obj13:= \nabla_{m}{A_{p p}}*Q_{m};
 @canonicalise!(%);
 
 # Test 14: prodrule on powers

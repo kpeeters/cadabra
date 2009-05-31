@@ -1,3 +1,7 @@
+2009-05-30  Kasper Peeters  <kasper.peeters@aei.mpg.de>
+
+	* Added experimental drawing of cell boundaries in the GUI.
+
 2009-05-29  Kasper Peeters  <kasper.peeters@aei.mpg.de>
 
 	* Fixed lookup of list properties so that multiple list properties
