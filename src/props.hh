@@ -53,12 +53,15 @@ class keyval_t {
 		typedef std::list<kvpair_t>                       kvlist_t;
 
 		typedef kvlist_t::const_iterator const_iterator;
+		typedef kvlist_t::iterator       iterator;
 		typedef kvpair_t value_type;
 		
 		const_iterator find(const std::string&) const;
+		iterator       find(const std::string&);
 		const_iterator begin() const;
 		const_iterator end() const;
 		void           push_back(const kvpair_t&);
+		void           erase(iterator);
 
 	private:
 		kvlist_t keyvals;

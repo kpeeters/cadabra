@@ -3611,8 +3611,10 @@ if(ki!=keyvals.end()) {
     // now ki->second is an iterator to an expression subtree
     }
 \end{screen}
-If the new property is derived from existing ones, do not forget
-to call the \verb|parse()| method of all parent classes at the end.
+You are supposed to remove any handled keyval pair from the list by
+using the \verb|erase()| member, so that the system can keep track of
+unhandled pairs.  Do not forget to call the \verb|parse()| method of
+all parent classes at the end.
 
 Once this is all done, register the property with the system by adding
 an appropriate call to the module's \verb|register_properties()|

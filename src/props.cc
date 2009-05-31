@@ -176,6 +176,17 @@ keyval_t::const_iterator keyval_t::find(const std::string& key) const
 	return it;
 	}
 
+keyval_t::iterator keyval_t::find(const std::string& key) 
+	{
+	keyval_t::iterator it=keyvals.begin();
+	while(it!=keyvals.end()) {
+		 if(it->first==key)
+			  break;
+		 ++it;
+		 }
+	return it;
+	}
+
 keyval_t::const_iterator keyval_t::begin() const
 	{
 	return keyvals.begin();
@@ -189,6 +200,11 @@ keyval_t::const_iterator keyval_t::end() const
 void keyval_t::push_back(const kvpair_t& kv) 
 	{
 	keyvals.push_back(kv);
+	}
+
+void keyval_t::erase(iterator it)
+	{
+	keyvals.erase(it);
 	}
 
 

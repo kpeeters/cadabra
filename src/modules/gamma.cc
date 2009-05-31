@@ -51,8 +51,11 @@ void GammaMatrix::display(std::ostream& str) const
 
 bool GammaMatrix::parse(exptree&tr, exptree::iterator pat, exptree::iterator prop, keyval_t& keyvals)
 	{
-	keyval_t::const_iterator kv=keyvals.find("metric");
-	if(kv!=keyvals.end()) metric=exptree(kv->second);
+	keyval_t::iterator kv=keyvals.find("metric");
+	if(kv!=keyvals.end()) {
+		metric=exptree(kv->second);
+		keyvals.erase(kv);
+		}
 
 	ImplicitIndex::parse(tr, pat, prop, keyvals);
 
@@ -105,10 +108,11 @@ std::string Spinor::name() const
 
 bool Spinor::parse(exptree& tr, exptree::iterator it, exptree::iterator prop, keyval_t& keyvals)
 	{
-	ImplicitIndex::parse(tr, it, prop, keyvals);
-	
-	keyval_t::const_iterator ki=keyvals.find("dimension");
-	if(ki!=keyvals.end()) dimension=to_long(*ki->second->multiplier);
+	keyval_t::iterator ki=keyvals.find("dimension");
+	if(ki!=keyvals.end()) {
+		dimension=to_long(*ki->second->multiplier);
+		keyvals.erase(ki);
+		}
 	else                  dimension=10;
 
 	ki=keyvals.find("type");
@@ -139,14 +143,18 @@ bool Spinor::parse(exptree& tr, exptree::iterator it, exptree::iterator prop, ke
 				return false;
 				}
 			}
+		keyvals.erase(ki);
 		}
 	
 	ki=keyvals.find("chirality");
 	if(ki!=keyvals.end()) {
 		if(*ki->second->name=="Positive") chirality=positive;
 		if(*ki->second->name=="Negative") chirality=negative;
+		keyvals.erase(ki);
 		}
 
+	ImplicitIndex::parse(tr, it, prop, keyvals);
+	
 	return true;
 	}
 
