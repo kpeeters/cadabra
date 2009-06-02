@@ -37,8 +37,13 @@ modules/xperm.o: modules/xperm.c
 
 modules: $(MOBJS)
 
+ifeq ($(strip $(MACTEST)),)
 cadabra: $(OBJS) $(MOBJS)
 	@CXX@ -o cadabra ${LDFLAGS} -Wl,--as-needed $+ `pkg-config modglue --libs` -lgmpxx -lpcrecpp -lgmp
+else
+cadabra: $(OBJS) $(MOBJS)
+	@CXX@ -o cadabra ${LDFLAGS} -Wl,-dead_strip_dylibs $+ `pkg-config modglue --libs` -lgmpxx -lpcrecpp -lgmp
+endif
 
 #`pkg-config glib-2.0 --libs` 
 # Static linking now works!

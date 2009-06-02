@@ -27,6 +27,7 @@
 #include <stdexcept>
 #include <cairomm/cairomm.h>
 #include <gdkmm/general.h>
+#include <pcrecpp.h>
 
 stopwatch tex_stopwatch;
 
