@@ -35,10 +35,23 @@ releases:
     - First officially stable release.
 - !ditz.rubyforge.org,2008-03-06/release 
   name: "1.05"
-  status: :unreleased
-  release_time: 
+  status: :released
+  release_time: 2009-06-03 21:12:40.313354 Z
   log_events: 
   - - 2009-01-21 22:42:59.204261 Z
     - Kasper Peeters <kasper.peeters@aei.mpg.de>
     - created
     - Fixes bugs related to handling of fractions and partial integration.
+  - - 2009-06-03 21:12:40.313385 Z
+    - Kasper Peeters <kasper.peeters@aei.mpg.de>
+    - released
+    - ""
+- !ditz.rubyforge.org,2008-03-06/release 
+  name: "1.12"
+  status: :unreleased
+  release_time: 
+  log_events: 
+  - - 2009-06-03 21:11:35.181237 Z
+    - Kasper Peeters <kasper.peeters@aei.mpg.de>
+    - created
+    - ""

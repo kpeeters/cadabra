@@ -26,4 +26,11 @@ void canonical_perm(int *perm,
 	int *freeps, int fl, int *dummyps, int dl, int ob, int metricQ,
 	int *cperm);
 
+void canonical_perm_ext(int *perm, int n,
+	int SGSQ, int *base, int bl, int *GS, int m,
+	int *frees, int fl,
+        int *vds, int vdsl, int *dummies, int dl, int *mQ,
+        int *vrs, int vrsl, int *repes, int rl,
+	int *cperm);
+
 #endif

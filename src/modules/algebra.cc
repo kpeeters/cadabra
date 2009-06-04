@@ -18,6 +18,8 @@
  
 */
 
+#define NEW_XPERM 1
+
 #include "algebra.hh"
 #include "display.hh"
 #include "properties.hh"
@@ -28,8 +30,11 @@
 #include "field_theory.hh"
 #include "numerical.hh"
 extern "C" {
-//#include "xperm_new.h"
-#include "xperm.h"
+#ifdef NEW_XPERM
+  #include "xperm_new.h"
+#else
+  #include "xperm.h"
+#endif
 }
 #include <utility>
 #include <algorithm>
@@ -3001,11 +3006,16 @@ algorithm::result_t canonicalise::apply(iterator& it)
 	// Construct the "name to slot" map from the order in ind_free & ind_dummy.
 	// Also construct the free and dummy lists.
 	// And a map from index number to iterator (for later).
-	int           *perm=new int[total_number_of_indices+2];
-	int          *cperm=new int[total_number_of_indices+2];
-	int        *dummies=new int[ind_dummy.size()];
-	int *dummysetlabels=new int[total_number_of_indices]; 
-	int   *free_indices=new int[ind_free.size()];
+	int                      *perm=new int[total_number_of_indices+2];
+	int                     *cperm=new int[total_number_of_indices+2];
+	int                   *dummies=new int[ind_dummy.size()];
+	int            *dummysetlabels=new int[total_number_of_indices]; 
+	int              *free_indices=new int[ind_free.size()];
+	int     *lengths_of_dummy_sets=new int[1];
+	int         *metric_signatures=new int[1];
+	int  *lengths_of_repeated_sets=new int[1];
+	int          *repeated_indices=new int[1];
+
 	std::vector<unsigned int> base_here;
 	// setlabels is a list of numbers such that indices from the same index set
 	// have the same number associated to them. 
@@ -3265,6 +3275,30 @@ algorithm::result_t canonicalise::apply(iterator& it)
 		stopwatch sw;
 		sw.start();
 
+#ifdef NEW_XPERM
+		lengths_of_dummy_sets[0]=ind_dummy.size()/2;
+		metric_signatures[0]=1;
+		lengths_of_repeated_sets[0]=0;
+		canonical_perm_ext(perm,                       // permutation to be canonicalised
+								 total_number_of_indices+2,  // degree (+2 for the overall sign)
+								 1,                          // is this a strong generating set?
+								 base,                       // base for the strong generating set
+								 base_here.size(),           //    its length
+								 gs,                         // generating set
+								 generating_set.size(),      //    its size
+								 free_indices,               // free indices
+								 ind_free.size(),            // number of free indices
+								 lengths_of_dummy_sets,      // list of lengths of dummy sets
+								 1,                          //    its length
+								 dummies,                    // list with pairs of dummies
+								 ind_dummy.size()/2,         //    its length
+								 metric_signatures,          // list of symmetries of metric
+								 lengths_of_repeated_sets,   // list of lengths of repeated-sets
+								 0,                          //    its length
+								 repeated_indices,           // list with repeated indices
+								 0,                          //    its length
+								 cperm);                     // output
+#else
 		canonical_perm(perm, 
 							1,                // strong generating set
 							base,             // base for the group
@@ -3280,6 +3314,7 @@ algorithm::result_t canonicalise::apply(iterator& it)
 							1,               // use an ordered base (what does this mean?)
 							1,               // symmetric metric
 							cperm);
+#endif
 		sw.stop();
 //		txtout << "xperm took " << sw << std::endl;
 		

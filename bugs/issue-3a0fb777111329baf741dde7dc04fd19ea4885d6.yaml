@@ -7,8 +7,8 @@ type: :feature
 component: cadabra
 release: 
 reporter: Kasper Peeters <kasper.peeters@aei.mpg.de>
-status: :in_progress
-disposition: 
+status: :closed
+disposition: :fixed
 creation_time: 2008-08-24 11:04:49.974071 Z
 references: []
 
@@ -22,3 +22,7 @@ log_events:
   - Kasper Peeters <kasper.peeters@aei.mpg.de>
   - changed status from unstarted to in_progress
   - ""
+- - 2009-06-03 21:12:16.383914 Z
+  - Kasper Peeters <kasper.peeters@aei.mpg.de>
+  - closed with disposition fixed
+  - Multi-level undo/redo now seems to be working without any major issues.
