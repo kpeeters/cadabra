@@ -1,3 +1,7 @@
+2009-06-05  Kasper Peeters  <kasper.peeters@aei.mpg.de>
+
+	* Made @rename_dummies act on single factor terms (traces).
+
 2009-05-31  Kasper Peeters  <kasper.peeters@aei.mpg.de>
 
 	* Released 1.11

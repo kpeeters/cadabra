@@ -33,13 +33,16 @@ void rename_dummies::description() const
 
 bool rename_dummies::can_apply(iterator st)
 	{
-	if(*st->name=="\\prod")
-		return true;
-	return false;
+	if(*st->name!="\\prod") 
+		if(!is_single_term(st))
+			return false;
+	return true;
 	}
 
 algorithm::result_t rename_dummies::apply(iterator& st)
 	{
+	prod_wrap_single_term(st);
+	
 	// First do a normal classify_indices both downwards and upwards.
 	//
 	index_map_t ind_free, ind_dummy, ind_free_up, ind_dummy_up;
@@ -81,6 +84,8 @@ algorithm::result_t rename_dummies::apply(iterator& st)
 			}
 		else ++ii;
 		}
+
+	prod_unwrap_single_term(st);
 
 	expression_modified=true;
 	return l_applied;

@@ -33,4 +33,9 @@ void canonical_perm_ext(int *perm, int n,
         int *vrs, int vrsl, int *repes, int rl,
 	int *cperm);
 
+void inverse(int *p, int *ip, int n);
+int onpoints(int point, int *p, int n);
+void copy_list(int *list1, int *list2, int n);
+
+
 #endif

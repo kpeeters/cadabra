@@ -18,7 +18,9 @@
  
 */
 
-#define NEW_XPERM 1
+//#define NEW_XPERM 
+//#define XPERM_USE_EXT 
+//#define XPERM_DEBUG
 
 #include "algebra.hh"
 #include "display.hh"
@@ -3209,9 +3211,13 @@ algorithm::result_t canonicalise::apply(iterator& it)
 		for(unsigned int i=0; i<generating_set.size(); ++i) {
 			for(unsigned int j=0; j<total_number_of_indices+2; ++j) {
 				gs[i*(total_number_of_indices+2)+j]=generating_set[i][j];
-//						txtout << gs[i*(total_number_of_indices+2)+j] << " ";
+#ifdef XPERM_DEBUG
+				txtout << gs[i*(total_number_of_indices+2)+j] << " ";
+#endif				
 				}
-//			txtout << std::endl;
+#ifdef XPERM_DEBUG
+			txtout << std::endl;
+#endif
 			}
 		
 		// Fill the dummysetlabels array with information about dummy sets.
@@ -3224,23 +3230,24 @@ algorithm::result_t canonicalise::apply(iterator& it)
 		for(unsigned int i=0; i<base_here.size(); ++i)
 			base[i]=base_here[i];
 		
-//			txtout << "perm:" << std::endl;
-//			for(unsigned int i=0; i<total_number_of_indices+2; ++i)
-//			txtout << perm[i] << " "; 
-//			txtout << std::endl;
-//			txtout << "base:" << std::endl;
-//			for(unsigned int i=0; i<base_here.size(); ++i)
-//			txtout << base[i] << " "; 
-//			txtout << std::endl;
-//			txtout << "free indices:" << std::endl;
-//			for(unsigned int i=0; i<ind_free.size(); ++i)
-//			txtout << free_indices[i] << " "; 
-//			txtout << std::endl;
-//			txtout << "dummies:" << std::endl;
-//			for(unsigned int i=0; i<ind_dummy.size(); ++i)
-//				txtout << dummies[i] << " "; 
-//			txtout << std::endl;
-
+#ifdef XPERM_DEBUG
+			txtout << "perm:" << std::endl;
+			for(unsigned int i=0; i<total_number_of_indices+2; ++i)
+			txtout << perm[i] << " "; 
+			txtout << std::endl;
+			txtout << "base:" << std::endl;
+			for(unsigned int i=0; i<base_here.size(); ++i)
+			txtout << base[i] << " "; 
+			txtout << std::endl;
+			txtout << "free indices:" << std::endl;
+			for(unsigned int i=0; i<ind_free.size(); ++i)
+			txtout << free_indices[i] << " "; 
+			txtout << std::endl;
+			txtout << "dummies:" << std::endl;
+			for(unsigned int i=0; i<ind_dummy.size(); ++i)
+				txtout << dummies[i] << " "; 
+			txtout << std::endl;
+#endif
 
 // FIXME: Temporarily disabled until xperm.c is fixed.
 /*				index_map_t::iterator ii=ind_dummy.begin();
@@ -3275,29 +3282,52 @@ algorithm::result_t canonicalise::apply(iterator& it)
 		stopwatch sw;
 		sw.start();
 
-#ifdef NEW_XPERM
-		lengths_of_dummy_sets[0]=ind_dummy.size()/2;
+#ifdef XPERM_USE_EXT
+		lengths_of_dummy_sets[0]=ind_dummy.size();
 		metric_signatures[0]=1;
 		lengths_of_repeated_sets[0]=0;
-		canonical_perm_ext(perm,                       // permutation to be canonicalised
+
+		// JMM now uses a different convention
+		int *perm1 = new int[total_number_of_indices+2];
+		int *perm2 = new int[total_number_of_indices+2];
+		int *free_indices_new_order = new int[ind_free.size()];
+		int *dummies_new_order      = new int[ind_dummy.size()];
+
+		inverse(perm, perm1, total_number_of_indices+2);
+		for(size_t i=0; i<ind_free.size(); i++) {
+			free_indices_new_order[i] = onpoints(free_indices[i], perm1, total_number_of_indices+2);
+			}
+		for(size_t i=0; i<ind_dummy.size(); i++) {
+			dummies_new_order[i] = onpoints(dummies[i], perm1, total_number_of_indices+2);
+			}
+
+		canonical_perm_ext(perm1,                       // permutation to be canonicalised
 								 total_number_of_indices+2,  // degree (+2 for the overall sign)
 								 1,                          // is this a strong generating set?
 								 base,                       // base for the strong generating set
 								 base_here.size(),           //    its length
 								 gs,                         // generating set
 								 generating_set.size(),      //    its size
-								 free_indices,               // free indices
+								 free_indices_new_order,     // free indices
 								 ind_free.size(),            // number of free indices
 								 lengths_of_dummy_sets,      // list of lengths of dummy sets
 								 1,                          //    its length
-								 dummies,                    // list with pairs of dummies
-								 ind_dummy.size()/2,         //    its length
+								 dummies_new_order,          // list with pairs of dummies
+								 ind_dummy.size(),           //    its length
 								 metric_signatures,          // list of symmetries of metric
-								 lengths_of_repeated_sets,   // list of lengths of repeated-sets
+								 0, //lengths_of_repeated_sets,   // list of lengths of repeated-sets
 								 0,                          //    its length
-								 repeated_indices,           // list with repeated indices
+								 0, //repeated_indices,           // list with repeated indices
 								 0,                          //    its length
-								 cperm);                     // output
+								 perm2);                     // output
+
+		if (perm2[0] != 0) inverse(perm2, cperm, total_number_of_indices+2);
+		else copy_list(perm2, cperm, total_number_of_indices+2);
+
+		delete [] dummies_new_order;
+		delete [] free_indices_new_order;
+		delete [] perm1;
+		delete [] perm2;
 #else
 		canonical_perm(perm, 
 							1,                // strong generating set
@@ -3310,17 +3340,23 @@ algorithm::result_t canonicalise::apply(iterator& it)
 							ind_free.size(),
 							dummies,
 							ind_dummy.size()/2,
+#ifndef NEW_XPERM
  							dummysetlabels, 
+#endif
 							1,               // use an ordered base (what does this mean?)
 							1,               // symmetric metric
 							cperm);
 #endif
 		sw.stop();
 //		txtout << "xperm took " << sw << std::endl;
-		
-//				for(unsigned int i=0; i<total_number_of_indices+2; ++i)
-//					txtout << cperm[i] << " ";
-//				txtout << std::endl;
+
+#ifdef XPERM_DEBUG		
+		txtout << "cperm:" << std::endl;
+		for(unsigned int i=0; i<total_number_of_indices+2; ++i)
+			txtout << cperm[i] << " ";
+		txtout << std::endl;
+#endif
+
 		if(cperm[0]!=0) {
 			 bool has_changed=false;
 			 for(unsigned int i=0; i<total_number_of_indices+1; ++i) {
@@ -3395,7 +3431,11 @@ algorithm::result_t canonicalise::apply(iterator& it)
 //	else txtout << "no generating set" << std::endl;
 
 	cleanup_expression(tr, it);
-	
+
+	delete [] repeated_indices;
+	delete [] lengths_of_repeated_sets;
+	delete [] metric_signatures;
+	delete [] lengths_of_dummy_sets;
 	delete [] free_indices;
 	delete [] dummies;
 	delete [] dummysetlabels;
