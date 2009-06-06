@@ -156,6 +156,9 @@ bool substitute::can_apply(iterator st)
 
 algorithm::result_t substitute::apply(iterator& st)
 	{
+//	txtout << "hi " << *st->name << std::endl;
+//	prod_wrap_single_term(st);
+
    sibling_iterator arrow=tr.arg(args_begin(), use_rule);
    iterator lhs=tr.begin(arrow);
    iterator rhs=lhs;
@@ -164,9 +167,9 @@ algorithm::result_t substitute::apply(iterator& st)
    if(*lhs->name=="\\conditional")
       lhs=tr.begin(lhs);
 
-	// We construct a new tree which is a copy of the rhs of the replacement rule, 
-	// and then replace nodes and subtrees in there based on how the pattern
-	// matching went.
+	// We construct a new tree 'repl' which is a copy of the rhs of the
+	// replacement rule, and then replace nodes and subtrees in there
+	// based on how the pattern matching went.
    exptree repl(rhs);
 
 	repl.wrap(repl.begin(), str_node("\\expression"));
@@ -203,7 +206,6 @@ algorithm::result_t substitute::apply(iterator& st)
 	exptree_comparator::subtree_replacement_map_t::iterator sloc;
 	std::vector<iterator> subtree_insertion_points;
 	while(it!=repl.end()) { 
-//		debugout << "attempting to find " << *it->name << std::endl;
 		bool is_stripped=false;
 		loc=comparator.replacement_map.find(exptree(it));
 		if(loc==comparator.replacement_map.end() && it->is_name_wildcard() && tr.number_of_children(it)!=0) {
@@ -214,8 +216,8 @@ algorithm::result_t substitute::apply(iterator& st)
 			 }
 
 		if(loc!=comparator.replacement_map.end()) { // name wildcards
-//			debugout << "rule : " << *((*loc).first.begin()->name) << " -> " << std::endl;
-//			debugout << "going to replace " << *it->name << " with " << *((*loc).second.begin()->name) << std::endl;
+			txtout << "rule : " << *((*loc).first.begin()->name) << " -> " << std::endl;
+			txtout << "going to replace " << *it->name << " with " << *((*loc).second.begin()->name) << std::endl;
 
 			// When a replacement is made here, and the index is actually
 			// a dummy in the replacement, we screw up the ind_dummy
@@ -365,7 +367,11 @@ algorithm::result_t substitute::apply(iterator& st)
 		iterator ip=subtree_insertion_points[i];
 		cleanup_nests(tr, ip);
 		}
+
+//	tr.print_recursive_treeform(txtout, st);
 	
+//	prod_unwrap_single_term(st);
+
 	cleanup_nests(tr, st);
 
 //	prodcollectnum pc(tr, tr.end());

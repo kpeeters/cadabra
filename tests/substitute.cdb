@@ -713,3 +713,12 @@ obj70:= A + B Q;
 tst70:= Q + Z Q - @(obj70);
 @collect_terms!(%);
 @assert(tst70);
+
+# Test 71: Single factor term issues.
+#
+@reset.
+obj71:= A_{m n};
+@substitute!(%)( A?? -> Q );
+tst71:= Q - @(obj71);
+@collect_terms!(%);
+@assert(tst71);
