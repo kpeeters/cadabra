@@ -1,5 +1,5 @@
 
-export RELEASE=1.11
+export RELEASE=1.11b
 
 .PHONY: static program_static test fasttest gui gui_static doc
 
