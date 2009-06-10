@@ -718,7 +718,8 @@ tst70:= Q + Z Q - @(obj70);
 #
 @reset.
 obj71:= A_{m n};
-@substitute!(%)( A?? -> Q );
+@substitute!(%)( A_{m n} -> Q );
+#@substitute!(%)( A?? -> Q );
 tst71:= Q - @(obj71);
 @collect_terms!(%);
 @assert(tst71);

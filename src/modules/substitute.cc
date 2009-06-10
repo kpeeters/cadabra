@@ -198,7 +198,7 @@ algorithm::result_t substitute::apply(iterator& st)
 	if(rhs_contains_dummies[use_rule])
 		classify_indices(repl.begin(), ind_free, ind_dummy);
 	
-	// Replace all patterns with the objects they matched.  
+	// Replace all patterns on the rhs of the rule with the objects they matched.  
 	// Keep track of all indices which _have_ to stay what they are, in ind_forced.
 	// Keep track of insertion points of subtrees.
 	iterator it=repl.begin();
@@ -216,8 +216,8 @@ algorithm::result_t substitute::apply(iterator& st)
 			 }
 
 		if(loc!=comparator.replacement_map.end()) { // name wildcards
-			txtout << "rule : " << *((*loc).first.begin()->name) << " -> " << std::endl;
-			txtout << "going to replace " << *it->name << " with " << *((*loc).second.begin()->name) << std::endl;
+//			txtout << "rule : " << *((*loc).first.begin()->name) << " -> " << std::endl;
+//			txtout << "going to replace " << *it->name << " with " << *((*loc).second.begin()->name) << std::endl;
 
 			// When a replacement is made here, and the index is actually
 			// a dummy in the replacement, we screw up the ind_dummy
@@ -292,6 +292,7 @@ algorithm::result_t substitute::apply(iterator& st)
 
 	repl.begin()->fl.bracket=st->fl.bracket;
 	bool rename_replacement_dummies_called=false;
+
 	// Now we do the actual replacement, putting the "repl" in the tree.
 	// If the to-be-replaced object sits in a product, we have to relabel all
 	// dummy indices in the replacement which clash with indices in other factors
@@ -362,13 +363,17 @@ algorithm::result_t substitute::apply(iterator& st)
 //		 exptree::print_recursive_treeform(debugout, st);
 		}
 
+//	tr.print_recursive_treeform(txtout, tr.begin());
+//	txtout << "-----" << std::endl;
+
 	// Cleanup nests on all insertion points and on the top node.
 	for(unsigned int i=0; i<subtree_insertion_points.size(); ++i) {
 		iterator ip=subtree_insertion_points[i];
 		cleanup_nests(tr, ip);
 		}
 
-//	tr.print_recursive_treeform(txtout, st);
+//	tr.print_recursive_treeform(txtout, tr.begin());
+//	txtout << "======" << std::endl;
 	
 //	prod_unwrap_single_term(st);
 

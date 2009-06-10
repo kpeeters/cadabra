@@ -35,6 +35,7 @@ const char* maxima::max_to_cad[][2] = {
 	{ "tan",      "\\\\tan" },
 	{ "inf",      "\\\\infty" },
 	{ "minf",     "-\\\\infty" },
+	{ "log",      "\\\\log" },
 	{ "infinity", "\\\\infty" },
 	{ "sqrt",     "\\\\sqrt" } //,
 //	{ "%i",       "i" },
