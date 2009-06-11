@@ -148,6 +148,13 @@ class print_dot : public node_printer {
 		virtual void print_infix(std::ostream&, iterator );
 };
 
+class print_sqrt : public node_printer {
+	public:
+		print_sqrt(exptree_output&);
+		virtual ~print_sqrt() {};
+		virtual void print_infix(std::ostream&, iterator );
+};
+
 class print_arrow : public node_printer {
 	public:
 		print_arrow(exptree_output&);

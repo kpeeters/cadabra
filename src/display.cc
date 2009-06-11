@@ -82,6 +82,7 @@ void exptree_output::setup_handlers(bool infix)
 				printers_["\\commutator"]   =&create<print_commutator>;
 				printers_["\\indexbracket"] =&create<print_indexbracket>;
 				printers_["\\pow"]          =&create<print_pow>;
+				printers_["\\sqrt"]         =&create<print_sqrt>;
 				if(output_format==out_xcadabra) {
 					printers_prop_["Tableau"]       = &create<print_tableau>;
 					printers_prop_["FilledTableau"] = &create<print_filled_tableau>;
@@ -371,6 +372,20 @@ void print_frac::print_infix(std::ostream& str, exptree::iterator it)
 		 str << "}";
 	if(close_bracket)
 		str << ")";
+	}
+
+print_sqrt::print_sqrt(exptree_output& eo)
+	: node_printer(eo)
+	{
+	}
+
+void print_sqrt::print_infix(std::ostream& str, exptree::iterator it)
+	{
+	str << "\\sqrt{";
+	
+	sibling_iterator arg=tr.begin(it);
+	parent.get_printer(arg)->print_infix(str, arg);
+	str << "}";
 	}
 
 print_sum::print_sum(exptree_output& eo)
