@@ -349,11 +349,11 @@ void NotebookCanvas::redraw_cells()
 			case DataCell::c_comment:
 			case DataCell::c_error:
 			case DataCell::c_output:
-				(*it)->outbox->image.set((*it)->datacell->texbuf->pixbuf);
+				(*it)->outbox->image.set((*it)->datacell->texbuf->get_pixbuf());
 				break;
 			case DataCell::c_tex:
 				(*it)->texbox->edit.modify_font(Pango::FontDescription(fstr.str()));
-				(*it)->texbox->texview.image.set((*it)->datacell->texbuf->pixbuf);
+				(*it)->texbox->texview.image.set((*it)->datacell->texbuf->get_pixbuf());
 				break;
 			}
 		++it;
@@ -1466,12 +1466,12 @@ Glib::RefPtr<DataCell> XCadabra::add_cell(Glib::RefPtr<DataCell> newcell, Glib::
 	try {
 		switch(newcell->cell_type) {
 			case DataCell::c_output:
-				newcell->texbuf->font_size=12+(font_step*2);
+//				newcell->texbuf->font_size=12+(font_step*2);
 				newcell->texbuf->generate("\\begin{dmath*}[compact,spread=2pt]\n","\\end{dmath*}\n",
 												  horizontal_pixels);
 				break;
 			case DataCell::c_comment:
-				newcell->texbuf->font_size=12+(font_step*2);
+//				newcell->texbuf->font_size=12+(font_step*2);
 				newcell->texbuf->generate("\\begin{verbatim}\n","\\end{verbatim}\n", horizontal_pixels);
 				break;
 			case DataCell::c_input:
@@ -1485,12 +1485,12 @@ Glib::RefPtr<DataCell> XCadabra::add_cell(Glib::RefPtr<DataCell> newcell, Glib::
 
 				break;
 			case DataCell::c_error:
-				newcell->texbuf->font_size=12+(font_step*2);
-				newcell->texbuf->generate("{\\color[named]{Red}", "}", horizontal_pixels);
+//				newcell->texbuf->font_size=12+(font_step*2);
+				newcell->texbuf->generate("{\\color[named]{Red}", "}");
 				break;
 			case DataCell::c_tex:
-				newcell->texbuf->font_size=12+(font_step*2);
-				newcell->texbuf->generate("","", horizontal_pixels);
+//				newcell->texbuf->font_size=12+(font_step*2);
+				newcell->texbuf->generate("","");
 				newcell->textbuf->signal_changed().connect(sigc::mem_fun(this, &XCadabra::tex_cell_modified));
 
 				// Connect insert/delete signals to undo/redo stack handler.
@@ -1733,7 +1733,7 @@ bool XCadabra::handle_tex_update_request(std::string, NotebookCanvas *can, Visua
 		NotebookCanvas::VisualCells_t::iterator it=canvasses[i]->visualcells.begin();
 		while(it!=canvasses[i]->visualcells.end()) {
 			if((*it)->datacell==vis->datacell) {
-				(*it)->texbox->texview.image.set(vis->texbox->texview.texbuf->pixbuf);
+				(*it)->texbox->texview.image.set(vis->texbox->texview.texbuf->get_pixbuf());
 				break;
 				}
 			++it;
@@ -2852,7 +2852,7 @@ void XCadabra::on_settings_font_size(int num)
 	while(it!=datacells.end()) {
 		if((*it)->cell_type==DataCell::c_output || (*it)->cell_type==DataCell::c_tex 
 			|| (*it)->cell_type==DataCell::c_error || (*it)->cell_type==DataCell::c_comment) {
-			(*it)->texbuf->font_size=12+(num*2);
+//			(*it)->texbuf->font_size=12+(num*2);
 			(*it)->texbuf->regenerate();
 			}
 		++it;

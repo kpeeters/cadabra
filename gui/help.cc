@@ -164,8 +164,8 @@ void CadabraHelp::display_help()
 		 helpfile.open((DESTDIR+std::string("/share/doc/cadabra/general.tex")).c_str());
 		 if(helpfile.is_open()==false) {
 			  textbuf->set_text(total);
-			  texbuf->generate("","",560);
-			  texview->image.set(texbuf->pixbuf);
+			  texbuf->generate("","");
+			  texview->image.set(texbuf->get_pixbuf());
 			  return;
 			  }
 		 }
@@ -185,7 +185,7 @@ void CadabraHelp::display_help()
 
 	textbuf->set_text(total);
 	try {
-		 texbuf->generate("","",560,true);
+		 texbuf->generate("","",true);
 		 }
 	catch(std::exception& ex) {
 		Gtk::MessageDialog md(ex.what());
@@ -193,7 +193,7 @@ void CadabraHelp::display_help()
 		md.run();
 		}
 
-	texview->image.set(texbuf->pixbuf);
+	texview->image.set(texbuf->get_pixbuf());
 
 	
 	for(unsigned int i=0; i<seeprop.size(); ++i) {

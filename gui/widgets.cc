@@ -19,6 +19,7 @@
 */
 
 #include "widgets.hh"
+#include <cassert>
 #include <modglue/pipe.hh>
 #include <modglue/process.hh>
 #include <fstream>
@@ -29,8 +30,7 @@
 #include <gdkmm/general.h>
 #include <pcrecpp.h>
 
-stopwatch tex_stopwatch;
-
+TeXEngine tex_engine_main, tex_engine_help;
 
 // General tool to strip spaces from both ends
 std::string trim(const std::string& s) 
@@ -44,28 +44,31 @@ std::string trim(const std::string& s)
 	return std::string(s, b, e - b + 1);
 	}
 
-double TeXBuffer::millimeter_per_inch = 25.4;
+double TeXEngine::millimeter_per_inch = 25.4;
 
-TeXBuffer::TeXBuffer(Glib::RefPtr<Gtk::TextBuffer> tb, int fs)
-	: tex_source(tb), foreground_colour("black"), font_size(fs)
+TeXBuffer::TeXBuffer(Glib::RefPtr<Gtk::TextBuffer> tb)
+	: tex_source(tb)
 	{
 	}
 
-void TeXBuffer::generate(const std::string& startwrap, const std::string& endwrap, int horizontal_pixels,
-								 bool nobreqn)
+void TeXBuffer::generate(const std::string& startwrap, const std::string& endwrap, bool nobreqn)
 	{		
-	start_wrap_=startwrap;
-	end_wrap_=endwrap;
-	horizontal_pixels_=horizontal_pixels;
-	regenerate(nobreqn);
+	tex_request = tex_engine_main.checkin(tex_source->get_text(), startwrap, endwrap);
 	}
 
-void TeXBuffer::erase_file(const std::string& nm) const
+Glib::RefPtr<Gdk::Pixbuf> TeXEngine::get_pixbuf(TeXEngine::TeXRequest *req)
+	{
+	if(req->needs_generating)
+		convert_one(req);
+	return req->pixbuf;
+	}
+
+void TeXEngine::erase_file(const std::string& nm) const
 	{
 	unlink(nm.c_str());
 	}
 
-std::string TeXBuffer::handle_latex_errors(const std::string& result) const
+std::string TeXEngine::handle_latex_errors(const std::string& result) const
 	{
 	std::string::size_type pos=result.find("! LaTeX Error");
 	if(pos != std::string::npos) {
@@ -93,15 +96,64 @@ std::string TeXBuffer::handle_latex_errors(const std::string& result) const
 	return "";
 	}
 
-void TeXBuffer::regenerate(bool nobreqn)
+TeXEngine::~TeXEngine()
+	{
+	// Delete all requests.
+	std::set<TeXRequest *>::iterator it=requests.begin();
+	while(it!=requests.end()) {
+		delete (*it);
+		++it;
+		}
+	}
+
+TeXEngine::TeXEngine()
+	{
+	}
+
+void TeXEngine::set_geometry(int horpix, int fontsize)
+	{
+	if(horizontal_pixels_!=horpix || font_size_!=fontsize) {
+		// flag all requests as requiring an update
+		std::set<TeXRequest *>::iterator reqit=requests.begin();
+		while(reqit!=requests.end()) {
+			(*reqit)->needs_generating=true;
+			++reqit;
+			}
+		}
+	horizontal_pixels_=horpix;
+	font_size_=fontsize;
+	no_breqn_=false;
+	}
+
+TeXEngine::TeXRequest::TeXRequest()
+	: needs_generating(true)
+	{
+	}
+
+TeXEngine::TeXRequest *TeXEngine::checkin(const std::string& txt,
+																const std::string& startwrap, const std::string& endwrap)
+	{
+	TeXRequest *req = new TeXRequest;
+	req->latex_string=txt;
+	req->start_wrap=startwrap;
+	req->end_wrap=endwrap;
+	return req;
+	}
+
+void TeXEngine::convert_one(TeXRequest *req)
+	{
+	std::set<TeXRequest *> reqset;
+	reqset.insert(req);
+	convert_set(reqset);
+	}
+
+void TeXEngine::convert_set(std::set<TeXRequest *>& reqs)
 	{
 	// We now follow
 	// 
 	// https://www.securecoding.cert.org/confluence/display/seccode/FI039-C.+Create+temporary+files+securely
 	// 
 	// for temporary files.
-
-//	tex_stopwatch.start();
 
 	char olddir[1024];
 	if(getcwd(olddir, 1023)==NULL)
@@ -119,7 +171,7 @@ void TeXBuffer::regenerate(bool nobreqn)
 	// The appropriate horizontal size in mm is determined by trial and error, 
 	// and of course scales with the number of horizontal pixels.
 
-	const double horizontal_mm=horizontal_pixels_*(12.0/font_size)/3.94;
+	const double horizontal_mm=horizontal_pixels_*(12.0/font_size_)/3.94;
 #ifdef DEBUG
 	std::cerr << "tex_it: font_size " << font_size << std::endl
 				 << "        pixels    " << horizontal_pixels_ << std::endl
@@ -128,8 +180,11 @@ void TeXBuffer::regenerate(bool nobreqn)
 
 	//(int)(millimeter_per_inch*horizontal_pixels/100.0); //140;
 	const double vertical_mm=10*horizontal_mm;
-	
-	// Write to .tex file and run latex.
+
+
+	// Write each string in the set of requests into a buffer, separating
+	// them by a page eject.
+
 	std::ostringstream total;
 	int fd = mkstemp(templ);
 	if(fd == -1) 
@@ -141,7 +196,7 @@ void TeXBuffer::regenerate(bool nobreqn)
 			<< vertical_mm << "mm]{geometry}\n"
 			<< "\\usepackage{color}\\usepackage{amssymb}\n"
 			<< "\\usepackage[parfill]{parskip}\n\\usepackage{tableaux}\n";
-	if(nobreqn==false)
+	if(no_breqn_==false)
 		 total << "\\usepackage{breqn}\n";
 	else
 		 total << "\\usepackage{cadabra}\n";
@@ -149,17 +204,25 @@ void TeXBuffer::regenerate(bool nobreqn)
 			<< "\\renewcommand{\\bar}[1]{\\overline{#1}}\n"
 			<< "\\begin{document}\n\\pagestyle{empty}\n";
 
-	if(tex_source->get_text().size()>100000)
-		total << "Expression too long, output suppressed.\n";
-	else {
-		if(start_wrap_.size()>0) 
-			total << start_wrap_;
-		total << tex_source->get_text();
-		if(end_wrap_.size()>0)
-			total << "\n" << end_wrap_;
-		else total << "\n";
+	std::set<TeXRequest *>::iterator reqit=reqs.begin();
+	while(reqit!=reqs.end()) {
+		if((*reqit)->latex_string.size()>100000)
+			total << "Expression too long, output suppressed.\n";
+		else {
+			if((*reqit)->start_wrap.size()>0) 
+				total << (*reqit)->start_wrap;
+			total << (*reqit)->latex_string;
+			if((*reqit)->end_wrap.size()>0)
+				total << "\n" << (*reqit)->end_wrap;
+			else total << "\n";
+			}
+		total << "\\eject\n";
+		++reqit;
 		}
 	total << "\\end{document}\n";
+
+
+	// Now write the 'total' buffer to the .tex file
 
 	ssize_t start=0;
 	do {
@@ -187,6 +250,8 @@ void TeXBuffer::regenerate(bool nobreqn)
 	nf="\\cygwin"+nf;
 	pcrecpp::RE("/").GlobalReplace("\\\\", &nf);
 #endif
+
+	// Run LaTeX on the .tex file.
 
 	modglue::child_process latex_proc("latex");
 	latex_proc << "--interaction" << "nonstopmode" << nf;
@@ -228,15 +293,17 @@ void TeXBuffer::regenerate(bool nobreqn)
 		throw std::logic_error("Cannot start LaTeX, is it installed?");
 		}
 
-	// Convert to png. 
+	// Convert the entire dvi file to png files.
+	//
 	modglue::child_process dvipng_proc("dvipng");
 	std::ostringstream rgbspec, resspec;
-	dvipng_proc << "-T" << "tight" << "-bg" << "Transparent" << "-fg";
-	rgbspec << "\"rgb "
-			  << foreground_colour.get_red()/65536.0 << " "
-			  << foreground_colour.get_green()/65536.0 << " "
-			  << foreground_colour.get_blue()/65536.0 << "\"";
-	dvipng_proc << rgbspec.str() << "-D";
+	dvipng_proc << "-T" << "tight" << "-bg" << "Transparent"; // << "-fg";
+//	rgbspec << "\"rgb "
+//			  << foreground_colour.get_red()/65536.0 << " "
+//			  << foreground_colour.get_green()/65536.0 << " "
+//			  << foreground_colour.get_blue()/65536.0 << "\"";
+//	dvipng_proc << rgbspec.str();
+	dvipng_proc << "-D";
 	resspec << horizontal_pixels_/(1.0*horizontal_mm)*millimeter_per_inch;
 	dvipng_proc << resspec.str() << std::string(templ)+".dvi";
 
@@ -252,7 +319,12 @@ void TeXBuffer::regenerate(bool nobreqn)
 		erase_file(std::string(templ)+"2.png");
 		erase_file(std::string(templ)+"3.png");
 		erase_file(std::string(templ)+"4.png");
-		pixbuf = Gdk::Pixbuf::create(Gdk::COLORSPACE_RGB, false, 8, 10,1);
+		reqit=reqs.begin();
+		while(reqit!=reqs.end()) {
+			(*reqit)->pixbuf = Gdk::Pixbuf::create(Gdk::COLORSPACE_RGB, false, 8, 10,1);
+			(*reqit)->needs_generating=true;
+			++reqit;
+			}
 		if(chdir(olddir)==-1)
 			throw std::logic_error(
 				std::string("Cannot run dvipng, is it installed? (and cannot chdir back to original)\n\n")+ex.what());
@@ -261,36 +333,37 @@ void TeXBuffer::regenerate(bool nobreqn)
 
 	erase_file(std::string(templ)+".dvi");
 
-   // An overflow results in all info being put on page 2; check for
-	// presence of that file.
-	std::string cmd=std::string(templ)+"2.png";
-	bool overflow=false;
-	std::ifstream tst(cmd.c_str());
-	if(!tst.good())  
-		 cmd=std::string(templ)+"1.png";
-	else {
-		 overflow=true;
-		 tst.close();
-		 }
+//   // An overflow results in all info being put on page 2; check for
+//	// presence of that file.
+//	std::string cmd=std::string(templ)+"2.png";
+//	bool overflow=false;
+//	std::ifstream tst(cmd.c_str());
+//	if(!tst.good())  
+//		 cmd=std::string(templ)+"1.png";
+//	else {
+//		 overflow=true;
+//		 tst.close();
+//		 }
 
-	pixbuf = Gdk::Pixbuf::create_from_file(cmd);
-#ifdef DEBUG
-	std::cerr << "image created, cleaning up" << std::endl;
-#endif
+	// Now convert all resulting PNG files to Pixbuf images.
 
-	// Remove all png temporaries.
-	erase_file(cmd);
-	if(overflow)
-		 erase_file(std::string(templ)+"1.png");
+	reqit=reqs.begin();
+	int pagenum=1;
+	while(reqit!=reqs.end()) {
+		std::ostringstream pngname;
+		pngname << std::string(templ) << pagenum << ".png";
+		std::ifstream tst(pngname.str().c_str());
+		if(!tst.good()) {
+			(*reqit)->pixbuf = Gdk::Pixbuf::create_from_file(pngname.str());
+			(*reqit)->needs_generating=false;
+			erase_file(pngname.str());
+			}
+		++reqit;
+		++pagenum;
+		}
 
-#ifdef DEBUG
-	std::cerr << "generating done" << std::endl;
-#endif
 	if(chdir(olddir)==-1)
 		throw std::logic_error("Failed to chdir back to " +std::string(olddir)+".");
-
-//	tex_stopwatch.stop();
-//	std::cerr << "Tex_Stopwatch so far " << tex_stopwatch << std::endl;
 	}
 
 TeXView::TeXView(Glib::RefPtr<TeXBuffer> texb, int hmargin)
@@ -299,7 +372,7 @@ TeXView::TeXView(Glib::RefPtr<TeXBuffer> texb, int hmargin)
 	add(vbox);
 	vbox.pack_start(hbox, Gtk::PACK_SHRINK, 10);
 	hbox.pack_start(image, Gtk::PACK_SHRINK, hmargin);
-	image.set(texb->pixbuf);
+	image.set(texb->get_pixbuf());
 //	set_state(Gtk::STATE_PRELIGHT);
 	modify_bg(Gtk::STATE_NORMAL, Gdk::Color("white"));
 	}
@@ -544,4 +617,9 @@ Glib::RefPtr<TeXBuffer> TeXBuffer::create(Glib::RefPtr<Gtk::TextBuffer> tb)
 	return Glib::RefPtr<TeXBuffer>(new TeXBuffer(tb));
 	}
 
+Glib::RefPtr<Gdk::Pixbuf> TeXBuffer::get_pixbuf()
+	{
+	assert(tex_request!=0);
+	return tex_engine_main.get_pixbuf(tex_request);
+	}
 

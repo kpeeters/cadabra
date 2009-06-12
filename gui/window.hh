@@ -18,6 +18,9 @@
  
 */
 
+#ifndef window_hh__
+#define window_hh__
+
 #include <gtkmm/main.h>
 #include <gtkmm/actiongroup.h>
 #include <gtkmm/radioaction.h>
@@ -53,7 +56,6 @@
 #include "help.hh"
 
 class XCadabra;
-
 
 /// A DataCell contains the information required to display a 
 /// cell, but not the actual widget. Therefore, multiple widgets
@@ -397,6 +399,12 @@ class XCadabra : public Gtk::Window {
 		std::string save_config() const;
 		std::string load_config();
 
+		TeXEngine tex_engine;
+
 		friend class ActionRemoveCell;
 		friend class ActionAddCell;
 };
+
+
+#endif
+
