@@ -30,6 +30,7 @@
 #include <gdkmm/general.h>
 #include <pcrecpp.h>
 
+
 TeXEngine tex_engine_main, tex_engine_help;
 
 // General tool to strip spaces from both ends
@@ -47,8 +48,14 @@ std::string trim(const std::string& s)
 double TeXEngine::millimeter_per_inch = 25.4;
 
 TeXBuffer::TeXBuffer(Glib::RefPtr<Gtk::TextBuffer> tb)
-	: tex_source(tb)
+	: tex_source(tb), tex_request(0)
 	{
+	}
+
+TeXBuffer::~TeXBuffer()
+	{
+	if(tex_request)
+		tex_engine_main.checkout(tex_request);
 	}
 
 void TeXBuffer::generate(const std::string& startwrap, const std::string& endwrap, bool nobreqn)
@@ -56,8 +63,17 @@ void TeXBuffer::generate(const std::string& startwrap, const std::string& endwra
 	tex_request = tex_engine_main.checkin(tex_source->get_text(), startwrap, endwrap);
 	}
 
+void TeXBuffer::regenerate(bool nobreqn)
+	{
+	assert(tex_request);
+	tex_engine_main.modify(tex_request, tex_source->get_text());
+	}
+
 Glib::RefPtr<Gdk::Pixbuf> TeXEngine::get_pixbuf(TeXEngine::TeXRequest *req)
 	{
+	if(req==0) // return empty pixbuf
+		return Gdk::Pixbuf::create(Gdk::COLORSPACE_RGB, false, 8, 1, 1);
+
 	if(req->needs_generating)
 		convert_one(req);
 	return req->pixbuf;
@@ -107,12 +123,13 @@ TeXEngine::~TeXEngine()
 	}
 
 TeXEngine::TeXEngine()
+	: horizontal_pixels_(800), font_size_(12)
 	{
 	}
 
-void TeXEngine::set_geometry(int horpix, int fontsize)
+void TeXEngine::set_geometry(int horpix)
 	{
-	if(horizontal_pixels_!=horpix || font_size_!=fontsize) {
+	if(horizontal_pixels_!=horpix) {
 		// flag all requests as requiring an update
 		std::set<TeXRequest *>::iterator reqit=requests.begin();
 		while(reqit!=requests.end()) {
@@ -121,8 +138,19 @@ void TeXEngine::set_geometry(int horpix, int fontsize)
 			}
 		}
 	horizontal_pixels_=horpix;
+	}
+
+void TeXEngine::set_font_size(int fontsize)
+	{
+	if(font_size_!=fontsize) {
+		// flag all requests as requiring an update
+		std::set<TeXRequest *>::iterator reqit=requests.begin();
+		while(reqit!=requests.end()) {
+			(*reqit)->needs_generating=true;
+			++reqit;
+			}
+		}
 	font_size_=fontsize;
-	no_breqn_=false;
 	}
 
 TeXEngine::TeXRequest::TeXRequest()
@@ -137,7 +165,29 @@ TeXEngine::TeXRequest *TeXEngine::checkin(const std::string& txt,
 	req->latex_string=txt;
 	req->start_wrap=startwrap;
 	req->end_wrap=endwrap;
+	req->needs_generating=true;
+	requests.insert(req);
 	return req;
+	}
+
+void TeXEngine::checkout(TeXRequest *req)
+	{
+	std::set<TeXRequest *>::iterator it=requests.find(req);
+	assert(it!=requests.end());
+	requests.erase(it);
+	}
+
+TeXEngine::TeXRequest *TeXEngine::modify(TeXRequest *req, const std::string& txt)
+	{
+	req->latex_string=txt;
+	req->needs_generating=true;
+	return req;
+	}
+
+void TeXEngine::convert_all()
+	{
+	if(requests.size()!=0) 
+		convert_set(requests);
 	}
 
 void TeXEngine::convert_one(TeXRequest *req)
@@ -172,11 +222,11 @@ void TeXEngine::convert_set(std::set<TeXRequest *>& reqs)
 	// and of course scales with the number of horizontal pixels.
 
 	const double horizontal_mm=horizontal_pixels_*(12.0/font_size_)/3.94;
-#ifdef DEBUG
-	std::cerr << "tex_it: font_size " << font_size << std::endl
-				 << "        pixels    " << horizontal_pixels_ << std::endl
-				 << "        mm        " << horizontal_mm << std::endl;
-#endif
+//#ifdef DEBUG
+//	std::cerr << "tex_it: font_size " << font_size << std::endl
+//				 << "        pixels    " << horizontal_pixels_ << std::endl
+//				 << "        mm        " << horizontal_mm << std::endl;
+//#endif
 
 	//(int)(millimeter_per_inch*horizontal_pixels/100.0); //140;
 	const double vertical_mm=10*horizontal_mm;
@@ -206,17 +256,19 @@ void TeXEngine::convert_set(std::set<TeXRequest *>& reqs)
 
 	std::set<TeXRequest *>::iterator reqit=reqs.begin();
 	while(reqit!=reqs.end()) {
-		if((*reqit)->latex_string.size()>100000)
-			total << "Expression too long, output suppressed.\n";
-		else {
-			if((*reqit)->start_wrap.size()>0) 
-				total << (*reqit)->start_wrap;
-			total << (*reqit)->latex_string;
-			if((*reqit)->end_wrap.size()>0)
-				total << "\n" << (*reqit)->end_wrap;
-			else total << "\n";
+		if((*reqit)->needs_generating) {
+			if((*reqit)->latex_string.size()>100000)
+				total << "Expression too long, output suppressed.\n";
+			else {
+				if((*reqit)->start_wrap.size()>0) 
+					total << (*reqit)->start_wrap;
+				total << (*reqit)->latex_string;
+				if((*reqit)->end_wrap.size()>0)
+					total << "\n" << (*reqit)->end_wrap;
+				else total << "\n";
+				}
+			total << "\\eject\n";
 			}
-		total << "\\eject\n";
 		++reqit;
 		}
 	total << "\\end{document}\n";
@@ -314,15 +366,19 @@ void TeXEngine::convert_set(std::set<TeXRequest *>& reqs)
 #endif
 		}
 	catch(std::logic_error& ex) {
+		// Erase all dvi and png files and put empty pixbufs into the TeXRequests.
 		erase_file(std::string(templ)+".dvi");
-		erase_file(std::string(templ)+"1.png");
-		erase_file(std::string(templ)+"2.png");
-		erase_file(std::string(templ)+"3.png");
-		erase_file(std::string(templ)+"4.png");
 		reqit=reqs.begin();
+		int pagenum=1;
 		while(reqit!=reqs.end()) {
-			(*reqit)->pixbuf = Gdk::Pixbuf::create(Gdk::COLORSPACE_RGB, false, 8, 10,1);
-			(*reqit)->needs_generating=true;
+			if((*reqit)->needs_generating) {
+				std::ostringstream pngname;
+				pngname << std::string(templ) << pagenum << ".png";
+				erase_file(pngname.str());
+				(*reqit)->pixbuf = Gdk::Pixbuf::create(Gdk::COLORSPACE_RGB, false, 8, 1, 1);
+				(*reqit)->needs_generating=true;
+				++pagenum;
+				}
 			++reqit;
 			}
 		if(chdir(olddir)==-1)
@@ -333,33 +389,23 @@ void TeXEngine::convert_set(std::set<TeXRequest *>& reqs)
 
 	erase_file(std::string(templ)+".dvi");
 
-//   // An overflow results in all info being put on page 2; check for
-//	// presence of that file.
-//	std::string cmd=std::string(templ)+"2.png";
-//	bool overflow=false;
-//	std::ifstream tst(cmd.c_str());
-//	if(!tst.good())  
-//		 cmd=std::string(templ)+"1.png";
-//	else {
-//		 overflow=true;
-//		 tst.close();
-//		 }
-
-	// Now convert all resulting PNG files to Pixbuf images.
+	// Conversion completed successfully, now convert all resulting PNG files to Pixbuf images.
 
 	reqit=reqs.begin();
 	int pagenum=1;
 	while(reqit!=reqs.end()) {
-		std::ostringstream pngname;
-		pngname << std::string(templ) << pagenum << ".png";
-		std::ifstream tst(pngname.str().c_str());
-		if(!tst.good()) {
-			(*reqit)->pixbuf = Gdk::Pixbuf::create_from_file(pngname.str());
-			(*reqit)->needs_generating=false;
-			erase_file(pngname.str());
+		if((*reqit)->needs_generating) {
+			std::ostringstream pngname;
+			pngname << std::string(templ) << pagenum << ".png";
+			std::ifstream tst(pngname.str().c_str());
+			if(tst.good()) {
+				(*reqit)->pixbuf = Gdk::Pixbuf::create_from_file(pngname.str());
+				(*reqit)->needs_generating=false;
+				erase_file(pngname.str());
+				}
+			++pagenum;
 			}
 		++reqit;
-		++pagenum;
 		}
 
 	if(chdir(olddir)==-1)
@@ -372,7 +418,7 @@ TeXView::TeXView(Glib::RefPtr<TeXBuffer> texb, int hmargin)
 	add(vbox);
 	vbox.pack_start(hbox, Gtk::PACK_SHRINK, 10);
 	hbox.pack_start(image, Gtk::PACK_SHRINK, hmargin);
-	image.set(texb->get_pixbuf());
+	image.set(Gdk::Pixbuf::create(Gdk::COLORSPACE_RGB, false, 8, 1, 1));
 //	set_state(Gtk::STATE_PRELIGHT);
 	modify_bg(Gtk::STATE_NORMAL, Gdk::Color("white"));
 	}
@@ -619,7 +665,6 @@ Glib::RefPtr<TeXBuffer> TeXBuffer::create(Glib::RefPtr<Gtk::TextBuffer> tb)
 
 Glib::RefPtr<Gdk::Pixbuf> TeXBuffer::get_pixbuf()
 	{
-	assert(tex_request!=0);
 	return tex_engine_main.get_pixbuf(tex_request);
 	}
 

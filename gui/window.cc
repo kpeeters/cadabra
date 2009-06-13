@@ -739,8 +739,10 @@ XCadabra::XCadabra(modglue::ext_process& cdbproc, const std::string& filename, m
 	if(filename.size()>0) load_file=true;
 
 	update_title();
-	set_default_size(std::min(Gdk::Screen::get_default()->get_width()-20,  800),
-						  std::min(Gdk::Screen::get_default()->get_height()-20, 900));
+	int aim_width=std::min(Gdk::Screen::get_default()->get_width()-20, 800);
+	set_default_size(aim_width, std::min(Gdk::Screen::get_default()->get_height()-20, 900));
+	tex_engine_main.set_geometry(aim_width-40);
+	tex_engine_main.set_font_size(12+(font_step*2));
 	add(topbox);
 	
 	actiongroup=Gtk::ActionGroup::create();
@@ -2670,6 +2672,11 @@ std::string XCadabra::load(const std::string& fn, bool ignore_nonexistence)
 			}
 		}
 
+	// Generate all TeX output and update the display.
+	tex_engine_main.convert_all();
+	for(unsigned int i=0; i<canvasses.size(); ++i) 
+		canvasses[i]->redraw_cells();
+
 //	show_all();
 	kernel_idle();
 	return "";
@@ -2852,13 +2859,14 @@ void XCadabra::on_settings_font_size(int num)
 	while(it!=datacells.end()) {
 		if((*it)->cell_type==DataCell::c_output || (*it)->cell_type==DataCell::c_tex 
 			|| (*it)->cell_type==DataCell::c_error || (*it)->cell_type==DataCell::c_comment) {
-//			(*it)->texbuf->font_size=12+(num*2);
+			tex_engine_main.set_font_size(12+(num*2));
 			(*it)->texbuf->regenerate();
 			}
 		++it;
 		}
 
 	// Update all VisualCells.
+	tex_engine_main.convert_all();
 	for(unsigned int i=0; i<canvasses.size(); ++i) 
 		canvasses[i]->redraw_cells();
 	}

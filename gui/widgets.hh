@@ -70,11 +70,13 @@ class TeXEngine {
 		~TeXEngine();
 
 		/// Set the width and font size for all images to be generated.
-		void set_geometry(int horizontal_pixels, int font_size);
+		void set_geometry(int horizontal_pixels);
+		void set_font_size(int font_size);
 
 		/// All checkin/checkout conversion routines.
 		TeXRequest                *checkin(const std::string&,
 													  const std::string& startwrap, const std::string& endwrap);
+		TeXRequest                *modify(TeXRequest *, const std::string&);
 		Glib::RefPtr<Gdk::Pixbuf>  get_pixbuf(TeXRequest *);
 		void                       convert_all();
 		void                       checkout(TeXRequest *);
@@ -105,6 +107,7 @@ class TeXEngine {
 class TeXBuffer : public Glib::Object {
 	public:
 		TeXBuffer(Glib::RefPtr<Gtk::TextBuffer>);
+		~TeXBuffer();
 		
 		void generate(const std::string& startwrap, const std::string& endwrap, bool nobreqn=false);
 		void regenerate(bool nobreqn=false);
@@ -113,7 +116,7 @@ class TeXBuffer : public Glib::Object {
 		Glib::RefPtr<Gdk::Pixbuf>      get_pixbuf();
 
 		Glib::RefPtr<Gtk::TextBuffer>  tex_source;
-		TeXEngine::TeXRequest   *tex_request;
+		TeXEngine::TeXRequest         *tex_request;
 };
 
 
