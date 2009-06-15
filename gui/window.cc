@@ -349,12 +349,37 @@ void NotebookCanvas::redraw_cells()
 			case DataCell::c_comment:
 			case DataCell::c_error:
 			case DataCell::c_output:
-				(*it)->outbox->image.set((*it)->datacell->texbuf->get_pixbuf());
+				(*it)->outbox->update_image();
+//				(*it)->outbox->image.set((*it)->datacell->texbuf->get_pixbuf());
 				break;
 			case DataCell::c_tex:
 				(*it)->texbox->edit.modify_font(Pango::FontDescription(fstr.str()));
-				(*it)->texbox->texview.image.set((*it)->datacell->texbuf->get_pixbuf());
+				(*it)->texbox->texview.update_image();
+//				(*it)->texbox->texview.image.set((*it)->datacell->texbuf->get_pixbuf());
 				break;
+			}
+		++it;
+		}
+	}
+
+void NotebookCanvas::show_cell(Glib::RefPtr<DataCell> datacell)
+	{
+	VisualCells_t::iterator it=visualcells.begin();
+	while(it!=visualcells.end()) {
+		if((*it)->datacell==datacell) {
+			switch((*it)->datacell->cell_type) {
+				case DataCell::c_input:
+					(*it)->inbox->show_all();
+					break;
+				case DataCell::c_comment:
+				case DataCell::c_error:
+				case DataCell::c_output:
+					(*it)->outbox->show_all();
+					break;
+				case DataCell::c_tex:
+					(*it)->texbox->show_all();
+					break;
+				}
 			}
 		++it;
 		}
@@ -444,7 +469,7 @@ VisualCell *NotebookCanvas::add_cell(Glib::RefPtr<DataCell> dc, Glib::RefPtr<Dat
 				 sigc::bind<VisualCell *>(
 					 sigc::mem_fun(this, &NotebookCanvas::scroll_into_view_callback), newcell));
 	
-			newcell->inbox->show_all();
+//			newcell->inbox->show_all();
 			break;
 			}
 		case DataCell::c_error:
@@ -457,7 +482,7 @@ VisualCell *NotebookCanvas::add_cell(Glib::RefPtr<DataCell> dc, Glib::RefPtr<Dat
 			gtk_box_set_child_packing(((Gtk::Box *)(&scrollbox))->gobj(), 
 											  ((Gtk::Widget *)(newcell->outbox))->gobj(),
 											  false, false, 0, GTK_PACK_START);
-			newcell->outbox->show_all();
+//			newcell->outbox->show_all();
 			
 			newcell->outbox->signal_button_release_event().connect( 
 				sigc::bind<NotebookCanvas *, VisualCell *>(
@@ -491,9 +516,7 @@ VisualCell *NotebookCanvas::add_cell(Glib::RefPtr<DataCell> dc, Glib::RefPtr<Dat
 					this, newcell));
 
 			// Hide source depending on setting in the datacell.
-			newcell->texbox->texview.show_all();
-			if(newcell->datacell->tex_hidden) newcell->texbox->edit.hide_all();
-			else                              newcell->texbox->edit.show_all();
+			newcell->texbox->set_folded(newcell->datacell->tex_hidden);
 			break;
 			}
 		}
@@ -957,6 +980,7 @@ XCadabra::XCadabra(modglue::ext_process& cdbproc, const std::string& filename, m
 	// Setup an empty notebook and add a single empty input cell.
 	Glib::RefPtr<DataCell> newcell(new DataCell(DataCell::c_input));
 	add_cell(newcell,	Glib::RefPtr<DataCell>() );
+
 	active_canvas->cell_grab_focus(newcell);
 	modified=false;
 	kernel_idle();
@@ -1078,6 +1102,9 @@ void XCadabra::on_run()
 	b_cdbstatus.set_text(" Status: Executing notebook.");
 	b_stop.set_sensitive(true);
 	active_canvas->select_first_input_cell();
+
+	// Upon returning from this function, the main loop will start
+	// executing the notebook cells one by one as long as 'running=true'.
 	}
 
 void XCadabra::on_run_to()
@@ -1091,6 +1118,8 @@ void XCadabra::on_run_to()
 		 b_cdbstatus.set_text(" Status: Executing until cursor.");
 		 active_canvas->select_first_input_cell();
 		 }
+	// Upon returning from this function, the main loop will start
+	// executing the notebook cells one by one as long as 'running=true'.
 	}
 
 void XCadabra::on_run_from()
@@ -1553,6 +1582,12 @@ Glib::RefPtr<DataCell> XCadabra::add_cell(Glib::RefPtr<DataCell> newcell, Glib::
 	return newcell;
 	}
 
+void XCadabra::show_cell(Glib::RefPtr<DataCell> datacell)
+	{
+	for(unsigned int i=0; i<canvasses.size(); ++i) 
+		canvasses[i]->show_cell(datacell);
+	}
+
 bool XCadabra::handle_editbox_output(std::string str, NotebookCanvas *can, VisualCell *vis)
 	{
 	// Disable this cell until output has been received, so we
@@ -1669,8 +1704,7 @@ bool XCadabra::handle_visibility_toggle(GdkEventButton *, NotebookCanvas *can, V
 		NotebookCanvas::VisualCells_t::iterator it=canvasses[i]->visualcells.begin();
 		while(it!=canvasses[i]->visualcells.end()) {
 			if((*it)->datacell==vis->datacell) {
-				if(vis->datacell->tex_hidden) (*it)->texbox->edit.hide_all();
-				else                          (*it)->texbox->edit.show_all();
+				(*it)->texbox->set_folded(vis->datacell->tex_hidden);
 				break;
 				}
 			++it;
@@ -1735,7 +1769,8 @@ bool XCadabra::handle_tex_update_request(std::string, NotebookCanvas *can, Visua
 		NotebookCanvas::VisualCells_t::iterator it=canvasses[i]->visualcells.begin();
 		while(it!=canvasses[i]->visualcells.end()) {
 			if((*it)->datacell==vis->datacell) {
-				(*it)->texbox->texview.image.set(vis->texbox->texview.texbuf->get_pixbuf());
+				(*it)->texbox->texview.update_image();
+//				(*it)->texbox->texview.image.set(vis->texbox->texview.texbuf->get_pixbuf());
 				break;
 				}
 			++it;
@@ -1844,6 +1879,7 @@ bool XCadabra::receive(modglue::ipipe& p)
 			if(trim(comment).size()!=0 && trim(comment)!=">") {
 				Glib::RefPtr<DataCell> newcell(new DataCell(DataCell::c_comment, trim(comment)));
 				cp=add_cell(newcell, cp, false);
+				show_cell(newcell);
 				}
 			comment="";
 			continue;
@@ -1921,6 +1957,7 @@ bool XCadabra::receive(modglue::ipipe& p)
 				Glib::RefPtr<DataCell> newcell(new DataCell(DataCell::c_error, trim(error)));
 				kernel_idle();
 				cp=add_cell(newcell, cp, false);
+				show_cell(newcell);
 //				// make previous input cell active
 //				DataCells_t::iterator dit=datacells.begin();
 //				while(dit!=datacells.end()) {
@@ -1957,6 +1994,7 @@ bool XCadabra::receive(modglue::ipipe& p)
 				Glib::RefPtr<DataCell> newcell(new DataCell(DataCell::c_output, eqno+"\\specialcolon{}= "+eq));
 				newcell->cdbbuf=plain;
 				cp=add_cell(newcell, cp, false);
+				show_cell(newcell);
 				}
 			eq="";
 			eqno="";
@@ -2043,6 +2081,7 @@ bool XCadabra::receive(modglue::ipipe& p)
 							action_add(Glib::RefPtr<ActionBase>(new ActionAddCell(newcell, cp, false)));
 							cp = newcell;
 //							cp=add_cell(newcell, cp, false); // HERE
+							show_cell(newcell);
 							active_canvas->cell_grab_focus(cp);
 							}
 						if(restarting_kernel) {
@@ -2080,6 +2119,7 @@ bool XCadabra::receive(modglue::ipipe& p)
 										action_add(Glib::RefPtr<ActionBase>(new ActionAddCell(newcell, cp, false)));
 										cp = newcell;
 //										cp=add_cell(newcell, cp, false); // HERE
+										show_cell(newcell);
 										active_canvas->cell_grab_focus(cp);
 										}
 									else {
@@ -2168,6 +2208,7 @@ bool XCadabra::receive(modglue::ipipe& p)
 			name=tmp;
 			Glib::RefPtr<DataCell> newcell(new DataCell(DataCell::c_input));
 			add_cell(newcell, Glib::RefPtr<DataCell>());
+			show_cell(newcell);
 			while (gtk_events_pending ())
 				gtk_main_iteration ();
 			active_canvas->cell_grab_focus(newcell);
@@ -2197,6 +2238,7 @@ void XCadabra::on_file_new()
 		clear();
 		Glib::RefPtr<DataCell> newcell(new DataCell(DataCell::c_input));
 		add_cell(newcell, Glib::RefPtr<DataCell>() );
+		show_cell(newcell);
 		active_canvas->cell_grab_focus(newcell);
 		modified=false;
 		update_title();
@@ -2226,6 +2268,7 @@ void XCadabra::on_file_open()
 				name=fd.get_filename();
 				Glib::RefPtr<DataCell> newcell(new DataCell(DataCell::c_input));
 				add_cell(newcell, Glib::RefPtr<DataCell>() ); 
+				show_cell(newcell);
 				active_canvas->select_first_input_cell();
 				modified=false;
 				update_title();
@@ -2672,12 +2715,11 @@ std::string XCadabra::load(const std::string& fn, bool ignore_nonexistence)
 			}
 		}
 
-	// Generate all TeX output and update the display.
+	// Now generate all TeX output and then show all widgets.
 	tex_engine_main.convert_all();
-	for(unsigned int i=0; i<canvasses.size(); ++i) 
-		canvasses[i]->redraw_cells();
+	show_all();
+	active_canvas->select_first_input_cell();
 
-//	show_all();
 	kernel_idle();
 	return "";
 	}

@@ -188,6 +188,11 @@ class NotebookCanvas : public Gtk::VPaned {
 		/// The second and third element determine the position relative
 		/// to another DataCell (or, by default, relative to the end marker).
 		VisualCell* add_cell(Glib::RefPtr<DataCell>, Glib::RefPtr<DataCell> ref, bool before=true);
+		
+		void show_cell(Glib::RefPtr<DataCell>);
+
+      /// As add_cell, but keep the cell hidden from view (for use during load)
+//		VisualCell* add_cell_hidden(Glib::RefPtr<DataCell>, Glib::RefPtr<DataCell> ref);
 
 		/// Remove a VisualCell corresponding to the given DataCell.
 		void         remove_cell(Glib::RefPtr<DataCell>);
@@ -306,6 +311,7 @@ class XCadabra : public Gtk::Window {
 		/// The DataCell ownership is handled by the XCadabra class once
 		/// it has been added here.
 		Glib::RefPtr<DataCell> add_cell(Glib::RefPtr<DataCell>, Glib::RefPtr<DataCell> ref, bool before=true);
+		void         show_cell(Glib::RefPtr<DataCell>);
 		void         add_canvas();
 
 		/// Signals from Gtk, such as closing windows or changing the text

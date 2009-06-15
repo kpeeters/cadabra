@@ -418,9 +418,20 @@ TeXView::TeXView(Glib::RefPtr<TeXBuffer> texb, int hmargin)
 	add(vbox);
 	vbox.pack_start(hbox, Gtk::PACK_SHRINK, 10);
 	hbox.pack_start(image, Gtk::PACK_SHRINK, hmargin);
-	image.set(Gdk::Pixbuf::create(Gdk::COLORSPACE_RGB, false, 8, 1, 1));
 //	set_state(Gtk::STATE_PRELIGHT);
 	modify_bg(Gtk::STATE_NORMAL, Gdk::Color("white"));
+	}
+
+void TeXView::on_show()
+	{
+	image.set(texbuf->get_pixbuf());
+	
+	Gtk::EventBox::on_show();
+	}
+
+void TeXView::update_image()
+	{
+	image.set(texbuf->get_pixbuf());
 	}
 
 
@@ -457,7 +468,6 @@ ExpressionInput::ExpressionInput(Glib::RefPtr<Gtk::TextBuffer> tb, const std::st
 //	hbox.add(edit);
 	add(edit);
 //	set_border_width(3);
-	show();
 	}
 
 bool ExpressionInput::exp_input_tv::on_key_press_event(GdkEventKey* event)
@@ -603,7 +613,7 @@ bool ExpressionInput::exp_input_tv::on_expose_event(GdkEventExpose *event)
 //
 
 TeXInput::exp_input_tv::exp_input_tv(Glib::RefPtr<Gtk::TextBuffer> tb)
-	: Gtk::TextView(tb)
+	: Gtk::TextView(tb), folded_away(false)
 	{
 	}
 
@@ -627,14 +637,23 @@ TeXInput::TeXInput(Glib::RefPtr<Gtk::TextBuffer> tb, Glib::RefPtr<TeXBuffer> tex
 //	expander.set_expanded();
 	pack_start(edit);
 	pack_start(texview);
-	show();
 	}
 
-bool TeXInput::toggle_visibility()
+bool TeXInput::is_folded() const
 	{
-	if(edit.is_visible()) edit.hide_all();
-	else                  edit.show_all();
-	return true;
+	return edit.folded_away;
+	}
+
+void TeXInput::set_folded(bool onoff)
+	{
+	edit.folded_away=onoff;
+	if(edit.folded_away) 
+		remove(edit);
+	else {
+		pack_start(edit);
+		reorder_child(edit, 0);
+		edit.show();
+		}
 	}
 
 bool TeXInput::exp_input_tv::on_key_press_event(GdkEventKey* event)
