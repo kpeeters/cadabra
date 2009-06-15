@@ -41,10 +41,9 @@ CadabraHelp::CadabraHelp()
 		std::cerr << "cannot open " << DESTDIR+std::string("/share/pixmaps/cadabra.png") << std::endl;
 		}
 	set_gravity(Gdk::GRAVITY_NORTH_EAST);
-	set_default_size((std::min)(Gdk::Screen::get_default()->get_width()-20,  600),
+	set_default_size((std::min)(Gdk::Screen::get_default()->get_width()-20, 600),
 						  (std::min)(Gdk::Screen::get_default()->get_height()-20, 800));
-
-
+	
 	add(topbox);
 	topbox.pack_start(navbox, Gtk::PACK_SHRINK);
 
@@ -85,6 +84,7 @@ CadabraHelp::CadabraHelp()
 	// Set-up the TeXView widget
 	textbuf=Gtk::TextBuffer::create();
 	texbuf=TeXBuffer::create(textbuf, tex_engine_help);
+
 	texview=new TeXView(texbuf, 12);
 	scrollbox.pack_start(*texview, Gtk::PACK_EXPAND_WIDGET, 0);
 
@@ -153,7 +153,7 @@ void CadabraHelp::display_help()
 		 }
 	fname+=history[history_pos].second+".tex";
 
-	std::cout << fname << std::endl;
+//	std::cout << fname << std::endl;
 
 	std::string total, line;
 
@@ -247,6 +247,14 @@ void CadabraHelp::on_help_context_link(CadabraHelp::objtype_t objtype, std::stri
 void CadabraHelp::on_help_close()
 	{
 	hide_all();
+	}
+
+bool CadabraHelp::on_configure_event(GdkEventConfigure *cfg)
+	{
+	tex_engine_help.set_geometry(cfg->width-20-35);
+	bool ret=Gtk::Window::on_configure_event(cfg);
+	texview->image.set(texbuf->get_pixbuf());
+	return ret;
 	}
 
 bool CadabraHelp::on_key_press_event(GdkEventKey* event)

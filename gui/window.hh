@@ -317,6 +317,7 @@ class XCadabra : public Gtk::Window {
 		/// Signals from Gtk, such as closing windows or changing the text
 		/// of an input cell.
 		virtual bool on_delete_event(GdkEventAny*);
+		virtual bool on_configure_event(GdkEventConfigure*);
 		void         input_cell_modified();
 		void         tex_cell_modified();
 

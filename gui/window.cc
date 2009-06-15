@@ -40,6 +40,7 @@
 
 #include "window.hh"
 
+TeXEngine tex_engine_main, tex_engine_help;
 
 #define THEFONT "cmtt12"
 
@@ -736,7 +737,7 @@ XCadabra::XCadabra(modglue::ext_process& cdbproc, const std::string& filename, m
 		set_icon_from_file(DESTDIR+std::string("/share/pixmaps/cadabra.png"));
 		}
 	catch(Glib::FileError fe) {
-		std::cerr << "cannot find cadabra.png" << std::endl;
+		std::cerr << "cannot open " << DESTDIR+std::string("/share/pixmaps/cadabra.png") << std::endl;
 		}
 
 	b_stop.set_sensitive(false);
@@ -980,6 +981,7 @@ XCadabra::XCadabra(modglue::ext_process& cdbproc, const std::string& filename, m
 	// Setup an empty notebook and add a single empty input cell.
 	Glib::RefPtr<DataCell> newcell(new DataCell(DataCell::c_input));
 	add_cell(newcell,	Glib::RefPtr<DataCell>() );
+	show_cell(newcell);
 
 	active_canvas->cell_grab_focus(newcell);
 	modified=false;
@@ -1781,6 +1783,16 @@ bool XCadabra::handle_tex_update_request(std::string, NotebookCanvas *can, Visua
 
 XCadabra::~XCadabra()
 	{
+	}
+
+bool XCadabra::on_configure_event(GdkEventConfigure *cfg)
+	{
+	tex_engine_main.set_geometry(cfg->width-20-35);
+	bool ret=Gtk::Window::on_configure_event(cfg);
+	tex_engine_main.convert_all();
+	for(unsigned int i=0; i<canvasses.size(); ++i) 
+		canvasses[i]->redraw_cells();
+	return ret;
 	}
 
 bool XCadabra::on_delete_event(GdkEventAny* event)

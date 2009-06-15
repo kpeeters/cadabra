@@ -31,8 +31,6 @@
 #include <pcrecpp.h>
 
 
-TeXEngine tex_engine_main, tex_engine_help;
-
 // General tool to strip spaces from both ends
 std::string trim(const std::string& s) 
 	{

@@ -119,7 +119,7 @@ class TeXBuffer : public Glib::Object {
 		TeXEngine::TeXRequest         *tex_request;
 
 	protected:
-		TeXEngine engine_;
+		TeXEngine &engine_;
 };
 
 

@@ -41,6 +41,7 @@ class CadabraHelp : public Gtk::Window {
 		
 		void on_help_context_link(CadabraHelp::objtype_t, std::string);
 		void on_help_close();
+		virtual bool on_configure_event(GdkEventConfigure *);
 		void display_help(objtype_t, const std::string& obj);
 		void display_help();
 		std::string texify(const std::string& str) const;

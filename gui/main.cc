@@ -104,7 +104,6 @@ int main (int argc, char *argv[])
 	mm.add(&ls_proc);
 
 	// Setup TeX engine parameters
-	tex_engine_help.set_geometry(380);
 	tex_engine_help.latex_packages.push_back("cadabra");
 	tex_engine_main.latex_packages.push_back("breqn");
 
