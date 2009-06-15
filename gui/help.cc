@@ -38,7 +38,7 @@ CadabraHelp::CadabraHelp()
 		set_icon_from_file(DESTDIR+std::string("/share/pixmaps/cadabra.png"));
 		}
 	catch(Glib::FileError fe) {
-		std::cerr << "cannot find cadabra.png" << std::endl;
+		std::cerr << "cannot open " << DESTDIR+std::string("/share/pixmaps/cadabra.png") << std::endl;
 		}
 	set_gravity(Gdk::GRAVITY_NORTH_EAST);
 	set_default_size((std::min)(Gdk::Screen::get_default()->get_width()-20,  600),
@@ -84,7 +84,7 @@ CadabraHelp::CadabraHelp()
 
 	// Set-up the TeXView widget
 	textbuf=Gtk::TextBuffer::create();
-	texbuf=TeXBuffer::create(textbuf);
+	texbuf=TeXBuffer::create(textbuf, tex_engine_help);
 	texview=new TeXView(texbuf, 12);
 	scrollbox.pack_start(*texview, Gtk::PACK_EXPAND_WIDGET, 0);
 
@@ -185,7 +185,7 @@ void CadabraHelp::display_help()
 
 	textbuf->set_text(total);
 	try {
-		 texbuf->generate("","",true);
+		 texbuf->generate("","");
 		 }
 	catch(std::exception& ex) {
 		Gtk::MessageDialog md(ex.what());

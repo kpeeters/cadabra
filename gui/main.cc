@@ -102,7 +102,12 @@ int main (int argc, char *argv[])
 	ls_proc << "--xcadabra" << "--bare";
 	ls_proc.setup_pipes(); // FIXME: need cleaner error messages if this is forgotten
 	mm.add(&ls_proc);
+
+	// Setup TeX engine parameters
 	tex_engine_help.set_geometry(380);
+	tex_engine_help.latex_packages.push_back("cadabra");
+	tex_engine_main.latex_packages.push_back("breqn");
+
 	XCadabra theiface(ls_proc, filename, &mm);
 
 	// Setup pipes

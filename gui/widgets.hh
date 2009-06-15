@@ -72,6 +72,7 @@ class TeXEngine {
 		/// Set the width and font size for all images to be generated.
 		void set_geometry(int horizontal_pixels);
 		void set_font_size(int font_size);
+		std::vector<std::string> latex_packages;
 
 		/// All checkin/checkout conversion routines.
 		TeXRequest                *checkin(const std::string&,
@@ -88,7 +89,6 @@ class TeXEngine {
 
 		int                    horizontal_pixels_;
 		int                    font_size_;
-		bool                   no_breqn_;
 
 		void erase_file(const std::string&) const;
 		void convert_one(TeXRequest*);
@@ -106,17 +106,20 @@ class TeXEngine {
 
 class TeXBuffer : public Glib::Object {
 	public:
-		TeXBuffer(Glib::RefPtr<Gtk::TextBuffer>);
+		TeXBuffer(Glib::RefPtr<Gtk::TextBuffer>, TeXEngine&);
 		~TeXBuffer();
 		
-		void generate(const std::string& startwrap, const std::string& endwrap, bool nobreqn=false);
-		void regenerate(bool nobreqn=false);
+		void generate(const std::string& startwrap, const std::string& endwrap);
+		void regenerate();
 
-		static Glib::RefPtr<TeXBuffer> create(Glib::RefPtr<Gtk::TextBuffer>);
+		static Glib::RefPtr<TeXBuffer> create(Glib::RefPtr<Gtk::TextBuffer>, TeXEngine&);
 		Glib::RefPtr<Gdk::Pixbuf>      get_pixbuf();
 
 		Glib::RefPtr<Gtk::TextBuffer>  tex_source;
 		TeXEngine::TeXRequest         *tex_request;
+
+	protected:
+		TeXEngine engine_;
 };
 
 

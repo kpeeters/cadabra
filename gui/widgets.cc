@@ -47,26 +47,26 @@ std::string trim(const std::string& s)
 
 double TeXEngine::millimeter_per_inch = 25.4;
 
-TeXBuffer::TeXBuffer(Glib::RefPtr<Gtk::TextBuffer> tb)
-	: tex_source(tb), tex_request(0)
+TeXBuffer::TeXBuffer(Glib::RefPtr<Gtk::TextBuffer> tb, TeXEngine& engine)
+	: tex_source(tb), tex_request(0), engine_(engine)
 	{
 	}
 
 TeXBuffer::~TeXBuffer()
 	{
 	if(tex_request)
-		tex_engine_main.checkout(tex_request);
+		engine_.checkout(tex_request);
 	}
 
-void TeXBuffer::generate(const std::string& startwrap, const std::string& endwrap, bool nobreqn)
+void TeXBuffer::generate(const std::string& startwrap, const std::string& endwrap)
 	{		
-	tex_request = tex_engine_main.checkin(tex_source->get_text(), startwrap, endwrap);
+	tex_request = engine_.checkin(tex_source->get_text(), startwrap, endwrap);
 	}
 
-void TeXBuffer::regenerate(bool nobreqn)
+void TeXBuffer::regenerate()
 	{
 	assert(tex_request);
-	tex_engine_main.modify(tex_request, tex_source->get_text());
+	engine_.modify(tex_request, tex_source->get_text());
 	}
 
 Glib::RefPtr<Gdk::Pixbuf> TeXEngine::get_pixbuf(TeXEngine::TeXRequest *req)
@@ -246,10 +246,10 @@ void TeXEngine::convert_set(std::set<TeXRequest *>& reqs)
 			<< vertical_mm << "mm]{geometry}\n"
 			<< "\\usepackage{color}\\usepackage{amssymb}\n"
 			<< "\\usepackage[parfill]{parskip}\n\\usepackage{tableaux}\n";
-	if(no_breqn_==false)
-		 total << "\\usepackage{breqn}\n";
-	else
-		 total << "\\usepackage{cadabra}\n";
+
+	for(size_t i=0; i<latex_packages.size(); ++i)
+		total << "\\usepackage{" << latex_packages[i] << "}\n";
+
 	total	<< "\\def\\specialcolon{\\mathrel{\\mathop{:}}\\hspace{-.5em}}\n"
 			<< "\\renewcommand{\\bar}[1]{\\overline{#1}}\n"
 			<< "\\begin{document}\n\\pagestyle{empty}\n";
@@ -677,13 +677,13 @@ bool TeXInput::exp_input_tv::on_key_press_event(GdkEventKey* event)
 		}
 	}
 
-Glib::RefPtr<TeXBuffer> TeXBuffer::create(Glib::RefPtr<Gtk::TextBuffer> tb)
+Glib::RefPtr<TeXBuffer> TeXBuffer::create(Glib::RefPtr<Gtk::TextBuffer> tb, TeXEngine& engine)
 	{
-	return Glib::RefPtr<TeXBuffer>(new TeXBuffer(tb));
+	return Glib::RefPtr<TeXBuffer>(new TeXBuffer(tb, engine) );
 	}
 
 Glib::RefPtr<Gdk::Pixbuf> TeXBuffer::get_pixbuf()
 	{
-	return tex_engine_main.get_pixbuf(tex_request);
+	return engine_.get_pixbuf(tex_request);
 	}
 

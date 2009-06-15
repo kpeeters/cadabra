@@ -313,7 +313,7 @@ DataCell::DataCell(cell_t ct, const std::string& str, bool texhidden)
 		case c_output:
 		case c_comment:
 		case c_tex:
-			texbuf=TeXBuffer::create(textbuf);
+			texbuf=TeXBuffer::create(textbuf, tex_engine_main);
 			break;
 		case c_input:
 			break;
@@ -764,7 +764,7 @@ XCadabra::XCadabra(modglue::ext_process& cdbproc, const std::string& filename, m
 	update_title();
 	int aim_width=std::min(Gdk::Screen::get_default()->get_width()-20, 800);
 	set_default_size(aim_width, std::min(Gdk::Screen::get_default()->get_height()-20, 900));
-	tex_engine_main.set_geometry(aim_width-40);
+	tex_engine_main.set_geometry(aim_width-20-35);
 	tex_engine_main.set_font_size(12+(font_step*2));
 	add(topbox);
 	
@@ -1492,18 +1492,17 @@ Glib::RefPtr<DataCell> XCadabra::add_cell(Glib::RefPtr<DataCell> newcell, Glib::
 		}
 
 	Gtk::Allocation al=get_allocation();
-	const int horizontal_pixels=al.get_width()-20-35;
+//	const int horizontal_pixels=al.get_width()-20-35;
 
 	try {
 		switch(newcell->cell_type) {
 			case DataCell::c_output:
 //				newcell->texbuf->font_size=12+(font_step*2);
-				newcell->texbuf->generate("\\begin{dmath*}[compact,spread=2pt]\n","\\end{dmath*}\n",
-												  horizontal_pixels);
+				newcell->texbuf->generate("\\begin{dmath*}[compact,spread=2pt]\n","\\end{dmath*}\n");
 				break;
 			case DataCell::c_comment:
 //				newcell->texbuf->font_size=12+(font_step*2);
-				newcell->texbuf->generate("\\begin{verbatim}\n","\\end{verbatim}\n", horizontal_pixels);
+				newcell->texbuf->generate("\\begin{verbatim}\n","\\end{verbatim}\n");
 				break;
 			case DataCell::c_input:
 				newcell->textbuf->signal_changed().connect(sigc::mem_fun(this, &XCadabra::input_cell_modified));
@@ -1753,10 +1752,10 @@ bool XCadabra::handle_tex_update_request(std::string, NotebookCanvas *can, Visua
 	{
 	// First re-generate the image.
 	Gtk::Allocation al=get_allocation();
-	const int horizontal_pixels=al.get_width()-20-35;
+//	const int horizontal_pixels=al.get_width()-20-35;
 	try {
-		 vis->texbox->texview.texbuf->generate("","",horizontal_pixels);
-		 }
+		vis->texbox->texview.texbuf->generate("","");
+		}
 	catch(std::exception& ex) {
 		 kernel_idle();
 		 Gtk::MessageDialog md(ex.what());
