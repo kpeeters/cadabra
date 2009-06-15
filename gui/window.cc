@@ -763,9 +763,8 @@ XCadabra::XCadabra(modglue::ext_process& cdbproc, const std::string& filename, m
 	if(filename.size()>0) load_file=true;
 
 	update_title();
-	int aim_width=std::min(Gdk::Screen::get_default()->get_width()-20, 800);
-	set_default_size(aim_width, std::min(Gdk::Screen::get_default()->get_height()-20, 900));
-	tex_engine_main.set_geometry(aim_width-20-35);
+	set_default_size((std::min)(Gdk::Screen::get_default()->get_width()-20, 800),
+						  (std::min)(Gdk::Screen::get_default()->get_height()-20, 900));
 	tex_engine_main.set_font_size(12+(font_step*2));
 	add(topbox);
 	
@@ -1494,7 +1493,6 @@ Glib::RefPtr<DataCell> XCadabra::add_cell(Glib::RefPtr<DataCell> newcell, Glib::
 		}
 
 	Gtk::Allocation al=get_allocation();
-//	const int horizontal_pixels=al.get_width()-20-35;
 
 	try {
 		switch(newcell->cell_type) {
@@ -1754,7 +1752,7 @@ bool XCadabra::handle_tex_update_request(std::string, NotebookCanvas *can, Visua
 	{
 	// First re-generate the image.
 	Gtk::Allocation al=get_allocation();
-//	const int horizontal_pixels=al.get_width()-20-35;
+
 	try {
 		vis->texbox->texview.texbuf->generate("","");
 		}
@@ -2222,7 +2220,7 @@ bool XCadabra::receive(modglue::ipipe& p)
 			show_cell(newcell);
 			while (gtk_events_pending ())
 				gtk_main_iteration ();
-			active_canvas->cell_grab_focus(newcell);
+//			active_canvas->cell_grab_focus(newcell);
 			}
 		modified=false;
 		update_title();
