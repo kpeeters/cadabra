@@ -52,7 +52,7 @@ class TeXEngine {
 	public:
 		class TeXException : public std::logic_error {
 			public:
-				TeXException(std::string);
+				TeXException(const std::string&);
 		};
 
 		class TeXRequest {

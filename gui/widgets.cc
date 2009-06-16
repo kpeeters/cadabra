@@ -67,6 +67,11 @@ void TeXBuffer::regenerate()
 	engine_.modify(tex_request, tex_source->get_text());
 	}
 
+TeXEngine::TeXException::TeXException(const std::string& str)
+	: std::logic_error(str)
+	{
+	}
+
 Glib::RefPtr<Gdk::Pixbuf> TeXEngine::get_pixbuf(TeXEngine::TeXRequest *req)
 	{
 	if(req==0) // return empty pixbuf
@@ -207,7 +212,7 @@ void TeXEngine::convert_set(std::set<TeXRequest *>& reqs)
 	if(getcwd(olddir, 1023)==NULL)
 		 olddir[0]=0;
 	if(chdir("/tmp")==-1)
-		throw std::logic_error("Failed to chdir to /tmp.");
+		throw TeXException("Failed to chdir to /tmp.");
 
 	char templ[]="/tmp/cdbXXXXXX";
 
@@ -236,7 +241,7 @@ void TeXEngine::convert_set(std::set<TeXRequest *>& reqs)
 	std::ostringstream total;
 	int fd = mkstemp(templ);
 	if(fd == -1) 
-		 throw std::logic_error("Failed to create temporary file in /tmp.");
+		 throw TeXException("Failed to create temporary file in /tmp.");
 
 	total << "\\documentclass[12pt]{article}\n"
 			<< "\\usepackage[dvips,verbose,voffset=0pt,hoffset=0pt,textwidth="
@@ -282,7 +287,7 @@ void TeXEngine::convert_set(std::set<TeXRequest *>& reqs)
 		else {
 			if(errno != EINTR) {
 				close(fd);
-				throw std::logic_error("Failed to write LaTeX temporary file.");
+				throw TeXException("Failed to write LaTeX temporary file.");
 				}
 			} 
 		} while(start<static_cast<ssize_t>(total.str().size()));
@@ -316,11 +321,15 @@ void TeXEngine::convert_set(std::set<TeXRequest *>& reqs)
 #endif
 
 		std::string err=handle_latex_errors(result);
+
 		if(err.size()>0) {
+			reqit=reqs.begin();
+			while(reqit!=reqs.end()) 
+				(*reqit++)->needs_generating=false;
 			 erase_file(std::string(templ)+".dvi");
 			 if(chdir(olddir)==-1)
-				 throw std::logic_error(err+" (and cannot chdir back to original "+olddir+")");
-			 throw std::logic_error(err); 
+				 throw TeXException(err+" (and cannot chdir back to original "+olddir+")");
+			 throw TeXException(err); 
 			 }
 		}
 	catch(std::logic_error& err) {
@@ -330,17 +339,21 @@ void TeXEngine::convert_set(std::set<TeXRequest *>& reqs)
 		erase_file(std::string(templ)+".log");
 		
 		std::string err=handle_latex_errors(result);
+		reqit=reqs.begin();
+		while(reqit!=reqs.end()) 
+			(*reqit++)->needs_generating=false;
+
 		if(err.size()>0) {
 			 if(chdir(olddir)==-1)
-				 throw std::logic_error(err+" (and cannot chdir back to original "+olddir+")");
-			 throw std::logic_error(err); 
+				 throw TeXException(err+" (and cannot chdir back to original "+olddir+")");
+			 throw TeXException(err); 
 			 }
 
 		// Even if we cannot find an explicit error in the output, we have to terminate
 		// since LaTeX has thrown an exception.
 		if(chdir(olddir)==-1)
-			throw std::logic_error("Cannot start LaTeX, is it installed? (and cannot chdir back to original)");
-		throw std::logic_error("Cannot start LaTeX, is it installed?");
+			throw TeXException("Cannot start LaTeX, is it installed? (and cannot chdir back to original)");
+		throw TeXException("Cannot start LaTeX, is it installed?");
 		}
 
 	// Convert the entire dvi file to png files.
@@ -380,9 +393,9 @@ void TeXEngine::convert_set(std::set<TeXRequest *>& reqs)
 			++reqit;
 			}
 		if(chdir(olddir)==-1)
-			throw std::logic_error(
+			throw TeXException(
 				std::string("Cannot run dvipng, is it installed? (and cannot chdir back to original)\n\n")+ex.what());
-		throw std::logic_error(std::string("Cannot run dvipng, is it installed?\n\n")+ex.what());
+		throw TeXException(std::string("Cannot run dvipng, is it installed?\n\n")+ex.what());
 		}
 
 	erase_file(std::string(templ)+".dvi");
@@ -407,7 +420,7 @@ void TeXEngine::convert_set(std::set<TeXRequest *>& reqs)
 		}
 
 	if(chdir(olddir)==-1)
-		throw std::logic_error("Failed to chdir back to " +std::string(olddir)+".");
+		throw TeXException("Failed to chdir back to " +std::string(olddir)+".");
 	}
 
 TeXView::TeXView(Glib::RefPtr<TeXBuffer> texb, int hmargin)

@@ -1,0 +1,180 @@
+% Cadabra notebook version 1.1
+\documentclass[11pt]{article}
+\usepackage[textwidth=460pt, textheight=660pt]{geometry}
+\usepackage[usenames]{color}
+\usepackage{amssymb}
+\usepackage[parfill]{parskip}
+\usepackage{breqn}
+\usepackage{tableaux}
+\def\specialcolon{\mathrel{\mathop{:}}\hspace{-.5em}}
+\renewcommand{\bar}[1]{\overline{#1}}
+\begin{document}
+{\color[named]{Blue}\begin{verbatim}
+::PostDefaultRules(@@prodsort!(%), @@rename_dummies!(%), @@canonicalise!(%), @@collect_terms!(%) ).
+
+{ a,b,c,d,e }::Indices(vector).
+\bar{#}::DiracBar.
+{ \partial{#}, \ppartial{#} }::PartialDerivative.
+{ A_{a}, f_{a b} }::Depends(\partial, \ppartial).
+{ \epsilon, \gamma_{#} }::Depends(\bar).
+\lambda::Depends(\bar, \partial).
+{ \lambda, \gamma_{#} }::NonCommuting.
+{ \lambda, \epsilon }::Spinor(dimension=4, type=Majorana).
+{ \epsilon, \lambda }::SortOrder.
+{ \epsilon, \lambda }::AntiCommuting.
+\lambda::SelfAntiCommuting.
+\gamma_{#}::GammaMatrix(metric=\delta).
+\delta{#}::Accent.
+f_{a b}::AntiSymmetric.
+\delta_{a b}::KroneckerDelta.
+\end{verbatim}}
+\begin{verbatim}
+Assigning property PostDefaultRules to .
+Assigning list property Indices to a, b, c, d, e.
+Assigning property DiracBar to \bar.
+Assigning property PartialDerivative to \partial, \ppartial.
+Assigning property Depends to A, f.
+Assigning property Depends to \epsilon, \gamma.
+Assigning property Depends to \lambda.
+Assigning list property NonCommuting to \lambda, \gamma.
+Assigning property Spinor to \lambda, \epsilon.
+Assigning list property SortOrder to \epsilon, \lambda.
+Assigning list property AntiCommuting to \epsilon, \lambda.
+Assigning property SelfAntiCommuting to ambda.
+Assigning property GammaMatrix to \gamma.
+Assigning property Accent to \delta.
+Assigning property AntiSymmetric to f.
+Assigning property KroneckerDelta to \delta.
+\end{verbatim}
+{\color[named]{Blue}\begin{verbatim}
+susy:= { \delta{A_{a}}   = \bar{\epsilon} \gamma_{a} \lambda, 
+         \delta{\lambda} = -(1/2) \gamma_{a b} \epsilon f_{a b} };
+
+S:= -(1/4) f_{a b} f_{a b} 
+              - (1/2) \bar{\lambda} \gamma_{a} \partial_{a}{\lambda};
+\end{verbatim}}
+% orig
+% {\delta{A_{a}} = \bar{\epsilon} \gamma_{a} \lambda, \delta{\lambda} = (-1/2) \gamma_{a b} \epsilon f_{a b}};
+% end_orig
+\begin{dmath*}[compact, spread=2pt]
+susy\specialcolon{}= {\delta{A_{a}} = \bar{\epsilon} \gamma_{a} \lambda,\quad \delta{\lambda} = (\frac{-1}{2})\, \gamma_{a b} \epsilon f_{a b}};
+\end{dmath*}
+% orig
+%  - 1/4 f_{a b} f_{a b} - 1/2 \bar{\lambda} \gamma_{a} \partial_{a}{\lambda};
+% end_orig
+\begin{dmath*}[compact, spread=2pt]
+S\specialcolon{}=  - \frac{1}{4}\, f_{a b} f_{a b} - \frac{1}{2}\, \bar{\lambda} \gamma_{a} \partial_{a}{\lambda};
+\end{dmath*}
+{\color[named]{Blue}\begin{verbatim}
+@vary!(%)( f_{a b} -> \partial_{a}{\delta{A_{b}}} - \partial_{b}{\delta{A_{a}}},
+           \lambda -> \delta{\lambda} );
+\end{verbatim}}
+% orig
+%  - 1/2 (\partial_{a}{\delta{A_{b}}} - \partial_{b}{\delta{A_{a}}}) f_{a b} - 1/2 \bar{\delta{\lambda}} \gamma_{a} \partial_{a}{\lambda} - 1/2 \bar{\lambda} \gamma_{a} \partial_{a}{\delta{\lambda}};
+% end_orig
+\begin{dmath*}[compact, spread=2pt]
+S\specialcolon{}=  - \frac{1}{2}\, (\partial_{a}{\delta{A_{b}}} - \partial_{b}{\delta{A_{a}}}) f_{a b} - \frac{1}{2}\, \bar{\delta{\lambda}} \gamma_{a} \partial_{a}{\lambda} - \frac{1}{2}\, \bar{\lambda} \gamma_{a} \partial_{a}{\delta{\lambda}};
+\end{dmath*}
+{\color[named]{Blue}\begin{verbatim}
+@distribute!(%);
+@substitute!(%)( @(susy) );
+@prodrule!(%); @distribute!(%); 
+@unwrap!(%);
+@rewrite_diracbar!(%);
+\end{verbatim}}
+% orig
+%  - \partial_{a}{\delta{A_{b}}} f_{a b} - 1/2 \bar{\delta{\lambda}} \gamma_{a} \partial_{a}{\lambda} - 1/2 \bar{\lambda} \gamma_{a} \partial_{a}{\delta{\lambda}};
+% end_orig
+\begin{dmath*}[compact, spread=2pt]
+S\specialcolon{}=  - \partial_{a}{\delta{A_{b}}} f_{a b} - \frac{1}{2}\, \bar{\delta{\lambda}} \gamma_{a} \partial_{a}{\lambda} - \frac{1}{2}\, \bar{\lambda} \gamma_{a} \partial_{a}{\delta{\lambda}};
+\end{dmath*}
+% orig
+%  - \partial_{a}(\bar{\epsilon} \gamma_{b} \lambda) f_{a b} + 1/4 \bar(\gamma_{a b} \epsilon f_{a b}) \gamma_{c} \partial_{c}{\lambda} - 1/2 \bar{\lambda} \gamma_{a} \partial_{a}((-1/2) \gamma_{b c} \epsilon f_{b c});
+% end_orig
+\begin{dmath*}[compact, spread=2pt]
+S\specialcolon{}=  - \partial_{a}(\bar{\epsilon} \gamma_{b} \lambda) f_{a b} + \frac{1}{4}\, \bar(\gamma_{a b} \epsilon f_{a b}) \gamma_{c} \partial_{c}{\lambda} - \frac{1}{2}\, \bar{\lambda} \gamma_{a} \partial_{a}((\frac{-1}{2})\, \gamma_{b c} \epsilon f_{b c});
+\end{dmath*}
+% orig
+%  - (\partial_{a}{\bar{\epsilon}} \gamma_{b} \lambda + \bar{\epsilon} \partial_{a}{\gamma_{b}} \lambda + \bar{\epsilon} \gamma_{b} \partial_{a}{\lambda}) f_{a b} + 1/4 \bar(\gamma_{a b} \epsilon f_{a b}) \gamma_{c} \partial_{c}{\lambda} - 1/2 \bar{\lambda} \gamma_{a} ( - 1/2 \partial_{a}{\gamma_{b c}} \epsilon f_{b c} - 1/2 \gamma_{b c} \partial_{a}{\epsilon} f_{b c} - 1/2 \gamma_{b c} \epsilon \partial_{a}{f_{b c}});
+% end_orig
+\begin{dmath*}[compact, spread=2pt]
+S\specialcolon{}=  - (\partial_{a}{\bar{\epsilon}} \gamma_{b} \lambda + \bar{\epsilon} \partial_{a}{\gamma_{b}} \lambda + \bar{\epsilon} \gamma_{b} \partial_{a}{\lambda}) f_{a b} + \frac{1}{4}\, \bar(\gamma_{a b} \epsilon f_{a b}) \gamma_{c} \partial_{c}{\lambda} - \frac{1}{2}\, \bar{\lambda} \gamma_{a} ( - \frac{1}{2}\, \partial_{a}{\gamma_{b c}} \epsilon f_{b c} - \frac{1}{2}\, \gamma_{b c} \partial_{a}{\epsilon} f_{b c} - \frac{1}{2}\, \gamma_{b c} \epsilon \partial_{a}{f_{b c}});
+\end{dmath*}
+% orig
+%  - \partial_{a}{\bar{\epsilon}} \gamma_{b} \lambda f_{a b} - \bar{\epsilon} \partial_{a}{\gamma_{b}} \lambda f_{a b} + \bar{\epsilon} \gamma_{a} \partial_{b}{\lambda} f_{a b} + 1/4 \bar(\gamma_{a b} \epsilon f_{a b}) \gamma_{c} \partial_{c}{\lambda} + 1/4 \bar{\lambda} \gamma_{a} \partial_{a}{\gamma_{b c}} \epsilon f_{b c} + 1/4 \bar{\lambda} \gamma_{a} \gamma_{b c} \partial_{a}{\epsilon} f_{b c} + 1/4 \bar{\lambda} \gamma_{a} \gamma_{b c} \epsilon \partial_{a}{f_{b c}};
+% end_orig
+\begin{dmath*}[compact, spread=2pt]
+S\specialcolon{}=  - \partial_{a}{\bar{\epsilon}} \gamma_{b} \lambda f_{a b} - \bar{\epsilon} \partial_{a}{\gamma_{b}} \lambda f_{a b} + \bar{\epsilon} \gamma_{a} \partial_{b}{\lambda} f_{a b} + \frac{1}{4}\, \bar(\gamma_{a b} \epsilon f_{a b}) \gamma_{c} \partial_{c}{\lambda} + \frac{1}{4}\, \bar{\lambda} \gamma_{a} \partial_{a}{\gamma_{b c}} \epsilon f_{b c} + \frac{1}{4}\, \bar{\lambda} \gamma_{a} \gamma_{b c} \partial_{a}{\epsilon} f_{b c} + \frac{1}{4}\, \bar{\lambda} \gamma_{a} \gamma_{b c} \epsilon \partial_{a}{f_{b c}};
+\end{dmath*}
+% orig
+% \bar{\epsilon} \gamma_{a} \partial_{b}{\lambda} f_{a b} + 1/4 \bar(\gamma_{a b} \epsilon) \gamma_{c} \partial_{c}{\lambda} f_{a b} + 1/4 \bar{\lambda} \gamma_{a} \gamma_{b c} \epsilon \partial_{a}{f_{b c}};
+% end_orig
+\begin{dmath*}[compact, spread=2pt]
+S\specialcolon{}= \bar{\epsilon} \gamma_{a} \partial_{b}{\lambda} f_{a b} + \frac{1}{4}\, \bar(\gamma_{a b} \epsilon) \gamma_{c} \partial_{c}{\lambda} f_{a b} + \frac{1}{4}\, \bar{\lambda} \gamma_{a} \gamma_{b c} \epsilon \partial_{a}{f_{b c}};
+\end{dmath*}
+% orig
+% \bar{\epsilon} \gamma_{a} \partial_{b}{\lambda} f_{a b} - 1/4 \bar{\epsilon} \gamma_{a b} \gamma_{c} \partial_{c}{\lambda} f_{a b} + 1/4 \bar{\lambda} \gamma_{a} \gamma_{b c} \epsilon \partial_{a}{f_{b c}};
+% end_orig
+\begin{dmath*}[compact, spread=2pt]
+S\specialcolon{}= \bar{\epsilon} \gamma_{a} \partial_{b}{\lambda} f_{a b} - \frac{1}{4}\, \bar{\epsilon} \gamma_{a b} \gamma_{c} \partial_{c}{\lambda} f_{a b} + \frac{1}{4}\, \bar{\lambda} \gamma_{a} \gamma_{b c} \epsilon \partial_{a}{f_{b c}};
+\end{dmath*}
+\begin{verbatim}
+Warning: assuming Minkowski signature.
+\end{verbatim}
+{\color[named]{Blue}\begin{verbatim}
+@substitute!(%)( \partial_{c}{f_{a b}} -> \ppartial_{c}{f_{a b}} ):
+@pintegrate!(%){\ppartial}:
+@rename!(%){"\ppartial"}{"\partial"}:
+@prodrule!(%);
+@unwrap!(%);
+\end{verbatim}}
+% orig
+% \bar{\epsilon} \gamma_{a} \partial_{b}{\lambda} f_{a b} - 1/4 \bar{\epsilon} \gamma_{a b} \gamma_{c} \partial_{c}{\lambda} f_{a b} - 1/4 (\partial_{a}{\bar{\lambda}} \gamma_{a} \gamma_{b c} \epsilon + \bar{\lambda} \partial_{a}{\gamma_{a}} \gamma_{b c} \epsilon + \bar{\lambda} \gamma_{a} \partial_{a}{\gamma_{b c}} \epsilon + \bar{\lambda} \gamma_{a} \gamma_{b c} \partial_{a}{\epsilon}) f_{b c};
+% end_orig
+\begin{dmath*}[compact, spread=2pt]
+S\specialcolon{}= \bar{\epsilon} \gamma_{a} \partial_{b}{\lambda} f_{a b} - \frac{1}{4}\, \bar{\epsilon} \gamma_{a b} \gamma_{c} \partial_{c}{\lambda} f_{a b} - \frac{1}{4}\, (\partial_{a}{\bar{\lambda}} \gamma_{a} \gamma_{b c} \epsilon + \bar{\lambda} \partial_{a}{\gamma_{a}} \gamma_{b c} \epsilon + \bar{\lambda} \gamma_{a} \partial_{a}{\gamma_{b c}} \epsilon + \bar{\lambda} \gamma_{a} \gamma_{b c} \partial_{a}{\epsilon}) f_{b c};
+\end{dmath*}
+% orig
+% \bar{\epsilon} \gamma_{a} \partial_{b}{\lambda} f_{a b} - 1/4 \bar{\epsilon} \gamma_{a b} \gamma_{c} \partial_{c}{\lambda} f_{a b} - 1/4 \partial_{a}{\bar{\lambda}} \gamma_{a} \gamma_{b c} \epsilon f_{b c};
+% end_orig
+\begin{dmath*}[compact, spread=2pt]
+S\specialcolon{}= \bar{\epsilon} \gamma_{a} \partial_{b}{\lambda} f_{a b} - \frac{1}{4}\, \bar{\epsilon} \gamma_{a b} \gamma_{c} \partial_{c}{\lambda} f_{a b} - \frac{1}{4}\, \partial_{a}{\bar{\lambda}} \gamma_{a} \gamma_{b c} \epsilon f_{b c};
+\end{dmath*}
+{\color[named]{Blue}\begin{verbatim}
+@join!(%){expand};
+@distribute!(%);
+@eliminate_kr!(%);
+@substitute!(%)( \partial_{a}{\bar{\lambda}} -> \bar{\partial_{a}{\lambda}} );
+@spinorsort!(%);
+\end{verbatim}}
+% orig
+% \bar{\epsilon} \gamma_{a} \partial_{b}{\lambda} f_{a b} - 1/4 \bar{\epsilon} (\gamma_{a b c} + \delta_{b c} \gamma_{a} - \delta_{a c} \gamma_{b}) \partial_{c}{\lambda} f_{a b} - 1/4 \partial_{a}{\bar{\lambda}} (\gamma_{a b c} + \delta_{a b} \gamma_{c} - \delta_{a c} \gamma_{b}) \epsilon f_{b c};
+% end_orig
+\begin{dmath*}[compact, spread=2pt]
+S\specialcolon{}= \bar{\epsilon} \gamma_{a} \partial_{b}{\lambda} f_{a b} - \frac{1}{4}\, \bar{\epsilon} (\gamma_{a b c} + \delta_{b c} \gamma_{a} - \delta_{a c} \gamma_{b}) \partial_{c}{\lambda} f_{a b} - \frac{1}{4}\, \partial_{a}{\bar{\lambda}} (\gamma_{a b c} + \delta_{a b} \gamma_{c} - \delta_{a c} \gamma_{b}) \epsilon f_{b c};
+\end{dmath*}
+% orig
+% \bar{\epsilon} \gamma_{a} \partial_{b}{\lambda} f_{a b} - 1/4 \bar{\epsilon} \gamma_{a b c} \partial_{a}{\lambda} f_{b c} + 1/2 \bar{\epsilon} \delta_{a b} \gamma_{c} \partial_{a}{\lambda} f_{b c} - 1/4 \partial_{a}{\bar{\lambda}} \gamma_{a b c} \epsilon f_{b c} - 1/2 \delta_{a b} \partial_{a}{\bar{\lambda}} \gamma_{c} \epsilon f_{b c};
+% end_orig
+\begin{dmath*}[compact, spread=2pt]
+S\specialcolon{}= \bar{\epsilon} \gamma_{a} \partial_{b}{\lambda} f_{a b} - \frac{1}{4}\, \bar{\epsilon} \gamma_{a b c} \partial_{a}{\lambda} f_{b c} + \frac{1}{2}\, \bar{\epsilon} \delta_{a b} \gamma_{c} \partial_{a}{\lambda} f_{b c} - \frac{1}{4}\, \partial_{a}{\bar{\lambda}} \gamma_{a b c} \epsilon f_{b c} - \frac{1}{2}\, \delta_{a b} \partial_{a}{\bar{\lambda}} \gamma_{c} \epsilon f_{b c};
+\end{dmath*}
+% orig
+% 1/2 \bar{\epsilon} \gamma_{a} \partial_{b}{\lambda} f_{a b} - 1/4 \bar{\epsilon} \gamma_{a b c} \partial_{a}{\lambda} f_{b c} - 1/4 \partial_{a}{\bar{\lambda}} \gamma_{a b c} \epsilon f_{b c} - 1/2 \partial_{a}{\bar{\lambda}} \gamma_{b} \epsilon f_{a b};
+% end_orig
+\begin{dmath*}[compact, spread=2pt]
+S\specialcolon{}= \frac{1}{2}\, \bar{\epsilon} \gamma_{a} \partial_{b}{\lambda} f_{a b} - \frac{1}{4}\, \bar{\epsilon} \gamma_{a b c} \partial_{a}{\lambda} f_{b c} - \frac{1}{4}\, \partial_{a}{\bar{\lambda}} \gamma_{a b c} \epsilon f_{b c} - \frac{1}{2}\, \partial_{a}{\bar{\lambda}} \gamma_{b} \epsilon f_{a b};
+\end{dmath*}
+% orig
+% 1/2 \bar{\epsilon} \gamma_{a} \partial_{b}{\lambda} f_{a b} - 1/4 \bar{\epsilon} \gamma_{a b c} \partial_{a}{\lambda} f_{b c} - 1/4 \bar{\partial_{a}{\lambda}} \gamma_{a b c} \epsilon f_{b c} - 1/2 \bar{\partial_{a}{\lambda}} \gamma_{b} \epsilon f_{a b};
+% end_orig
+\begin{dmath*}[compact, spread=2pt]
+S\specialcolon{}= \frac{1}{2}\, \bar{\epsilon} \gamma_{a} \partial_{b}{\lambda} f_{a b} - \frac{1}{4}\, \bar{\epsilon} \gamma_{a b c} \partial_{a}{\lambda} f_{b c} - \frac{1}{4}\, \bar{\partial_{a}{\lambda}} \gamma_{a b c} \epsilon f_{b c} - \frac{1}{2}\, \bar{\partial_{a}{\lambda}} \gamma_{b} \epsilon f_{a b};
+\end{dmath*}
+% orig
+% (-1/2) \bar{\epsilon} \gamma_{a b c} \partial_{a}{\lambda} f_{b c};
+% end_orig
+\begin{dmath*}[compact, spread=2pt]
+S\specialcolon{}= (\frac{-1}{2})\, \bar{\epsilon} \gamma_{a b c} \partial_{a}{\lambda} f_{b c};
+\end{dmath*}
+\end{document}

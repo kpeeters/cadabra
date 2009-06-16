@@ -318,6 +318,7 @@ class XCadabra : public Gtk::Window {
 		/// of an input cell.
 		virtual bool on_delete_event(GdkEventAny*);
 		virtual bool on_configure_event(GdkEventConfigure*);
+		void         on_signal_exception();
 		void         input_cell_modified();
 		void         tex_cell_modified();
 

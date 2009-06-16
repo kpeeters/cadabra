@@ -969,6 +969,10 @@ XCadabra::XCadabra(modglue::ext_process& cdbproc, const std::string& filename, m
 	b_run_to.signal_clicked().connect(sigc::mem_fun(*this, &XCadabra::on_run_to));
 	b_run_from.signal_clicked().connect(sigc::mem_fun(*this, &XCadabra::on_run_from));
 
+	// Setup the exception handler for exceptions thrown inside signal handlers (mainly
+	// to catch LaTeX errors which occur during 'on_show' of the TeXView widget).
+	Glib::add_exception_handler(sigc::mem_fun(*this, &XCadabra::on_signal_exception));
+
 	// We always have at least one canvas: this one
 	canvasses.push_back(manage( new NotebookCanvas(*this) ));
 	mainbox.pack_start(*canvasses.back(), Gtk::PACK_EXPAND_WIDGET, 0);
@@ -1497,11 +1501,9 @@ Glib::RefPtr<DataCell> XCadabra::add_cell(Glib::RefPtr<DataCell> newcell, Glib::
 	try {
 		switch(newcell->cell_type) {
 			case DataCell::c_output:
-//				newcell->texbuf->font_size=12+(font_step*2);
 				newcell->texbuf->generate("\\begin{dmath*}[compact,spread=2pt]\n","\\end{dmath*}\n");
 				break;
 			case DataCell::c_comment:
-//				newcell->texbuf->font_size=12+(font_step*2);
 				newcell->texbuf->generate("\\begin{verbatim}\n","\\end{verbatim}\n");
 				break;
 			case DataCell::c_input:
@@ -1515,11 +1517,9 @@ Glib::RefPtr<DataCell> XCadabra::add_cell(Glib::RefPtr<DataCell> newcell, Glib::
 
 				break;
 			case DataCell::c_error:
-//				newcell->texbuf->font_size=12+(font_step*2);
 				newcell->texbuf->generate("{\\color[named]{Red}", "}");
 				break;
 			case DataCell::c_tex:
-//				newcell->texbuf->font_size=12+(font_step*2);
 				newcell->texbuf->generate("","");
 				newcell->textbuf->signal_changed().connect(sigc::mem_fun(this, &XCadabra::tex_cell_modified));
 
@@ -1530,6 +1530,19 @@ Glib::RefPtr<DataCell> XCadabra::add_cell(Glib::RefPtr<DataCell> newcell, Glib::
 					sigc::bind<Glib::RefPtr<DataCell> >(sigc::mem_fun(this, &XCadabra::on_my_erase), newcell), false);
 
 				break;
+			}
+		
+		// Now we have to tell all NotebookCanvas objects to create a
+		// view on the just created DataCell. 
+		
+		for(unsigned int i=0; i<canvasses.size(); ++i) {
+			VisualCell *vis=canvasses[i]->add_cell(newcell, ref, before);
+			if(canvasses[i]==active_canvas) {
+				//			active_canvas->cell_grab_focus(vis);
+				// make this new cell the active cell if it is an input or tex cell.
+				if(newcell->cell_type==DataCell::c_input || newcell->cell_type==DataCell::c_tex)
+					active_cell=vis;
+				}
 			}
 		}
 	catch(std::exception& ex) {
@@ -1562,21 +1575,6 @@ Glib::RefPtr<DataCell> XCadabra::add_cell(Glib::RefPtr<DataCell> newcell, Glib::
 			}
 		}
 
-	// Now we have to tell all NotebookCanvas objects to create a
-	// view on the just created DataCell. 
-
-	for(unsigned int i=0; i<canvasses.size(); ++i) {
-		VisualCell *vis=canvasses[i]->add_cell(newcell, ref, before);
-		if(canvasses[i]==active_canvas) {
-#ifdef DEBUG
-			std::cerr << "found active canvas" << std::endl;
-#endif
-//			active_canvas->cell_grab_focus(vis);
-			// make this new cell the active cell if it is an input or tex cell.
-			if(newcell->cell_type==DataCell::c_input || newcell->cell_type==DataCell::c_tex)
-				 active_cell=vis;
-			}
-		}
 
 	return newcell;
 	}
@@ -1769,7 +1767,6 @@ bool XCadabra::handle_tex_update_request(std::string, NotebookCanvas *can, Visua
 		while(it!=canvasses[i]->visualcells.end()) {
 			if((*it)->datacell==vis->datacell) {
 				(*it)->texbox->texview.update_image();
-//				(*it)->texbox->texview.image.set(vis->texbox->texview.texbuf->get_pixbuf());
 				break;
 				}
 			++it;
@@ -1802,6 +1799,41 @@ bool XCadabra::on_delete_event(GdkEventAny* event)
 		return false;
 		}
 	else return true;
+	}
+
+void XCadabra::on_signal_exception()
+	{
+	try {
+		throw;
+		}
+	catch(TeXEngine::TeXException& ex) {
+		size_t lines=1;
+		std::string what=ex.what();
+		for(size_t i=0; i<what.size(); ++i)
+			if(what[i]=='\n')
+				++lines;
+		if(lines<11) {
+			Gtk::MessageDialog md(ex.what());
+			md.set_type_hint(Gdk::WINDOW_TYPE_HINT_DIALOG);
+			md.run();
+			}
+		else {
+			Gtk::Dialog md;
+			Gtk::TextView tv;
+			Glib::RefPtr<Gtk::TextBuffer> tb=Gtk::TextBuffer::create();
+			Gtk::ScrolledWindow sw;
+			Gtk::Button ok(Gtk::Stock::OK);
+			tb->set_text(ex.what());
+			md.get_vbox()->add(sw);
+			md.add_button(Gtk::Stock::OK, 1);
+			sw.add(tv);
+			tv.set_buffer(tb);
+			tv.set_editable(false);
+			md.set_size_request(400,300);
+			md.show_all();
+			md.run();
+			}
+		}
 	}
 
 void XCadabra::input_cell_modified()
