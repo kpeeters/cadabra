@@ -40,7 +40,7 @@ Assigning list property NonCommuting to \lambda, \gamma.
 Assigning property Spinor to \lambda, \epsilon.
 Assigning list property SortOrder to \epsilon, \lambda.
 Assigning list property AntiCommuting to \epsilon, \lambda.
-Assigning property SelfAntiCommuting to ambda.
+Assigning property SelfAntiCommuting to \lambda.
 Assigning property GammaMatrix to \gamma.
 Assigning property Accent to \delta.
 Assigning property AntiSymmetric to f.
