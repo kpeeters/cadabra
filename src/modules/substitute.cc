@@ -115,6 +115,8 @@ void substitute::description() const
 
 bool substitute::can_apply(iterator st)
 	{
+	if(*st->name=="\\expression" || *st->name=="\\asymimplicit") return false;
+
 	tmr.start();
 	sibling_iterator subslist=args_begin();
 	for(unsigned int i=0; i<tr.arg_size(subslist); ++i) {
@@ -242,6 +244,7 @@ algorithm::result_t substitute::apply(iterator& st)
 			}
 		else if( (sloc=comparator.subtree_replacement_map.find(it->name)) 
 					!=comparator.subtree_replacement_map.end()) { // object wildcards
+//			txtout << "srule : " << *it->name << std::endl;
 			multiplier_t tmpmult=*it->multiplier; // remember target multiplier
 			iterator tmp= tr.insert_subtree(it, (*sloc).second);
 			tmp->fl.bracket=it->fl.bracket;
@@ -300,34 +303,19 @@ algorithm::result_t substitute::apply(iterator& st)
 	if(*lhs->name=="\\prod") {
 		for(unsigned int i=1; i<comparator.factor_locations.size(); ++i)
 			tr.erase(comparator.factor_locations[i]);
-//		if(*rhs->name=="\\prod") {
-         // no need to keep repl
-			iterator newtr=tr.move_ontop(iterator(comparator.factor_locations[0]),repl.begin()); 
-			multiply(st->multiplier, *newtr->multiplier);
-			one(newtr->multiplier);
-//			pushup_multiplier(st); WORK
-			if(ind_dummy.size()>0) {
-				rename_replacement_dummies(newtr); // do NOW, otherwise the replacement cannot be isolated anymore
-				rename_replacement_dummies_called=true;
-				}
-			if(*rhs->name=="\\prod") {
-				 tr.flatten(newtr);
-				 tr.erase(newtr);
-				 }
-//			}
-//		else {
-//			if(*st->name=="\\prod") {
-//				multiply(st->multiplier, *(repl.begin()->multiplier));
-//				one(repl.begin()->multiplier);
-//				}
-//			else {
-//				assert(factor_locations[0]==st);
-//				multiply(repl.begin()->multiplier, *st->multiplier);
-//				}
-//			
-//			tr.move_ontop(iterator(factor_locations[0]),repl.begin()); // no need to keep repl
-//			}
-
+		
+		// no need to keep repl
+		iterator newtr=tr.move_ontop(iterator(comparator.factor_locations[0]),repl.begin()); 
+		multiply(st->multiplier, *newtr->multiplier);
+		one(newtr->multiplier);
+		if(ind_dummy.size()>0) {
+			rename_replacement_dummies(newtr); // do NOW, otherwise the replacement cannot be isolated anymore
+			rename_replacement_dummies_called=true;
+			}
+		if(*rhs->name=="\\prod") {
+			tr.flatten(newtr);
+			tr.erase(newtr);
+			}
 		if(tr.number_of_children(st)==1) {
 			multiply(tr.begin(st)->multiplier, *st->multiplier);
 			tr.flatten(st);
@@ -337,11 +325,11 @@ algorithm::result_t substitute::apply(iterator& st)
 	else {
 		multiply(repl.begin()->multiplier, *st->multiplier);
 		st=tr.move_ontop(st, repl.begin()); // no need to keep the original repl tree
-//		pushup_multiplier(st); WORK
 		}
-	if(ind_dummy.size()>0 && !rename_replacement_dummies_called) {
+
+	if(ind_dummy.size()>0 && !rename_replacement_dummies_called) 
 		rename_replacement_dummies(st);
-		}
+
 	expression_modified=true;
 
 	// The replacement is done now.  What is left is to take into
@@ -372,8 +360,6 @@ algorithm::result_t substitute::apply(iterator& st)
 		cleanup_nests(tr, ip);
 		}
 
-//	tr.print_recursive_treeform(txtout, tr.begin());
-//	txtout << "======" << std::endl;
 	
 //	prod_unwrap_single_term(st);
 
@@ -387,6 +373,9 @@ algorithm::result_t substitute::apply(iterator& st)
 //		start_reporting_outside=true;
 //		}
 //	debugout << "leaving with st=" << *st->name << std::endl;
+//	tr.print_recursive_treeform(txtout, tr.begin());
+//	txtout << "======" << std::endl;
+
 	tmr.reset();
 	return l_applied;
 	}
