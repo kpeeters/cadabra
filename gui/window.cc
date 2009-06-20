@@ -2378,29 +2378,40 @@ void XCadabra::update_title()
 
 void XCadabra::on_file_save_as()
 	{
-	Gtk::FileChooserDialog fd("Save notebook as...", Gtk::FILE_CHOOSER_ACTION_SAVE);
-	fd.add_button(Gtk::Stock::SAVE,1);
-	fd.add_button(Gtk::Stock::CANCEL,2);
-	fd.set_default_response(1);
-	int action=fd.run();
-	if(action==1) {
-		fd.hide_all();
-#ifdef DEBUG
-		std::cerr << "going to save as " << fd.get_filename() << std::endl;
-#endif
-		std::string res=save(fd.get_filename());
-		if(res.size()>0) {
-			Gtk::MessageDialog md("Error saving document "+fd.get_filename());
-			md.set_secondary_text(res);
-			md.set_type_hint(Gdk::WINDOW_TYPE_HINT_DIALOG);
-//			md.set_position(Gtk::WIN_POS_CENTER_ALWAYS);
-			md.run();
+	for(;;) {
+		Gtk::FileChooserDialog fd("Save notebook as...", Gtk::FILE_CHOOSER_ACTION_SAVE);
+		fd.add_button(Gtk::Stock::SAVE,1);
+		fd.add_button(Gtk::Stock::CANCEL,2);
+		fd.set_default_response(1);
+		int action=fd.run();
+		if(action==1) {
+			fd.hide_all();
+
+			std::ifstream testpresence(fd.get_filename().c_str());
+			if(testpresence.is_open()) {
+				Gtk::MessageDialog md("File "+fd.get_filename()+" already exists.", 
+											 false, Gtk::MESSAGE_WARNING, 
+											 Gtk::BUTTONS_NONE, true);
+				md.set_type_hint(Gdk::WINDOW_TYPE_HINT_DIALOG);
+				md.add_button("Overwrite",1);
+				md.add_button("Choose other name",2);
+				if(md.run()!=1) 
+					continue;
+				}
+			std::string res=save(fd.get_filename());
+			if(res.size()>0) {
+				Gtk::MessageDialog md("Error saving document "+fd.get_filename());
+				md.set_secondary_text(res);
+				md.set_type_hint(Gdk::WINDOW_TYPE_HINT_DIALOG);
+				md.run();
+				}
+			else {
+				name=fd.get_filename();
+				modified=false;
+				update_title();
+				}
 			}
-		else {
-			name=fd.get_filename();
-			modified=false;
-			update_title();
-			}
+		break;
 		}
 	}
 
@@ -2788,7 +2799,6 @@ bool XCadabra::quit_safeguard(bool quit)
 		Gtk::MessageDialog md(mes, false, Gtk::MESSAGE_WARNING, 
 									 Gtk::BUTTONS_NONE, true);
 		md.set_type_hint(Gdk::WINDOW_TYPE_HINT_DIALOG);
-//		md.set_position(Gtk::WIN_POS_CENTER_ALWAYS);
 		md.add_button(Gtk::Stock::SAVE,1);
 		md.add_button(Gtk::Stock::CANCEL,2);
 		if(quit)
