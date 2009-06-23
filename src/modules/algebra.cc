@@ -3119,7 +3119,7 @@ algorithm::result_t canonicalise::apply(iterator& it)
 				unsigned int number_of_indices=tr.number_of_indices(facit);
 //					txtout << "loop over tabs for " << *facit->name << " " << number_of_indices << std::endl;
 				// add indices (except the last one) to the base
-				for(unsigned int kk=0; kk+1<number_of_indices; ++kk) 
+				for(unsigned int kk=0; kk<number_of_indices; ++kk) 
 					base_here.push_back(curr_pos+kk+1);
 				
 				// loop over tabs
