@@ -27,6 +27,7 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <assert.h>
+#include <cstdio>
 
 LiE::LiE_t::LiE_t(algebra_t a, unsigned int d)
 	: algebra_type(a), algebra_dim(d), lie_proc("ptywrap"), curchar(-1)
