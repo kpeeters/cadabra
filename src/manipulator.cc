@@ -44,7 +44,8 @@ manipulator::algo_info::algo_info(std::auto_ptr<algorithm> (*cr)(exptree&, itera
 	}
 
 manipulator::manipulator()
-	: output_format(exptree_output::out_plain), editing_equation(0), last_used_equation_number(0), 
+	: eo(expressions, exptree_output::out_plain), 
+	  editing_equation(0), last_used_equation_number(0), 
 	  utf8_output(getenv("CDB_USE_UTF8")), status_output(false), prompt_string(">")
 	{
 	properties::register_properties();
@@ -342,10 +343,10 @@ bool manipulator::getline_precut(std::istream& str, std::string& buf)
 void manipulator::output_comment(const std::string& comment) const
 	{
 	if(status_output) 
-		 txtout << "\n<comment>\n";
+		 txtout << "\n<texcomment>\n";
 	txtout << comment + "\n";
 	if(status_output) 
-		 txtout << "</comment>\n";
+		 txtout << "</texcomment>\n";
 	}
 
 // Reads and processes input from streamstack.top() until end of stream.
@@ -461,9 +462,9 @@ bool manipulator::handle_input()
 								fake_txtout=&output_file;
 								fake_forcedout=&output_file;
 								// turn off status output and switch to plain output format
-								remember_output_format=output_format;
+								remember_output_format=eo.output_format;
 								remember_status_output=status_output;
-								output_format=exptree_output::out_plain;
+								eo.output_format=exptree_output::out_plain;
 								status_output=false;
 								}
 							filename.clear();
@@ -559,7 +560,7 @@ bool manipulator::handle_input()
 			try {
 				if(status_output) {
 					incomment=true;
-					txtout << "\n<comment>\n";
+					txtout << "\n<texcomment>\n";
 					}
 				pit=it;
 				it=apply_pre_default_rules_(it);
@@ -581,16 +582,16 @@ bool manipulator::handle_input()
 					last_used_equation_number=expressions.equation_number(pit);
 					if(incomment) {
 						incomment=false;
-						txtout << "</comment>" << std::endl;
+						txtout << "</texcomment>" << std::endl;
 						}
 					if(display_result) {
 						if(status_output) output_status();
-						exptree_output eo(expressions, txtout, output_format);
+//						exptree_output eo(expressions, txtout, output_format);
 						if(status_output) eo.xml_structured=true;
 						eo.utf8_output=utf8_output;
 						if(keep_result) { // change wrt. old setup
-							eo.print_full_standardform(pit, keep_result);
-							txtout << std::endl;
+							eo.print_full_standardform(txtout, pit, keep_result);
+							txtout << ";" << std::endl;
 							}
 						}
 					if(!keep_result) {
@@ -608,7 +609,7 @@ bool manipulator::handle_input()
 					expressions.erase(pit);
 					pit=expressions.end();
 					}
-				if(output_format==exptree_output::out_texmacs)
+				if(eo.output_format==exptree_output::out_texmacs)
 					txtout << DATA_BEGIN << "verbatim:";
 				if(status_output) txtout << "<error>\n";
 				txtout << std::endl;
@@ -616,7 +617,7 @@ bool manipulator::handle_input()
 				else              txtout << "ERROR: " << ex.what() << "." << std::endl;
 //				txtout << "       Expression removed." << std::endl << std::endl;
 				if(status_output) txtout << "</error>\n";
-				if(output_format==exptree_output::out_texmacs)
+				if(eo.output_format==exptree_output::out_texmacs)
 					txtout << DATA_END;
 				}
 			catch(consistency_error& ex) {
@@ -628,7 +629,7 @@ bool manipulator::handle_input()
 				expressions.erase(pit);
 				pit=expressions.end();
 				// Output, depending on format.
-				if(output_format==exptree_output::out_texmacs)
+				if(eo.output_format==exptree_output::out_texmacs)
 					txtout << DATA_BEGIN << "verbatim:";
 				if(status_output) txtout << "<error>\n";
 				txtout << std::endl;
@@ -636,12 +637,12 @@ bool manipulator::handle_input()
 				else              txtout << "ERROR: " << ex.what() << std::endl;
 //				txtout << "       Expression removed." << std::endl << std::endl;
 				if(status_output) txtout << "</error>\n";
-				if(output_format==exptree_output::out_texmacs)
+				if(eo.output_format==exptree_output::out_texmacs)
 					txtout << DATA_END;
 				if(getenv("CDB_ERRORS_ARE_FATAL")) {
 					if(incomment) {
 						incomment=false;
-						txtout << "</comment>\n";
+						txtout << "</texcomment>\n";
 						}
 					throw consistency_error("Error triggered program abort by CDB_ERRORS_ARE_FATAL setting.");
 					}
@@ -663,14 +664,14 @@ bool manipulator::handle_input()
 					output_file.clear();
 					fake_txtout=real_txtout;
 					fake_forcedout=real_forcedout;
-					output_format=remember_output_format;
+					eo.output_format=remember_output_format;
 					status_output=remember_status_output;
 					output_comment("Output file closed.");
 					}
 				print_prompt();
 				if(input_buffer.size()>0) goto inputbuffer_ready;
 				else {
-					if(output_format==exptree_output::out_texmacs)
+					if(eo.output_format==exptree_output::out_texmacs)
 						txtout << DATA_BEGIN << "verbatim: " << DATA_END; 
 					goto reinput;
 					}
@@ -683,7 +684,7 @@ bool manipulator::handle_input()
 
 	   anotherline:
 		debugout << std::flush;
-		if(output_format==exptree_output::out_texmacs) {
+		if(eo.output_format==exptree_output::out_texmacs) {
 			if(getline_precut_buffer.size()==0) {
 				txtout << DATA_BEGIN << "verbatim: " << DATA_END; 
 				}
@@ -695,7 +696,7 @@ bool manipulator::handle_input()
 			output_file.clear();
 			fake_txtout=real_txtout;
 			fake_forcedout=real_forcedout;
-			output_format=remember_output_format;
+			eo.output_format=remember_output_format;
 			status_output=remember_status_output;
 			output_comment("Output file closed.");
 			}
@@ -725,7 +726,7 @@ void manipulator::set_prompt(const std::string& str)
 
 void manipulator::print_prompt() const
 	{
-	if(output_format!=exptree_output::out_texmacs)
+	if(eo.output_format!=exptree_output::out_texmacs)
 		txtout << prompt_string;
 	else {
 		if(getline_precut_buffer.size()==0) {
@@ -830,6 +831,7 @@ void manipulator::extract_properties_(exptree::iterator it)
 
 //	txtout << "extracting properties" << std::endl;
 	extract_properties props(expressions, expressions.end());
+	props.eo=&eo; // enable printing
 	props.apply_recursive(it, false);
 //	txtout << "extracting properties done" << std::endl;
 	}
@@ -878,10 +880,10 @@ exptree::iterator manipulator::handle_active_nodes_(exptree::iterator original_e
 		else if(*it->name=="@properties") {
 			 properties::registered_property_map_t::iterator pit=properties::registered_properties.begin();
 			 while(pit!=properties::registered_properties.end()) {
-				  if(output_format==exptree_output::out_xcadabra)
+				  if(eo.output_format==exptree_output::out_xcadabra)
 						txtout << "<property>\n";
 				  txtout << "::" << pit->first << std::endl;
-				  if(output_format==exptree_output::out_xcadabra)
+				  if(eo.output_format==exptree_output::out_xcadabra)
 						txtout << "</property>\n";
 				  ++pit;
 				  }
@@ -892,10 +894,10 @@ exptree::iterator manipulator::handle_active_nodes_(exptree::iterator original_e
 		else if(*it->name=="@algorithms") {
 			algorithm_map_t::iterator it=algorithms.begin();
 			while(it!=algorithms.end()) {
-				 if(output_format==exptree_output::out_xcadabra)
+				 if(eo.output_format==exptree_output::out_xcadabra)
 						txtout << "<algorithm>\n";
 				 txtout << it->first << std::endl;
-				 if(output_format==exptree_output::out_xcadabra)
+				 if(eo.output_format==exptree_output::out_xcadabra)
 						txtout << "</algorithm>\n";
 				++it;
 				}
@@ -935,13 +937,13 @@ exptree::iterator manipulator::handle_active_nodes_(exptree::iterator original_e
 			}
 		else if(*it->name=="@output_format") {
 			sibling_iterator sib=expressions.begin(it);
-			if(*sib->name=="cadabra")          output_format=exptree_output::out_plain;
-			else if(*sib->name=="mathematica") output_format=exptree_output::out_mathematica;
-			else if(*sib->name=="reduce")      output_format=exptree_output::out_reduce;
-			else if(*sib->name=="maple")       output_format=exptree_output::out_maple;
-			else if(*sib->name=="texmacs")     output_format=exptree_output::out_texmacs;
-			else if(*sib->name=="xcadabra")    output_format=exptree_output::out_xcadabra;
-			else if(*sib->name=="mathml")      output_format=exptree_output::out_mathml;
+			if(*sib->name=="cadabra")          eo.output_format=exptree_output::out_plain;
+			else if(*sib->name=="mathematica") eo.output_format=exptree_output::out_mathematica;
+			else if(*sib->name=="reduce")      eo.output_format=exptree_output::out_reduce;
+			else if(*sib->name=="maple")       eo.output_format=exptree_output::out_maple;
+			else if(*sib->name=="texmacs")     eo.output_format=exptree_output::out_texmacs;
+			else if(*sib->name=="xcadabra")    eo.output_format=exptree_output::out_xcadabra;
+			else if(*sib->name=="mathml")      eo.output_format=exptree_output::out_mathml;
 			expressions.erase_expression(original_expression);
 			if(last_used_equation_number!=0)
 				return expressions.equation_by_number(last_used_equation_number);
@@ -1177,16 +1179,10 @@ bool manipulator::handle_external_commands_(exptree::iterator& original_expressi
 	if(ait!=algorithms.end()) {
 		try {
 			std::auto_ptr<algorithm> thealg=ait->second->create(expressions, it);
-			thealg->output_format=output_format;
+			thealg->eo=&eo;
 
 			if(last_used_equation_number==0)
 				last_used_equation_number=expressions.number_of_equations()-1;
-			// propagate output flags if this is an output module
-			exptree_output *eo=dynamic_cast<exptree_output *>(&(*thealg));
-			if(eo) {
-				eo->output_format=output_format;
-				eo->utf8_output=utf8_output;
-				}
 
 			bool make_copies=true;
 			const KeepHistory *kh=properties::get<KeepHistory>();

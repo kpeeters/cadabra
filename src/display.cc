@@ -31,12 +31,12 @@
 #define nbsp   (( parent.utf8_output?(unichar(0x00a0)):" "))
 #define zwnbsp (( parent.utf8_output?(unichar(0xfeff)):""))
 
-exptree_output::exptree_output(const exptree& tr_, std::ostream& str_, output_format_t of) 
+exptree_output::exptree_output(const exptree& tr_, output_format_t of) 
 	: 	tight_star(getenv("CDB_TIGHTSTAR")), tight_plus(getenv("CDB_TIGHTPLUS")), 
  	   tight_brackets(getenv("CDB_TIGHTBRACKETS")),
 		print_star(getenv("CDB_PRINTSTAR")), output_format(of),
 		xml_structured(false), utf8_output(false), print_expression_number(true),
-		str(str_), tr(tr_), bracket_level(0),
+		tr(tr_), bracket_level(0),
 		print_default_(&create<node_printer>)
 	{
 	setup_handlers();
@@ -93,6 +93,17 @@ void exptree_output::setup_handlers(bool infix)
 		}
 	}
 
+void exptree_output::newline(std::ostream& str)
+	{
+	switch(output_format) {
+		case out_xcadabra:
+			str << "\\\\" << std::endl;
+			break;
+		default:
+			str << std::endl;
+		}
+	}
+
 display_error::display_error()
 	{
 	}
@@ -129,7 +140,7 @@ std::auto_ptr<node_base_printer> exptree_output::get_printer(exptree::iterator i
 	return print_default_(*this);
 	}
 
-void exptree_output::print_infix(exptree::iterator start)
+void exptree_output::print_infix(std::ostream& str, exptree::iterator start)
 	{
 	setup_handlers(true);
 	if(output_format==out_texmacs) str << DATA_BEGIN << "latex:$";
@@ -137,7 +148,7 @@ void exptree_output::print_infix(exptree::iterator start)
 	if(output_format==out_texmacs) str << "$" << DATA_END << std::flush;
 	}
 
-void exptree_output::print_prefix(exptree::iterator start)
+void exptree_output::print_prefix(std::ostream& str, exptree::iterator start)
 	{
 	setup_handlers(false);
 	get_printer(start)->print_infix(str, start);
@@ -158,7 +169,6 @@ void print_expression::print_infix(std::ostream& str, exptree::iterator it)
 	// like the externally (anti)symmetrised indices, which should
 	// be displayed in a different way.
 	parent.get_printer(tr.begin(it))->print_infix(str, tr.begin(it));
-	str << ";";
 	}
 
 /* --------------------------------------------------------------------- */
@@ -606,7 +616,7 @@ void print_comma::print_infix(std::ostream& str, exptree::iterator it)
 			str << ",";
 			if(!parent.tight_plus) {
 				if(parent.output_format==exptree_output::out_xcadabra)
-					str << "\\quad ";
+					str << "\\; ";
 				else
 					str << " ";
 // FIXME: print extra endl depending on line_per_node
@@ -1182,7 +1192,7 @@ void node_printer::print_parent_rel(std::ostream& str, str_node::parent_rel_t pr
 	}
 
 
-void exptree_output::print_full_standardform(exptree::iterator it, bool eqno)
+void exptree_output::print_full_standardform(std::ostream& str, exptree::iterator it, bool eqno)
 	{
 	if(eqno) {
 		nset_t::iterator name=tr.equation_label(it);
@@ -1197,13 +1207,13 @@ void exptree_output::print_full_standardform(exptree::iterator it, bool eqno)
 	if(output_format==exptree_output::out_xcadabra) { // first output plain
 		output_format=exptree_output::out_plain;
 		str << "<plain>" << std::endl;
-		print_infix(tr.active_expression(it));
+		print_infix(str, tr.active_expression(it));
 		str << std::endl << "</plain>" << std::endl;
 		output_format=exptree_output::out_xcadabra;
 		}
 
 	if(xml_structured) str << "<eq>" << std::endl;
-	print_infix(tr.active_expression(it));
+	print_infix(str, tr.active_expression(it));
 	if(xml_structured) str << std::endl << "</eq>" << std::endl;
 
 	}

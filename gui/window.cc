@@ -234,7 +234,8 @@ void ActionAddCell::revert(XCadabra& xc)
 	// We have to put the cursor in the previous input cell or in the previous open TeX cell.
 	// So walk up the cells until we meet this condition.
 	while((*prevcell)->cell_type!=DataCell::c_input 
-			&& !( (*prevcell)->cell_type==DataCell::c_comment && (*prevcell)->tex_hidden==false) )
+			&& !( ( (*prevcell)->cell_type==DataCell::c_comment || (*prevcell)->cell_type==DataCell::c_texcomment ) 
+					&& (*prevcell)->tex_hidden==false) )
 		--prevcell;
 	
 	xc.active_canvas->cell_grab_focus(*prevcell);
@@ -276,7 +277,8 @@ void ActionRemoveCell::execute(XCadabra& xc)
 		// So walk down the cells until we meet this condition (or end).
 		while(fnd!=xc.datacells.end() 
 				&& (*fnd)->cell_type!=DataCell::c_input 
-				&& !( (*fnd)->cell_type==DataCell::c_comment && (*fnd)->tex_hidden==false) )
+				&& !( ( (*fnd)->cell_type==DataCell::c_comment || (*fnd)->cell_type==DataCell::c_texcomment) 
+						&& (*fnd)->tex_hidden==false) )
 			 ++fnd;
 
 		if(fnd!=xc.datacells.end())
@@ -313,6 +315,7 @@ DataCell::DataCell(cell_t ct, const std::string& str, bool texhidden)
 		case c_error:
 		case c_output:
 		case c_comment:
+		case c_texcomment:
 		case c_tex:
 			texbuf=TeXBuffer::create(textbuf, tex_engine_main);
 			break;
@@ -348,6 +351,7 @@ void NotebookCanvas::redraw_cells()
 				(*it)->inbox->edit.modify_font(Pango::FontDescription(fstr.str()));
 				break;
 			case DataCell::c_comment:
+			case DataCell::c_texcomment:
 			case DataCell::c_error:
 			case DataCell::c_output:
 				(*it)->outbox->update_image();
@@ -373,6 +377,7 @@ void NotebookCanvas::show_cell(Glib::RefPtr<DataCell> datacell)
 					(*it)->inbox->show_all();
 					break;
 				case DataCell::c_comment:
+				case DataCell::c_texcomment:
 				case DataCell::c_error:
 				case DataCell::c_output:
 					(*it)->outbox->show_all();
@@ -470,20 +475,19 @@ VisualCell *NotebookCanvas::add_cell(Glib::RefPtr<DataCell> dc, Glib::RefPtr<Dat
 				 sigc::bind<VisualCell *>(
 					 sigc::mem_fun(this, &NotebookCanvas::scroll_into_view_callback), newcell));
 	
-//			newcell->inbox->show_all();
 			break;
 			}
 		case DataCell::c_error:
 		case DataCell::c_output:
+		case DataCell::c_texcomment:
 		case DataCell::c_comment: {
 			newcell->outbox=manage( new TeXView(dc->texbuf) );
 			Gtk::VBox::BoxList::iterator newit=bl.insert(gtkit, *newcell->outbox);
-// REPORT BUG: this sometimes segfaults
-//			(*newit).set_options(Gtk::PACK_SHRINK);
+         // REPORT BUG: this sometimes segfaults
+         //			(*newit).set_options(Gtk::PACK_SHRINK);
 			gtk_box_set_child_packing(((Gtk::Box *)(&scrollbox))->gobj(), 
 											  ((Gtk::Widget *)(newcell->outbox))->gobj(),
 											  false, false, 0, GTK_PACK_START);
-//			newcell->outbox->show_all();
 			
 			newcell->outbox->signal_button_release_event().connect( 
 				sigc::bind<NotebookCanvas *, VisualCell *>(
@@ -548,6 +552,7 @@ void NotebookCanvas::remove_cell(Glib::RefPtr<DataCell> dc)
 			break;
 		case DataCell::c_error:
 		case DataCell::c_comment:
+		case DataCell::c_texcomment:
 		case DataCell::c_output:
 			scrollbox.remove(*((*it)->outbox));
 			break;
@@ -586,6 +591,7 @@ void NotebookCanvas::cell_grab_focus(VisualCell *vis)
 			case DataCell::c_error:
 			case DataCell::c_output:
 			case DataCell::c_comment:
+			case DataCell::c_texcomment:
 				break;
 			case DataCell::c_tex:
 				if(vis->datacell->tex_hidden==false) {
@@ -1506,6 +1512,9 @@ Glib::RefPtr<DataCell> XCadabra::add_cell(Glib::RefPtr<DataCell> newcell, Glib::
 			case DataCell::c_comment:
 				newcell->texbuf->generate("\\begin{verbatim}\n","\\end{verbatim}\n");
 				break;
+			case DataCell::c_texcomment:
+				newcell->texbuf->generate("{\\small ","}");
+				break;
 			case DataCell::c_input:
 				newcell->textbuf->signal_changed().connect(sigc::mem_fun(this, &XCadabra::input_cell_modified));
 
@@ -1866,6 +1875,7 @@ void XCadabra::remove_noninput_below(Glib::RefPtr<DataCell> dc)
 			while(it!=datacells.end() && (
 						(*it)->cell_type==DataCell::c_output ||
 						(*it)->cell_type==DataCell::c_comment ||
+						(*it)->cell_type==DataCell::c_texcomment ||
 						(*it)->cell_type==DataCell::c_error) ) {
 				 for(unsigned int i=0; i<canvasses.size(); ++i) {
 					  canvasses[i]->remove_cell(*it);
@@ -1937,6 +1947,22 @@ bool XCadabra::receive(modglue::ipipe& p)
 		else if(str=="</comment>") {
 			parse_mode.pop_back();
 			last_was_prompt=false;
+			continue;
+			}
+		else if(str=="<texcomment>") {
+			parse_mode.push_back(m_texcomment);
+			last_was_prompt=false;
+			continue;
+			}
+		else if(str=="</texcomment>") {
+			parse_mode.pop_back();
+			last_was_prompt=false;
+			if(trim(comment).size()!=0 && trim(comment)!=">") {
+				Glib::RefPtr<DataCell> newcell(new DataCell(DataCell::c_texcomment, trim(comment)));
+				cp=add_cell(newcell, cp, false);
+				show_cell(newcell);
+				}
+			comment="";
 			continue;
 			}
 		else if(str=="<status>") {
@@ -2212,6 +2238,7 @@ bool XCadabra::receive(modglue::ipipe& p)
 				reserved+=str; 
 				break;
 			case m_comment:
+			case m_texcomment:
 				if(trim(str).size()>0)
 					comment+=str+"\n";
 				break;
@@ -2513,6 +2540,11 @@ std::string XCadabra::save(const std::string& fn) const
 							 << trim( (*it)->textbuf->get_text() )
 							 << "\n\\end{verbatim}\n";
 						break;
+					case DataCell::c_texcomment:
+						str << "% Begin TeX comment\n"
+							 << trim( (*it)->textbuf->get_text() )
+							 << "\n% End TeX comment\n";
+						break;
 					case DataCell::c_tex:
 						str << "% Begin TeX cell "
 							 << ( (*it)->tex_hidden==true ? "closed\n":"open\n" );
@@ -2565,6 +2597,7 @@ std::string XCadabra::expo(const std::string& fn) const
 					case DataCell::c_error:
 					case DataCell::c_output:
 					case DataCell::c_comment:
+					case DataCell::c_texcomment:
 						break;
 						break;
 					}
@@ -2611,7 +2644,7 @@ std::string XCadabra::load(const std::string& fn, bool ignore_nonexistence)
 
 		clear();
 
-		enum state_t { s_top, s_input, s_output, s_comment, s_tex, s_error, s_output_as_cdb };
+		enum state_t { s_top, s_input, s_output, s_comment, s_texcomment, s_tex, s_error, s_output_as_cdb };
 		state_t curstat=s_top;
 		std::string buffer, cdb_buffer;
 		int line_num=2;
@@ -2724,6 +2757,25 @@ std::string XCadabra::load(const std::string& fn, bool ignore_nonexistence)
 					return err.str();
 					}
 				Glib::RefPtr<DataCell> newcell(new DataCell(DataCell::c_comment, buffer));
+				add_cell(newcell, Glib::RefPtr<DataCell>());
+				curstat=s_top;
+				}
+			else if(ln=="% Begin TeX comment") {
+				if(curstat!=s_top) {
+					err << "Illegal location of TeX comment cell at line " << line_num << ".";
+					kernel_idle();
+					return err.str();
+					}
+				curstat=s_texcomment;
+				buffer="";
+				}
+			else if(ln=="% End TeX comment") {
+				if(curstat!=s_texcomment) {
+					err << "Unmatched TeX comment cell closing at line " << line_num << ".";
+					kernel_idle();
+					return err.str();
+					}
+				Glib::RefPtr<DataCell> newcell(new DataCell(DataCell::c_texcomment, buffer));
 				add_cell(newcell, Glib::RefPtr<DataCell>());
 				curstat=s_top;
 				}
@@ -2951,7 +3003,8 @@ void XCadabra::on_settings_font_size(int num)
 	DataCells_t::iterator it=datacells.begin();
 	while(it!=datacells.end()) {
 		if((*it)->cell_type==DataCell::c_output || (*it)->cell_type==DataCell::c_tex 
-			|| (*it)->cell_type==DataCell::c_error || (*it)->cell_type==DataCell::c_comment) {
+			|| (*it)->cell_type==DataCell::c_error || (*it)->cell_type==DataCell::c_comment 
+			|| (*it)->cell_type==DataCell::c_texcomment) {
 			tex_engine_main.set_font_size(12+(num*2));
 			(*it)->texbuf->regenerate();
 			}

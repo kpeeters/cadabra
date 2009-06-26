@@ -46,7 +46,7 @@ bool LaTeXForm::parse(exptree& tr, exptree::iterator pat, exptree::iterator prop
 	}
 
 tree_dump::tree_dump(exptree& thetr, iterator it)
-	: algorithm(thetr, it), exptree_output(thetr, txtout)
+	: algorithm(thetr, it)
 	{
 	}
 
@@ -100,7 +100,7 @@ void tree_dump::print_one(std::ostream& out, sibling_iterator st) const
 
 
 print::print(exptree&tr, iterator it)
-	: algorithm(tr, it), exptree_output(tr, forcedout)
+	: algorithm(tr, it)
 	{
 	}
 
@@ -123,7 +123,7 @@ algorithm::result_t print::apply(iterator& st)
 			   forcedout << (*si->name).substr(1,(*si->name).size()-2);
 			else {
 				if(*si->name=="endl") forcedout << std::endl;
-				else                  print_infix(si);
+				else                  eo->print_infix(forcedout, si);
 				}
 			++si;
 			}
@@ -133,15 +133,21 @@ algorithm::result_t print::apply(iterator& st)
 			forcedout << (*st->name).substr(1,(*st->name).size()-2);
 		else {
 			if(*st->name=="endl") forcedout << std::endl;
-			else                  print_infix(st);
+			else                  eo->print_infix(forcedout, st);
 			}
 		}
 	forcedout << std::endl;
+	discard_command_node=true;
 	return l_applied;
 	}
 
+bool print::is_output_module() const
+	{
+	return true;
+	}
+
 indexlist::indexlist(exptree& tr, iterator it)
-	: algorithm(tr, it), exptree_output(tr, txtout)
+	: algorithm(tr, it)
 	{
 	}
 
@@ -170,7 +176,7 @@ algorithm::result_t indexlist::apply(iterator& st)
 
 
 assert_or_exit::assert_or_exit(exptree& tr, iterator it)
-	: algorithm(tr, it), exptree_output(tr, txtout)
+	: algorithm(tr, it)
 	{
 	}
 
@@ -194,7 +200,7 @@ algorithm::result_t assert_or_exit::apply(iterator& st)
 	}
 
 number_of_terms::number_of_terms(exptree&tr, iterator it)
-	: algorithm(tr, it), exptree_output(tr, txtout)
+	: algorithm(tr, it)
 	{
 	}
 
@@ -217,7 +223,7 @@ algorithm::result_t number_of_terms::apply(iterator& st)
 	}
 
 memdump::memdump(exptree& tr, iterator it)
-	: algorithm(tr, it), exptree_output(tr, txtout)
+	: algorithm(tr, it)
 	{
 	}
 
@@ -278,7 +284,7 @@ algorithm::result_t memdump::apply(iterator&)
 
 
 depprint::depprint(exptree& tr, iterator it)
-	: algorithm(tr, it), exptree_output(tr, txtout)
+	: algorithm(tr, it)
 	{
 	}
 
@@ -304,7 +310,7 @@ algorithm::result_t depprint::apply(iterator& it)
 			properties::property_map_t::iterator pit=properties::props.begin();
 			while(pit!=properties::props.end()) {
 				if((*pit).second.first->obj.begin()->name==walk->name) {  // FIXME: match pattern
-					print_infix((*pit).second.first->obj.begin());
+					eo->print_infix(txtout, (*pit).second.first->obj.begin());
 					txtout << "::";
 					(*pit).second.second->display(txtout);
 					txtout << "." << std::endl;
@@ -316,14 +322,14 @@ algorithm::result_t depprint::apply(iterator& it)
 		++walk;
 		}
 	txtout << std::endl;
-	print_infix(active_node::tr.active_expression(it));
+	eo->print_infix(txtout, active_node::tr.active_expression(it));
 	txtout << std::endl;
 	return l_applied;
 	}
 
 
 eqs::eqs(exptree& tr, iterator it)
-	: algorithm(tr, it), exptree_output(tr, txtout)
+	: algorithm(tr, it)
 	{
 	}
 
@@ -344,8 +350,8 @@ algorithm::result_t eqs::apply(iterator&)
 	while(eit!=active_node::tr.end()) {
 		if(eit!=active_node::tr.named_parent(this_command, "\\history")) {
 			if(*eit->name=="\\history") {
-				print_full_standardform(eit, eqno);
-				str << std::endl;
+				eo->print_full_standardform(txtout, eit, eqno);
+				txtout << std::endl;
 				}
 			}
 		++eit;
@@ -380,7 +386,7 @@ algorithm::result_t eqs::apply(iterator&)
 
 
 proplist::proplist(exptree& tr, iterator it)
-	: algorithm(tr, it), exptree_output(tr, txtout)
+	: algorithm(tr, it)
 	{
 	}
 
@@ -403,7 +409,7 @@ algorithm::result_t proplist::apply(iterator& it)
 		if(num>1) {
 			txtout << "{";
 			while(num>0) {
-				print_prefix(pit->second->obj.begin());
+				eo->print_prefix(txtout, pit->second->obj.begin());
 				if(num>1) {
 					txtout << ", ";
 					++pit;
@@ -412,7 +418,7 @@ algorithm::result_t proplist::apply(iterator& it)
 				}
 			txtout << "}";
 			}
-		else print_prefix(pit->second->obj.begin());
+		else eo->print_prefix(txtout, pit->second->obj.begin());
 
 		txtout << "::";
 		pit->first->display(txtout);

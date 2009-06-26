@@ -112,6 +112,8 @@ class algorithm : public active_node {
 			g_apply_failed=6
 		};
 
+		virtual bool     is_output_module() const;
+
 		virtual bool     can_apply(iterator);
 		virtual bool     can_apply(sibling_iterator, sibling_iterator);
 		// These return their result in the return value
@@ -139,8 +141,8 @@ class algorithm : public active_node {
 		bool             suppress_normal_output;
 		bool             discard_command_node;
 
-		// Any output will follow the settings of this flag.
-		exptree_output::output_format_t output_format;
+		// Any output should be handled using this output object.
+		exptree_output  *eo;
 
 		// Given an \expression node, check consistency
 		bool      check_consistency(iterator) const;

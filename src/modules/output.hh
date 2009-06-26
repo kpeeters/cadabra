@@ -36,7 +36,7 @@ class LaTeXForm : virtual public property {
 		std::string latex;
 };
 
-class tree_dump : public algorithm, public exptree_output {
+class tree_dump : public algorithm {
 	public:
 		tree_dump(exptree&, iterator);
 
@@ -47,7 +47,7 @@ class tree_dump : public algorithm, public exptree_output {
 		void print_one(std::ostream&, sibling_iterator) const;
 };
 
-class memdump : public algorithm, public exptree_output {
+class memdump : public algorithm {
 	public:
 		memdump(exptree&, iterator);
 			
@@ -56,7 +56,7 @@ class memdump : public algorithm, public exptree_output {
 		virtual result_t apply(iterator&);
 };
 
-class depprint : public algorithm, public exptree_output {
+class depprint : public algorithm {
 	public:
 		depprint(exptree&, iterator);
 
@@ -65,7 +65,7 @@ class depprint : public algorithm, public exptree_output {
 		virtual result_t apply(iterator&);
 };
 
-class eqs : public algorithm, public exptree_output {
+class eqs : public algorithm {
 	public:
 		eqs(exptree&, iterator);
 		 
@@ -74,7 +74,7 @@ class eqs : public algorithm, public exptree_output {
 		virtual result_t apply(iterator&);
 };
 
-class proplist : public algorithm, public exptree_output {
+class proplist : public algorithm {
 	public: 
 		proplist(exptree&, iterator);
 		
@@ -83,16 +83,18 @@ class proplist : public algorithm, public exptree_output {
 		virtual result_t apply(iterator&);
 };
 
-class print : public algorithm, public exptree_output {
+class print : public algorithm {
 	public:
 		print(exptree&, iterator);
 		
 		virtual void     description() const;
 		virtual bool     can_apply(iterator);
 		virtual result_t apply(iterator&);
+
+		virtual bool     is_output_module() const;
 };
 
-class indexlist : public algorithm, public exptree_output {
+class indexlist : public algorithm {
 	public:
 		indexlist(exptree&, iterator);
 
@@ -110,7 +112,7 @@ class indexlist : public algorithm, public exptree_output {
 //   		virtual result_t apply(iterator&);
 //   };
 
-class assert_or_exit : public algorithm, public exptree_output {
+class assert_or_exit : public algorithm {
 	public:
 		assert_or_exit(exptree&, iterator);
 
@@ -119,7 +121,7 @@ class assert_or_exit : public algorithm, public exptree_output {
 		virtual result_t apply(iterator&);
 };
 
-class number_of_terms : public algorithm, public exptree_output {
+class number_of_terms : public algorithm {
 	public:
 		number_of_terms(exptree&, iterator);
 		

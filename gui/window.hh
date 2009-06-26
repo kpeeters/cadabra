@@ -68,7 +68,7 @@ class XCadabra;
 
 class DataCell : public Glib::Object {
 	public:
-		enum cell_t { c_input, c_output, c_comment, c_tex, c_error };
+		enum cell_t { c_input, c_output, c_comment, c_texcomment, c_tex, c_error };
 
 		DataCell(cell_t, const std::string& str="", bool texhidden=false);
 
@@ -386,7 +386,7 @@ class XCadabra : public Gtk::Window {
 		/// cadabra process.
 		modglue::ext_process&     cdb;
 		enum parse_mode_t         { m_status, m_eqno, m_eq, m_property, m_algorithm, m_reserved,
-											 m_discard, m_comment, m_error,
+											 m_discard, m_comment, m_texcomment, m_error,
 		                            m_progress, m_plain };
 		std::vector<parse_mode_t> parse_mode;
 		std::string               eqno, eq, status, progress, plain, algorithm, property, reserved;

@@ -1297,9 +1297,13 @@ exptree_comparator::match_t exptree_comparator::compare(const exptree::iterator&
 	if(nobrackets==false && one->fl.bracket != two->fl.bracket) 
 		return (one->fl.bracket < two->fl.bracket)?no_match_less:no_match_greater;
 
+//	std::cerr << "one passed" << std::endl;
+
+	// FIXME: this needs to be relaxed for position-free indices
 	if(one->fl.parent_rel != two->fl.parent_rel)                
 		return (one->fl.parent_rel < two->fl.parent_rel)?no_match_less:no_match_greater;
 
+//	std::cerr << "two passed" << std::endl;
 
 	// Determine whether we are dealing with one of the pattern types.
 	bool pattern=false;
@@ -1320,6 +1324,7 @@ exptree_comparator::match_t exptree_comparator::compare(const exptree::iterator&
 		}
 		
 	if(pattern || (implicit_pattern && two->is_integer()==false)) { 
+//		std::cerr << "three" << std::endl;
 		// The above is to ensure that we never match integers to implicit patterns.
 
 		bool tested_full=true;
@@ -1335,6 +1340,7 @@ exptree_comparator::match_t exptree_comparator::compare(const exptree::iterator&
 			}
 
 		if(loc!=replacement_map.end()) {
+//			std::cerr << "found!" << std::endl;
 			// If this is an index/pattern, try to match the whole index/pattern.
 			// We want to make sure that e.g. a pattern k1_a k2_a does not match an expression k1_c k2_d.
 
@@ -1359,6 +1365,8 @@ exptree_comparator::match_t exptree_comparator::compare(const exptree::iterator&
 			// This index/pattern was not encountered earlier. Check that the index types in pattern
 			// and object agree (if known, otherwise assume they match)
 
+//			std::cerr << "index check " << *one->name << " " << *two->name << std::endl;
+
 			const Indices *t1=properties::get<Indices>(one);
 			const Indices *t2=properties::get<Indices>(two);
 			if( (t1 || t2) && implicit_pattern ) {
@@ -1374,6 +1382,7 @@ exptree_comparator::match_t exptree_comparator::compare(const exptree::iterator&
 					}
 				}
 			// The index types match, so register this replacement rule.
+//			std::cerr << "registering " << *one->name << " " << *two->name << std::endl;
 			replacement_map[one]=two;
 			
 			// if this is a pattern and the pattern has a non-zero number of children,

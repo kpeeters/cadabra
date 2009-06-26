@@ -321,7 +321,7 @@ algorithm::result_t run::apply(iterator& it)
 algorithm::result_t run::apply(iterator& it, std::string program_name, bool mapleout)
 	{
 	std::ostringstream argstr;
-	exptree_output eo(tr, argstr);
+	exptree_output eo(tr);
 	if(mapleout)
 		eo.output_format=exptree_output::out_maple;
 	
@@ -332,7 +332,7 @@ algorithm::result_t run::apply(iterator& it, std::string program_name, bool mapl
 			   argstr << (*si->name).substr(1,(*si->name).size()-2);
 			else {
 				if(*si->name=="endl") argstr << std::endl;
-				else                  eo.print_infix(si);
+				else                  eo.print_infix(argstr, si);
 				}
 			++si;
 			}
@@ -342,7 +342,7 @@ algorithm::result_t run::apply(iterator& it, std::string program_name, bool mapl
 			argstr << (*it->name).substr(1,(*it->name).size()-2);
 		else {
 			if(*it->name=="endl") argstr << std::endl;
-			else                  eo.print_infix(it);
+			else                  eo.print_infix(argstr, it);
 			}
 		}
 
@@ -432,11 +432,11 @@ bool maxima::can_apply(iterator it)
 algorithm::result_t maxima::apply(iterator& it)
 	{
 	std::ostringstream argstr;
-	exptree_output eo(tr, argstr);
+	exptree_output eo(tr);
 	eo.output_format=exptree_output::out_plain;
 	eo.print_star=true;
 
-	eo.print_infix(it);
+	eo.print_infix(argstr, it);
 	
 	std::string result;
 	modglue::child_process proc("maxima");
@@ -516,11 +516,11 @@ bool maple::can_apply(iterator it)
 algorithm::result_t maple::apply(iterator& it)
 	{
 	std::ostringstream argstr;
-	exptree_output eo(tr, argstr);
+	exptree_output eo(tr);
 	eo.output_format=exptree_output::out_plain;
 	eo.print_star=true;
 
-	eo.print_infix(it);
+	eo.print_infix(argstr, it);
 	
 	std::string result;
 	modglue::child_process proc("maple");

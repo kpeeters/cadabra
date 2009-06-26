@@ -40,8 +40,8 @@ std::istream& operator>>(std::istream& str, parser& pa)
 
 std::ostream& operator<<(std::ostream& str, parser& pa)
 	  {
-	  exptree_output eo(pa.tree, str);
-	  eo.print_infix(pa.tree.begin());
+	  exptree_output eo(pa.tree);
+	  eo.print_infix(str, pa.tree.begin());
 	  return str;
 	  }
 

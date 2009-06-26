@@ -209,6 +209,10 @@ algorithm::result_t substitute::apply(iterator& st)
 	std::vector<iterator> subtree_insertion_points;
 	while(it!=repl.end()) { 
 		bool is_stripped=false;
+
+//		For some reason 'a?' is not found!?! Well, that's presumably because _{a?} does not
+//      match ^{a?}. (though this does match when we write 'i' instead of a?. 
+
 		loc=comparator.replacement_map.find(exptree(it));
 		if(loc==comparator.replacement_map.end() && it->is_name_wildcard() && tr.number_of_children(it)!=0) {
 			 exptree tmp(it);
@@ -218,8 +222,8 @@ algorithm::result_t substitute::apply(iterator& st)
 			 }
 
 		if(loc!=comparator.replacement_map.end()) { // name wildcards
-//			txtout << "rule : " << *((*loc).first.begin()->name) << " -> " << std::endl;
-//			txtout << "going to replace " << *it->name << " with " << *((*loc).second.begin()->name) << std::endl;
+//			std::cerr << "rule : " << *((*loc).first.begin()->name) << " -> " << std::endl;
+//			std::cerr << "going to replace " << *it->name << " with " << *((*loc).second.begin()->name) << std::endl;
 
 			// When a replacement is made here, and the index is actually
 			// a dummy in the replacement, we screw up the ind_dummy

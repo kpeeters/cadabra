@@ -83,7 +83,7 @@ class manipulator : public sigc::trackable {
 		void read_program_file();
 
 		std::stack<std::istream *> streamstack;
-		exptree_output::output_format_t output_format;
+		exptree_output             eo;
 	private:
 		bool              getline_precut(std::istream&, std::string&);
 		std::string       getline_precut_buffer;

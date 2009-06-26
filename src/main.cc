@@ -165,13 +165,13 @@ int main(int argc, char **argv)
 			loginput=true;
 			}
 		else if(strcmp(argv[i],"--texmacs")==0) {
-			mnp.output_format=exptree_output::out_texmacs;
+			mnp.eo.output_format=exptree_output::out_texmacs;
 			}
 		else if(strcmp(argv[i],"--xcadabra")==0) {
-			mnp.output_format=exptree_output::out_xcadabra;
+			mnp.eo.output_format=exptree_output::out_xcadabra;
 			}
 		else if(strcmp(argv[i],"--mathml")==0) {
-			mnp.output_format=exptree_output::out_mathml;
+			mnp.eo.output_format=exptree_output::out_mathml;
 			}
 		else if(strcmp(argv[i],"--input")==0) {
 			++i;
@@ -205,7 +205,7 @@ int main(int argc, char **argv)
 	if(mm.check()) {
 		determine_window_size();
 		globaltime.start();
-		if(mnp.output_format==exptree_output::out_texmacs) {
+		if(mnp.eo.output_format==exptree_output::out_texmacs) {
 //			txtout << DATA_BEGIN << "scheme:";
 //			txtout << "<with|font-family|rm|<with|font-size|2.0|Cadabra> 0.8>" << std::endl;
 			txtout << DATA_BEGIN << "latex:";
@@ -253,7 +253,7 @@ int main(int argc, char **argv)
 				}
 			else debugout << "Default startup file ~/.cadabra not present." << std::endl << std::endl;
 			}
-		if(mnp.output_format==exptree_output::out_texmacs)
+		if(mnp.eo.output_format==exptree_output::out_texmacs)
 			txtout << DATA_END << std::flush;
 		// Process input file, if any.
 		if(inputfile.size()>0) {

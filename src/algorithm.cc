@@ -102,12 +102,17 @@ algorithm::algorithm(exptree& tr_, iterator it_)
 	  equation_number(0), global_success(g_not_yet_started), 
 	  number_of_calls(0), number_of_modifications(0),
 	  suppress_normal_output(false),
-	  discard_command_node(false)
+	  discard_command_node(false), eo(0)
 	{
 	}
 
 algorithm::~algorithm()
 	{
+	}
+
+bool algorithm::is_output_module() const
+	{
+	return false;
 	}
 
 bool algorithm::can_apply(iterator it) 
@@ -119,7 +124,6 @@ bool algorithm::can_apply(iterator it)
 
 bool algorithm::can_apply(sibling_iterator st, sibling_iterator nd)
 	{
-	txtout << "calling algorithm::can_apply?!?" << std::endl;
 	while(st!=nd) {
 		if(can_apply(st)) return true;
 		++st;
@@ -205,7 +209,7 @@ void algorithm::apply(unsigned int lue, bool multiple, bool until_nochange, bool
 	// Depending on the outcome, different actions should be taken to copy the
 	// original tree and store the result.
 	
-	bool is_output_module=dynamic_cast<exptree_output *>(this);
+	bool is_output_module=this->is_output_module(); //dynamic_cast<exptree_output *>(this);
 
 	if(actold!=tr.end()) { // act on an existing expression
 		previous_expression=tr.named_parent(tr.active_expression(actold), "\\expression");
@@ -244,9 +248,7 @@ void algorithm::apply(unsigned int lue, bool multiple, bool until_nochange, bool
 		if(!is_output_module) {
 			if(global_success==g_apply_failed) {
 				if(make_copy) {
-//					txtout << "cancelling modification" << std::endl;
 					cancel_modification();
-//					txtout << "cancelling modification done" << std::endl;
 					}
 				subtree=previous_expression;
 				}
@@ -339,7 +341,6 @@ void algorithm::apply(unsigned int lue, bool multiple, bool until_nochange, bool
 			discard_command_node=false;
 			}
 		else {
-			txtout << "* no change" << std::endl;
 			discard_command_node=true;
 			subtree=tr.end();
 			}
@@ -378,10 +379,6 @@ void algorithm::apply(unsigned int lue, bool multiple, bool until_nochange, bool
 	if(is_output_module) {
 		suppress_normal_output=true;
 		}
-//	txtout << *subtree->name << std::endl;
-	// bughunt: there does not seem to be any slowdown anymore in apply. 
-//	ww.stop();
-//	txtout << " apply took " << ww << std::endl;
 	}
 
 
@@ -899,7 +896,7 @@ void algorithm::report_progress(const std::string& str, int todo, int done, int 
 		}
 
 	if(display) { // prevents updates at a rate of more than one per second
-		if(output_format==exptree_output::out_xcadabra) {
+		if(eo->output_format==exptree_output::out_xcadabra) {
 			txtout << "<progress>" << std::endl
 					 << str << std::endl
 					 << todo << std::endl

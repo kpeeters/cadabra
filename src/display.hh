@@ -375,7 +375,7 @@ class exptree_output {
 		enum output_format_t { out_plain, out_mathematica, out_reduce, out_maple, 
 									  out_texmacs, out_mathml, out_xcadabra };
 
-		exptree_output(const exptree&, std::ostream&, output_format_t of=out_plain);
+		exptree_output(const exptree&, output_format_t of=out_plain);
 
 		bool            highlight;
 		const bool      tight_star;
@@ -386,13 +386,13 @@ class exptree_output {
 		bool            xml_structured;
 		bool            utf8_output;
 		bool            print_expression_number;
-		std::ostream&   str;
 		const exptree&  tr;
 
-		void print_full_standardform(exptree::iterator, bool eqno);
-		void print_infix(exptree::iterator);
-		void print_prefix(exptree::iterator);
+		void print_full_standardform(std::ostream&, exptree::iterator, bool eqno);
+		void print_infix(std::ostream&, exptree::iterator);
+		void print_prefix(std::ostream&, exptree::iterator);
 		void setup_handlers(bool infix=true);
+		void newline(std::ostream&);
 
 		std::auto_ptr<node_base_printer> get_printer(exptree::iterator);		
 		

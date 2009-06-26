@@ -62,15 +62,14 @@ algorithm::result_t extract_properties::apply(iterator& st)
 						std::vector<iterator> objs;
 						if(*st->name=="\\comma") {
 							sibling_iterator sib=tr.begin(st);
-							txtout << "Assigning list property " << propname << " to ";
+							txtout << "Assigning list property " << propname << " to $";
+							eo->print_infix(txtout, st);
+							txtout << "$." << std::endl;
+							eo->newline(txtout);
 							while(sib!=tr.end(st)) {
-								if(sib->fl.parent_rel!=str_node::p_property) {
-									txtout << *sib->name;
+								if(sib->fl.parent_rel!=str_node::p_property) 
 									objs.push_back(sib);
-									}
 								++sib;
-								if(sib!=tr.end(st)) txtout << ", ";
-								else txtout << "." << std::endl;
 								}
 							}
 						if(objs.size()<2) 
@@ -94,17 +93,29 @@ algorithm::result_t extract_properties::apply(iterator& st)
 									theprop->core_parse(keyvals);
 									}
 								if(sib->fl.parent_rel!=str_node::p_property) {
-									txtout << *sib->name;
+									txtout << "$";
+									eo->print_infix(txtout, sib);
+									txtout << "$";
 									properties::insert_prop(sib, theprop);
 									theprop=0;
 									}
 								++sib;
-								if(sib==tr.end(st)) txtout << "." << std::endl;
+								if(sib==tr.end(st)) {
+									txtout << "." << std::endl;
+									eo->newline(txtout);
+									}
 								else                txtout << ", ";
 								}				
 							}
 						else {
-							txtout << "Assigning property " << propname << " to " << *st->name << "." << std::endl;
+							txtout << "Assigning property " << propname << " to ";
+							if(eo) {
+								txtout << "$";
+								eo->print_infix(txtout, st);
+								txtout << "$";
+								}	
+							txtout << "." << std::endl;
+							if(eo) eo->newline(txtout);
 							properties::insert_prop(st, theprop);
 							}
 						}

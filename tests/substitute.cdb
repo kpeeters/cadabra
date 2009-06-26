@@ -723,3 +723,14 @@ obj71:= A;
 tst71:= Q - @(obj71);
 @collect_terms!(%);
 @assert(tst71);
+
+# Test 72: raising/lowering indices.
+#
+@reset.
+{i,j,k}::Indices(position=fixed).
+obj72:= A_{i}B^{i} + C^{i}D_{i}; 
+@substitute!(%)( A?^{a?} -> A?_{a?} );
+tst72:= A_{i}B_{i} + C_{i}D_{i} - @(obj72);
+@collect_terms!(%);
+#@assert(tst72);
+
