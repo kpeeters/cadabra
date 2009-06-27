@@ -1202,16 +1202,16 @@ bool manipulator::handle_external_commands_(exptree::iterator& original_expressi
 			expression_to_print=thealg->subtree;
 			switch(thealg->global_success) {
 				case algorithm::g_not_yet_started:
-					txtout << ait->first << ": failed to start." << std::endl;
+					txtout << texify(ait->first) << ": failed to start." << std::endl;
 					break;
 				case algorithm::g_arguments_accepted:
-					txtout << ait->first << ": no such expression." << std::endl;
+					txtout << texify(ait->first) << ": no such expression." << std::endl;
 					break;
 				case algorithm::g_operand_determined:
 //					txtout << "dangerous" << std::endl;
 					if(it->is_inert_command()==false) {
 						if(!silentfail)
-							txtout << ait->first << ": not applicable." << std::endl;
+							txtout << texify(ait->first) << ": not applicable." << std::endl;
 						}
 					break;
 				case algorithm::g_applied:
@@ -1222,7 +1222,7 @@ bool manipulator::handle_external_commands_(exptree::iterator& original_expressi
 						display_result=false;
 					break;
 				case algorithm::g_apply_failed:
-					txtout << ait->first << ": error" << std::endl;
+					txtout << texify(ait->first) << ": error" << std::endl;
 					break;
 				}
 
@@ -1238,7 +1238,7 @@ bool manipulator::handle_external_commands_(exptree::iterator& original_expressi
 				}
 			}
 		catch(algorithm::constructor_error& ex) {
-			txtout << ait->first << ": illegal arguments." << std::endl;
+			txtout << texify(ait->first) << ": illegal arguments." << std::endl;
 			if(it->is_inert_command()==false)
 				expressions.erase_expression(original_expression);
 			original_expression=expressions.end();
@@ -1256,7 +1256,8 @@ bool manipulator::handle_external_commands_(exptree::iterator& original_expressi
 			}
 		}
 	else {
-		throw consistency_error("Unknown active node \'"+node_name+"\'.");
+		throw consistency_error("Unknown active node \'"+texify(node_name)+"\'.");
+
 		// FIXME: this of course does not get executed anymore, but it should be the
 		// job of the higher level anyway.
 		if(it->is_inert_command()==false)

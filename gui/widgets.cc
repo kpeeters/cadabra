@@ -427,7 +427,7 @@ TeXView::TeXView(Glib::RefPtr<TeXBuffer> texb, int hmargin)
 	: texbuf(texb), vbox(false, 10), hbox(false, hmargin)
 	{
 	add(vbox);
-	vbox.pack_start(hbox, Gtk::PACK_SHRINK, 10);
+	vbox.pack_start(hbox, Gtk::PACK_SHRINK, 0);
 	hbox.pack_start(image, Gtk::PACK_SHRINK, hmargin);
 //	set_state(Gtk::STATE_PRELIGHT);
 	modify_bg(Gtk::STATE_NORMAL, Gdk::Color("white"));
@@ -642,6 +642,8 @@ TeXInput::TeXInput(Glib::RefPtr<Gtk::TextBuffer> tb, Glib::RefPtr<TeXBuffer> tex
 	edit.set_pixels_inside_wrap(2*LINE_SPACING);
 	edit.set_left_margin(10);
 
+	set_spacing(10);
+
 //	add(expander);
 //	expander.set_label_widget(texview);
 //	expander.add(edit);
@@ -657,11 +659,15 @@ bool TeXInput::is_folded() const
 
 void TeXInput::set_folded(bool onoff)
 	{
+	if(edit.folded_away==onoff) return;
+
 	edit.folded_away=onoff;
 	if(edit.folded_away) 
 		remove(edit);
 	else {
+		std::cerr << "here perhaps?" << std::endl;
 		pack_start(edit);
+		std::cerr << "here perhaps!" << std::endl;
 		reorder_child(edit, 0);
 		edit.show();
 		}

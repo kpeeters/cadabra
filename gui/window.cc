@@ -457,7 +457,9 @@ VisualCell *NotebookCanvas::add_cell(Glib::RefPtr<DataCell> dc, Glib::RefPtr<Dat
 
 			gtk_box_set_child_packing(((Gtk::Box *)(&scrollbox))->gobj(), 
 											  ((Gtk::Widget *)(newcell->inbox))->gobj(),
-											  false, false, 0, GTK_PACK_START);
+											  false, false, 10, GTK_PACK_START);
+			while (gtk_events_pending ())
+				gtk_main_iteration ();
 
 //			(*newit).set_options(Gtk::PACK_SHRINK);
 			
@@ -487,7 +489,7 @@ VisualCell *NotebookCanvas::add_cell(Glib::RefPtr<DataCell> dc, Glib::RefPtr<Dat
          //			(*newit).set_options(Gtk::PACK_SHRINK);
 			gtk_box_set_child_packing(((Gtk::Box *)(&scrollbox))->gobj(), 
 											  ((Gtk::Widget *)(newcell->outbox))->gobj(),
-											  false, false, 0, GTK_PACK_START);
+											  false, false, (dc->cell_type==DataCell::c_texcomment?3:10), GTK_PACK_START);
 			
 			newcell->outbox->signal_button_release_event().connect( 
 				sigc::bind<NotebookCanvas *, VisualCell *>(
@@ -511,7 +513,7 @@ VisualCell *NotebookCanvas::add_cell(Glib::RefPtr<DataCell> dc, Glib::RefPtr<Dat
 
 			gtk_box_set_child_packing(((Gtk::Box *)(&scrollbox))->gobj(), 
 											  ((Gtk::Widget *)(newcell->texbox))->gobj(),
-											  false, false, 0, GTK_PACK_START);
+											  false, false, 10, GTK_PACK_START);
 
 // REPORT BUG: this sometimes segfaults
 //			(*newit).set_options(Gtk::PACK_SHRINK);
@@ -1544,15 +1546,8 @@ Glib::RefPtr<DataCell> XCadabra::add_cell(Glib::RefPtr<DataCell> newcell, Glib::
 		// Now we have to tell all NotebookCanvas objects to create a
 		// view on the just created DataCell. 
 		
-		for(unsigned int i=0; i<canvasses.size(); ++i) {
-			VisualCell *vis=canvasses[i]->add_cell(newcell, ref, before);
-			if(canvasses[i]==active_canvas) {
-				//			active_canvas->cell_grab_focus(vis);
-				// make this new cell the active cell if it is an input or tex cell.
-				if(newcell->cell_type==DataCell::c_input || newcell->cell_type==DataCell::c_tex)
-					active_cell=vis;
-				}
-			}
+		for(unsigned int i=0; i<canvasses.size(); ++i) 
+			canvasses[i]->add_cell(newcell, ref, before);
 		}
 	catch(std::exception& ex) {
 		kernel_idle();
@@ -1658,7 +1653,7 @@ void XCadabra::on_my_erase(const Gtk::TextIter& start, const Gtk::TextIter& end,
 void XCadabra::handle_on_grab_focus(NotebookCanvas *can, VisualCell *vis) 
 	{
 #ifdef DEBUG
-	std::cerr << "focus grabbed" << std::endl;
+	std::cerr << "focus grabbed " << can << " " << vis << std::endl;
 #endif
 	active_canvas=can;
 	active_cell=vis;
@@ -2143,7 +2138,8 @@ bool XCadabra::receive(modglue::ipipe& p)
 								  active_canvas->cell_grab_focus(active_cell);
 								  }
 							 else {
-								  active_canvas->cell_grab_focus(datacells.back());
+// FIXME: FOCUS
+//								  active_canvas->cell_grab_focus(datacells.back());
 								  }
 							 while (gtk_events_pending ())
 								  gtk_main_iteration ();
@@ -2155,7 +2151,8 @@ bool XCadabra::receive(modglue::ipipe& p)
 							cp = newcell;
 //							cp=add_cell(newcell, cp, false); // HERE
 							show_cell(newcell);
-							active_canvas->cell_grab_focus(cp);
+// FIXME: focus
+//							active_canvas->cell_grab_focus(cp);
 							}
 						if(restarting_kernel) {
 							restarting_kernel=false;
@@ -2285,7 +2282,7 @@ bool XCadabra::receive(modglue::ipipe& p)
 			show_cell(newcell);
 			while (gtk_events_pending ())
 				gtk_main_iteration ();
-//			active_canvas->cell_grab_focus(newcell);
+
 			}
 		modified=false;
 		update_title();
@@ -2819,15 +2816,15 @@ std::string XCadabra::load(const std::string& fn, bool ignore_nonexistence)
 			else buffer+=ln+"\n";
 
 			++line_num;
-			
-			while (gtk_events_pending ())
-				gtk_main_iteration ();
 			}
 		}
 
 	// Now generate all TeX output and then show all widgets.
 	tex_engine_main.convert_all();
 	show_all();
+	while (gtk_events_pending ())
+		gtk_main_iteration ();
+	
 	active_canvas->select_first_input_cell();
 
 	kernel_idle();
@@ -2891,6 +2888,7 @@ void XCadabra::on_edit_insert_tex_above()
 	{
 	Glib::RefPtr<DataCell> newcell(new DataCell(DataCell::c_tex, "[empty TeX cell]"));
 	action_add(Glib::RefPtr<ActionBase>(new ActionAddCell(newcell, active_cell->datacell, true)));
+	show_cell(newcell);
 	while (gtk_events_pending ())
 		 gtk_main_iteration ();
 	active_canvas->cell_grab_focus(newcell);
@@ -2901,6 +2899,7 @@ void XCadabra::on_edit_insert_tex_below()
 	{
 	Glib::RefPtr<DataCell> newcell(new DataCell(DataCell::c_tex, "[empty TeX cell]"));
 	action_add(Glib::RefPtr<ActionBase>(new ActionAddCell(newcell, active_cell->datacell, false)));
+	show_cell(newcell);
 	while (gtk_events_pending ())
 		 gtk_main_iteration ();
 	active_canvas->cell_grab_focus(newcell);
@@ -2911,6 +2910,7 @@ void XCadabra::on_edit_insert_input_above()
 	{
 	Glib::RefPtr<DataCell> newcell(new DataCell(DataCell::c_input, ""));
 	action_add(Glib::RefPtr<ActionBase>(new ActionAddCell(newcell, active_cell->datacell, true)));
+	show_cell(newcell);
 	while (gtk_events_pending ())
 		 gtk_main_iteration ();
 	active_canvas->cell_grab_focus(newcell);
@@ -2921,6 +2921,7 @@ void XCadabra::on_edit_insert_input_below()
 	{
 	Glib::RefPtr<DataCell> newcell(new DataCell(DataCell::c_input, ""));
 	action_add(Glib::RefPtr<ActionBase>(new ActionAddCell(newcell, active_cell->datacell, false)));
+	show_cell(newcell);
 	while (gtk_events_pending ())
 		 gtk_main_iteration ();
 	active_canvas->cell_grab_focus(newcell);
@@ -2930,6 +2931,7 @@ void XCadabra::on_edit_insert_input_below()
 void XCadabra::on_edit_insert_section_above()
 	{
 	Glib::RefPtr<DataCell> newcell(new DataCell(DataCell::c_tex, "[insert section header]"));
+	show_cell(newcell);
 	newcell->sectioning=1;
 	active_canvas->cell_grab_focus(
 		add_cell(newcell, active_cell->datacell) ); // HERE
@@ -2975,7 +2977,7 @@ void XCadabra::on_edit_divide_cell()
 
 	Glib::RefPtr<DataCell> newcell(new DataCell(DataCell::c_input, segment2));
 	action_add(Glib::RefPtr<ActionBase>(new ActionAddCell(newcell, dc, false)));
-//	add_cell(newcell, dc, false); // HERE
+	show_cell(newcell);
 	}
 
 void XCadabra::on_view_split()

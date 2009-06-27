@@ -309,7 +309,8 @@ class XCadabra : public Gtk::Window {
 		/// These routines also update all NotebookCanvas objects
 		/// so that they reflect the current structure of the document.
 		/// The DataCell ownership is handled by the XCadabra class once
-		/// it has been added here.
+		/// it has been added here. 
+		/// These functions do _not_ grab focus or make the new cell active.
 		Glib::RefPtr<DataCell> add_cell(Glib::RefPtr<DataCell>, Glib::RefPtr<DataCell> ref, bool before=true);
 		void         show_cell(Glib::RefPtr<DataCell>);
 		void         add_canvas();

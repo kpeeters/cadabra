@@ -111,11 +111,14 @@ algorithm::result_t extract_properties::apply(iterator& st)
 							}
 						else {
 							properties::insert_prop(st, theprop);
-							txtout << "Assigning property " << propname << " to ";
-							if(eo) {
-								txtout << "$";
-								eo->print_infix(txtout, st);
-								txtout << "$";
+							txtout << "Assigning property " << propname;
+							if( *st->name!="" ) {
+								txtout << " to ";
+								if(eo) {
+									txtout << "$";
+									eo->print_infix(txtout, st);
+									txtout << "$";
+									}
 								}
 							txtout << "." << std::endl;
 							if(eo) eo->newline(txtout);

@@ -984,7 +984,7 @@ std::string node_printer::texify(const std::string& str) const
 	std::string res;
    for(unsigned int i=0; i<str.size(); ++i) {
 		 if(str[i]=='#') res+="\\#";
-		 res+=str[i];
+		 else res+=str[i];
       }
    return res;
 	}
