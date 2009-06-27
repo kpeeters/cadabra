@@ -173,11 +173,6 @@ join::join(exptree& tr_, iterator it_)
 	{
 	}
 
-void join::description() const
-	{
-	txtout << "Join two gamma matrix products." << std::endl;
-	}
-
 void join::regroup_indices_(sibling_iterator gam1, sibling_iterator gam2,
 									 unsigned int i, std::vector<exptree>& r1, std::vector<exptree>& r2) 
 	{
@@ -498,11 +493,6 @@ gammasplit::gammasplit(exptree& tr, iterator it)
 	{
 	}
 
-void gammasplit::description() const
-	{
-	txtout << "Split off a single gamma matrix from the back of a multiple-gamma." << std::endl;
-	}
-
 bool gammasplit::can_apply(iterator it)
 	{
 	if(properties::get<GammaMatrix>(it))
@@ -582,11 +572,6 @@ algorithm::result_t gammasplit::apply(iterator& it)
 remove_gamma_trace::remove_gamma_trace(exptree& tr, iterator it)
 	: algorithm(tr, it), gamma_first(false), pos(0)
 	{
-	}
-
-void remove_gamma_trace::description() const
-	{
-	txtout << "Remove terms with a single gamma matrix tracing a GammaTraceless spinor." << std::endl;
 	}
 
 bool remove_gamma_trace::find_contraction() 
@@ -694,11 +679,6 @@ projweyl::projweyl(exptree& tr, iterator it)
 	{
 	}
 
-void projweyl::description() const
-	{
-	txtout << "Projects a product containing a single GammaMatrix onto a Weyl subspace, dualising all gamma matrices with more than d/2 indices." << std::endl;
-	}
-
 bool projweyl::can_apply(iterator st)
 	{
 	if(*st->name=="\\prod") {
@@ -774,11 +754,6 @@ algorithm::result_t projweyl::apply(iterator& st)
 // 	{
 // 	}
 // 
-// void fermibilinear_sort::description() const
-// 	{
-// 	txtout << "Put arguments of \\fermibilinear in the right slot." << std::endl;
-// 	}
-// 
 // bool fermibilinear_sort::can_apply(iterator it)
 // 	{
 // 	if(*it->name=="\\fermibilinear") return true;
@@ -846,11 +821,6 @@ multpauli::multpauli(exptree& tr, iterator it)
 	{
 	}
 
-void multpauli::description() const
-	{
-	txtout << "Work out the product of two adjacent Pauli matrices in a product." << std::endl;
-	}
-
 bool multpauli::can_apply(iterator it) 
 	{
 //	if(*it->name=="\\prod")
@@ -866,11 +836,6 @@ algorithm::result_t multpauli::apply(iterator& it)
 rewrite_diracbar::rewrite_diracbar(exptree& tr, iterator it)
 	: algorithm(tr, it)
 	{
-	}
-
-void rewrite_diracbar::description() const
-	{
-	txtout << "Rewrite the DiracBar of a product as a product involving a DiracBar." << std::endl;
 	}
 
 bool rewrite_diracbar::can_apply(iterator it) 
@@ -932,11 +897,6 @@ fierz::fierz(exptree& tr, iterator it)
 	if(*args_begin()->name!="\\comma") throw constructor_error();
 
 	if(tr.number_of_children(args_begin())!=4) throw constructor_error();
-	}
-
-void fierz::description() const
-	{
-	txtout << "Perform a Fierz transformation on a four-fermi term with the right fermions but incorrect spinor flow." << std::endl;
 	}
 
 bool fierz::can_apply(iterator it) 

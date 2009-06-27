@@ -591,7 +591,6 @@ bool manipulator::handle_input()
 						eo.utf8_output=utf8_output;
 						if(keep_result) { // change wrt. old setup
 							eo.print_full_standardform(txtout, pit, keep_result);
-							txtout << ";" << std::endl;
 							}
 						}
 					if(!keep_result) {

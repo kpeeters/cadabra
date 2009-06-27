@@ -87,7 +87,6 @@ class generate_indexbracket : public algorithm {
 	public:
 		generate_indexbracket(exptree&, iterator);
 
-		virtual void     description() const;
 		virtual bool     can_apply(iterator);
 		virtual result_t apply(iterator&);
 };
@@ -96,7 +95,6 @@ class unique_indices : public algorithm {
 	public:
 		unique_indices(exptree&, iterator);
 
-		virtual void     description() const;
 		virtual bool     can_apply(iterator);
 		virtual result_t apply(iterator&);
 };
@@ -105,7 +103,6 @@ class einsteinify : public algorithm {
 	public:
 		einsteinify(exptree&, iterator);
 
-		virtual void     description() const;
 		virtual bool     can_apply(iterator);
 		virtual result_t apply(iterator&);
 };
@@ -114,7 +111,6 @@ class combine : public algorithm {
 	public:
 		combine(exptree&, iterator);
 		
-		virtual void     description() const;
 		virtual bool     can_apply(iterator);
 		virtual result_t apply(iterator&);
 	private:
@@ -127,7 +123,6 @@ class expand : public algorithm {
 	public:
 		expand(exptree&, iterator);
 		
-		virtual void     description() const;
 		virtual bool     can_apply(iterator);
 		virtual result_t apply(iterator&);
 
@@ -139,7 +134,6 @@ class debracket : public algorithm {
 	public:
 		debracket(exptree&, iterator);
 		
-		virtual void     description() const;
 		virtual bool     can_apply(iterator);
 		virtual result_t apply(iterator&);
 };
@@ -148,7 +142,6 @@ class eliminate_kronecker : public algorithm {
 	public:
 		eliminate_kronecker(exptree&, iterator);
 
-		virtual void     description() const;
 		virtual bool     can_apply(iterator);
 		virtual result_t apply(iterator&);
 };
@@ -157,7 +150,6 @@ class reduce_gendelta : public algorithm {
 	public:
 		reduce_gendelta(exptree&, iterator);
 
-		virtual void     description() const;
 		virtual bool     can_apply(iterator);
 		virtual result_t apply(iterator&);
 	private:
@@ -168,7 +160,6 @@ class break_gendelta : public algorithm {
 	public:
 		break_gendelta(exptree&, iterator);
 
-		virtual void     description() const;
 		virtual bool     can_apply(iterator);
 		virtual result_t apply(iterator&);
 };
@@ -177,7 +168,6 @@ class dualise_tensor : public algorithm {
 	public:
 		dualise_tensor(exptree&, iterator);
 
-		virtual void     description() const;
 		virtual bool     can_apply(iterator);
 		virtual result_t apply(iterator&);
 };
@@ -186,7 +176,6 @@ class epsprod2gendelta : public algorithm {
 	public:
 		epsprod2gendelta(exptree&, iterator);
 
-		virtual void     description() const;
 		virtual bool     can_apply(iterator);
 		virtual result_t apply(iterator&);
 	private:
@@ -199,7 +188,6 @@ class eliminate_eps : public algorithm {
 	public:
 		eliminate_eps(exptree&, iterator);
 
-		virtual void     description() const;
 		virtual bool     can_apply(iterator);
 		virtual result_t apply(iterator&);
 	private:
@@ -211,7 +199,6 @@ class product_shorthand : public algorithm {
 	public:
 		product_shorthand(exptree&, iterator);
 
-		virtual void     description() const;
 		virtual bool     can_apply(iterator);
 		virtual result_t apply(iterator&);
 };
@@ -220,7 +207,6 @@ class expand_product_shorthand : public algorithm {
 	public:
 		expand_product_shorthand(exptree&, iterator);
 
-		virtual void     description() const;
 		virtual bool     can_apply(iterator);
 		virtual result_t apply(iterator&);
 };
@@ -229,7 +215,6 @@ class remove_eoms : public algorithm {
 	public:
 		remove_eoms(exptree&, iterator);
 
-		virtual void     description() const;
 		virtual bool     can_apply(iterator);
 		virtual result_t apply(iterator&);
 };
@@ -238,7 +223,6 @@ class pintegrate : public algorithm {
 	public:
 	   pintegrate(exptree&, iterator);
 
-		virtual void     description() const;
 		virtual bool     can_apply(iterator);
 		virtual result_t apply(iterator&);
 };
@@ -247,7 +231,6 @@ class remove_vanishing_derivatives : public algorithm {
 	public:
 		remove_vanishing_derivatives(exptree&, iterator);
 		
-		virtual void     description() const;
 		virtual bool     can_apply(iterator);
 		virtual result_t apply(iterator&);   
 };
@@ -256,7 +239,6 @@ class unwrap : public algorithm {
 	public:
 		unwrap(exptree&, iterator);
 		
-		virtual void     description() const;
 		virtual bool     can_apply(iterator);
 		virtual result_t apply(iterator&);   
 };
@@ -265,7 +247,6 @@ class impose_bianchi : public algorithm {
 	public:
 		impose_bianchi(exptree&, iterator);
 
-		virtual void     description() const;
 		virtual bool     can_apply(iterator);
 		virtual result_t apply(iterator&);
 
@@ -277,7 +258,6 @@ class all_contractions : public algorithm {
 	public:
 		all_contractions(exptree&, iterator);
 
-		virtual void     description() const;
 		virtual bool     can_apply(iterator);
 		virtual result_t apply(iterator&);
 

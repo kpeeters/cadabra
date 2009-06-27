@@ -1905,6 +1905,8 @@ bool XCadabra::receive(modglue::ipipe& p)
 	static bool last_was_prompt=true; // avoid repeated empty cells
 	static bool in_cell=false; // prompts only get honored outside cells
 	static Glib::RefPtr<DataCell> cp, origcell;
+	
+	static std::vector<Glib::RefPtr<DataCell> > cells_to_show;
 
 	have_received=true;
 
@@ -1930,8 +1932,12 @@ bool XCadabra::receive(modglue::ipipe& p)
 			if(trim(comment).size()!=0 && trim(comment)!=">") {
 				Glib::RefPtr<DataCell> newcell(new DataCell(DataCell::c_comment, trim(comment)));
 				cp=add_cell(newcell, cp, false);
-				show_cell(newcell);
+				cells_to_show.push_back(newcell);
 				}
+			tex_engine_main.convert_all();
+			for(size_t i=0; i<cells_to_show.size(); ++i)
+				show_cell(cells_to_show[i]);
+			cells_to_show.clear();
 			comment="";
 			continue;
 			}
@@ -1960,7 +1966,7 @@ bool XCadabra::receive(modglue::ipipe& p)
 			if(trim(comment).size()!=0 && trim(comment)!=">") {
 				Glib::RefPtr<DataCell> newcell(new DataCell(DataCell::c_texcomment, trim(comment)));
 				cp=add_cell(newcell, cp, false);
-				show_cell(newcell);
+				cells_to_show.push_back(newcell);
 				}
 			comment="";
 			continue;
@@ -2024,7 +2030,7 @@ bool XCadabra::receive(modglue::ipipe& p)
 				Glib::RefPtr<DataCell> newcell(new DataCell(DataCell::c_error, trim(error)));
 				kernel_idle();
 				cp=add_cell(newcell, cp, false);
-				show_cell(newcell);
+				cells_to_show.push_back(newcell);
 //				// make previous input cell active
 //				DataCells_t::iterator dit=datacells.begin();
 //				while(dit!=datacells.end()) {
@@ -2061,7 +2067,7 @@ bool XCadabra::receive(modglue::ipipe& p)
 				Glib::RefPtr<DataCell> newcell(new DataCell(DataCell::c_output, eqno+"\\specialcolon{}= "+eq));
 				newcell->cdbbuf=plain;
 				cp=add_cell(newcell, cp, false);
-				show_cell(newcell);
+				cells_to_show.push_back(newcell);
 				}
 			eq="";
 			eqno="";

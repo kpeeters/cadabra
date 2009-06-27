@@ -253,7 +253,6 @@ class prodrule : public algorithm {
 	public:
 		prodrule(exptree&, iterator);
 
-		virtual void     description() const;
 		virtual bool     can_apply(iterator);
 		virtual result_t apply(iterator&);
 
@@ -265,7 +264,6 @@ class remove_indexbracket : public algorithm {
 	public:
 		remove_indexbracket(exptree&, iterator);
 		
-		virtual void     description() const;
 		virtual bool     can_apply(iterator);
 		virtual result_t apply(iterator&);
 };
@@ -274,7 +272,6 @@ class distribute : public algorithm {
 	public:
 		distribute(exptree&, iterator);
 
-		virtual void     description() const;
 		virtual bool     can_apply(iterator);
 		virtual result_t apply(iterator&);
 };
@@ -283,7 +280,6 @@ class sumsort : public algorithm {
 	public:
 		sumsort(exptree&, iterator);
 
-		virtual void     description() const;
 		virtual bool     can_apply(iterator);
 		virtual result_t apply(iterator&);
 
@@ -294,7 +290,6 @@ class prodsort : public algorithm {
 	public:
 		prodsort(exptree&, iterator);
 
-		virtual void     description() const;
 		virtual bool     can_apply(iterator);
 		virtual result_t apply(iterator&);
 
@@ -306,7 +301,6 @@ class spinorsort : public algorithm {
 	public:
 		spinorsort(exptree&, iterator);
 		
-		virtual void     description() const;
 		virtual bool     can_apply(iterator);
 		virtual result_t apply(iterator&);
 
@@ -317,7 +311,6 @@ class keep_terms : public algorithm {
 	public:
 		keep_terms(exptree&, iterator);
 
-		virtual void     description() const;
 		virtual bool     can_apply(iterator);
 		virtual result_t apply(iterator&);
 };
@@ -326,7 +319,6 @@ class reduce_sub : public algorithm {
 	public:
 		reduce_sub(exptree&, iterator);
 
-		virtual void     description() const;
 		virtual bool     can_apply(iterator);
 		virtual result_t apply(iterator&);
 };
@@ -335,7 +327,6 @@ class prodflatten : public algorithm {
 	public:
 		prodflatten(exptree&, iterator);
 
-		virtual void     description() const;
 		virtual bool     can_apply(iterator);
 		virtual result_t apply(iterator&);
 
@@ -346,7 +337,6 @@ class sumflatten : public algorithm {
 	public:
 		sumflatten(exptree&, iterator);
 
-		virtual void     description() const;
 		virtual bool     can_apply(iterator);
 		virtual result_t apply(iterator&);
 
@@ -357,7 +347,6 @@ class listflatten : public algorithm {
 	public:
 		listflatten(exptree&, iterator);
 
-		virtual void     description() const;
 		virtual bool     can_apply(iterator);
 		virtual result_t apply(iterator&);
 };
@@ -366,7 +355,6 @@ class prodcollectnum : public algorithm {
 	public:
 		prodcollectnum(exptree&, iterator);
 
-		virtual void     description() const;
 		virtual bool     can_apply(iterator);
 		virtual result_t apply(iterator&);
 };
@@ -378,7 +366,6 @@ class reduce_div : public algorithm {
 	public:
 		reduce_div(exptree&, iterator);
 		
-		virtual void     description() const;
 		virtual bool     can_apply(iterator);
 		virtual result_t apply(iterator&);
 };
@@ -387,7 +374,6 @@ class subseq : public algorithm {
 	public:
 		subseq(exptree&, iterator);
 
-		virtual void     description() const;
 		virtual bool     can_apply(iterator);
 		virtual result_t apply(iterator&);
 };
@@ -396,7 +382,6 @@ class collect_factors : public algorithm {
 	public:
 		collect_factors(exptree&, iterator);
 		
-		virtual void     description() const;
 		virtual bool     can_apply(iterator);
 		virtual result_t apply(iterator&);
 	private:
@@ -412,7 +397,6 @@ class collect_terms : public algorithm {
 	public:
 		collect_terms(exptree&, iterator);
 
-		virtual void     description() const;
 		virtual bool     can_apply(iterator);
 		virtual result_t apply(iterator&);
 		virtual result_t apply(sibling_iterator&, sibling_iterator&);
@@ -433,7 +417,6 @@ class factor_in : public algorithm {
 	public:
 		factor_in(exptree&, iterator);
 
-		virtual void     description() const;
 		virtual bool     can_apply(iterator);
 		virtual result_t apply(iterator&);
 
@@ -457,7 +440,6 @@ class factor_out : public algorithm {
 	public:
 		factor_out(exptree&, iterator);
 		
-		virtual void     description() const;
 		virtual bool     can_apply(iterator);
 		virtual result_t apply(iterator&);
 
@@ -470,7 +452,6 @@ class canonicalise : public algorithm {
 	public:
 		canonicalise(exptree&, iterator);
 
-		virtual void     description() const;
 		virtual bool     can_apply(iterator);
 		virtual result_t apply(iterator&);		
 
@@ -484,7 +465,6 @@ class reduce : public algorithm {
 	public:
 		reduce(exptree&, iterator);
 
-		virtual void     description() const;
 		virtual bool     can_apply(iterator);
 		virtual result_t apply(iterator&);		
 };
@@ -494,7 +474,6 @@ class drop : public algorithm {
 	public:
 		drop(exptree&, iterator);
 
-		virtual void     description() const;
 		virtual bool     can_apply(iterator);
 		virtual result_t apply(iterator&);		
 };
@@ -516,7 +495,6 @@ class drop_weight : public drop_keep_weight {
 	public:
 		drop_weight(exptree&, iterator);
 
-		virtual void     description() const;
 		virtual result_t apply(iterator&);		
 };
 
@@ -524,7 +502,6 @@ class keep_weight : public drop_keep_weight {
 	public:
 		keep_weight(exptree&, iterator);
 
-		virtual void     description() const;
 		virtual result_t apply(iterator&);		
 };
 
@@ -532,7 +509,6 @@ class ratrewrite : public algorithm {
 	public:
 		ratrewrite(exptree&, iterator);
 
-		virtual void     description() const;
 		virtual bool     can_apply(iterator);
 		virtual result_t apply(iterator&);		
 };
@@ -567,7 +543,6 @@ class sym : virtual public algorithm, virtual public sym_asym {
 	public:
 		sym(exptree&, iterator);
 		
-		virtual void     description() const;
 		virtual result_t apply(iterator& it);
 		virtual result_t apply(sibling_iterator&, sibling_iterator&);		
 };
@@ -576,7 +551,6 @@ class asym : virtual public algorithm, virtual public sym_asym {
 	public:
 		asym(exptree&, iterator);
 		
-		virtual void     description() const;
 		virtual result_t apply(iterator& it);
 		virtual result_t apply(sibling_iterator&, sibling_iterator&);
 };
@@ -594,7 +568,6 @@ class canonicalorder : virtual public algorithm, virtual public order {
 	public:
 		canonicalorder(exptree&, iterator);
 		
-		virtual void     description() const;
 		virtual result_t apply(iterator&);
 };
 
@@ -602,7 +575,6 @@ class acanonicalorder : virtual public algorithm, virtual public order {
 	public:
 		acanonicalorder(exptree&, iterator);
 		
-		virtual void     description() const;
 		virtual result_t apply(iterator&);
 };
 
@@ -610,7 +582,6 @@ class impose_asym : public algorithm {
 	public:
 		impose_asym(exptree&, iterator);
 
-		virtual void     description() const;
 		virtual bool     can_apply(iterator);
 		virtual result_t apply(iterator&);		
 };
@@ -619,7 +590,6 @@ class eqn : public algorithm {
 	public:
 		eqn(exptree&, iterator);
 
-		virtual void     description() const;
 		virtual bool     can_apply(iterator);
 		virtual result_t apply(iterator&);		
 };
@@ -628,7 +598,6 @@ class indexsort : public algorithm {
 	public:
 		indexsort(exptree&, iterator);
 
-		virtual void     description() const;
 		virtual bool     can_apply(iterator);
 		virtual result_t apply(iterator&);		
 
@@ -648,7 +617,6 @@ class asymprop : public algorithm {
 	public:
 		asymprop(exptree&, iterator);
 
-		virtual void     description() const;
 		virtual bool     can_apply(iterator);
 		virtual result_t apply(iterator&);		
 	private:
@@ -659,7 +627,6 @@ class young_project : public algorithm {
 	public:
 		young_project(exptree&, iterator);
 
-		virtual void     description() const;
 		virtual bool     can_apply(iterator);
 		virtual result_t apply(iterator&);		
 
@@ -684,7 +651,6 @@ class young_project_tensor : public algorithm {
 	public:
 		young_project_tensor(exptree&, iterator);
 
-		virtual void     description() const;
 		virtual bool     can_apply(iterator);
 		virtual result_t apply(iterator&);		
 
@@ -698,7 +664,6 @@ class expand_power : public algorithm {
 	public:
 		expand_power(exptree&, iterator);
 
-		virtual void     description() const;
 		virtual bool     can_apply(iterator);
 		virtual result_t apply(iterator&);		
 };

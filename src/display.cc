@@ -605,9 +605,16 @@ void print_comma::print_infix(std::ostream& str, exptree::iterator it)
 	sibling_iterator ch=tr.begin(it);
 	if(! (tr.begin(it)->fl.bracket==str_node::b_none && 
 			it->fl.bracket!=str_node::b_none) ) {
-//		if(parent.output_format==exptree_output::out_xcadabra)
-//			str << "\\";
-		print_opening_bracket(str, tr.begin(it)->fl.bracket, tr.begin(it)->fl.parent_rel);
+
+		switch(tr.begin(it)->fl.bracket) {
+			case str_node::b_none:   str << "\\{";   break;
+			case str_node::b_pointy: str << "\\<"; break;
+			case str_node::b_curly:  str << "\\{"; break;
+			case str_node::b_round:  str << "(";   break;
+			case str_node::b_square: str << "[";   break;
+			default :	return;
+			}
+		++(parent.bracket_level);
 		}
 	while(ch!=tr.end(it)) {
 		parent.get_printer(ch)->print_infix(str, ch);
@@ -627,9 +634,15 @@ void print_comma::print_infix(std::ostream& str, exptree::iterator it)
 		}
 	if(! (tr.begin(it)->fl.bracket==str_node::b_none && 
 			it->fl.bracket!=str_node::b_none) ) {
-//		if(parent.output_format==exptree_output::out_xcadabra)
-//			str << "\\";
-		print_closing_bracket(str, tr.begin(it)->fl.bracket, tr.begin(it)->fl.parent_rel);
+		switch(tr.begin(it)->fl.bracket) {
+			case str_node::b_none:   str << "\\}";   break;
+			case str_node::b_pointy: str << "\\>"; break;
+			case str_node::b_curly:  str << "\\}"; break;
+			case str_node::b_round:  str << ")";   break;
+			case str_node::b_square: str << "]";   break;
+			default :	return;
+			}
+		--(parent.bracket_level);
 		}
 	}
 
@@ -1214,8 +1227,8 @@ void exptree_output::print_full_standardform(std::ostream& str, exptree::iterato
 
 	if(xml_structured) str << "<eq>" << std::endl;
 	print_infix(str, tr.active_expression(it));
+	str << ";";
 	if(xml_structured) str << std::endl << "</eq>" << std::endl;
-
 	}
 
 /* ----------------------------------------------------------------------- */

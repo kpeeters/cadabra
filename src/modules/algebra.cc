@@ -657,10 +657,6 @@ prodrule::prodrule(exptree& tr, iterator it)
 	{
 	}
 
-void prodrule::description() const
- 	{
- 	txtout << "Apply the Leibnitz rule over the first non-index child which contains a product.";
- 	}
 //
 //  A(b*c*d)     -> A(b)*c*d + b*A(c)*d + b*c*A(d)
 //  A(b*c)(e*f) 1-> A(b)(e*f)*c + b*A(c)(e*f)
@@ -877,12 +873,6 @@ distribute::distribute(exptree& tr, iterator it)
 	{
 	}
 
-void distribute::description() const
-	{
-	txtout << "Rewrite a product of sums into a sum of product." << std::endl
-			 << "Applies to all selected products." << std::endl;
-	}
-
 bool distribute::can_apply(iterator st)
 	{
 	const Distributable *db=properties::get<Distributable>(st);
@@ -1000,11 +990,6 @@ remove_indexbracket::remove_indexbracket(exptree& tr, iterator it)
 	{
 	}
 
-void remove_indexbracket::description() const
-	{
-	txtout << "Remove index bracket around a single symbol." << std::endl;
-	}
-
 bool remove_indexbracket::can_apply(iterator it) 
 	{
 	if(*it->name=="\\indexbracket") {
@@ -1035,11 +1020,6 @@ algorithm::result_t remove_indexbracket::apply(iterator& it)
 prodflatten::prodflatten(exptree& tr, iterator it)
 	: algorithm(tr, it), make_consistent_only(false), is_diff(false)
 	{
-	}
-
-void prodflatten::description() const
-	{
-	txtout << "Turns products of products into a single product." << std::endl;
 	}
 
 bool prodflatten::can_apply(iterator it)
@@ -1112,11 +1092,6 @@ sumflatten::sumflatten(exptree& tr, iterator it)
 	{
 	}
 
-void sumflatten::description() const
-	{
-	txtout << "Turns sums of sums into a single sum and flattens sums with only a single child." << std::endl;
-	}
-
 bool sumflatten::can_apply(iterator it)
 	{
 	if(*it->name!="\\sum") return false;
@@ -1186,11 +1161,6 @@ listflatten::listflatten(exptree& tr, iterator it)
 	{
 	}
 
-void listflatten::description() const
-	{
-	txtout << "Flatten a list." << std::endl;
-	}
-
 bool listflatten::can_apply(iterator it)
 	{
 	if(*it->name!="\\comma") return false;
@@ -1223,11 +1193,6 @@ algorithm::result_t listflatten::apply(iterator& it)
 prodcollectnum::prodcollectnum(exptree& tr, iterator it)
 	: algorithm(tr, it)
 	{
-	}
-
-void prodcollectnum::description() const
-	{
-	txtout << "Collects all numerical factors in a product." << std::endl;
 	}
 
 bool prodcollectnum::can_apply(iterator it)
@@ -1283,11 +1248,6 @@ algorithm::result_t prodcollectnum::apply(iterator& it)
 sumsort::sumsort(exptree& tr, iterator it)
 	: algorithm(tr, it)
 	{
-	}
-
-void sumsort::description() const
-	{
-	txtout << "Order terms in a sum." << std::endl;
 	}
 
 bool sumsort::can_apply(iterator st) 
@@ -1359,11 +1319,6 @@ prodsort::prodsort(exptree& tr, iterator it)
 //		}
 	}
 
-void prodsort::description() const
-	{
-	txtout << "Order factors in a product." << std::endl;
-	}
-
 bool prodsort::can_apply(iterator st) 
 	{
 	if(*st->name=="\\prod" || *st->name=="\\dot") return true;
@@ -1408,11 +1363,6 @@ algorithm::result_t prodsort::apply(iterator& st)
 spinorsort::spinorsort(exptree& tr, iterator it)
 	: algorithm(tr, it)
 	{
-	}
-
-void spinorsort::description() const
-	{
-	txtout << "Sort Majorana spinor bilinears." << std::endl;
 	}
 
 bool spinorsort::can_apply(iterator it) 
@@ -1497,11 +1447,6 @@ reduce_div::reduce_div(exptree& tr, iterator it)
 	{
 	}
 
-void reduce_div::description() const
-	{
-	txtout << "Change \\div nodes with only numerical arguments to a pure multiplier, and change \\div nodes with a number dividing an expression to a multiplier construction." << std::endl;
-	}
-
 bool reduce_div::can_apply(iterator st)
 	{
 	if(*st->name!="\\frac") return false;
@@ -1574,11 +1519,6 @@ keep_terms::keep_terms(exptree& tr, iterator it)
 	{
 	}
 
-void keep_terms::description() const
-	{
-	txtout << "Keep from the nth (to the mth, inclusive) term in a sum, drop the rest." << std::endl;
-	}
-
 bool keep_terms::can_apply(iterator it)
 	{
 	if(*it->name!="\\sum") return false;
@@ -1629,11 +1569,6 @@ reduce_sub::reduce_sub(exptree& tr, iterator it)
 	{
 	}
 
-void reduce_sub::description() const
-	{
-	txtout << "Change \\sub nodes to \\sum nodes and simplify the \\sub{0}{something} case to -something." << std::endl;
-	}
-
 bool reduce_sub::can_apply(iterator st)
 	{
 	if(*st->name!="\\sub") return false;
@@ -1677,11 +1612,6 @@ algorithm::result_t reduce_sub::apply(iterator& it)
 subseq::subseq(exptree& tr, iterator it)
 	: algorithm(tr, it)
 	{
-	}
-
-void subseq::description() const
-	{
-	txtout << "Substitutes actual equations for \\eqn{..} nodes." << std::endl;
 	}
 
 bool subseq::can_apply(iterator it)
@@ -1816,11 +1746,6 @@ drop_weight::drop_weight(exptree& tr, iterator it)
 	{
 	}
 
-void drop_weight::description() const
-	{
-	txtout << "Drop all products or terms in a sum with the indicated weight." << std::endl;
-	}
-
 algorithm::result_t drop_weight::apply(iterator& it)
 	{
 	return drop_keep_weight::apply(it, false);
@@ -1830,11 +1755,6 @@ algorithm::result_t drop_weight::apply(iterator& it)
 keep_weight::keep_weight(exptree& tr, iterator it)
 	: drop_keep_weight(tr, it)
 	{
-	}
-
-void keep_weight::description() const
-	{
-	txtout << "Keep all products or terms in a sum with the indicated weight." << std::endl;
 	}
 
 algorithm::result_t keep_weight::apply(iterator& it)
@@ -1848,11 +1768,6 @@ algorithm::result_t keep_weight::apply(iterator& it)
 drop::drop(exptree& tr, iterator it)
 	: algorithm(tr, it)
 	{
-	}
-
-void drop::description() const
-	{
-	txtout << "Drop all products with the indicated number of powers of the given object." << std::endl;
 	}
 
 bool drop::can_apply(iterator st)
@@ -1897,11 +1812,6 @@ algorithm::result_t drop::apply(iterator& st)
 collect_factors::collect_factors(exptree& tr, iterator it)
 	: algorithm(tr, it)
 	{
-	}
-
-void collect_factors::description() const
-	{
-	txtout << "Collect identical factors in a product." << std::endl;
 	}
 
 bool collect_factors::can_apply(iterator it)
@@ -2049,11 +1959,6 @@ factor_out::factor_out(exptree& tr, iterator it)
 	{
 	}
 
-void factor_out::description() const
-	{
-	txtout << "bla" << std::endl;
-	}
-
 bool factor_out::can_apply(iterator st)
 	{
 	if(*st->name=="\\sum") {
@@ -2185,11 +2090,6 @@ algorithm::result_t factor_out::apply(iterator& it)
 factor_in::factor_in(exptree& tr, iterator it)
 	: algorithm(tr, it)
 	{
-	}
-
-void factor_in::description() const
-	{
-	txtout << "Collect identical terms in a sum" << std::endl;
 	}
 
 bool factor_in::can_apply(iterator st)
@@ -2439,11 +2339,6 @@ collect_terms::collect_terms(exptree& tr, iterator it)
 	{
 	}
 
-void collect_terms::description() const
-	{
-	txtout << "Collect identical terms in a sum" << std::endl;
-	}
-
 //bool collect_terms::check_index_consistency(iterator it) 
 //	{
 //	index_map_t ind_free, ind_dummy;
@@ -2668,11 +2563,6 @@ sym::sym(exptree& tr, iterator it)
 	{
 	}
 
-void sym::description() const
-	{
-	txtout << "Construct a sum, symmetrised over the indicated objects." << std::endl;
-	}
-
 algorithm::result_t sym::apply(iterator& it)
 	{
 	prod_wrap_single_term(it);
@@ -2703,11 +2593,6 @@ algorithm::result_t sym::apply(sibling_iterator& st, sibling_iterator& nd)
 asym::asym(exptree& tr, iterator it)
 	: algorithm(tr, it), locate(tr, it), sym_asym(tr, it)
 	{
-	}
-
-void asym::description() const
-	{
-	txtout << "Construct a sum, anti-symmetrised over the indicated objects." << std::endl;
 	}
 
 algorithm::result_t asym::apply(sibling_iterator& st, sibling_iterator& nd)
@@ -2921,11 +2806,6 @@ algorithm::result_t order::doit(iterator& st, bool sign)
 canonicalise::canonicalise(exptree& tr, iterator it)
 	: algorithm(tr, it), reuse_generating_set(false) //, method(adjacency)
 	{
-	}
-
-void canonicalise::description() const
-	{
-	txtout << "Rewrite a product in canonical form, using index and tensor exchange symmetries." << std::endl;
 	}
 
 bool canonicalise::can_apply(iterator it) 
@@ -3454,11 +3334,6 @@ reduce::reduce(exptree& tr, iterator it)
 	{
 	}
 
-void reduce::description() const
-	{
-	txtout << "Reduce a sum of tensor monomials so as to remove terms which can be expressed as linear combinations of others." << std::endl;
-	}
-
 bool reduce::can_apply(iterator it) 
 	{
 	if(*it->name!="\\sum") return false;
@@ -3476,21 +3351,9 @@ acanonicalorder::acanonicalorder(exptree& tr, iterator it)
 	{
 	}
 
-void acanonicalorder::description() const
-	{
-	txtout << "Collect terms in a sum which only differ by index "
-			 << "permutations on the given indices." << std::endl;
-	}
-
 canonicalorder::canonicalorder(exptree& tr, iterator it)
 	: algorithm(tr, it), locate(tr, it), order(tr, it)
 	{
-	}
-
-void canonicalorder::description() const
-	{
-	txtout << "Collect terms in a sum which only differ by index "
-			 << "permutations on the given indices." << std::endl;
 	}
 
 algorithm::result_t canonicalorder::apply(iterator& st)
@@ -3508,12 +3371,6 @@ algorithm::result_t acanonicalorder::apply(iterator& st)
 ratrewrite::ratrewrite(exptree& tr, iterator it)
 	: algorithm(tr, it)
 	{
-	}
-
-void ratrewrite::description() const
-	{
-	txtout << "Rewrite all 'pure rational' nodes in their canonical form (i.e. '1' times a multiplier)." 
-			 << std::endl;
 	}
 
 bool ratrewrite::can_apply(iterator st)
@@ -3536,12 +3393,6 @@ algorithm::result_t ratrewrite::apply(iterator& st)
 impose_asym::impose_asym(exptree& tr, iterator it)
 	: algorithm(tr, it)
 	{
-	}
-
-void impose_asym::description() const
-	{
-	txtout << "Remove terms where symmetric tensors contain more than one of the indicated indices."
-			 << std::endl;
 	}
 
 bool impose_asym::can_apply(iterator it)
@@ -3589,11 +3440,6 @@ eqn::eqn(exptree& tr, iterator it)
 	{
 	}
 
-void eqn::description() const
-	{
-	txtout << "Gets replaced with the equation referred to by its argument." << std::endl;
-	}
-
 bool eqn::can_apply(iterator it)
 	{
 	if(tr.number_of_children(tr.parent(it))!=1) {
@@ -3639,11 +3485,6 @@ algorithm::result_t eqn::apply(iterator& st)
 indexsort::indexsort(exptree& tr, iterator it) 
 	: algorithm(tr, it), tb(0)
 	{
-	}
-
-void indexsort::description() const
-	{
-	txtout << "Use (anti)symmetry of a tensor in its indices to order them canonically." << std::endl;
 	}
 
 bool indexsort::can_apply(iterator st)
@@ -3702,11 +3543,6 @@ algorithm::result_t indexsort::apply(iterator& st)
 asymprop::asymprop(exptree& tr, iterator it)
 	: algorithm(tr, it)
 	{
-	}
-
-void asymprop::description() const
-	{
-	txtout << "For objects anti-symmetric in indices, eliminate those which have double indices." << std::endl;
 	}
 
 bool asymprop::can_apply(iterator st)
@@ -3779,11 +3615,6 @@ young_project::young_project(exptree& tr, iterator it)
 			}
 		}
 	throw algorithm::constructor_error();
-	}
-
-void young_project::description() const
-	{
-	txtout << "Project expression using a Young tableau projector." << std::endl;
 	}
 
 bool young_project::can_apply(iterator it)
@@ -3921,11 +3752,6 @@ algorithm::result_t young_project::apply(iterator& it)
 young_project_tensor::young_project_tensor(exptree& tr, iterator it)
 	: algorithm(tr,it), modulo_monoterm(false)
 	{
-	}
-
-void young_project_tensor::description() const
-	{
-	txtout << "Project single tensor with TableauSymmetry using the Young tableau projector." << std::endl;
 	}
 
 bool young_project_tensor::can_apply(iterator it)
@@ -4072,11 +3898,6 @@ expand_power::expand_power(exptree& tr, iterator it)
 	: algorithm(tr, it)
 	{
 	}
-
-void expand_power::description() const
- 	{
- 	txtout << "Expand a power into a repeated product.";
- 	}
 
 bool expand_power::can_apply(iterator it)
 	{

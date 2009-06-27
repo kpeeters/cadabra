@@ -25,11 +25,6 @@ eval::eval(exptree& tr, iterator it)
 	{
 	}
 
-void eval::description() const
-	{
-	txtout << "Evaluate the components of an expression." << std::endl;
-	}
-
 bool eval::can_apply(iterator)
 	{
 	return true;

@@ -9,6 +9,11 @@ interface. Example:
 This prints $\partial_{m}(A);$ in the notebook, despite the fact
 that \verb|\del| is not a \LaTeX{} command.
 
+If you use this property to make a symbol printable, make sure to
+declare it \emph{before} any other properties are declared, otherwise
+the notebook will not know how to display the symbol and produce an
+error message.
+
 Note that the property is attached to a pattern (\verb|\del{#}| in
 this case) which matches the expression in which the replacement has
 to be made. If the pattern matches, the replacement will be done on

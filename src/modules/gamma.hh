@@ -82,7 +82,6 @@ class join : public algorithm {
 	public:
 		join(exptree&, iterator);
 
-		virtual void     description() const;
 		virtual bool     can_apply(iterator);
 		virtual result_t apply(iterator&);
 
@@ -105,7 +104,6 @@ class remove_gamma_trace : public algorithm {
 	public:
 		remove_gamma_trace(exptree&, iterator);
 
-		virtual void     description() const;
 		virtual bool     can_apply(iterator);
 		virtual result_t apply(iterator&);		
 		
@@ -120,7 +118,6 @@ class gammasplit : public algorithm {
 	public:
 		gammasplit(exptree&, iterator);
 		
-		virtual void     description() const;
 		virtual bool     can_apply(iterator);
 		virtual result_t apply(iterator&);		
 
@@ -131,7 +128,6 @@ class projweyl : public algorithm {
 	public:
 		projweyl(exptree&, iterator);
 
-		virtual void     description() const;
 		virtual bool     can_apply(iterator);
 		virtual result_t apply(iterator&);
 	private:
@@ -142,7 +138,6 @@ class multpauli : public algorithm {
 	public:
 		multpauli(exptree&, iterator);
 		
-		virtual void     description() const;
 		virtual bool     can_apply(iterator);
 		virtual result_t apply(iterator&);
 };
@@ -151,7 +146,6 @@ class rewrite_diracbar : public algorithm {
 	public:
 		rewrite_diracbar(exptree&, iterator);
 
-		virtual void     description() const;
 		virtual bool     can_apply(iterator);
 		virtual result_t apply(iterator&);		
 };
@@ -160,7 +154,6 @@ class fierz : public algorithm {
 	public:
 		fierz(exptree&, iterator);
 		
-		virtual void     description() const;
 		virtual bool     can_apply(iterator);
 		virtual result_t apply(iterator&);
 

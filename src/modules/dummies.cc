@@ -26,11 +26,6 @@ rename_dummies::rename_dummies(exptree& tr, iterator it)
 	{
 	}
 
-void rename_dummies::description() const
-	{
-	txtout << "Rename dummies to canonical order." << std::endl;
-	}
-
 bool rename_dummies::can_apply(iterator st)
 	{
 	if(*st->name!="\\prod") 

@@ -74,7 +74,6 @@ class active_node {
 		unsigned int     number_of_args() const;
 		bool             has_argument(const std::string&) const;
 
-		virtual void description() const=0;
 		iterator this_command;
 	protected:
 		exptree& tr;

@@ -55,11 +55,6 @@ frommath::frommath(exptree& tr, iterator it)
 	{
 	}
 
-void frommath::description() const
-	{
-	txtout << "Convert a Mathematica expression in InputForm." << std::endl;
-	}
-
 bool frommath::can_apply(sibling_iterator, sibling_iterator)
 	{
 	// FIXME: crude check: if there are still comma separated lists, there
@@ -237,11 +232,6 @@ frommaple::frommaple(exptree& tr, iterator it)
 	{
 	}
 
-void frommaple::description() const
-	{
-	txtout << "Convert a Maplee expression in prettyprint=0 form." << std::endl;
-	}
-
 bool frommaple::can_apply(iterator)
 	{
 	// FIXME: crude check: if there are still comma separated lists, there
@@ -284,11 +274,6 @@ algorithm::result_t frommaple::apply(iterator& st)
 run::run(exptree& tr, iterator it)
 	: algorithm(tr, it)
 	{
-	}
-
-void run::description() const
-	{
-	txtout << "Run an external program on an expression." << std::endl;
 	}
 
 bool run::can_apply(iterator it)
@@ -412,11 +397,6 @@ maxima::maxima(exptree& tr, iterator it)
 	{
 	}
 
-void maxima::description() const
-	{
-	txtout << "Write an expression to maxima and read it back in." << std::endl;
-	}
-
 bool maxima::can_apply(iterator it)
 	{
 	// Check that the expression contains no indices, neither free nor dummy.
@@ -494,11 +474,6 @@ algorithm::result_t maxima::apply(iterator& it)
 maple::maple(exptree& tr, iterator it)
 	: algorithm(tr, it)
 	{
-	}
-
-void maple::description() const
-	{
-	txtout << "Write an expression to maple and read it back in." << std::endl;
 	}
 
 bool maple::can_apply(iterator it)

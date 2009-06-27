@@ -28,7 +28,6 @@ class rename_dummies : public algorithm {
 	public:
 		rename_dummies(exptree&, iterator);
 
-		virtual void     description() const;
 		virtual bool     can_apply(iterator);
 		virtual result_t apply(iterator&);
 };

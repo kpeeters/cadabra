@@ -198,11 +198,6 @@ generate_indexbracket::generate_indexbracket(exptree& tr, iterator it)
 	{
 	}
 
-void generate_indexbracket::description() const
-	{
-	txtout << "Wrap indices on brackets in indexbracket nodes" << std::endl;
-	}
-
 // The things to be wrapped:
 //
 //   - sub/superscript nodes with a parent with an empty name, e.g. (b)_\mu.
@@ -263,11 +258,6 @@ unique_indices::unique_indices(exptree& tr, iterator it)
 	{
 	}
 
-void unique_indices::description() const
-	{
-	txtout << "Make all open indices of tensors in a list unique." << std::endl;
-	}
-
 bool unique_indices::can_apply(iterator it)
 	{
 	if(*it->name=="\\comma") return true;
@@ -313,11 +303,6 @@ algorithm::result_t unique_indices::apply(iterator& it)
 einsteinify::einsteinify(exptree& tr, iterator it)
 	: algorithm(tr, it)
 	{
-	}
-
-void einsteinify::description() const
-	{
-	txtout << "Einsteinify index pairs." << std::endl;
 	}
 
 bool einsteinify::can_apply(iterator it)
@@ -379,11 +364,6 @@ algorithm::result_t einsteinify::apply(iterator& it)
 combine::combine(exptree& tr, iterator it)
 	: algorithm(tr, it)
 	{
-	}
-
-void combine::description() const
-	{
-	txtout << "Combine indexbrackets." << std::endl;
 	}
 
 bool combine::can_apply(iterator it)
@@ -513,11 +493,6 @@ expand::expand(exptree& tr, iterator it)
 	{
 	}
 
-void expand::description() const
-	{
-	txtout << "Expand indexbrackets." << std::endl;
-	}
-
 bool expand::can_apply(iterator it)
 	{
 	if(*it->name=="\\indexbracket") 
@@ -642,11 +617,6 @@ debracket::debracket(exptree& tr, iterator it)
 	{
 	}
 
-void debracket::description() const
-	{
-	txtout << "Remove indicated objects outside indexbracket." << std::endl;
-	}
-
 bool debracket::can_apply(iterator it)
 	{
 	if(args_begin()==args_end()) {
@@ -738,11 +708,6 @@ algorithm::result_t debracket::apply(iterator& it)
 eliminate_kronecker::eliminate_kronecker(exptree& tr, iterator it)
 	: algorithm(tr, it)
 	{
-	}
-
-void eliminate_kronecker::description() const
-	{
-	txtout << "Eliminate Kronecker deltas." << std::endl;
 	}
 
 bool eliminate_kronecker::can_apply(iterator st)
@@ -852,11 +817,6 @@ reduce_gendelta::reduce_gendelta(exptree&tr, iterator it)
 	{
 	}
 
-void reduce_gendelta::description() const
-	{
-	txtout << "Reduce generalised deltas with contracted indices to simpler form." << std::endl;
-	}
-
 bool reduce_gendelta::can_apply(iterator st)
 	{
 	const KroneckerDelta *kr=properties::get<KroneckerDelta>(st);
@@ -951,11 +911,6 @@ bool reduce_gendelta::one_step_(sibling_iterator dl)
 break_gendelta::break_gendelta(exptree&tr, iterator it)
 	: algorithm(tr, it)
 	{
-	}
-
-void break_gendelta::description() const
-	{
-	txtout << "Convert a generalised KroneckerDelta (with more than two indices) to a product of normal KroneckerDeltas." << std::endl;
 	}
 
 bool break_gendelta::can_apply(iterator st)
@@ -1137,11 +1092,6 @@ dualise_tensor::dualise_tensor(exptree& tr, iterator it)
 	{
 	}
 
-void dualise_tensor::description() const
-	{
-	txtout << "Use (anti)self-duality of the indicated tensor to dualise it." << std::endl;
-	}
-
 bool dualise_tensor::can_apply(iterator st)
 	{
 	const SelfDual *sd=properties::get<SelfDual>(st);
@@ -1198,12 +1148,6 @@ algorithm::result_t dualise_tensor::apply(iterator& st)
 epsprod2gendelta::epsprod2gendelta(exptree& tr, iterator it)
 	: algorithm(tr, it)
 	{
-	}
-
-void epsprod2gendelta::description() const
-	{
-	txtout << "Eliminate the product of two epsilon tensors in favour of a generalised kronecker delta." 
-			 << std::endl;
 	}
 
 bool epsprod2gendelta::can_apply(iterator st)
@@ -1292,11 +1236,6 @@ algorithm::result_t epsprod2gendelta::apply(iterator& st)
 eliminate_eps::eliminate_eps(exptree& tr, iterator it) 
 	: algorithm(tr,it)
 	{
-	}
-
-void eliminate_eps::description() const
-	{
-	txtout << "Eliminate epsilon tensors using self-duality." << std::endl;
 	}
 
 bool eliminate_eps::can_apply(iterator st)
@@ -1410,11 +1349,6 @@ product_shorthand::product_shorthand(exptree& tr, iterator it)
 	{
 	}
 
-void product_shorthand::description() const
-	{
-	txtout << "Rewrites the product of two symmetric or anti-symmetric tensors in a compact form by removing the contracting dummy indices." << std::endl;
-	}
-
 bool product_shorthand::can_apply(iterator it) 
 	{
 	if(*it->name=="\\prod")
@@ -1468,11 +1402,6 @@ algorithm::result_t product_shorthand::apply(iterator& it)
 expand_product_shorthand::expand_product_shorthand(exptree& tr, iterator it)
 	: algorithm(tr, it)
 	{
-	}
-
-void expand_product_shorthand::description() const
-	{
-	txtout << "Inverse of product shorthand." << std::endl;
 	}
 
 bool expand_product_shorthand::can_apply(iterator it) 
@@ -1529,12 +1458,6 @@ remove_eoms::remove_eoms(exptree& tr, iterator it)
 	{
 	}
 
-void remove_eoms::description() const
-	{
-	// FIXME: this is ugly
-	txtout << "Remove DF lowest order equations of motion." << std::endl;
-	}
-
 bool remove_eoms::can_apply(iterator it)
 	{
 	const DAntiSymmetric *da=properties::get<DAntiSymmetric>(it);
@@ -1562,11 +1485,6 @@ algorithm::result_t remove_eoms::apply(iterator& it)
 pintegrate::pintegrate(exptree& tr, iterator it)
 	: algorithm(tr, it)
 	{
-	}
-
-void pintegrate::description() const
-	{
-	txtout << "Perform partial integration." << std::endl;
 	}
 
 bool pintegrate::can_apply(iterator it)
@@ -1700,11 +1618,6 @@ algorithm::result_t pintegrate::apply(iterator& it)
 unwrap::unwrap(exptree& tr, iterator it)
 	: algorithm(tr, it)
 	{
-	}
-
-void unwrap::description() const
-	{
-	txtout << "" << std::endl;
 	}
 
 bool unwrap::can_apply(iterator it)
@@ -1905,10 +1818,6 @@ algorithm::result_t unwrap::apply(iterator& it)
 // 	{
 // 	}
 // 
-// void remove_vanishing_derivatives::description() const
-// 	{
-// 	txtout << "Remove terms with identically vanishing derivatives." << std::endl;
-// 	}
 // 
 // bool remove_vanishing_derivatives::can_apply(iterator it)
 // 	{
@@ -1950,11 +1859,6 @@ algorithm::result_t unwrap::apply(iterator& it)
 impose_bianchi::impose_bianchi(exptree& tr, iterator it)
 	: algorithm(tr, it), tb(0)
 	{
-	}
-
-void impose_bianchi::description() const
-	{
-	txtout << "Remove this term if a full hook of the TableauSymmetry is contracted with an anti-symmetric set of indices." << std::endl;
 	}
 
 bool impose_bianchi::can_apply(iterator it)
@@ -2038,11 +1942,6 @@ algorithm::result_t impose_bianchi::apply(iterator& st)
 all_contractions::all_contractions(exptree& tr, iterator it)
 	: algorithm(tr, it)
 	{
-	}
-
-void all_contractions::description() const
-	{
-	txtout << "Construct all possible full contractions given mono-term symmetries." << std::endl;
 	}
 
 bool all_contractions::can_apply(iterator it)

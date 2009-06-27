@@ -27,7 +27,6 @@ class frommath : public algorithm {
 	public:
 		frommath(exptree&, iterator);
 
-		virtual void     description() const;
 		virtual bool     can_apply(sibling_iterator, sibling_iterator);
 		virtual result_t apply(sibling_iterator&, sibling_iterator&);
 };
@@ -36,7 +35,6 @@ class frommaple : public algorithm {
 	public:
 		frommaple(exptree&, iterator);
 
-		virtual void     description() const;
 		virtual bool     can_apply(iterator);
 		virtual result_t apply(iterator&);
 };
@@ -45,7 +43,6 @@ class run : public algorithm {
 	public:
 		run(exptree&, iterator);
 
-		virtual void     description() const;
 		virtual bool     can_apply(iterator);
 		virtual result_t apply(iterator&);
 
@@ -56,7 +53,6 @@ class maxima : public algorithm {
 	public:
 		maxima(exptree&, iterator);
 
-		virtual void     description() const;
 		virtual bool     can_apply(iterator);
 		virtual result_t apply(iterator&);
 
@@ -69,7 +65,6 @@ class maple : public algorithm {
 	public:
 		maple(exptree&, iterator);
 
-		virtual void     description() const;
 		virtual bool     can_apply(iterator);
 		virtual result_t apply(iterator&);
 
@@ -83,7 +78,6 @@ class tomath : public algorithm {
 	public:
 		tomath(exptree&, iterator);
 		
-		virtual void     description() const;
 		virtual bool     can_apply(iterator);
 		virtual iterator apply(iterator&);
 };

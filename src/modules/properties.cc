@@ -93,10 +93,12 @@ algorithm::result_t extract_properties::apply(iterator& st)
 									theprop->core_parse(keyvals);
 									}
 								if(sib->fl.parent_rel!=str_node::p_property) {
-									txtout << "$";
-									eo->print_infix(txtout, sib);
-									txtout << "$";
 									properties::insert_prop(sib, theprop);
+									if(eo) {
+										txtout << "$";
+										eo->print_infix(txtout, sib);
+										txtout << "$";
+										}
 									theprop=0;
 									}
 								++sib;
@@ -108,15 +110,15 @@ algorithm::result_t extract_properties::apply(iterator& st)
 								}				
 							}
 						else {
+							properties::insert_prop(st, theprop);
 							txtout << "Assigning property " << propname << " to ";
 							if(eo) {
 								txtout << "$";
 								eo->print_infix(txtout, st);
 								txtout << "$";
-								}	
+								}
 							txtout << "." << std::endl;
 							if(eo) eo->newline(txtout);
-							properties::insert_prop(st, theprop);
 							}
 						}
 					}
