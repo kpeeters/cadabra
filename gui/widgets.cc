@@ -624,7 +624,7 @@ bool ExpressionInput::exp_input_tv::on_expose_event(GdkEventExpose *event)
 //
 
 TeXInput::exp_input_tv::exp_input_tv(Glib::RefPtr<Gtk::TextBuffer> tb)
-	: Gtk::TextView(tb), folded_away(false)
+	: Gtk::TextView(tb), is_modified(false), folded_away(false)
 	{
 	}
 
@@ -665,9 +665,7 @@ void TeXInput::set_folded(bool onoff)
 	if(edit.folded_away) 
 		remove(edit);
 	else {
-		std::cerr << "here perhaps?" << std::endl;
 		pack_start(edit);
-		std::cerr << "here perhaps!" << std::endl;
 		reorder_child(edit, 0);
 		edit.show();
 		}
@@ -684,11 +682,13 @@ bool TeXInput::exp_input_tv::on_key_press_event(GdkEventKey* event)
 		std::cerr << "running: " << tmp << std::endl;
 #endif
 		emitter(tmp);
+		is_modified=false;
 //		set_editable(false);
 //		textbuf->set_text("");
 		return true;
 		}
 	else {
+		is_modified=true;
 		bool retval=Gtk::TextView::on_key_press_event(event);
 		return retval;
 		}

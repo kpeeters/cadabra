@@ -75,10 +75,10 @@ class DataCell : public Glib::Object {
 		cell_t                        cell_type;
 		Glib::RefPtr<Gtk::TextBuffer> textbuf;
 		Glib::RefPtr<TeXBuffer>       texbuf;
-		std::string                   cdbbuf;     // c_output only: the output in cadabra input format
-		bool                          tex_hidden; // c_tex only
+		std::string                   cdbbuf;             // c_output only: the output in cadabra input format
+		bool                          tex_hidden;         // c_tex only
 		bool                          sensitive;
-		int                           sectioning; // >0 for section header cells
+		int                           sectioning;         // >0 for section header cells
 		bool                          running;
 };
 

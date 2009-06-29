@@ -1700,6 +1700,13 @@ void XCadabra::handle_on_grab_focus(NotebookCanvas *can, VisualCell *vis)
 
 bool XCadabra::handle_visibility_toggle(GdkEventButton *, NotebookCanvas *can, VisualCell *vis) 
 	{
+	// If this action wants to close the cell, update the TeX image first (this will
+	if(vis->datacell->tex_hidden==false) 
+		if(vis->texbox->edit.is_modified) 
+			if(handle_tex_update_request(vis->datacell->textbuf->get_text(), can, vis)==false)
+				return false;
+
+	// Now change the visibility
 	vis->datacell->tex_hidden = !vis->datacell->tex_hidden;
 	for(unsigned int i=0; i<canvasses.size(); ++i) {
 		NotebookCanvas::VisualCells_t::iterator it=canvasses[i]->visualcells.begin();
@@ -1753,16 +1760,16 @@ bool XCadabra::handle_outbox_select(GdkEventButton *, NotebookCanvas *can, Visua
 bool XCadabra::handle_tex_update_request(std::string, NotebookCanvas *can, VisualCell *vis)
 	{
 	// First re-generate the image.
-	Gtk::Allocation al=get_allocation();
-
 	try {
 		vis->texbox->texview.texbuf->generate("","");
+		vis->texbox->edit.is_modified=false;
 		}
 	catch(std::exception& ex) {
 		 kernel_idle();
 		 Gtk::MessageDialog md(ex.what());
 		 md.set_type_hint(Gdk::WINDOW_TYPE_HINT_DIALOG);
 		 md.run();
+		 return false;
 		 }		
 
 	// Now walk through all TeXInput cells and update the Image widget.

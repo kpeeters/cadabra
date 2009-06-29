@@ -184,9 +184,10 @@ class TeXInput : public Gtk::VBox {
 				virtual bool on_key_press_event(GdkEventKey*);
 				sigc::signal1<bool, std::string> emitter;
 
+				bool is_modified;
+
 				friend class TeXInput;
 			protected:
-//				virtual void on_show();
 				bool folded_away;
 		};
 		
