@@ -742,6 +742,10 @@ print_commutator::print_commutator(exptree_output& eo)
 
 void print_commutator::print_infix(std::ostream& str, exptree::iterator it)
 	{
+	if(parent.output_format!=exptree_output::out_xcadabra && 
+		parent.output_format!=exptree_output::out_texmacs )
+		 return node_printer::print_infix(str, it);
+
 	if(*it->multiplier!=1) 
 		print_multiplier(str, it);
 	sibling_iterator ch=tr.begin(it);
