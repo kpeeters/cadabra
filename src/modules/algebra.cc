@@ -18,7 +18,7 @@
  
 */
 
-//#define NEW_XPERM 
+#define NEW_XPERM 
 //#define XPERM_USE_EXT 
 //#define XPERM_DEBUG
 
@@ -3070,7 +3070,7 @@ algorithm::result_t canonicalise::apply(iterator& it)
 				if(number_of_indices==1)
 					base_here.push_back(curr_pos+1);
 				else {
-					for(unsigned int kk=0; kk+1<number_of_indices; ++kk) 
+					for(unsigned int kk=0; kk<number_of_indices; ++kk) 
 						base_here.push_back(curr_pos+kk+1);
 					}
 				curr_pos+=tr.number_of_indices(facit); // even if tba=0, this factor may contain indices
