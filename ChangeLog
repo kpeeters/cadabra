@@ -1,3 +1,11 @@
+2009-07-17  Kasper Peeters  <kasper.peeters@aei.mpg.de>
+
+	* Released 1.13
+
+	* Disabled word-wrapping in input cells to prevent gtk from
+	messing up input at non-symbol boundaries. Added horizontal scroll
+	bar. 
+
 2009-06-20  Kasper Peeters  <kasper.peeters@aei.mpg.de>
 
 	* Added safeguard against overwriting existing notebook files.

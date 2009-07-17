@@ -328,7 +328,7 @@ NotebookCanvas::NotebookCanvas(XCadabra& doc_)
 	: doc(doc_)
 	{
 	pack1(scroll, true, true);
- 	scroll.set_policy(Gtk::POLICY_NEVER, Gtk::POLICY_ALWAYS);
+ 	scroll.set_policy(Gtk::POLICY_ALWAYS, Gtk::POLICY_ALWAYS);
  	scroll.set_border_width(1);
 	scroll.add(ebox);
 	ebox.add(scrollbox);

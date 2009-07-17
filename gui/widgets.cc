@@ -460,7 +460,7 @@ ExpressionInput::ExpressionInput(Glib::RefPtr<Gtk::TextBuffer> tb, const std::st
 //	scroll_.set_border_width(1);
 //	scroll_.set_policy(Gtk::POLICY_NEVER, Gtk::POLICY_ALWAYS);
 	edit.modify_font(Pango::FontDescription(fontname)); 
-	edit.set_wrap_mode(Gtk::WRAP_WORD);
+	edit.set_wrap_mode(Gtk::WRAP_NONE);
 	edit.modify_text(Gtk::STATE_NORMAL, Gdk::Color("blue"));
 	edit.set_pixels_above_lines(LINE_SPACING);
 	edit.set_pixels_below_lines(LINE_SPACING);
