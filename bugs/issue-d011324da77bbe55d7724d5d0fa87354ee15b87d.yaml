@@ -1,0 +1,18 @@
+--- !ditz.rubyforge.org,2008-03-06/issue 
+title: Fix output messages to be TeX
+desc: "e.g. @collect_terms: not applicable does not print correctly."
+type: :bugfix
+component: cadabra
+release: 
+reporter: Kasper Peeters <kasper.peeters@aei.mpg.de>
+status: :unstarted
+disposition: 
+creation_time: 2009-06-27 11:06:33.608356 Z
+references: []
+
+id: d011324da77bbe55d7724d5d0fa87354ee15b87d
+log_events: 
+- - 2009-06-27 11:06:34.506656 Z
+  - Kasper Peeters <kasper.peeters@aei.mpg.de>
+  - created
+  - ""

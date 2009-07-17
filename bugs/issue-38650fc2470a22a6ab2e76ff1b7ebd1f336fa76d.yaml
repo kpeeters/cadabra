@@ -1,0 +1,25 @@
+--- !ditz.rubyforge.org,2008-03-06/issue 
+title: Re-LaTeX TeX cells on close
+desc: |-
+  When closing a TeX cell, the content of the output should be updated if
+  the input has changed, and the cell should refuse to close when an
+  error occurs.
+type: :bugfix
+component: cadabra
+release: 
+reporter: Kasper Peeters <kasper.peeters@aei.mpg.de>
+status: :closed
+disposition: :fixed
+creation_time: 2009-06-29 08:18:33.674961 Z
+references: []
+
+id: 38650fc2470a22a6ab2e76ff1b7ebd1f336fa76d
+log_events: 
+- - 2009-06-29 08:18:34.460887 Z
+  - Kasper Peeters <kasper.peeters@aei.mpg.de>
+  - created
+  - ""
+- - 2009-06-30 21:43:29.463937 Z
+  - Kasper Peeters <kasper.peeters@aei.mpg.de>
+  - closed with disposition fixed
+  - ""

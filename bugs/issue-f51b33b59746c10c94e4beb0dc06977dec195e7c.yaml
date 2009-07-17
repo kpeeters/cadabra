@@ -1,0 +1,22 @@
+--- !ditz.rubyforge.org,2008-03-06/issue 
+title: Potential bug with A_{m m} -> replacements
+desc: |-
+  If the left-hand side of a substitution rule is not a product,
+  some code paths are cut short, potentially messing up dummy
+  replacements in rules which have a dummy pair inside a single
+  tensor on the lhs.
+type: :bugfix
+component: cadabra
+release: 
+reporter: Kasper Peeters <kasper.peeters@aei.mpg.de>
+status: :unstarted
+disposition: 
+creation_time: 2009-06-19 06:50:38.985389 Z
+references: []
+
+id: f51b33b59746c10c94e4beb0dc06977dec195e7c
+log_events: 
+- - 2009-06-19 06:50:40.139415 Z
+  - Kasper Peeters <kasper.peeters@aei.mpg.de>
+  - created
+  - ""

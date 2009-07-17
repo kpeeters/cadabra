@@ -1,0 +1,21 @@
+--- !ditz.rubyforge.org,2008-03-06/issue 
+title: Make @canonicalise work on functional arguments
+desc: |-
+  Right now it is not possible to declare a function f(x,y) symmetric in
+  its two arguments, and then use @canonicalise to simplify it. This should
+  be added, with a suitable notation for Symmetric, AntiSymmetric and friends.
+type: :bugfix
+component: cadabra
+release: 
+reporter: Kasper Peeters <kasper.peeters@aei.mpg.de>
+status: :unstarted
+disposition: 
+creation_time: 2009-06-29 08:40:38.767074 Z
+references: []
+
+id: 0180195bb345a1d9168742e86b5f9edd57c33937
+log_events: 
+- - 2009-06-29 08:40:39.513109 Z
+  - Kasper Peeters <kasper.peeters@aei.mpg.de>
+  - created
+  - ""
