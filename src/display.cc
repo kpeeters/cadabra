@@ -1232,6 +1232,7 @@ void exptree_output::print_full_standardform(std::ostream& str, exptree::iterato
 	if(xml_structured) str << "<eq>" << std::endl;
 	print_infix(str, tr.active_expression(it));
 	str << ";";
+	if(output_format==exptree_output::out_plain) str << std::endl;
 	if(xml_structured) str << std::endl << "</eq>" << std::endl;
 	}
 
