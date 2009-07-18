@@ -44,7 +44,7 @@ manipulator::algo_info::algo_info(std::auto_ptr<algorithm> (*cr)(exptree&, itera
 	}
 
 manipulator::manipulator()
-	: eo(expressions, exptree_output::out_plain), 
+	: eo(expressions, exptree_output::out_plain), getline_was_eof(0),
 	  editing_equation(0), last_used_equation_number(0), 
 	  utf8_output(getenv("CDB_USE_UTF8")), status_output(false), prompt_string(">")
 	{
@@ -280,9 +280,16 @@ void manipulator::read_program_file()
 
 bool manipulator::getline_precut(std::istream& str, std::string& buf) 
 	{
-	if(getline_precut_buffer.size()==0) {
-		if(getline(str, getline_precut_buffer)==false)
+	if(getline_precut_buffer.size()==0 || getline_was_eof) {
+		std::string input_now;
+		getline_was_eof=false;
+		if(std::getline(str, input_now)==false)
 			return false;
+		getline_precut_buffer+=input_now;
+		}
+	if(str.eof()) { // this input is not enough; need to store it for a future call
+		getline_was_eof=true;
+		return false;
 		}
 
 	if(getline_precut_buffer[0]=='#' || getline_precut_buffer[0]=='%') {

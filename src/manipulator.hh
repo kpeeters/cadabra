@@ -85,8 +85,12 @@ class manipulator : public sigc::trackable {
 		std::stack<std::istream *> streamstack;
 		exptree_output             eo;
 	private:
+		/// A modified getline which ensures that the return string is one complete
+		/// line of input, and no more than that. Will return false if there is no
+		/// or not enough input (yet).
 		bool              getline_precut(std::istream&, std::string&);
 		std::string       getline_precut_buffer;
+		bool              getline_was_eof;
 
 		bool              is_whitespace_(const std::string& str) const;
 
