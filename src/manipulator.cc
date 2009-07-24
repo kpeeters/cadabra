@@ -506,7 +506,7 @@ bool manipulator::handle_input()
 			std::stringstream str(input_buffer);
 			parser pa(true);
 
-//			std::cout << "|" << input_buffer << "|" << std::endl;
+			debugout << "attempting to parse " << input_buffer << std::endl;
 			try {
 				str >> pa;
 				}
@@ -520,6 +520,7 @@ bool manipulator::handle_input()
 				goto anotherline;
 				}
 			input_buffer.clear();
+			debugout << "parsing done" << std::endl;
 
 			// The parser has accepted the input and we now start processing the
 			// generated tree. The first step is to collect the label and make sure
@@ -706,9 +707,12 @@ bool manipulator::handle_input()
 			status_output=remember_status_output;
 			output_comment("Output file closed.");
 			}
+		debugout << "almost done" << std::endl;
 
-		if(streamstack.size()==1)
+		if(streamstack.size()==1) {
+			debugout << "going to print prompt" << std::endl;
 			print_prompt();
+			}
 		}
 
 	jumpout:

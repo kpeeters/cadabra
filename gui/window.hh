@@ -323,6 +323,9 @@ class XCadabra : public Gtk::Window {
 		void         input_cell_modified();
 		void         tex_cell_modified();
 
+		/// Display of error messages.
+		void         generic_error_popup(const std::string&) const;
+
 		void         connect_io_signals();
 		void         disconnect_io_signals();	
 

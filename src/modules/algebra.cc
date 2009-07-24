@@ -975,8 +975,8 @@ algorithm::result_t distribute::apply(iterator& prod)
 	pc.apply_recursive(ret,false);
 //	cleanup_sums_products(tr, ret);
 //	txtout << "..." << *ret->name << std::endl;
-	cleanup_nests_below(tr, ret, true); // CHANGED
-	cleanup_nests(tr, ret, true); // CHANGED
+	cleanup_nests_below(tr, ret, false); // CHANGED  true to false in last argument
+	cleanup_nests(tr, ret, false); // CHANGED true to false in last argument
 
 	// FIXME: if we had a flattened sum, does the apply_recursive now
 	// go and examine every sum that we have created? Should we better

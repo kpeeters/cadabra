@@ -742,19 +742,28 @@ print_commutator::print_commutator(exptree_output& eo)
 
 void print_commutator::print_infix(std::ostream& str, exptree::iterator it)
 	{
+	bool prettyform;
 	if(parent.output_format!=exptree_output::out_xcadabra && 
-		parent.output_format!=exptree_output::out_texmacs )
-		 return node_printer::print_infix(str, it);
+		parent.output_format!=exptree_output::out_texmacs ) 
+		prettyform=false;
+	else prettyform=true;
 
 	if(*it->multiplier!=1) 
 		print_multiplier(str, it);
 	sibling_iterator ch=tr.begin(it);
-	str << "[";
+	if(prettyform)	str << "[";
+	else str << "\\commutator{";
+
 	parent.get_printer(ch)->print_infix(str, ch);
-	str << ", ";
+	if(prettyform)	str << ",";
+	else str << "}{";
+
 	++ch;
 	parent.get_printer(ch)->print_infix(str, ch);
-	str << "]";
+
+	parent.get_printer(ch)->print_infix(str, ch);
+	if(prettyform)	str << "]";
+	else str << "}";
 	}
 
 print_indexbracket::print_indexbracket(exptree_output& eo)
@@ -975,8 +984,10 @@ void node_printer::print_infix(std::ostream& str, exptree::iterator it)
 		}
 	else if(parent.output_format==exptree_output::out_xcadabra) {
 		 const LaTeXForm *lf=properties::get<LaTeXForm>(it);
+		 if(tr.number_of_children(it)!=0) str << "{"; // to prevent double sup/sub script errors
 		 if(lf) str << lf->latex;
 		 else   str << texify(*it->name);
+		 if(tr.number_of_children(it)!=0) str << "}";
 		}
 	else str << *it->name;
 

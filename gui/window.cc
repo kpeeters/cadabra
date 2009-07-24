@@ -17,7 +17,7 @@
 
 */
 
-// #define DEBUG 1
+//#define DEBUG 1
 
 #include <modglue/pipe.hh>
 #include <modglue/process.hh>
@@ -461,8 +461,6 @@ VisualCell *NotebookCanvas::add_cell(Glib::RefPtr<DataCell> dc, Glib::RefPtr<Dat
 			while (gtk_events_pending ())
 				gtk_main_iteration ();
 
-//			(*newit).set_options(Gtk::PACK_SHRINK);
-			
 			// Connect to signal for 'ctrl-enter pressed', i.e. 'feed this cell to the kernel'.
 			newcell->inbox->edit.emitter.connect(
 				sigc::bind<NotebookCanvas *, VisualCell *>(
@@ -1608,6 +1606,9 @@ bool XCadabra::handle_editbox_output(std::string str, NotebookCanvas *can, Visua
 		*(cdb.output_pipe("stdin")) << "#cellstart " << last_used_id << "\n"
 											 << str << "\n"
 											 << "#cellend\n" << std::flush;
+#ifdef DEBUG
+		std::cerr << "sending done" << std::endl;
+#endif
 		}
 	return true;
 	}
@@ -1795,7 +1796,12 @@ bool XCadabra::on_configure_event(GdkEventConfigure *cfg)
 	{
 	tex_engine_main.set_geometry(cfg->width-20-35);
 	bool ret=Gtk::Window::on_configure_event(cfg);
-	tex_engine_main.convert_all();
+	try {
+		tex_engine_main.convert_all();
+		}
+	catch(TeXEngine::TeXException& ex) {
+		generic_error_popup(std::string(ex.what()));
+		}
 	for(unsigned int i=0; i<canvasses.size(); ++i) 
 		canvasses[i]->redraw_cells();
 	return ret;
@@ -1812,38 +1818,46 @@ bool XCadabra::on_delete_event(GdkEventAny* event)
 	else return true;
 	}
 
+void XCadabra::generic_error_popup(const std::string& err) const
+	{
+	size_t lines=1;
+	std::string what=err;
+	for(size_t i=0; i<what.size(); ++i)
+		if(what[i]=='\n')
+			++lines;
+	if(lines<11) {
+		Gtk::MessageDialog md(err);
+		md.set_type_hint(Gdk::WINDOW_TYPE_HINT_DIALOG);
+		md.run();
+		}
+	else {
+		Gtk::Dialog md;
+		Gtk::TextView tv;
+		Glib::RefPtr<Gtk::TextBuffer> tb=Gtk::TextBuffer::create();
+		Gtk::ScrolledWindow sw;
+		Gtk::Button ok(Gtk::Stock::OK);
+		tb->set_text(err);
+		md.get_vbox()->add(sw);
+		md.add_button(Gtk::Stock::OK, 1);
+		sw.add(tv);
+		tv.set_buffer(tb);
+		tv.set_editable(false);
+		md.set_size_request(400,300);
+		md.show_all();
+		md.run();
+		}
+	}
+
 void XCadabra::on_signal_exception()
 	{
+#ifdef DEBUG
+	std::cerr << "on_signal_exception" << std::endl;
+#endif
 	try {
 		throw;
 		}
 	catch(TeXEngine::TeXException& ex) {
-		size_t lines=1;
-		std::string what=ex.what();
-		for(size_t i=0; i<what.size(); ++i)
-			if(what[i]=='\n')
-				++lines;
-		if(lines<11) {
-			Gtk::MessageDialog md(ex.what());
-			md.set_type_hint(Gdk::WINDOW_TYPE_HINT_DIALOG);
-			md.run();
-			}
-		else {
-			Gtk::Dialog md;
-			Gtk::TextView tv;
-			Glib::RefPtr<Gtk::TextBuffer> tb=Gtk::TextBuffer::create();
-			Gtk::ScrolledWindow sw;
-			Gtk::Button ok(Gtk::Stock::OK);
-			tb->set_text(ex.what());
-			md.get_vbox()->add(sw);
-			md.add_button(Gtk::Stock::OK, 1);
-			sw.add(tv);
-			tv.set_buffer(tb);
-			tv.set_editable(false);
-			md.set_size_request(400,300);
-			md.show_all();
-			md.run();
-			}
+		generic_error_popup(std::string(ex.what()));
 		}
 	}
 
@@ -1936,7 +1950,12 @@ bool XCadabra::receive(modglue::ipipe& p)
 				cp=add_cell(newcell, cp, false);
 				cells_to_show.push_back(newcell);
 				}
-			tex_engine_main.convert_all();
+			try {
+				tex_engine_main.convert_all();
+				}
+			catch(TeXEngine::TeXException& ex) {
+				generic_error_popup(std::string(ex.what()));
+				}
 			for(size_t i=0; i<cells_to_show.size(); ++i)
 				show_cell(cells_to_show[i]);
 			cells_to_show.clear();
@@ -2075,6 +2094,16 @@ bool XCadabra::receive(modglue::ipipe& p)
 			eqno="";
 			plain="";
 			last_was_prompt=false;
+//			if(!running) 
+//				kernel_idle();
+//			if(origcell) {
+//				origcell->running=false;
+//#if (GLIBMM_VER == 216)
+//				origcell.reset();
+//#else
+//				origcell.clear();
+//#endif
+//				}
 			continue;
 			}
 		else if(str=="<property>") {
@@ -2119,9 +2148,8 @@ bool XCadabra::receive(modglue::ipipe& p)
 			progressbar2.set_text(" ");
 			progressbar1.set_text(" ");
 			if(!last_was_prompt && !in_cell) {
-				if(!running) {
-					 kernel_idle();
-					}
+				if(!running) 
+					kernel_idle();
 				last_was_prompt=true;
 				if(error_occurred) {
 					error_occurred=false;
@@ -2156,10 +2184,9 @@ bool XCadabra::receive(modglue::ipipe& p)
 							Glib::RefPtr<DataCell> newcell(new DataCell(DataCell::c_input, ""));
 							action_add(Glib::RefPtr<ActionBase>(new ActionAddCell(newcell, cp, false)));
 							cp = newcell;
-//							cp=add_cell(newcell, cp, false); // HERE
 							show_cell(newcell);
-// FIXME: focus
-//							active_canvas->cell_grab_focus(cp);
+							if(!running) // grab focus if we are in interactive mode
+								active_canvas->cell_grab_focus(cp);
 							}
 						if(restarting_kernel) {
 							restarting_kernel=false;
@@ -2827,7 +2854,12 @@ std::string XCadabra::load(const std::string& fn, bool ignore_nonexistence)
 		}
 
 	// Now generate all TeX output and then show all widgets.
-	tex_engine_main.convert_all();
+	try {
+		tex_engine_main.convert_all();
+		}
+	catch(TeXEngine::TeXException& ex) {
+		generic_error_popup(std::string(ex.what()));
+		}
 	show_all();
 	while (gtk_events_pending ())
 		gtk_main_iteration ();
@@ -3027,7 +3059,12 @@ void XCadabra::on_settings_font_size(int num)
 		}
 
 	// Update all VisualCells.
-	tex_engine_main.convert_all();
+	try {
+		tex_engine_main.convert_all();
+		}
+	catch(TeXEngine::TeXException& ex) {
+		generic_error_popup(std::string(ex.what()));
+		}
 	for(unsigned int i=0; i<canvasses.size(); ++i) 
 		canvasses[i]->redraw_cells();
 	}

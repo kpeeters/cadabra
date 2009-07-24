@@ -30,6 +30,7 @@
 #include <gdkmm/general.h>
 #include <pcrecpp.h>
 
+//#define DEBUG 1
 
 // General tool to strip spaces from both ends
 std::string trim(const std::string& s) 
@@ -98,6 +99,20 @@ std::string TeXEngine::handle_latex_errors(const std::string& result) const
 	if(pos != std::string::npos) {
 		 return "Output cell too large (TeX capacity exceeded), output suppressed.";
 		 }
+	
+	pos=result.find("! Double superscript.");
+	if(pos != std::string::npos) {
+		return "Internal typesetting error: double superscript. Please report a bug.";
+		}
+	pos=result.find("! Double subscript.");
+	if(pos != std::string::npos) {
+		return "Internal typesetting error: double subscript. Please report a bug.";
+		}
+	
+	pos=result.find("! Package breqn Error: ");
+	if(pos != std::string::npos) {
+		return "Typesetting error (breqn.sty related). Please report a bug.";
+		}
 	
 	pos=result.find("! Undefined control sequence");
 	if(pos != std::string::npos) {
