@@ -230,21 +230,12 @@ void print_productlike::doprint(std::ostream& str, exptree::iterator it, const s
 				beginning_of_group=true;
 				}
 			}
-//		bool wrapping_bracket=false;
-//		if(*ch->name=="\\sum") {
-//			wrapping_bracket=!children_have_brackets(ch);
-//			if(wrapping_bracket) 
-//				str << "(";
-//			}
 		parent.get_printer(ch)->print_infix(str, ch);
-//		if(wrapping_bracket)
-//			str << ")";
 		++ch;
 		if(ch==tr.end(it)) {
 			if(current_bracket_!=str_node::b_none) 
 				print_closing_bracket(str, current_bracket_, str_node::p_none);
 			}
-//		else assert(current_bracket_==(*ch).fl.bracket);
 
 		if(ch!=tr.end(it)) {
 			 if(parent.print_star && parent.output_format != exptree_output::out_texmacs) {
@@ -951,46 +942,15 @@ void node_printer::print_infix(std::ostream& str, exptree::iterator it)
 		return;
 		}
 
-	if(parent.output_format==exptree_output::out_mathematica && it->fl.parent_rel==str_node::p_none) {
-		const GammaMatrix     *g=properties::get<GammaMatrix>(it);
-		const KroneckerDelta  *k=properties::get<KroneckerDelta>(it);
-		const WeylTensor     *wt=properties::get<WeylTensor>(it);
-		
-		if(g)
-			str << "GammaProd" << zwnbsp << "[";
-		else if(k) {
-			str << "Delta" << zwnbsp << "[";
-			isdelta=true;
-			}
-		else if(wt) {
-			str << "Weyl" << zwnbsp << "[";
-			isweyl=true;
-			}
-		else if(tr.number_of_children(it)>0) {
-			if(getenv("CDB_MATH_COMPACT")) str << *it->name << "[";
-			else                           str << "Tensor" << zwnbsp << "[" << *it->name << "," << nbsp;
-			}
-		else {
-			 str << *it->name;
-			}
-		}
-	else if(parent.output_format==exptree_output::out_maple && it->fl.parent_rel==str_node::p_none) {
-		const WeylTensor     *wt=properties::get<WeylTensor>(it);
-		if(wt) {
-			isweyl=true;
-			str << *it->name << "[";
-			}
-		else str << *it->name;
-		}
-	else if(parent.output_format==exptree_output::out_xcadabra) {
-		 const LaTeXForm *lf=properties::get<LaTeXForm>(it);
-		 if(tr.number_of_children(it)!=0) str << "{"; // to prevent double sup/sub script errors
-		 if(lf) str << lf->latex;
-		 else   str << texify(*it->name);
-		 if(tr.number_of_children(it)!=0) str << "}";
+	if(parent.output_format==exptree_output::out_xcadabra) {
+		const LaTeXForm *lf=properties::get<LaTeXForm>(it);
+		if(tr.number_of_children(it)!=0) str << "{"; // to prevent double sup/sub script errors
+		if(lf) str << lf->latex;
+		else   str << texify(*it->name);
+		if(tr.number_of_children(it)!=0) str << "}";
 		}
 	else str << *it->name;
-
+	
 	print_children(str, it);
 	}
 
