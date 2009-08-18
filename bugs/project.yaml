@@ -48,10 +48,27 @@ releases:
     - ""
 - !ditz.rubyforge.org,2008-03-06/release 
   name: "1.12"
-  status: :unreleased
-  release_time: 
+  status: :released
+  release_time: 2009-08-18 17:37:31.895514 Z
   log_events: 
   - - 2009-06-03 21:11:35.181237 Z
     - Kasper Peeters <kasper.peeters@aei.mpg.de>
     - created
+    - ""
+  - - 2009-08-18 17:37:31.895540 Z
+    - Kasper Peeters <kasper.peeters@aei.mpg.de>
+    - released
+    - Long ago...
+- !ditz.rubyforge.org,2008-03-06/release 
+  name: "1.15"
+  status: :released
+  release_time: 2009-08-18 17:37:56.437346 Z
+  log_events: 
+  - - 2009-08-18 17:37:15.979707 Z
+    - Kasper Peeters <kasper.peeters@aei.mpg.de>
+    - created
+    - Stable version release before Ubuntu Karmic 9.10 freeze.
+  - - 2009-08-18 17:37:56.437371 Z
+    - Kasper Peeters <kasper.peeters@aei.mpg.de>
+    - released
     - ""

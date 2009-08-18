@@ -1,3 +1,7 @@
+2009-08-18  Kasper Peeters  <kasper.peeters@aei.mpg.de>
+
+	* Released 1.15
+
 2009-07-24  Kasper Peeters  <kasper.peeters@aei.mpg.de>
 
 	* Started refactoring the output in Mathematica and Maple formats.
