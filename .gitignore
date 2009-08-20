@@ -19,6 +19,7 @@ src/tree_example
 src/tree_regression_tests
 tests/*.res
 tests/*.exp
+html
 aclocal.m4
 autom4te.cache
 *.log
