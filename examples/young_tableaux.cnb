@@ -1,0 +1,64 @@
+% Cadabra notebook version 1.1
+\documentclass[11pt]{article}
+\usepackage[textwidth=460pt, textheight=660pt]{geometry}
+\usepackage[usenames]{color}
+\usepackage{amssymb}
+\usepackage[parfill]{parskip}
+\usepackage{breqn}
+\usepackage{tableaux}
+\def\specialcolon{\mathrel{\mathop{:}}\hspace{-.5em}}
+\renewcommand{\bar}[1]{\overline{#1}}
+\begin{document}
+{\color[named]{Blue}\begin{verbatim}
+\tableau{#}::Tableau(dimension=10).
+\end{verbatim}}
+% Begin TeX comment
+Assigning property Tableau to $\tableau{1}
+$.
+\\
+% End TeX comment
+{\color[named]{Blue}\begin{verbatim}
+\tableau{2}{2} \tableau{2}{2};
+\end{verbatim}}
+% orig
+% \tableau{2 2} \tableau{2 2}
+% end_orig
+\begin{dmath*}[compact, spread=2pt]
+1\specialcolon{}= \tableau{2 2} \tableau{2 2};
+\end{dmath*}
+{\color[named]{Blue}\begin{verbatim}
+@lr_tensor!(%);
+\end{verbatim}}
+% orig
+% \tableau{4 4} + \tableau{4 3 1} + \tableau{4 2 2} + \tableau{3 3 1 1} + \tableau{3 2 2 1} + \tableau{2 2 2 2}
+% end_orig
+\begin{dmath*}[compact, spread=2pt]
+1\specialcolon{}= \tableau{4 4} + \tableau{4 3 1} + \tableau{4 2 2} + \tableau{3 3 1 1} + \tableau{3 2 2 1} + \tableau{2 2 2 2};
+\end{dmath*}
+{\color[named]{Blue}\begin{verbatim}
+\ftableau{#}::FilledTableau(dimension=10).
+\end{verbatim}}
+% Begin TeX comment
+Assigning property FilledTableau to $\ftableau{{\#}}
+$.
+\\
+% End TeX comment
+{\color[named]{Blue}\begin{verbatim}
+\ftableau{0,0}{1,1} \ftableau{a,a}{b,b};
+\end{verbatim}}
+% orig
+% \ftableau{{0}{0},{1}{1}} \ftableau{{a}{a},{b}{b}}
+% end_orig
+\begin{dmath*}[compact, spread=2pt]
+3\specialcolon{}= \ftableau{{0}{0},{1}{1}} \ftableau{{a}{a},{b}{b}};
+\end{dmath*}
+{\color[named]{Blue}\begin{verbatim}
+@lr_tensor!(%);
+\end{verbatim}}
+% orig
+% (\ftableau{{0}{0}{a}{a},{1}{1}{b}{b}} + \ftableau{{0}{0}{a}{a},{1}{1}{b},{b}} + \ftableau{{0}{0}{a}{a},{1}{1},{b}{b}} + \ftableau{{0}{0}{a},{1}{1}{b},{a},{b}} + \ftableau{{0}{0}{a},{1}{1},{a}{b},{b}} + \ftableau{{0}{0},{1}{1},{a}{a},{b}{b}})
+% end_orig
+\begin{dmath*}[compact, spread=2pt]
+3\specialcolon{}= (\ftableau{{0}{0}{a}{a},{1}{1}{b}{b}} + \ftableau{{0}{0}{a}{a},{1}{1}{b},{b}} + \ftableau{{0}{0}{a}{a},{1}{1},{b}{b}} + \ftableau{{0}{0}{a},{1}{1}{b},{a},{b}} + \ftableau{{0}{0}{a},{1}{1},{a}{b},{b}} + \ftableau{{0}{0},{1}{1},{a}{a},{b}{b}});
+\end{dmath*}
+\end{document}

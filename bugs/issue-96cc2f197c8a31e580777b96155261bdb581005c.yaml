@@ -1,0 +1,30 @@
+--- !ditz.rubyforge.org,2008-03-06/issue 
+title: "'Derivation' property"
+desc: |-
+  A 'Derivation' should be an object which
+  non-commutes with everything that 'Depends' on it, and for which
+  @prodrule gives
+  
+    D a b c -> (D a) b c + a (D b) c + a b (D c)
+  
+  Moreover, '@prodflatten' should never take the brackets away in these
+  situations.
+  
+  It would be good to have a solution in mind which can easily be
+  extended to work with graded algebras, so that exterior derivatives
+  can be handled with the same logic.
+type: :feature
+component: cadabra
+release: 
+reporter: Kasper Peeters <kasper.peeters@aei.mpg.de>
+status: :unstarted
+disposition: 
+creation_time: 2009-08-18 17:40:13.947979 Z
+references: []
+
+id: 96cc2f197c8a31e580777b96155261bdb581005c
+log_events: 
+- - 2009-08-18 17:40:24.472409 Z
+  - Kasper Peeters <kasper.peeters@aei.mpg.de>
+  - created
+  - ""
