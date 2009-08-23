@@ -1978,63 +1978,64 @@ algorithm::result_t factor_out::apply(iterator& it)
 	sibling_iterator st=tr.begin(it);
 	size_t current_term=0;
 	while(st!=tr.end(it)) {
-		 exptree powers; // a collecting prod in which we store all factors which we find
-		 powers.set_head(str_node("\\prod"));
+		exptree powers_left, powers_right; // a collecting prod in which we store all factors which we find
+		powers_left.set_head(str_node("\\prod"));
+		powers_right.set_head(str_node("\\prod"));
 	
-		 // We count the powers of each factor that we want to move out,
-		 // and also immediately delete these factors. 
-		 for(unsigned int tfo=0; tfo<to_factor_out.size(); ++tfo) {
-			  if(*st->name=="\\prod") {
-					sibling_iterator psi=tr.begin(st);
-					bool firstfactor=true;
-					bool foundfactor=false;
-					while(psi!=tr.end(st)) {
-						exptree_comparator comparator;
-						if(comparator.equal_subtree(static_cast<iterator>(psi), 
-													 to_factor_out[tfo].begin()) ==exptree_comparator::subtree_match)  {
-							  powers.append_child(powers.begin(), static_cast<iterator>(psi));
-							  psi=tr.erase(psi);
-							  foundfactor=true;
-							  break;
-							  }
-						 else {
-							  ++psi;
-							  firstfactor=false;
-							  }
-						 }
-					if(foundfactor) {
-						 if(firstfactor==false) 
-							  expression_modified=true;
-						 if(tr.number_of_children(st)==0) {
-							  rset_t::iterator mtmp=st->multiplier;
-							  node_one(st);
-							  st->multiplier=mtmp;
-							  }
-						 else if(tr.number_of_children(st)==1) {
-							  multiply(tr.begin(st)->multiplier, *st->multiplier);
-							  tr.flatten(st);
-							  st=tr.erase(st);
-							  }
-						 }
+		// We count the powers of each factor that we want to move out,
+		// and also immediately delete these factors. 
+		for(unsigned int tfo=0; tfo<to_factor_out.size(); ++tfo) {
+			if(*st->name=="\\prod") {
+				sibling_iterator psi=tr.begin(st);
+				bool firstfactor=true;
+				bool foundfactor=false;
+				while(psi!=tr.end(st)) {
+					exptree_comparator comparator;
+					if(comparator.equal_subtree(static_cast<iterator>(psi), 
+														 to_factor_out[tfo].begin()) ==exptree_comparator::subtree_match)  {
+						powers_left.append_child(powers_left.begin(), static_cast<iterator>(psi));
+						psi=tr.erase(psi);
+						foundfactor=true;
+						break;
+						}
+					else {
+						++psi;
+						firstfactor=false;
+						}
 					}
-			  else {
-				   exptree_comparator comparator;
-					if(comparator.equal_subtree(static_cast<iterator>(st), 
-														 to_factor_out[tfo].begin())==exptree_comparator::subtree_match) {
-						 iterator tmp=powers.append_child(powers.begin(), static_cast<iterator>(st));
-						 one(tmp->multiplier);
-						 rset_t::iterator mtmp=st->multiplier;
-						 node_one(st);
-						 st->multiplier=mtmp;
-						 }
+				if(foundfactor) {
+					if(firstfactor==false) 
+						expression_modified=true;
+					if(tr.number_of_children(st)==0) {
+						rset_t::iterator mtmp=st->multiplier;
+						node_one(st);
+						st->multiplier=mtmp;
+						}
+					else if(tr.number_of_children(st)==1) {
+						multiply(tr.begin(st)->multiplier, *st->multiplier);
+						tr.flatten(st);
+						st=tr.erase(st);
+						}
 					}
-			  }
-		 if(powers.number_of_children(powers.begin())>0)
-			  collector.insert(std::make_pair(powers, st));
-
-		 ++current_term;
-		 ++st;
-		 }
+				}
+			else {
+				exptree_comparator comparator;
+				if(comparator.equal_subtree(static_cast<iterator>(st), 
+													 to_factor_out[tfo].begin())==exptree_comparator::subtree_match) {
+					iterator tmp=powers_left.append_child(powers_left.begin(), static_cast<iterator>(st));
+					one(tmp->multiplier);
+					rset_t::iterator mtmp=st->multiplier;
+					node_one(st);
+					st->multiplier=mtmp;
+					}
+				}
+			}
+		if(powers_left.number_of_children(powers_left.begin())>0)
+			collector.insert(std::make_pair(powers_left, st));
+		
+		++current_term;
+		++st;
+		}
 	if(collector.size()==0) return l_no_action;
 
 	// Now generate all new, factorised terms.
