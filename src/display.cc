@@ -944,10 +944,18 @@ void node_printer::print_infix(std::ostream& str, exptree::iterator it)
 
 	if(parent.output_format==exptree_output::out_xcadabra) {
 		const LaTeXForm *lf=properties::get<LaTeXForm>(it);
-		if(tr.number_of_children(it)!=0) str << "{"; // to prevent double sup/sub script errors
+		bool needs_extra_brackets=false;
+		sibling_iterator sib=tr.begin(it);
+		while(sib!=tr.end(it)) {
+			if(sib->is_index()) 
+				needs_extra_brackets=true;
+			++sib;
+			}
+		
+		if(needs_extra_brackets) str << "{"; // to prevent double sup/sub script errors
 		if(lf) str << lf->latex;
 		else   str << texify(*it->name);
-		if(tr.number_of_children(it)!=0) str << "}";
+		if(needs_extra_brackets) str << "}";
 		}
 	else str << *it->name;
 	

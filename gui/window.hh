@@ -379,6 +379,7 @@ class XCadabra : public Gtk::Window {
 		Gtk::HBox                      statusbox;
 		Gtk::Label                     b_cdbstatus, b_kernelversion;
 		Gtk::Button                    b_kill, b_run, b_run_to, b_run_from, b_help, b_stop, b_undo, b_redo;
+		int                            last_configure_width;
 
 		/// Storage of document data. This data is not managed by smart
 		/// pointers and should thus be deleted by the XCadabra

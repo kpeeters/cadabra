@@ -1,3 +1,16 @@
+2009-08-23  Kasper Peeters  <kasper.peeters@aei.mpg.de>
+
+	* Released 1.16
+
+	* Fixed a problem with prod-sorting of two neighbouring objects
+	with non-contracted implicit indices.
+
+	* Fixed split-view operation of the GUI.
+
+2009-08-21  Kasper Peeters  <kasper.peeters@aei.mpg.de>
+
+	* Fixed handling of Accents in the new output routines.
+
 2009-08-18  Kasper Peeters  <kasper.peeters@aei.mpg.de>
 
 	* Released 1.15

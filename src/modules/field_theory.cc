@@ -36,16 +36,10 @@ void field_theory::register_properties()
 	{
 	properties::register_property(&create_property<Depends>);
 	properties::register_property(&create_property<DependsInherit>);
-	properties::register_property(&create_property<Accent>);
 //	properties::register_property(&create_property<GrassmannNumber>);
 //	properties::register_property(&create_property<GrassmannNumberInherit>);
 	properties::register_property(&create_property<Weight>);
 	properties::register_property(&create_property<WeightInherit>);
-	}
-
-std::string Accent::name() const
-	{
-	return "Accent";
 	}
 
 std::string DependsInherit::name() const

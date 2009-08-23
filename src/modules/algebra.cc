@@ -53,7 +53,6 @@ void algebra::register_properties()
 	properties::register_property(&create_property<SelfCommuting>);
 	properties::register_property(&create_property<SelfAntiCommuting>);
 	properties::register_property(&create_property<SelfNonCommuting>);
-	properties::register_property(&create_property<Distributable>);
 	properties::register_property(&create_property<TableauSymmetry>);
 	properties::register_property(&create_property<SatisfiesBianchi>);
 	properties::register_property(&create_property<Symmetric>);
@@ -116,12 +115,6 @@ std::string SelfAntiCommuting::name() const
 std::string SelfNonCommuting::name() const
 	{
 	return "SelfNonCommuting";
-	}
-
-
-std::string Distributable::name() const
-	{
-	return "Distributable";
 	}
 
 std::string Symmetric::name() const
@@ -1344,6 +1337,7 @@ algorithm::result_t prodsort::apply(iterator& st)
 			if(exptree_ordering::should_swap(one, es)) {
 				int canswap=exptree_ordering::can_swap(one, two, es);
 				if(canswap!=0) {
+//					std::cout << "swapping " << *one->name << " with " << *two->name << std::endl;
 					tr.swap(one);
 					std::swap(one,two);  // put the iterators back in order
 					if(canswap==-1)

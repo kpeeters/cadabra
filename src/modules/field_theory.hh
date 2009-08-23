@@ -78,11 +78,6 @@ class WeightInherit : virtual public WeightBase {
 		enum { multiplicative, additive } combination_type;
 };
 
-class Accent : public PropertyInherit, public IndexInherit, virtual public property {
-	public:
-		virtual std::string name() const;
-};
-
 class generate_indexbracket : public algorithm {
 	public:
 		generate_indexbracket(exptree&, iterator);

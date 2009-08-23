@@ -37,6 +37,9 @@ void properties::register_properties()
 	register_property(&create_property<Coordinate>);
 	register_property(&create_property<SortOrder>);
 	register_property(&create_property<ImplicitIndex>);
+	register_property(&create_property<Distributable>);
+	register_property(&create_property<Accent>);
+	register_property(&create_property<DiracBar>);
 
 	// commutativity
 	register_property(&create_property<CommutingAsProduct>);
@@ -553,6 +556,11 @@ std::string SortOrder::name() const
 	return "SortOrder";
 	}
 
+std::string Distributable::name() const
+	{
+	return "Distributable";
+	}
+
 std::string ImplicitIndex::name() const
 	{
 	return "ImplicitIndex";
@@ -583,6 +591,16 @@ void ImplicitIndex::display(std::ostream& str) const
 		if(n>0) str << ", ";
 		str << set_names[n];
 		}
+	}
+
+std::string Accent::name() const
+	{
+	return "Accent";
+	}
+
+std::string DiracBar::name() const
+	{
+	return "DiracBar";
 	}
 
 std::string CommutingAsProduct::name() const

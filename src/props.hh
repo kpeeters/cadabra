@@ -534,6 +534,22 @@ class ImplicitIndex : virtual public property {
 		std::vector<std::string> set_names;
 };
 
+class Distributable : virtual public  property {
+	public:
+		virtual ~Distributable() {};
+		virtual std::string name() const;
+};
+
+class Accent : public PropertyInherit, public IndexInherit, virtual public property {
+	public:
+		virtual std::string name() const;
+};
+
+class DiracBar : public Accent, public Distributable, virtual public property {
+	public:
+		virtual std::string name() const;
+};
+
 class CommutingAsProduct : virtual public property {
 	public:
 		virtual std::string name() const;

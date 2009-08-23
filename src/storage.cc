@@ -1702,20 +1702,34 @@ int exptree_ordering::can_swap_ilist_ilist(exptree::iterator obj1, exptree::iter
 int exptree_ordering::can_swap(exptree::iterator one, exptree::iterator two, int subtree_comparison,
 										 bool ignore_implicit_indices) 
 	{
-//	std::cout << "can_swap " << *one->name << " " << *two->name << std::endl;
+//	std::cout << "can_swap " << *one->name << " " << *two->name << ignore_implicit_indices << std::endl;
 
-	// First of all, check whether there is an explicit declaration for the commutativity 
-	// of these two symbols.
-	const CommutingBehaviour *com = properties::get_composite<CommutingBehaviour>(one, two);
+	const ImplicitIndex *ii1 = properties::get_composite<ImplicitIndex>(one);
+	const ImplicitIndex *ii2 = properties::get_composite<ImplicitIndex>(two);
 
-	if(com) 
-		return com->sign();
+	// When both objects carry an implicit index but the index lines are not connected,
+	// we should not be using explicit commutation rules, as this would mess up the
+	// index lines and make the expression meaningless.
+	// FIXME: this would ideally make use of index and conjugate index lines.
+
+	const DiracBar *db2 = properties::get_composite<DiracBar>(two);
+	if(! (ii1 && ii2 && db2) ) {
+
+		// First of all, check whether there is an explicit declaration for the commutativity 
+		// of these two symbols.
+		const CommutingBehaviour *com = properties::get_composite<CommutingBehaviour>(one, two);
+		
+		if(com) {
+//			std::cout << "explicit " << com->sign() << std::endl;
+			return com->sign();
+			}
+		}
 	
 	if(ignore_implicit_indices==false) {
 		// Two implicit-index objects cannot move through each other if they have the
 		// same type of implicit index.
-		const ImplicitIndex *ii1 = properties::get_composite<ImplicitIndex>(one);
-		const ImplicitIndex *ii2 = properties::get_composite<ImplicitIndex>(two);
+//		std::cout << "can_swap " << *one->name << " " << *two->name << std::endl;
+
 		if(ii1 && ii2) {
 			if(ii1->set_names.size()==0 && ii2->set_names.size()==0) return 0; // empty index name
 			for(size_t n1=0; n1<ii1->set_names.size(); ++n1)

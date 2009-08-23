@@ -67,11 +67,6 @@ class Spinor : public ImplicitIndex, virtual public property {
 		bool majorana;
 };
 
-class DiracBar : public Accent, public Distributable, virtual public property {
-	public:
-		virtual std::string name() const;
-};
-
 class GammaTraceless : public property {
 	public:
 		virtual ~GammaTraceless() {};

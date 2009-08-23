@@ -22,6 +22,7 @@
 #include <modglue/pipe.hh>
 #include <modglue/process.hh>
 #include <gdk/gdkkeysyms.h>
+#include <gdk/gdk.h>
 #include <gtkmm/filechooserdialog.h>
 #include <gtkmm/messagedialog.h>
 #include <gtkmm/aboutdialog.h>
@@ -733,6 +734,7 @@ XCadabra::XCadabra(modglue::ext_process& cdbproc, const std::string& filename, m
 	  active_canvas(0), active_cell(0),
 	  b_kernelversion("Kernel version: not running"),
 	  b_help(Gtk::Stock::HELP), b_stop(Gtk::Stock::STOP), b_undo(Gtk::Stock::UNDO), b_redo(Gtk::Stock::REDO),
+	  last_configure_width(0),
      cdb(cdbproc), selected(0)
 	{
 	std::string res=load_config();
@@ -1066,6 +1068,7 @@ void XCadabra::add_canvas()
 	DataCells_t::iterator it=datacells.begin();
 	while(it!=datacells.end()) {
 		canvasses.back()->add_cell(*it, 	Glib::RefPtr<DataCell>());
+		canvasses.back()->show_cell(*it);
 		++it;
 		}
 	canvasses.back()->show();
@@ -1794,16 +1797,23 @@ XCadabra::~XCadabra()
 
 bool XCadabra::on_configure_event(GdkEventConfigure *cfg)
 	{
-	tex_engine_main.set_geometry(cfg->width-20-35);
+	if(cfg->width != last_configure_width) 
+		tex_engine_main.set_geometry(cfg->width-20-35);
+
 	bool ret=Gtk::Window::on_configure_event(cfg);
-	try {
-		tex_engine_main.convert_all();
+	
+	if(cfg->width != last_configure_width) {
+		last_configure_width = cfg->width;
+		try {
+			tex_engine_main.convert_all();
+			}
+		catch(TeXEngine::TeXException& ex) {
+			generic_error_popup(std::string(ex.what()));
+			}
+		for(unsigned int i=0; i<canvasses.size(); ++i) 
+			canvasses[i]->redraw_cells();
 		}
-	catch(TeXEngine::TeXException& ex) {
-		generic_error_popup(std::string(ex.what()));
-		}
-	for(unsigned int i=0; i<canvasses.size(); ++i) 
-		canvasses[i]->redraw_cells();
+
 	return ret;
 	}
 

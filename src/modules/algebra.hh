@@ -90,12 +90,6 @@ class SelfNonCommuting : virtual public SelfCommutingBehaviour {
 };
 
 
-class Distributable : virtual public  property {
-	public:
-		virtual ~Distributable() {};
-		virtual std::string name() const;
-};
-
 class TableauBase {
 	public:
 		virtual ~TableauBase() {};

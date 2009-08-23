@@ -36,7 +36,6 @@ void gamma_algebra::register_properties()
 	properties::register_property(&create_property<SigmaBarMatrix>);
 	properties::register_property(&create_property<Spinor>);
 	properties::register_property(&create_property<GammaTraceless>);
-	properties::register_property(&create_property<DiracBar>);
 	}
 
 std::string GammaMatrix::name() const
@@ -161,11 +160,6 @@ bool Spinor::parse(exptree& tr, exptree::iterator it, exptree::iterator prop, ke
 std::string GammaTraceless::name() const
 	{
 	return "GammaTraceless";
-	}
-
-std::string DiracBar::name() const
-	{
-	return "DiracBar";
 	}
 
 join::join(exptree& tr_, iterator it_)

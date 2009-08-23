@@ -102,16 +102,16 @@ std::string TeXEngine::handle_latex_errors(const std::string& result) const
 	
 	pos=result.find("! Double superscript.");
 	if(pos != std::string::npos) {
-		return "Internal typesetting error: double superscript. Please report a bug.";
+		return "Internal typesetting error: double superscript. Please report a bug.\n\n" + result;
 		}
 	pos=result.find("! Double subscript.");
 	if(pos != std::string::npos) {
-		return "Internal typesetting error: double subscript. Please report a bug.";
+		return "Internal typesetting error: double subscript. Please report a bug.\n\n" + result;
 		}
 	
 	pos=result.find("! Package breqn Error: ");
 	if(pos != std::string::npos) {
-		return "Typesetting error (breqn.sty related). Please report a bug.";
+		return "Typesetting error (breqn.sty related). Please report a bug.\n\n" + result;
 		}
 	
 	pos=result.find("! Undefined control sequence");
