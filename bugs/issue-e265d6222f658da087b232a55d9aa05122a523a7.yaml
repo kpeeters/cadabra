@@ -1,0 +1,23 @@
+--- !ditz.rubyforge.org,2008-03-06/issue 
+title: Redraw segfault on OS X
+desc: |-
+  When dragging (or resizing?) a window on OS X, the quick successive calls
+  to XCadabra::on_configure_event and the subsequent redraw_cells result
+  in a segfault somewhere inside convert_subset of the TeX engine. Might
+  be because GTK on the mac calls the redraw handler in a different way
+  than on X11.
+type: :bugfix
+component: cadabra
+release: 
+reporter: Kasper Peeters <kasper.peeters@aei.mpg.de>
+status: :unstarted
+disposition: 
+creation_time: 2009-08-21 09:51:16.723880 Z
+references: []
+
+id: e265d6222f658da087b232a55d9aa05122a523a7
+log_events: 
+- - 2009-08-21 09:51:17.750069 Z
+  - Kasper Peeters <kasper.peeters@aei.mpg.de>
+  - created
+  - ""

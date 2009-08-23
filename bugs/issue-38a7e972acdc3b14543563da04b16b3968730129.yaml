@@ -1,0 +1,20 @@
+--- !ditz.rubyforge.org,2008-03-06/issue 
+title: "@factor_out does not take into account commutativity properties"
+desc: |-
+  The @factor_out algorithm moves objects through each other without
+  respecting AntiCommuting or NonCommuting.
+type: :bugfix
+component: cadabra
+release: 
+reporter: Kasper Peeters <kasper.peeters@aei.mpg.de>
+status: :unstarted
+disposition: 
+creation_time: 2009-08-20 07:57:08.180699 Z
+references: []
+
+id: 38a7e972acdc3b14543563da04b16b3968730129
+log_events: 
+- - 2009-08-20 07:57:09.238755 Z
+  - Kasper Peeters <kasper.peeters@aei.mpg.de>
+  - created
+  - ""

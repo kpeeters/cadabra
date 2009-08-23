@@ -1,0 +1,26 @@
+--- !ditz.rubyforge.org,2008-03-06/issue 
+title: Implicit indices need to come in normal and conjugate forms.
+desc: |-
+  Right now, two objects with the same implicit index sitting next to
+  each other are assumed to be connected. However, for e.g.
+  \psi \bar{\chi} with \bar a DiracBar, this is not the case, and the
+  lines go in a different way. In order to determine this, we need to
+  have the concept of indices and conjugate indices.
+  
+  The can_swap routine currently has an exception for DiracBar objects,
+  but this needs to be generalised.
+type: :bugfix
+component: cadabra
+release: 
+reporter: Kasper Peeters <kasper.peeters@aei.mpg.de>
+status: :unstarted
+disposition: 
+creation_time: 2009-08-23 09:58:30.245616 Z
+references: []
+
+id: 1c7bc5e7512020226c1ca90fb249cab7886b6833
+log_events: 
+- - 2009-08-23 09:58:31.295916 Z
+  - Kasper Peeters <kasper.peeters@aei.mpg.de>
+  - created
+  - ""

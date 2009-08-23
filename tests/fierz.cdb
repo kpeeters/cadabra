@@ -1,0 +1,45 @@
+# Test 1: from supergravity.cnb
+#
+D{#}::Derivative.
+\bar{#}::DiracBar.
+\partial{#}::PartialDerivative.
+\delta{A??}::Derivative.
+{m,n,p,q,r,s,t,u,m#}::Indices(flat).
+{m,n,p,q,r,s,t,u,m#}::Integer(0..3).
+{\mu,\nu,\rho,\sigma,\kappa,\lambda,\alpha,\beta,\gamma}::Indices(curved,position=fixed).
+{\mu,\nu,\rho,\sigma,\kappa,\lambda,\alpha,\beta,\gamma}::Integer(0..3).
+e^{m \mu}::Vielbein.
+e_{m \mu}::InverseVielbein.
+g^{\mu\nu}::InverseMetric.
+g_{\mu\nu}::Metric.
+\omega_{\mu m n}::TableauSymmetry( indices={1,2}, shape={1,1} ).
+\delta_{\mu}^{\rho}::KroneckerDelta.
+\delta^{\mu}_{\rho}::KroneckerDelta.
+\delta^{m n}::KroneckerDelta.
+R_{\mu\nu m n}::TableauSymmetry( indices={0,1}, shape={1,1}, indices={2,3}, shape={1,1} ).
+{ e^{m \mu}, e_{m \mu}, e, T^{\mu}_{\nu\rho} }::Depends(\partial, D).
+T^{\mu}_{\nu\rho}::TableauSymmetry( indices={1,2}, shape={1,1} ).
+\epsilon_{m n p q}::AntiSymmetric.
+\epsilon^{\mu\nu\rho\sigma}::AntiSymmetric.
+{ \epsilon,\psi_{\mu},\psi_{\mu\nu} }::Spinor(dimension=4, type=Majorana).
+\Gamma_{#{m}}::GammaMatrix(metric=\delta).
+\Gamma_{#{\mu}}::GammaMatrix(metric=g).
+\Gamma_{#}::GammaMatrix.
+{ \psi_{\mu\nu}, \psi_{\mu}, \epsilon }::AntiCommuting.
+{ \psi_{\mu}, \psi_{\mu\nu} }::SelfAntiCommuting.
+{ \epsilon, \psi_{\mu}, \psi_{\mu\nu} }::SortOrder.
+{ \epsilon, \psi_{\mu}, \psi_{\mu\nu} }::Depends(\bar,\partial,D).
+\Gamma_{#}::Depends(\bar).
+\psi_{\mu\nu}::AntiSymmetric.
+
+#obj1:= \bar{\psi_{\mu}} \Gamma^{\mu} \bar{\epsilon} 
+#       \psi_{\nu} \Gamma^{m n p} \psi_{\rho \sigma} 
+#       e e^{m \nu} e^{n \rho} e^{p \sigma};
+
+#@fierz!(%)( \psi_{\mu}, \psi_{\rho}, \epsilon, \psi_{\sigma\kappa} );
+
+
+
+
+\bar{\psi_{\mu}} \Gamma^{m} \psi_{\nu}   \bar{\epsilon}\Gamma^{n p q}\psi_{\rho\sigma};
+@prodsort!(%);

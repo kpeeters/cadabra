@@ -1,0 +1,21 @@
+--- !ditz.rubyforge.org,2008-03-06/issue 
+title: "@fierz does not produce useful error messages."
+desc: |-
+  When calling @fierz on an expression which cannot be Fierz transformed,
+  there are typically no useful error messages about why the algorithm
+  failed.
+type: :bugfix
+component: cadabra
+release: 
+reporter: Kasper Peeters <kasper.peeters@aei.mpg.de>
+status: :unstarted
+disposition: 
+creation_time: 2009-08-23 09:20:23.538180 Z
+references: []
+
+id: ada88ddc28be6f0f3567fc2d0f50fb3dc64a37b4
+log_events: 
+- - 2009-08-23 09:20:24.547994 Z
+  - Kasper Peeters <kasper.peeters@aei.mpg.de>
+  - created
+  - ""
