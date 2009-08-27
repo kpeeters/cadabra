@@ -32,6 +32,9 @@ TIMESTAMP = -D"RELEASE=\"${RELEASE}\"" -D"DATETIME=\"`date | sed -e 's/  / /'`\"
 modules/xperm.o: modules/xperm.c
 	@CC@ @NESTED@ ${MCFLAGS} ${TIMESTAMP} -c -o $@ $<
 
+modules/xperm_new.o: modules/xperm_new.c
+	@CC@ @NESTED@ ${MCFLAGS} ${TIMESTAMP} -c -o $@ $<
+
 #modules/xperm_no_nests.o: modules/xperm_no_nests.c
 #	@CC@ -Wall -g @NESTED@ ${MCFLAGS} ${TIMESTAMP} -c -o $@ $<
 
