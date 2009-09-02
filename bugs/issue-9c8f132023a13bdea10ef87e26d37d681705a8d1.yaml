@@ -1,0 +1,21 @@
+--- !ditz.rubyforge.org,2008-03-06/issue 
+title: Derivatives of sums do not always display correctly in notebook
+desc: |-
+  While expressions of the type \nabla_{f}{a_{c} d+b_{c}} print correctly,
+  the ones without explicit derivative index, \nabla{a_{c} d+b_{c}}, fail
+  to print brackets.
+type: :bugfix
+component: cadabra
+release: "1.17"
+reporter: Kasper Peeters <kasper.peeters@aei.mpg.de>
+status: :unstarted
+disposition: 
+creation_time: 2009-09-02 19:08:55.722106 Z
+references: []
+
+id: 9c8f132023a13bdea10ef87e26d37d681705a8d1
+log_events: 
+- - 2009-09-02 19:09:00.449753 Z
+  - Kasper Peeters <kasper.peeters@aei.mpg.de>
+  - created
+  - ""

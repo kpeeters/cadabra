@@ -977,110 +977,73 @@ void node_printer::print_children(std::ostream& str, exptree::iterator it, int s
 	previous_bracket_   =str_node::b_invalid;
 	previous_parent_rel_=str_node::p_none;
 
-	if(parent.output_format==exptree_output::out_mathematica && isdelta) { // Mathematica
-		str << "{";
-		exptree::sibling_iterator ch=tr.begin(it);
-		while(ch!=tr.end(it)) {
-			if(ch!=tr.begin(it)) str << "," << nbsp;
-			parent.get_printer(ch)->print_infix(str, ch);
-			++ch;
-			++ch;
-			}
-		str << "}," << nbsp << "{";
-		ch=tr.begin(it);
-		while(ch!=tr.end(it)) {
-			if(ch!=tr.begin(it)) str << "," << nbsp;
-			++ch;
-			parent.get_printer(ch)->print_infix(str, ch);
-			++ch;
-			}
-		str << "}";
-		}
-	else if(parent.output_format==exptree_output::out_maple && isweyl) { // Maple
-		exptree::sibling_iterator ch=tr.begin(it);
-		while(ch!=tr.end(it)) {
-			if(ch!=tr.begin(it)) str << "," << nbsp;
-			if(ch->fl.parent_rel==str_node::p_sub) 
-				str << "-";
-			parent.get_printer(ch)->print_infix(str, ch);
-			++ch;
-			}
-		}
-	else { // Normal (non-maple, non-mathematica) output
-		int number_of_nonindex_children=0;
-		int number_of_index_children=0;
-		exptree::sibling_iterator ch=tr.begin(it);
-		while(ch!=tr.end(it)) {
-			if(ch->is_index()==false) {
+	int number_of_nonindex_children=0;
+	int number_of_index_children=0;
+	exptree::sibling_iterator ch=tr.begin(it);
+	while(ch!=tr.end(it)) {
+		if(ch->is_index()==false) {
+			++number_of_nonindex_children;
+			if(*ch->name=="\\prod")
 				++number_of_nonindex_children;
-				if(*ch->name=="\\prod")
-					++number_of_nonindex_children;
-				}
-			else ++number_of_index_children;
-			++ch;
 			}
-
-		ch=tr.begin(it);
-		ch+=skip;
-		unsigned int chnum=0;
-		while(ch!=tr.end(it)) {
-			current_bracket_   =(*ch).fl.bracket;
-			current_parent_rel_=(*ch).fl.parent_rel;
-			
-			if(current_bracket_!=str_node::b_none || previous_bracket_!=current_bracket_ || previous_parent_rel_!=current_parent_rel_) {
-				 if(parent.output_format==exptree_output::out_plain ||
-					 parent.output_format==exptree_output::out_xcadabra ||
-					 parent.output_format==exptree_output::out_texmacs )
-					print_parent_rel(str, current_parent_rel_, ch==tr.begin(it));
-				 if(parent.output_format!=exptree_output::out_reduce) {
-					print_opening_bracket(str, (number_of_nonindex_children>1 /* &&number_of_index_children>0 */ &&
-														 current_parent_rel_!=str_node::p_sub && 
-														 current_parent_rel_!=str_node::p_super ? str_node::b_round:current_bracket_), current_parent_rel_);
-					 }
-				else
-					str << zwnbsp << "(" << zwnbsp;
-				}
-			if(parent.output_format==exptree_output::out_mathematica && getenv("CDB_MATH_COMPAC")==0) {
-				if(ch!=tr.begin(it)) {
-					if(chnum==2 && isweyl)
-						str << "}," << nbsp << "{";
-					else
-						str << "," << nbsp;
-					}
-				}
-			else if(parent.output_format==exptree_output::out_reduce) {
-				if(ch!=tr.begin(it))
-					str << "," << zwnbsp;
-				}
-			parent.get_printer(ch)->print_infix(str, ch);
-//			if((*it).fl.mark && parent.highlight) str << "\033[1m"; 
-			++ch;
-			if(ch==tr.end(it) || current_bracket_!=str_node::b_none ||
-				current_bracket_!=(*ch).fl.bracket || current_parent_rel_!=(*ch).fl.parent_rel) {
-				if(parent.output_format!=exptree_output::out_reduce)
-					 print_closing_bracket(str,  (number_of_nonindex_children>1 /* &&number_of_index_children>0 */ && 
-														  current_parent_rel_!=str_node::p_sub && 
-														  current_parent_rel_!=str_node::p_super ? str_node::b_round:current_bracket_), current_parent_rel_);
-				else
-					str << ")";
-				}
-			else if(parent.output_format==exptree_output::out_plain 
-					  || parent.output_format==exptree_output::out_xcadabra
-					  || parent.output_format==exptree_output::out_maple
-					  || parent.output_format==exptree_output::out_texmacs)
-				str << nbsp;
-			
-			previous_bracket_=current_bracket_;
-			previous_parent_rel_=current_parent_rel_;
-			++chnum;
-			}
+		else ++number_of_index_children;
+		++ch;
 		}
-	if(parent.output_format==exptree_output::out_mathematica && 
-		it->fl.parent_rel==str_node::p_none && tr.number_of_children(it)>0)
-		str << "]";
-	if(parent.output_format==exptree_output::out_maple && isweyl)
-		str << "]";
-//	if((*it).fl.mark && parent.highlight) str << "\033[0m";	
+	
+	ch=tr.begin(it);
+	ch+=skip;
+	unsigned int chnum=0;
+	while(ch!=tr.end(it)) {
+		current_bracket_   =(*ch).fl.bracket;
+		current_parent_rel_=(*ch).fl.parent_rel;
+		
+		if(current_bracket_!=str_node::b_none || previous_bracket_!=current_bracket_ || previous_parent_rel_!=current_parent_rel_) {
+			if(parent.output_format==exptree_output::out_plain ||
+				parent.output_format==exptree_output::out_xcadabra ||
+				parent.output_format==exptree_output::out_texmacs )
+				print_parent_rel(str, current_parent_rel_, ch==tr.begin(it));
+			if(parent.output_format!=exptree_output::out_reduce) {
+				print_opening_bracket(str, (number_of_nonindex_children>1 /* &&number_of_index_children>0 */ &&
+													 current_parent_rel_!=str_node::p_sub && 
+													 current_parent_rel_!=str_node::p_super ? str_node::b_round:current_bracket_), current_parent_rel_);
+				}
+			else
+				str << zwnbsp << "(" << zwnbsp;
+			}
+		if(parent.output_format==exptree_output::out_mathematica && getenv("CDB_MATH_COMPAC")==0) {
+			if(ch!=tr.begin(it)) {
+				if(chnum==2 && isweyl)
+					str << "}," << nbsp << "{";
+				else
+					str << "," << nbsp;
+				}
+			}
+		else if(parent.output_format==exptree_output::out_reduce) {
+			if(ch!=tr.begin(it))
+				str << "," << zwnbsp;
+			}
+		parent.get_printer(ch)->print_infix(str, ch);
+//			if((*it).fl.mark && parent.highlight) str << "\033[1m"; 
+		++ch;
+		if(ch==tr.end(it) || current_bracket_!=str_node::b_none ||
+			current_bracket_!=(*ch).fl.bracket || current_parent_rel_!=(*ch).fl.parent_rel) {
+			if(parent.output_format!=exptree_output::out_reduce)
+				print_closing_bracket(str,  (number_of_nonindex_children>1 /* &&number_of_index_children>0 */ && 
+													  current_parent_rel_!=str_node::p_sub && 
+													  current_parent_rel_!=str_node::p_super ? str_node::b_round:current_bracket_), current_parent_rel_);
+			else
+				str << ")";
+			}
+		else if(parent.output_format==exptree_output::out_plain 
+				  || parent.output_format==exptree_output::out_xcadabra
+				  || parent.output_format==exptree_output::out_maple
+				  || parent.output_format==exptree_output::out_texmacs)
+			str << nbsp;
+		
+		previous_bracket_=current_bracket_;
+		previous_parent_rel_=current_parent_rel_;
+		++chnum;
+		}
 	}
 
 void node_printer::print_multiplier(std::ostream& str, exptree::iterator it)
