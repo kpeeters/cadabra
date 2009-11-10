@@ -3,7 +3,6 @@ MACTEST= @MAC_OS_X@
 
 TESTS=pre.res tree.res \
       properties.res \
-      maxima.res \
 	   procedure.res substitute.res dummies.res numerical.res relativity.res mixed1.res distribute.res \
       gamma.res symmetry.res fieldtheory.res sorting.res factorise.res \
       canonicalise.res output.res young.res diff_geometry.res \
@@ -12,6 +11,8 @@ TESTS=pre.res tree.res \
       repeated.res paper.res 
 
 MAPLETESTS=maple.res
+
+MAXIMATESTS=maxima.res
 
 ADVTESTS=r4decompose.res kk.res 
 
@@ -24,6 +25,8 @@ all: $(TESTS) summary
 advanced: $(ADVTESTS) advsummary
 
 maple: $(MAPLETESTS) maplesummary
+
+maxima: $(MAXIMATESTS) maximasummary
 
 summary: $(TESTS)
 ifeq ($(strip $(MACTEST)),)
@@ -38,6 +41,12 @@ ifeq ($(strip $(MACTEST)),)
 endif
 
 maplesummary: $(MAPLETESTS)
+ifeq ($(strip $(MACTEST)),)
+	@printf "total cpu time: "
+	@awk '{total+=$$0} END {print total " seconds."}' < timing.log
+endif
+
+maximasummary: $(MAXIMATESTS)
 ifeq ($(strip $(MACTEST)),)
 	@printf "total cpu time: "
 	@awk '{total+=$$0} END {print total " seconds."}' < timing.log
