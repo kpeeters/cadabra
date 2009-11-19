@@ -1,0 +1,20 @@
+--- !ditz.rubyforge.org,2008-03-06/issue 
+title: Fix dependence on numbers
+desc: |-
+  A declaration of the type a::Depends(0) will introduce dependence on
+  all rationals (as the overall constant is always ignored).
+type: :bugfix
+component: cadabra
+release: 
+reporter: Kasper Peeters <kasper.peeters@aei.mpg.de>
+status: :unstarted
+disposition: 
+creation_time: 2009-11-18 00:52:35.149705 Z
+references: []
+
+id: d3968c05090854806ec986d696e99a887d458b18
+log_events: 
+- - 2009-11-18 00:52:35.807835 Z
+  - Kasper Peeters <kasper.peeters@aei.mpg.de>
+  - created
+  - ""

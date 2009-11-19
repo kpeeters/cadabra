@@ -1,0 +1,18 @@
+--- !ditz.rubyforge.org,2008-03-06/issue 
+title: Expanding fractional powers fails.
+desc: An @expand_power on A**(3/2) produces A*A*A, obviously incorrect.
+type: :bugfix
+component: cadabra
+release: "1.17"
+reporter: Kasper Peeters <kasper.peeters@aei.mpg.de>
+status: :unstarted
+disposition: 
+creation_time: 2009-11-14 14:21:52.412089 Z
+references: []
+
+id: 16b3dc7c2f7508a10da63f93e3407730a757908e
+log_events: 
+- - 2009-11-14 14:21:53.302036 Z
+  - Kasper Peeters <kasper.peeters@aei.mpg.de>
+  - created
+  - ""

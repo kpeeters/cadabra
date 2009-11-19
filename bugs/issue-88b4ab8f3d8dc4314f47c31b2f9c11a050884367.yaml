@@ -1,0 +1,21 @@
+--- !ditz.rubyforge.org,2008-03-06/issue 
+title: Printing problem with \commutator
+desc: |-
+  \commutator{X}{Y} is stored correctly, but prints
+  [X,YY]
+  instead.
+type: :bugfix
+component: cadabra
+release: "1.17"
+reporter: Kasper Peeters <kasper.peeters@aei.mpg.de>
+status: :unstarted
+disposition: 
+creation_time: 2009-11-16 08:16:07.736244 Z
+references: []
+
+id: 88b4ab8f3d8dc4314f47c31b2f9c11a050884367
+log_events: 
+- - 2009-11-16 08:16:08.687917 Z
+  - Kasper Peeters <kasper.peeters@aei.mpg.de>
+  - created
+  - ""

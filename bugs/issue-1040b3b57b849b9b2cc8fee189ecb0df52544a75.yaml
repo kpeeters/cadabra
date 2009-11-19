@@ -1,0 +1,18 @@
+--- !ditz.rubyforge.org,2008-03-06/issue 
+title: Varying does not handle single-factor terms.
+desc: A @vary!(%)( A->a ) on \partial{A} fails. Note that it does work on just 'A'.
+type: :bugfix
+component: cadabra
+release: "1.17"
+reporter: Kasper Peeters <kasper.peeters@aei.mpg.de>
+status: :unstarted
+disposition: 
+creation_time: 2009-11-14 14:23:03.351440 Z
+references: []
+
+id: 1040b3b57b849b9b2cc8fee189ecb0df52544a75
+log_events: 
+- - 2009-11-14 14:23:04.225549 Z
+  - Kasper Peeters <kasper.peeters@aei.mpg.de>
+  - created
+  - ""

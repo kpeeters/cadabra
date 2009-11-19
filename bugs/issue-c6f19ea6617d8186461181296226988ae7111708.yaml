@@ -1,0 +1,23 @@
+--- !ditz.rubyforge.org,2008-03-06/issue 
+title: Numerical indices default to position=free.
+desc: |-
+  Numerical indices default to position=free and hence n^0 equals n_0. 
+  Could probably benefit from a declaration of index properties directly
+  at the level of the tensor, rather than the indices themselves (though
+  this would then require declaration for every tensor, instead of only
+  the index set as currently).
+type: :bugfix
+component: cadabra
+release: 
+reporter: Kasper Peeters <kasper.peeters@aei.mpg.de>
+status: :unstarted
+disposition: 
+creation_time: 2009-11-18 00:55:14.615394 Z
+references: []
+
+id: c6f19ea6617d8186461181296226988ae7111708
+log_events: 
+- - 2009-11-18 00:55:16.281256 Z
+  - Kasper Peeters <kasper.peeters@aei.mpg.de>
+  - created
+  - ""

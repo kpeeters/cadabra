@@ -1,0 +1,27 @@
+--- !ditz.rubyforge.org,2008-03-06/issue 
+title: Depends property overwrites earlier ones.
+desc: |-
+  The following fails:
+  \hat{#}::Accent.
+  \partial{#}::PartialDerivative.
+  A::Depends(\hat).
+  A::Depends(\partial).
+  \hat{A};
+  @unwrap!(%);
+  
+  Putting all dependencies in one works though. Formalise or fix.
+type: :bugfix
+component: cadabra
+release: "1.17"
+reporter: Kasper Peeters <kasper.peeters@aei.mpg.de>
+status: :unstarted
+disposition: 
+creation_time: 2009-11-14 14:24:01.474019 Z
+references: []
+
+id: 9258c825583707f6bf901795c9d4e2a82f13e0d3
+log_events: 
+- - 2009-11-14 14:24:02.284006 Z
+  - Kasper Peeters <kasper.peeters@aei.mpg.de>
+  - created
+  - ""
