@@ -1,0 +1,35 @@
+
+\section{Component expansion}
+
+
+
+# algorithm:
+#
+# - need to cache information because there are potentially many operations
+# - need to canonicalise indices 
+#
+# Eval first works at C_{\alpha} level. 
+#
+#
+# Estimates:
+#
+#   Kretschmann in 10d: 10^4 values to sum over. So we need to be able to cut
+#   this down to the non-zero ones early: as soon as a zero combination is found
+#   for one of the factors, remove this branch of the search tree.
+#   Need to:
+#        a) make the algorithm work at the top, recursively down, since
+            we need to keep memory/cache of already evaluated objects.
+#        b) for all levels recursively visited, determine whether substitution
+#           rules fix the value (hence allowing D_1 + E_1 -> 3 even if E_1 is 
+#           not known as a component.
+#        c) use a 'base n' type notation to map an index value combination for 
+#           an n-valent tensor to an integer, so that we can make a map from
+#           integers to expressions for any tensor, avoiding repeated substitutions.
+#
+#  A_m ( B_m + C_m ) D_n Q_n:
+#
+#   - collect free and dummy indices.
+#   - do a depth-first walk
+#          - for each node, determine the index values for which
+#            a rule is available
+
