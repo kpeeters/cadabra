@@ -752,7 +752,6 @@ void print_commutator::print_infix(std::ostream& str, exptree::iterator it)
 	++ch;
 	parent.get_printer(ch)->print_infix(str, ch);
 
-	parent.get_printer(ch)->print_infix(str, ch);
 	if(prettyform)	str << "]";
 	else str << "}";
 	}
