@@ -51,6 +51,14 @@ tst8:= A**(-1) - @(obj8);
 @collect_terms!(%);
 @assert(tst8);
 
+# Test 8b: Catch non-integer powers.
+@reset.
+obj8b:= A**(3/2);
+@expand_power!(%);
+tst8b:= A**(3/2) - @(obj8b);
+@collect_terms!(%);
+@assert(tst8b);
+
 
 # Test 9: nested powers and so on
 #

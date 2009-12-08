@@ -1,3 +1,7 @@
+2009-12-06  Kasper Peeters  <kasper.peeters@aei.mpg.de>
+
+	* Fixed @expand_power action on fractional powers.
+
 2009-12-02  Kasper Peeters  <kasper.peeters@aei.mpg.de>
 
 	* Fixed display of commutators (duplicate second part).

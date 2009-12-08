@@ -3896,7 +3896,12 @@ expand_power::expand_power(exptree& tr, iterator it)
 
 bool expand_power::can_apply(iterator it)
 	{
-	if(*it->name=="\\pow") return true;
+	if(*it->name=="\\pow") {
+		sibling_iterator exponent=tr.begin(it);
+		++exponent;
+		if(exponent->is_integer())
+			return true;
+		}
 	return false;
 	}
 
