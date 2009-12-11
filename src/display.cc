@@ -929,12 +929,10 @@ node_printer::node_printer(exptree_output& eo)
 
 void node_printer::print_infix(std::ostream& str, exptree::iterator it)
 	{
-//	if((*it).fl.mark && parent.highlight) str << "\033[1m";
-
 	// print multiplier and object name
 	if(*it->multiplier!=1)
 		print_multiplier(str, it);
-
+	
 	if(*it->name=="1") {
 		if(*it->multiplier==1) // this would print nothing altogether.
 			str << "1";
@@ -944,11 +942,14 @@ void node_printer::print_infix(std::ostream& str, exptree::iterator it)
 	if(parent.output_format==exptree_output::out_xcadabra) {
 		const LaTeXForm *lf=properties::get<LaTeXForm>(it);
 		bool needs_extra_brackets=false;
-		sibling_iterator sib=tr.begin(it);
-		while(sib!=tr.end(it)) {
-			if(sib->is_index()) 
-				needs_extra_brackets=true;
-			++sib;
+		const Accent *ac=properties::get<Accent>(it);
+		if(!ac) { // accents should never get additional curly brackets, {\bar}{g} does not print.
+			sibling_iterator sib=tr.begin(it);
+			while(sib!=tr.end(it)) {
+				if(sib->is_index()) 
+					needs_extra_brackets=true;
+				++sib;
+				}
 			}
 		
 		if(needs_extra_brackets) str << "{"; // to prevent double sup/sub script errors

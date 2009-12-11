@@ -286,6 +286,7 @@ void ActionRemoveCell::execute(XCadabra& xc)
 			 xc.active_canvas->cell_grab_focus(*fnd);
 		}
 	else {
+		std::cout << "no cell below, adding cell" << std::endl;
 		// There is no cell below; create a new one and put the cursor there.
 		Glib::RefPtr<DataCell> newcell(new DataCell(DataCell::c_input));
 		next_cell=newcell;
@@ -2327,6 +2328,7 @@ bool XCadabra::receive(modglue::ipipe& p)
 			while (gtk_events_pending ())
 				gtk_main_iteration ();
 
+			active_canvas->select_first_input_cell();
 			}
 		modified=false;
 		update_title();
@@ -2661,18 +2663,21 @@ std::string XCadabra::load(const std::string& fn, bool ignore_nonexistence)
 	struct stat buf;
 	int statres=lstat(fn.c_str(), &buf);
 	if(statres==-1) {
-		 switch(errno) {
-			  case EACCES:
-					return "Search permission denied.";
-			  case ELOOP:
-					return "Too many symbolic links.";
-			  case ENOENT:
-					if(ignore_nonexistence) return "";
-					else return "File does not exist.";
-			  default:
-					return "Error stat'ing file.";
-			  }
-		 }
+		switch(errno) {
+			case EACCES:
+				return "Search permission denied.";
+			case ELOOP:
+				return "Too many symbolic links.";
+			case ENOENT:
+				if(ignore_nonexistence) {
+					clear();
+					return "";
+					}
+				else return "File does not exist.";
+			default:
+				return "Error stat'ing file.";
+			}
+		}
 	
 	std::ifstream str(fn.c_str());
 	std::ostringstream err;
@@ -2874,7 +2879,7 @@ std::string XCadabra::load(const std::string& fn, bool ignore_nonexistence)
 	while (gtk_events_pending ())
 		gtk_main_iteration ();
 	
-	active_canvas->select_first_input_cell();
+//	active_canvas->select_first_input_cell();
 
 	kernel_idle();
 	return "";

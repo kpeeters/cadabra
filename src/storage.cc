@@ -771,6 +771,15 @@ bool str_node::is_rational() const
 	return (*name=="1");
 	}
 
+bool str_node::is_integer() const
+	{
+	if(*name=="1") {
+		if(multiplier->get_den()==1)
+			return true;
+		}
+	return false;
+	}
+
 bool str_node::is_unsimplified_rational() const
 	{
 	if((*name).size()==0) return false;
@@ -781,7 +790,7 @@ bool str_node::is_unsimplified_rational() const
 	return true;
 	}
 
-bool str_node::is_integer() const
+bool str_node::is_unsimplified_integer() const
 	{
 	if((*name).size()==0) return false;
 	for(unsigned int i=0; i<(*name).size(); ++i) {
