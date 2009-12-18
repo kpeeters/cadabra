@@ -17,7 +17,7 @@
 
 */
 
-//#define DEBUG 1
+#define DEBUG 1
 
 #include <modglue/pipe.hh>
 #include <modglue/process.hh>
@@ -257,6 +257,12 @@ void ActionRemoveCell::execute(XCadabra& xc)
 	xc.selected=0;
 	XCadabra::DataCells_t::iterator fnd=std::find(xc.datacells.begin(), xc.datacells.end(), cell);
 	assert(fnd!=xc.datacells.end());
+	assert(fnd!=xc.datacells.begin());
+
+	// Store a pointer to the previous DataCell.
+	XCadabra::DataCells_t::iterator fnd_prev=fnd;
+	--fnd_prev;
+	prev_cell=(*fnd_prev);
 
 	// Remove cells until an input or tex cell is found.
 	associated_cells.clear();
@@ -272,8 +278,6 @@ void ActionRemoveCell::execute(XCadabra& xc)
 
 	// Position the cursor.
 	if(fnd!=xc.datacells.end()) {
-		next_cell=(*fnd);
-
 		// We have to put the cursor in the next input cell or in the next open TeX cell.
 		// So walk down the cells until we meet this condition (or end).
 		while(fnd!=xc.datacells.end() 
@@ -286,26 +290,35 @@ void ActionRemoveCell::execute(XCadabra& xc)
 			 xc.active_canvas->cell_grab_focus(*fnd);
 		}
 	else {
-		std::cout << "no cell below, adding cell" << std::endl;
-		// There is no cell below; create a new one and put the cursor there.
-		Glib::RefPtr<DataCell> newcell(new DataCell(DataCell::c_input));
-		next_cell=newcell;
-		xc.add_cell(newcell, Glib::RefPtr<DataCell>() );
-		xc.active_canvas->cell_grab_focus(newcell);
+		// There is no cell below (i.e. we just deleted the last cell). 
+		// Find the last input cell of the notebook and activate that one.
+		// (i.e. we walk upward here, as opposed to the normal action, which is to 
+		// move one input cell down).
+		--fnd;
+		while(fnd!=xc.datacells.begin() 
+				&& (*fnd)->cell_type!=DataCell::c_input 
+				&& !( ( (*fnd)->cell_type==DataCell::c_comment || (*fnd)->cell_type==DataCell::c_texcomment) 
+						&& (*fnd)->tex_hidden==false) ) {
+			--fnd;
+			}
+		
+		xc.active_canvas->cell_grab_focus(*fnd);
 		}
 	}
 
 void ActionRemoveCell::revert(XCadabra& xc)
 	{
-	// Find next_cell in the currently active cells.
-	XCadabra::DataCells_t::iterator fnd=std::find(xc.datacells.begin(), xc.datacells.end(), next_cell);
+	// Find prev_cell in the currently active cells.
+	XCadabra::DataCells_t::iterator fnd=std::find(xc.datacells.begin(), xc.datacells.end(), prev_cell);
 	assert(fnd!=xc.datacells.end());
 
 	// Re-insert all these cells back into the tree.
-	xc.add_cell(cell, (*fnd) );
+	xc.add_cell(cell, (*fnd), false);
 //	std::cerr << associated_cells.size() << " cells to add" << std::endl;
 	for(size_t i=0; i<associated_cells.size(); ++i)
-		xc.add_cell(associated_cells[i], (*fnd));
+		xc.add_cell(associated_cells[i], (*fnd), false);
+
+//	WHY DO THESE CELLS NOT SHOW UP?
 	}
 
 DataCell::DataCell(cell_t ct, const std::string& str, bool texhidden)
@@ -2995,6 +3008,11 @@ void XCadabra::on_edit_insert_section_above()
 void XCadabra::on_edit_remove_cell()
 	{
 	Glib::RefPtr<DataCell> dc=active_cell->datacell;
+
+	// Prevent removal of the first cell of the notebook.
+	if(std::find(datacells.begin(), datacells.end(), dc)==datacells.begin())
+		return;
+
 	if(dc->cell_type!=DataCell::c_input && dc->cell_type!=DataCell::c_tex) return;
 
 	action_add(Glib::RefPtr<ActionBase>(new ActionRemoveCell(dc)));

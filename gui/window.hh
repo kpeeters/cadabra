@@ -139,7 +139,12 @@ class ActionRemoveCell : public ActionBase {
 		virtual void revert(XCadabra&);
 
 	private:
-		Glib::RefPtr<DataCell>               next_cell; 
+		// Keep track of the location where this cell was in the notebook. Since it is
+		// not possible to delete the first cell, it is safe to keep a reference to the
+		// cell just before the one we are deleting. 
+		// Note that since we keep a RefPtr to this datacell, that cell will stay alive
+		// even when a subsequent action will remove it. 
+		Glib::RefPtr<DataCell>               prev_cell; 
 		std::vector<Glib::RefPtr<DataCell> > associated_cells; // output and comment cells
 };
 
