@@ -221,7 +221,7 @@ algorithmic and
 display modules and thereby extend the functionality of \cdb.\\[3ex]
 The software is available for download under the terms of the GNU
 General Public License from
-\url{http://www.aei.mpg.de/~peekas/cadabra/} .\\[3ex]
+\url{http://cadabra.phi-sci.com/} .\\[3ex]
 
 \noindent A paper introducing \cdb to high-energy physicists is
 available as
@@ -1872,11 +1872,6 @@ T^{b a} \partial_{a b}( C_{m n} D_{n m} );
 T^{a b} \partial_{a b}( C_{m n} D_{m n} );
 \end{screen}
 
-\subsection{Anti-commuting objects}
-
-
-
-
 
 \subsection{Accents}
 \label{s:accents}
@@ -2058,6 +2053,42 @@ order of the two gamma matrices unchanged.
 %  g_{m n}::Metric(polar).
 % 
 % R_{m n p}^{q} = \partial_{m}{\Gamma
+
+\subsection{Anti-commuting objects and derivatives}
+
+We have discussed anti-commuting objects to some extend in the
+previous section, but things become somewhat more hairy in combination
+with derivatives. Hence the current section, in which we will look in
+more detail at how to write properties which take care of
+anti-commuting derivatives (as they occur in e.g.~superspace field
+theories).
+
+We will use the \subscommand{prodrule} command to show how the various
+property assignments work. 
+
+There are various ways in which you may want to write derivatives
+which are anti-commuting. One way is to use explicit indices, and
+declare them to be anti-commuting, as in
+\begin{screen}{1,2,3,4}
+{\alpha,\beta,\gamma}::Indices(spinor).
+{\alpha,\beta,\gamma}::AntiCommuting.
+D{#}::Derivative.
+D_{\alpha}{\theta^\beta \theta^\gamma};
+D_{\alpha}{\theta^{\beta}} \theta^{\gamma} 
+           - \theta^{\beta} D_{\alpha}{\theta^{\gamma}};
+\end{screen}
+Note the appearance of the minus sign for the second term. Writing
+things in this way is the most straightforward way to handle
+anti-commuting derivatives, and only requires the assignment of the
+\subsprop{AntiCommuting} property to the indices (second line above).
+
+However, one often deals with implicit indices when tackling problems
+involving anti-commuting variables. Here is an example to illustrate
+what is meant by this:
+\begin{screen}{1,2,3}
+test 19d does not do the right thing: it does not pick up a minus sign
+at the first step.
+\end{screen}
 
 \subsection{Input and output redirection}
 \label{s:inputoutput}

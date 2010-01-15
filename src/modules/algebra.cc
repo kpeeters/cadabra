@@ -838,10 +838,11 @@ algorithm::result_t prodrule::apply(iterator& it)
 //			  txtout << "trying to move " << *emptyD.begin()->name << " through " << *repch->name 
 //						<< " " << stc << std::endl;
 			  int ret=exptree_ordering::can_swap(emptyD.begin(), repch, stc);
+//			  txtout << ret << std::endl;
 			  if(ret==0)
 				  return l_no_action;
 			  sign*=ret;
-//			  txtout << ret << std::endl;
+
 			  
 			  // Avoid \partial_{a}{\partial_{b} ...} constructions in 
 			  // case this child is a \partial-like too.

@@ -345,3 +345,8 @@ tst23:= D_{a}{A^{b}} * T^{c d} * C^{e} - A^{b} * D_{a}{T^{c d}} * C^{e} - A^{b} 
 @collect_terms!(%);
 @assert(tst23);
 
+# Test 24: implicit indices
+#
+#@reset.
+#{ D{#}, bD{#} }::Derivative.
+#obj24:= D{ 

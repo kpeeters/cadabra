@@ -1590,7 +1590,11 @@ int exptree_ordering::can_swap_prod_obj(exptree::iterator prod, exptree::iterato
 	while(sib!=prod.end()) {
 		const Indices *ind1=properties::get_composite<Indices>(sib);
 		const Indices *ind2=properties::get_composite<Indices>(obj);
-		if(! (ind1!=0 && ind2!=0) ) {
+		if(! (ind1!=0 && ind2!=0) ) { // If both objects are actually real indices, 
+			                           // then we do not include their commutativity property
+			                           // in the sign. This is because the routines that use
+                                    // can_swap_prod_obj all test for such index-index 
+                                    // swaps separately.
 			int es=subtree_compare(sib, obj);
 			sign*=can_swap(sib, obj, es, ignore_implicit_indices);
 			if(sign==0) break;
@@ -1755,13 +1759,16 @@ int exptree_ordering::can_swap(exptree::iterator one, exptree::iterator two, int
 		return sc1->sign();
 
 	// One or both of the objects are not in an explicit list. So now comes the generic
-	// part. The first step is to look at all indices of the two objects and determine 
+	// part. The first step is to look at all explicit indices of the two objects and determine 
 	// their commutativity. 
+	// Note: this does not yet look at arguments (non-index children).
 
 	int tmpsign=can_swap_ilist_ilist(one, two);
 	if(tmpsign==0) return 0;
 	
-	// The second step is to check for product-like and sum-like behaviour.
+	// The second step is to check for product-like and sum-like behaviour. The following
+	// take into account all commutativity properties of explict with implicit indices,
+	// as well as hard-specified commutativity of factors.
 
 	const CommutingAsProduct *comap1 = properties::get_composite<CommutingAsProduct>(one);
 	const CommutingAsProduct *comap2 = properties::get_composite<CommutingAsProduct>(two);

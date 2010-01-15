@@ -11,7 +11,7 @@ type: :feature
 component: cadabra
 release: 
 reporter: Kasper Peeters <kasper.peeters@aei.mpg.de>
-status: :unstarted
+status: :in_progress
 disposition: 
 creation_time: 2009-05-26 17:41:13.764695 Z
 references: []
@@ -22,3 +22,9 @@ log_events:
   - Kasper Peeters <kasper.peeters@aei.mpg.de>
   - created
   - ""
+- - 2010-01-15 21:04:09.317656 Z
+  - Kasper Peeters <kasper.peeters@aei.mpg.de>
+  - changed status from unstarted to in_progress
+  - |-
+    Various Inherit properties have been removed, a few still remain
+    in particular on Derivative.

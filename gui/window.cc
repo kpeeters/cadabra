@@ -17,7 +17,7 @@
 
 */
 
-#define DEBUG 1
+// #define DEBUG 1
 
 #include <modglue/pipe.hh>
 #include <modglue/process.hh>
