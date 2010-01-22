@@ -409,7 +409,8 @@ void print_sum::do_actual_print(std::ostream& str, exptree::iterator it)
 		print_multiplier(str, it);
 
 	iterator par=tr.parent(it);
-	if(tr.number_of_children(par)>1) { // for a single argument, the parent already takes care of the brackets
+	if(tr.number_of_children(par) - tr.number_of_direct_indices(par)>1) { 
+      // for a single argument, the parent already takes care of the brackets
 		if(*it->multiplier!=1 || (tr.is_valid(par) && *par->name!="\\expression")) {
 			// test whether we need extra brackets
 			close_bracket=!children_have_brackets(it);
@@ -693,24 +694,38 @@ void print_filled_tableau::print_infix(std::ostream& str, exptree::iterator it)
 	}
 
 
-// print_derivative::print_derivative(exptree_output& eo)
-// 	: node_printer(eo)
-// 	{
-// 	}
-// 
-// void print_derivative::print_infix(std::ostream& str, exptree::iterator it)
-// 	{
-// 	if(*it->multiplier!=1) 
-// 		print_multiplier(str, it);
-// 	sibling_iterator sib=tr.begin(it);
-// 	str << *it->name;
-// 	while(sib!=tr.end(it)) {
-// 		 if(sib->is_index()) {
-// 			  
-// 			  }
-// 		 ++sib;
-// 		 }
-// 	}
+//print_derivative::print_derivative(exptree_output& eo)
+//	: node_printer(eo)
+//	{
+//	}
+//
+//void print_derivative::print_infix(std::ostream& str, exptree::iterator it)
+//	{
+//	if(*it->multiplier!=1) 
+//		print_multiplier(str, it);
+//
+//	if(parent.output_format==exptree_output::out_xcadabra) {
+//		const LaTeXForm *lf=properties::get<LaTeXForm>(it);
+//		bool needs_extra_brackets=false;
+//		const Accent *ac=properties::get<Accent>(it);
+//		if(!ac) { // accents should never get additional curly brackets, {\bar}{g} does not print.
+//			sibling_iterator sib=tr.begin(it);
+//			while(sib!=tr.end(it)) {
+//				if(sib->is_index()) 
+//					needs_extra_brackets=true;
+//				++sib;
+//				}
+//			}
+//		
+//		if(needs_extra_brackets) str << "{"; // to prevent double sup/sub script errors
+//		if(lf) str << lf->latex;
+//		else   str << texify(*it->name);
+//		if(needs_extra_brackets) str << "}";
+//		}
+//	else str << *it->name;
+//	
+//	print_children(str, it);
+//	}
 
 print_sequence::print_sequence(exptree_output& eo)
 	: node_printer(eo)
@@ -1108,7 +1123,10 @@ void node_printer::print_multiplier(std::ostream& str, exptree::iterator it)
 void node_printer::print_opening_bracket(std::ostream& str, str_node::bracket_t br, str_node::parent_rel_t pr)
 	{
 	switch(br) {
-		case str_node::b_none:   str << "{";   break;
+		case str_node::b_none: 
+			if(parent.output_format==exptree_output::out_xcadabra && pr==str_node::p_none) str << "(";  
+			else                                                                           str << "{";
+			break;
 		case str_node::b_pointy: str << "\\<"; break;
 		case str_node::b_curly:  str << "\\{"; break;
 		case str_node::b_round:  str << "(";   break;
@@ -1121,7 +1139,10 @@ void node_printer::print_opening_bracket(std::ostream& str, str_node::bracket_t 
 void node_printer::print_closing_bracket(std::ostream& str, str_node::bracket_t br, str_node::parent_rel_t pr)
 	{
 	switch(br) {
-		case str_node::b_none:   str << "}";   break;
+		case str_node::b_none:   
+			if(parent.output_format==exptree_output::out_xcadabra && pr==str_node::p_none) str << ")";  
+			else                                                                           str << "}";
+			break;
 		case str_node::b_pointy: str << "\\>"; break;
 		case str_node::b_curly:  str << "\\}"; break;
 		case str_node::b_round:  str << ")";   break;

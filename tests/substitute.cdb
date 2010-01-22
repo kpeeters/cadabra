@@ -421,13 +421,7 @@ tst43:= C*B*A + A*B*C - @(obj43);
 @collect_terms!(%);
 @assert(tst43);
 
-# This example is hard to do right, let's for the time being use vary
-# only on single products, not nested ones.
-#
-# obj44:= A*(A*C*A+D*E)*E*A;
-# @vary(%)( A -> Q );
-# tst44:= Q*(A*C*A+D*E)*E*A + A*(Q*C*A+D*E)*E*A + A*(A*C*Q+D*E)*E*A + A*(A*C*A+D*E)*E*Q;
-
+@reset.
 \bar{?}::Accent.
 obj45:= \bar{A}*B*A;
 @vary!(%)( A -> C );
@@ -733,4 +727,10 @@ obj72:= A_{i}B^{i} + C^{i}D_{i};
 tst72:= A_{i}B_{i} + C_{i}D_{i} - @(obj72);
 @collect_terms!(%);
 #@assert(tst72);
+
+# Test 73: vary on nested products/sums
+#
+obj73:= A*(A*C*A+D*E)*E*A;
+@vary(%)( A -> Q );
+tst73:= Q*(A*C*A+D*E)*E*A + A*(Q*C*A+D*E)*E*A + A*(A*C*Q+D*E)*E*A + A*(A*C*A+D*E)*E*Q;
 

@@ -535,6 +535,18 @@ unsigned int exptree::number_of_indices(iterator it)
 	return res;
 	}
 
+unsigned int exptree::number_of_direct_indices(iterator it) const
+	{
+	unsigned int res=0;
+	sibling_iterator sib=begin(it);
+	while(sib!=end(it)) {
+		if(sib->fl.parent_rel==str_node::p_sub || sib->fl.parent_rel==str_node::p_super)
+			++res;
+		++sib;
+		}
+	return res;
+	}
+
 exptree::index_iterator::index_iterator()
 	: iterator_base()
 	{

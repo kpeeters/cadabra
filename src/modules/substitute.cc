@@ -385,6 +385,30 @@ algorithm::result_t substitute::apply(iterator& st)
 	}
 
 
+/*  bug: cadabra-34.
+
+    Vary should take into account the depth of an object in a more clever way than
+	 is currently done. Consider an expression
+
+         A \partial{ A C + B } + D A;
+
+    and A->a, B->b etc. This should vary to
+
+         a  \partial{ A C + B } + A \partial{ a C + A c + b } + d A + a D;
+
+    Right now it produces a total mess for the partial derivative, because it does
+	 not understand that the depth counting for factors inside the partial involves
+	 knowing about the top-level product.
+
+    So what we should do is introduce a 'factor depth' and a 'sum index', which equal
+
+         A \partial{ A C + B } + D A;
+         1           1 1   1     1 1
+			1           1 1   1     2 2
+
+    For all 
+ */
+
 vary::vary(exptree& tr, iterator it)
 	: algorithm(tr, it)
 	{
@@ -398,13 +422,16 @@ void vary::description() const
 bool vary::can_apply(iterator it) 
 	{
 	if(*it->name=="\\prod") return true;
+	if(*it->name=="\\sum") return true;
 	if(is_single_term(it)) return true;
 	return false;
 	}
 
 algorithm::result_t vary::apply(iterator& it)
 	{
-	if(is_single_term(it)) { // easy: just vary this term
+	debugout << "entering vary "<< std::endl;
+	if(is_single_term(it)) { // easy: just vary this term by substitution
+ 		debugout << "single" << std::endl;
 		substitute subs(tr, this_command);
 		if(subs.can_apply(it)) {
 			if(subs.apply(it)==l_applied) {
@@ -414,7 +441,23 @@ algorithm::result_t vary::apply(iterator& it)
 			}
 		return l_no_action;
 		}
+	
+	if(*it->name=="\\sum") { // call vary on every term
+		debugout << "sum" << std::endl;
+		vary vry(tr, this_command);
 
+		sibling_iterator sib=tr.begin(it);
+		while(sib!=tr.end(it)) {
+			iterator app=sib;
+			++sib;
+			if(vry.can_apply(app))
+				vry.apply(app);
+			}
+		expression_modified=true;
+		return l_applied;
+		}
+
+	debugout << "prod" << std::endl;
 	exptree result;
 	result.set_head(str_node("\\expression"));
 	iterator newsum=result.append_child(result.begin(), str_node("\\sum"));
@@ -426,7 +469,7 @@ algorithm::result_t vary::apply(iterator& it)
 
 	exptree prodcopy(it); // keep a copy to restore after each substitute
 
-	substitute subs(tr, this_command);
+	vary subs(tr, this_command);
 	int pos=0;
 	for(;;) { 
 		sibling_iterator fcit=tr.begin(it);
@@ -434,7 +477,10 @@ algorithm::result_t vary::apply(iterator& it)
 		if(fcit==tr.end(it)) break;
 
 		iterator fcit2(fcit);
-		if(subs.apply_recursive(fcit2, false)) {
+		if(subs.can_apply(fcit2)) {
+			debugout << "before" << std::endl;
+			subs.apply(fcit2);
+			debugout << "end" << std::endl;
 			expression_modified=true;
 			iterator newterm=result.append_child(newsum, it);
 			// restore original

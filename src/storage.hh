@@ -167,7 +167,12 @@ class exptree : public tree<str_node> {
 		/// top node, i.e. it does 2\prod{A} -> 2 A.
 		iterator         flatten_and_erase(iterator position);
 		
+		/// The number of indices of a node, taking into account IndexInherit-ance
 		static unsigned int number_of_indices(iterator it);
+
+		/// The number of indices of a node, counting only the direct ones (i.e. not those
+		/// inherited from child nodes).
+		unsigned int number_of_direct_indices(iterator it) const;
 
 		/// An iterator which iterates over indices even if they are at lower levels, 
 		/// i.e. taking into account the "Inherit" property of nodes.
