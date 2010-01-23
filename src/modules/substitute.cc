@@ -424,14 +424,108 @@ bool vary::can_apply(iterator it)
 	if(*it->name=="\\prod") return true;
 	if(*it->name=="\\sum") return true;
 	if(is_single_term(it)) return true;
+	if(is_nonprod_factor_in_prod(it)) return true;
+	const Derivative *der = properties::get<Derivative>(it);
+	if(der) return true;
+	der = properties::get<Derivative>(tr.parent(it));
+	if(der) return true;
+	const Accent *acc = properties::get<Accent>(it);
+	if(acc) return true;
+	acc = properties::get<Accent>(tr.parent(it));
+	if(acc) return true;
 	return false;
 	}
 
 algorithm::result_t vary::apply(iterator& it)
 	{
-	debugout << "entering vary "<< std::endl;
-	if(is_single_term(it)) { // easy: just vary this term by substitution
- 		debugout << "single" << std::endl;
+	const Derivative *der = properties::get<Derivative>(it);
+	const Accent     *acc = properties::get<Accent>(it);
+	if(der || acc) {
+		vary vry(tr, this_command);
+
+		sibling_iterator sib=tr.begin(it);
+		while(sib!=tr.end(it)) {
+			iterator app=sib;
+			++sib;
+			if(app->is_index()) continue;
+			if(vry.can_apply(app)) {
+				vry.apply(app);
+				}// not complete: should remove object when zero
+			}
+		expression_modified=true;
+		return l_applied;		
+		}
+
+	if(*it->name=="\\prod") {
+		exptree result;
+		result.set_head(str_node("\\expression"));
+		iterator newsum=result.append_child(result.begin(), str_node("\\sum"));
+		
+		// Iterate over all factors, attempting a substitute. If this
+		// succeeds, copy the term to the "result" tree. Then restore the
+		// original. We have to do the substitute on the original tree so
+		// that index relabelling takes into account the rest of the tree.
+		
+		exptree prodcopy(it); // keep a copy to restore after each substitute
+		
+		vary subs(tr, this_command);
+		int pos=0;
+		for(;;) { 
+			sibling_iterator fcit=tr.begin(it);
+			fcit+=pos;
+			if(fcit==tr.end(it)) break;
+			
+			iterator fcit2(fcit);
+			if(subs.can_apply(fcit2)) {
+				subs.apply(fcit2);
+				expression_modified=true;
+				
+				if(fcit2->is_zero()==false)
+					iterator newterm=result.append_child(newsum, it);
+
+				// restore original
+				it=tr.replace(it, prodcopy.begin());
+				}
+			++pos;
+			}
+		if(expression_modified && tr.number_of_children(newsum)>0) {
+			it=tr.move_ontop(it, newsum);
+			cleanup_nests(tr, it);
+			cleanup_expression(tr, it);
+			}
+		else { // varying any of the factors produces nothing, variation is zero
+			zero(it->multiplier);
+			expression_modified=true;
+			}
+		return l_applied;
+		}
+
+	if(*it->name=="\\sum") { // call vary on every term
+		vary vry(tr, this_command);
+
+		sibling_iterator sib=tr.begin(it);
+		while(sib!=tr.end(it)) {
+			iterator app=sib;
+			++sib;
+			if(vry.can_apply(app)) {
+				vry.apply(app);
+				if(app->is_zero()) {
+					tr.erase(app);
+					}
+				}
+			else {
+				// remove this term
+				tr.erase(app);
+				}
+			}
+		expression_modified=true;
+		return l_applied;
+		}
+	
+	der = properties::get<Derivative>(tr.parent(it));
+	acc = properties::get<Accent>(tr.parent(it));
+
+	if(der || acc || is_single_term(it)) { // easy: just vary this term by substitution
 		substitute subs(tr, this_command);
 		if(subs.can_apply(it)) {
 			if(subs.apply(it)==l_applied) {
@@ -442,63 +536,21 @@ algorithm::result_t vary::apply(iterator& it)
 		return l_no_action;
 		}
 	
-	if(*it->name=="\\sum") { // call vary on every term
-		debugout << "sum" << std::endl;
-		vary vry(tr, this_command);
-
-		sibling_iterator sib=tr.begin(it);
-		while(sib!=tr.end(it)) {
-			iterator app=sib;
-			++sib;
-			if(vry.can_apply(app))
-				vry.apply(app);
+	if(is_nonprod_factor_in_prod(it)) {
+		substitute subs(tr, this_command);
+		if(subs.can_apply(it)) {
+			if(subs.apply(it)==l_applied) {
+				expression_modified=true;
+				return l_applied;
+				}
 			}
+		// else set to zero
+		zero(it->multiplier);
 		expression_modified=true;
 		return l_applied;
 		}
 
-	debugout << "prod" << std::endl;
-	exptree result;
-	result.set_head(str_node("\\expression"));
-	iterator newsum=result.append_child(result.begin(), str_node("\\sum"));
-
-	// Iterate over all factors, attempting a substitute. If this
-	// succeeds, copy the term to the "result" tree. Then restore the
-	// original. We have to do the substitute on the original tree so
-	// that index relabelling takes into account the rest of the tree.
-
-	exptree prodcopy(it); // keep a copy to restore after each substitute
-
-	vary subs(tr, this_command);
-	int pos=0;
-	for(;;) { 
-		sibling_iterator fcit=tr.begin(it);
-		fcit+=pos;
-		if(fcit==tr.end(it)) break;
-
-		iterator fcit2(fcit);
-		if(subs.can_apply(fcit2)) {
-			debugout << "before" << std::endl;
-			subs.apply(fcit2);
-			debugout << "end" << std::endl;
-			expression_modified=true;
-			iterator newterm=result.append_child(newsum, it);
-			// restore original
-			it=tr.replace(it, prodcopy.begin());
-			}
-		++pos;
-		}
-	if(expression_modified) {
-		it=tr.move_ontop(it, newsum);
-		cleanup_nests(tr, it);
-		cleanup_expression(tr, it);
-		}
-	else { // substitute didn't act anywhere, variation is zero
-		zero(it->multiplier);
-		expression_modified=true;
-		}
-
-	return l_applied;
+	return l_no_action;
 	}
 
 

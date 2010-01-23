@@ -1620,6 +1620,19 @@ bool algorithm::is_single_term(iterator it)
 	return false;
 	}
 
+bool algorithm::is_nonprod_factor_in_prod(iterator it)
+	{
+	if(*it->name!="\\prod" && *it->name!="\\sum" && *it->name!="\\asymimplicit" && *it->name!="\\comma" 
+		&& *it->name!="\\equals") {
+		if(tr.is_valid(tr.parent(it))) {
+			if(*tr.parent(it)->name=="\\prod")
+				return true;
+			}
+//		else return true;
+		}
+	return false;
+	}
+
 bool algorithm::prod_wrap_single_term(iterator& it)
 	{
 	if(is_single_term(it)) {

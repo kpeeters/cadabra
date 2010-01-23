@@ -416,7 +416,7 @@ tst42b:= \Gamma_{p q r} (\Gamma_{m n} + A_{m} \Gamma_{n}) - @(obj42b);
 #
 @reset;
 obj43:= A*B*A + D*E;
-@vary!(%)( A -> C );
+@vary(%)( A -> C );
 tst43:= C*B*A + A*B*C - @(obj43);
 @collect_terms!(%);
 @assert(tst43);
@@ -424,7 +424,7 @@ tst43:= C*B*A + A*B*C - @(obj43);
 @reset.
 \bar{?}::Accent.
 obj45:= \bar{A}*B*A;
-@vary!(%)( A -> C );
+@vary(%)( A -> C );
 tst45:= \bar{C}*B*A + \bar{A}*B*C - @(obj45);
 @collect_terms!(%);
 @assert(tst45);
@@ -703,7 +703,7 @@ tst69:= 1/f(r) + r**2 * \sin(\theta)**2 - @(obj69);
 #
 @reset.
 obj70:= A + B Q;
-@vary!(%)( A -> Q, B -> Z );
+@vary(%)( A -> Q, B -> Z );
 tst70:= Q + Z Q - @(obj70);
 @collect_terms!(%);
 @assert(tst70);
@@ -730,7 +730,34 @@ tst72:= A_{i}B_{i} + C_{i}D_{i} - @(obj72);
 
 # Test 73: vary on nested products/sums
 #
-obj73:= A*(A*C*A+D*E)*E*A;
+@reset.
+\partial{#}::Derivative.
+obj73:=A \partial{ A C + B } + D A;
+@vary(%)( A-> a, B->b, C->c, D->d);
+tst73:=a \partial{ A C + B } + A \partial{a C + A c + b} + d A + D a - @(obj73);
+@collect_terms!(%);
+@assert(tst73);
+
+@reset.
+\partial{#}::Derivative.
+obj73b:=A \partial_{m n}{ A C + B \partial{D} };
+@vary(%)( A-> a, B->b, C->c, D->d);
+tst73b:=a \partial_{m n}{ A C + B \partial{D} } + A \partial_{m n}{ a C + A c + b \partial{D} 
+             + B \partial{d} } - @(obj73b);
+@collect_terms!(%);
+@assert(tst73b);
+
+@reset.
+obj73d:= F*(A*C*A+D*E);
+@vary(%)( A-> Q );
+tst73d:= F*(Q*C*A + A*C*Q) - @(obj73d);
+@collect_terms!(%);
+@assert(tst73d);
+
+@reset.
+obj73c:= A*(A*C*A+D*E)*E*A;
 @vary(%)( A -> Q );
-tst73:= Q*(A*C*A+D*E)*E*A + A*(Q*C*A+D*E)*E*A + A*(A*C*Q+D*E)*E*A + A*(A*C*A+D*E)*E*Q;
+tst73c:= Q*(A*C*A+D*E)*E*A + A*(Q*C*A + A*C*Q)*E*A + A*(A*C*A+D*E)*E*Q - @(obj73c);
+@collect_terms!(%);
+@assert(tst73c);
 

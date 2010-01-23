@@ -21,8 +21,8 @@ susy:= { \delta{A_{a}}   = \bar{\epsilon} \gamma_{a} \lambda,
 S:= -(1/4) f_{a b} f_{a b} 
               - (1/2) \bar{\lambda} \gamma_{a} \partial_{a}{\lambda};
 
-@vary!(%)( f_{a b} -> \partial_{a}{\delta{A_{b}}} - \partial_{b}{\delta{A_{a}}},
-           \lambda -> \delta{\lambda} );
+@vary(%)( f_{a b} -> \partial_{a}{\delta{A_{b}}} - \partial_{b}{\delta{A_{a}}},
+          \lambda -> \delta{\lambda} );
 
 @distribute!(%);
 @substitute!(%)( @(susy) ): @prodrule!(%): @distribute!(%): @unwrap!(%);

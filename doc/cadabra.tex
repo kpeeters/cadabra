@@ -653,9 +653,9 @@ operators around the objects on which they are supposed to act. We are
 now ready to perform the supersymmetry transformation. This is done by
 using the \subscommand{vary} algorithm, 
 \begin{screen}{1,5,6}
-@vary!(%)( X_\mu       ->   i \epsbar \Psi_\mu + i \eps \Psibar_\mu,
-           \Psi_\mu    -> - \epsbar \del{X_\mu},
-           \Psibar_\mu -> - \eps \delbar{X_\mu} );
+@vary(%)( X_\mu       ->   i \epsbar \Psi_\mu + i \eps \Psibar_\mu,
+          \Psi_\mu    -> - \epsbar \del{X_\mu},
+          \Psibar_\mu -> - \eps \delbar{X_\mu} );
 
 @distribute!(%);
 @prodrule!(%);
@@ -753,9 +753,9 @@ S:= -(1/4) f_{a b} f_{a b}
 \end{screen}
 Showing invariance starts by applying a variational derivative,
 \begin{screen}{1,5,6,7}
-@vary!(%)( f_{a b} ->   \partial_{a}{\delta{A_{b}}} 
-                      - \partial_{b}{\delta{A_{a}}},
-           \lambda -> \delta{\lambda} );
+@vary(%)( f_{a b} ->   \partial_{a}{\delta{A_{b}}} 
+                     - \partial_{b}{\delta{A_{a}}},
+          \lambda -> \delta{\lambda} );
 
 @distribute!(%):
 @substitute!(%)( @(susy) ): @prodrule!(%): @distribute!(%): @unwrap!(%);

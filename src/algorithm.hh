@@ -177,6 +177,7 @@ class algorithm : public active_node {
 		/// Take a single non-product node in a sum and wrap it in a 
 		/// product node, so it can be handled on the same footing as a proper product.
 		bool     is_single_term(iterator);
+		bool     is_nonprod_factor_in_prod(iterator);
 		bool     prod_wrap_single_term(iterator&);
 		bool     prod_unwrap_single_term(iterator&);
 
