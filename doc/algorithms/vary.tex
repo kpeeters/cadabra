@@ -19,7 +19,7 @@ Note: In the example above, the command is applied only at the top
 level (there is no exclamation mark used in the call
 of \subscommand{vary}). To understand why this is important, compare
 the following two examples. The first one works as expected,
-\begin{screen}
+\begin{screen}{1,2}
 A B;
 @vary(%)( A -> a, B -> b);
 a * B + A * b;
@@ -32,7 +32,7 @@ A B;
 \end{screen}
 The reason why we now get a zero is that in the first step, the vary
 command acts in each of the individual factors, producing
-\begin{screen}
+\begin{screen}{0}
 a b;
 \end{screen}
 It then acts once more at the level of the product. But now there are

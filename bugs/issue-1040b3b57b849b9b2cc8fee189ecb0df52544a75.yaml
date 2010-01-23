@@ -5,8 +5,8 @@ type: :bugfix
 component: cadabra
 release: "1.17"
 reporter: Kasper Peeters <kasper.peeters@aei.mpg.de>
-status: :unstarted
-disposition: 
+status: :closed
+disposition: :fixed
 creation_time: 2009-11-14 14:23:03.351440 Z
 references: []
 
@@ -16,3 +16,9 @@ log_events:
   - Kasper Peeters <kasper.peeters@aei.mpg.de>
   - created
   - ""
+- - 2010-01-23 21:45:03.611977 Z
+  - Kasper Peeters <kasper.peeters@aei.mpg.de>
+  - closed with disposition fixed
+  - |-
+    Should now work for derivatives and accents, as well as nested products.
+    Documentation and test cases updated as well.

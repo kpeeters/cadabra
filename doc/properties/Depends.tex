@@ -25,6 +25,21 @@ coordinates a field depends,
 Taking objects out of derivatives (because they do not depend on them)
 is handled using the \subscommand{unwrap} algorithm.
 
+If you want to make an object depend on more than one thing, you need
+to specify them all in one \subsprop{Depends} property. If you specify
+them in two separate properties, the last property will overwrite
+the previous one. Therefore, you get
+\begin{screen}{1,2,3,4,5,6}
+\hat{#}::Accent.
+\partial{#}::PartialDerivative.
+A::Depends(\hat).
+A::Depends(\partial).
+\hat{A};
+@unwrap!(%);
+A;
+\end{screen}
+instead of \verb|\hat{A}| which you might have expected.
+
 \cdbseealgo{unwrap}
 \cdbseeprop{Derivative}
 

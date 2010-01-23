@@ -14,8 +14,8 @@ type: :bugfix
 component: cadabra
 release: "1.17"
 reporter: Kasper Peeters <kasper.peeters@aei.mpg.de>
-status: :unstarted
-disposition: 
+status: :closed
+disposition: :wontfix
 creation_time: 2009-11-14 14:24:01.474019 Z
 references: []
 
@@ -25,3 +25,9 @@ log_events:
   - Kasper Peeters <kasper.peeters@aei.mpg.de>
   - created
   - ""
+- - 2010-01-23 21:50:19.691874 Z
+  - Kasper Peeters <kasper.peeters@aei.mpg.de>
+  - closed with disposition wontfix
+  - |-
+    Has been documented now in the Depends documentation. Won't fix for 
+    the time being as there is a simple workaround.
