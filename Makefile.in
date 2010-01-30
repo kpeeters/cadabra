@@ -1,5 +1,5 @@
 
-export RELEASE=1.17
+export RELEASE=1.18
 
 .PHONY: static program_static test fasttest gui gui_static doc
 
@@ -54,7 +54,7 @@ fasttest: program
 	@echo "==== Running tests without consistency checks ===="
 	( export CDB_PRINTSTAR=1 && export CDB_ERRORS_ARE_FATAL=1 && cd tests && $(MAKE) clean && $(MAKE) all);
 	@echo "==== Tests passed ====="
-	@echo "**** Do not forget to run the advanced tests with 'make advtest' ****"
+	@echo "**** Do not forget to run the 'advtest', 'mapletest' and 'maximates' targets ****"
 
 advtest: program
 	@echo "==== Running advanced tests (this may take a while) ===="
@@ -64,7 +64,12 @@ advtest: program
 mapletest: program
 	@echo "==== Running maple dependent tests ===="
 	( export CDB_PARANOID=1 && export CDB_PRINTSTAR=1 && cd tests && $(MAKE) clean && $(MAKE) maple);
-	@echo "==== Advanced tests passed ====="
+	@echo "==== Maple tests passed ====="
+
+maximatest: program
+	@echo "==== Running maxima dependent tests ===="
+	( export CDB_PARANOID=1 && export CDB_PRINTSTAR=1 && cd tests && $(MAKE) clean && $(MAKE) maxima);
+	@echo "==== Maxima tests passed ====="
 
 install_program: program
 	( cd src && $(MAKE) install );

@@ -19,7 +19,7 @@
 */
 
 #define NEW_XPERM 
-//#define XPERM_USE_EXT 
+#define XPERM_USE_EXT 
 //#define XPERM_DEBUG
 
 #include "algebra.hh"

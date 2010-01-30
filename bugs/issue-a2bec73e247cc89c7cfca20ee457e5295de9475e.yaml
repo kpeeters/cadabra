@@ -5,7 +5,7 @@ desc: |-
   warning is produced and the cursor disappears.
 type: :bugfix
 component: cadabra
-release: "1.17"
+release: "1.18"
 reporter: Kasper Peeters <kasper.peeters@aei.mpg.de>
 status: :unstarted
 disposition: 
@@ -18,3 +18,7 @@ log_events:
   - Kasper Peeters <kasper.peeters@aei.mpg.de>
   - created
   - ""
+- - 2010-01-28 13:42:29.255930 Z
+  - Kasper Peeters <kasper.peeters@aei.mpg.de>
+  - assigned to release 1.18 from 1.17
+  - Not quite debugged yet, a few issues remaining.

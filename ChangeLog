@@ -1,3 +1,7 @@
+2010-01-28  Kasper Peeters  <kasper.peeters@aei.mpg.de>
+
+	* Fixed cadabra-7.
+
 2009-12-06  Kasper Peeters  <kasper.peeters@aei.mpg.de>
 
 	* Fixed @expand_power action on fractional powers.

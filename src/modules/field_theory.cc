@@ -749,23 +749,34 @@ algorithm::result_t eliminate_kronecker::apply(iterator& st)
 				 sibling_iterator oi=tr.begin(st);
 				 ++looping;
 				 // iterate over all factors in the product
+				 bool doing1=false;
+				 bool doing2=false;
 				 while(!replaced && oi!=tr.end(st)) {
 					  if(oi!=it) { // this is not the delta node
 							// compare delta indices with all indices of this object
 							exptree::index_iterator ind=tr.begin_index(oi);
 							while(ind!=tr.end_index(oi)) {
-								 if(ii1->is_rational()==false && subtree_compare(ind, ii1, 1, false, true)==0) {
-									  tr.replace_index(ind, ii2)->fl.parent_rel=ii2->fl.parent_rel; 
-									  replaced=true;
-									  break;
-									  }
-								 else if(ii2->is_rational()==false && subtree_compare(ind, ii2, 1, false, true)==0) {
-									  tr.replace_index(ind, ii1)->fl.parent_rel=ii1->fl.parent_rel;
-									  replaced=true;
-									  break;
-									  }
-								 ++ind;
-								 }
+								exptree::index_iterator nxt=ind;
+								++nxt;
+								if(ii1->is_rational()==false && subtree_compare(ind, ii1, 1, false, true)==0 ) {
+									if(! (replaced && doing2) ) {
+										tr.replace_index(ind, ii2)->fl.parent_rel=ii2->fl.parent_rel; 
+										replaced=true;
+										doing1=true;
+										}
+									// cannot 'break' here because that would miss cases when the 
+									// delta multiplies a sum.
+									}
+								else if(ii2->is_rational()==false && subtree_compare(ind, ii2, 1, false, true)==0) {
+									if(! (replaced && doing1) ) {
+										tr.replace_index(ind, ii1)->fl.parent_rel=ii1->fl.parent_rel;
+										replaced=true;
+										doing2=true;
+										}
+									// no break here either.
+									}
+								ind=nxt;
+								}
 							}
 					  if(!replaced) 
 							++oi;

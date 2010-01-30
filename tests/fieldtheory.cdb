@@ -434,3 +434,13 @@ obj34:= \bar{\Psi^{dA}+\chi^{dA}};
 tst34:= \bar{\Psi^{dA}+\chi^{dA}} - @(obj34);
 @collect_terms!(%);
 @assert(tst34);
+
+# Test 35: @eliminate_kr on sums.
+#
+@reset.
+\delta{#}::KroneckerDelta.
+obj35:= \delta_{m}^{n} ( A_{n p} + B_{n q} F_{q p} ) E^{m s};
+@eliminate_kr!(%);
+tst35:= (A_{m p} + B_{m q} F_{q p} ) E^{m s} - @(obj35);
+@collect_terms!(%);
+@assert(tst35);
