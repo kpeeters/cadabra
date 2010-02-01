@@ -75,3 +75,13 @@ max9:= expand( @(obj9) );
 tst9:= @(max9) - @(obj9);
 @collect_terms!(%);
 @assert(tst9);
+
+# Test 10: non-commuting factors
+#
+@reset.
+{A,B,C,D,E}::NonCommuting.
+obj10:= A B D q E B A q;
+@collect_factors!(%);
+tst10:= A B D q**2 E B A - @(obj10);
+@collect_terms!(%);
+@assert(tst10);

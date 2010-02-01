@@ -1,3 +1,8 @@
+2010-02-01  Kasper Peeters  <kasper.peeters@aei.mpg.de>
+
+	* Fixed cadabra-41: @collect_factors does not take commutativity
+	properties into account.
+
 2010-01-28  Kasper Peeters  <kasper.peeters@aei.mpg.de>
 
 	* Fixed cadabra-7.

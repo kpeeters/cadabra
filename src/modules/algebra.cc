@@ -1875,26 +1875,35 @@ algorithm::result_t collect_factors::apply(iterator& st)
 			// find the other, identical factors
 			while(thisbin2!=factor_hash.end() && thisbin2->first==curr) {
 				if(subtree_exact_equal((*thisbin1).second, (*thisbin2).second)) {
-					assert(*((*thisbin2).second->multiplier)==1);
-					res=l_applied;
-					if(*(tr.parent((*thisbin2).second)->name)=="\\pow") {
-						sibling_iterator powch=tr.parent((*thisbin2).second).begin();
-						++powch;
-						iterator newch=expsum.append_child(expsumit, iterator(powch));
-						newch->fl.bracket=str_node::b_round;
+					// only do something if this factor can be moved to the other one
+					iterator objnode1=(*thisbin1).second;
+					iterator objnode2=(*thisbin2).second;
+					if(*tr.parent(objnode1)->name=="\\pow") objnode1=tr.parent(objnode1);
+					if(*tr.parent(objnode2)->name=="\\pow") objnode2=tr.parent(objnode2);
+					if(exptree_ordering::can_move_adjacent(st, objnode1, objnode2)) {
+						// all clear
+						assert(*((*thisbin2).second->multiplier)==1);
+						res=l_applied;
+						if(*(tr.parent((*thisbin2).second)->name)=="\\pow") {
+							sibling_iterator powch=tr.parent((*thisbin2).second).begin();
+							++powch;
+							iterator newch=expsum.append_child(expsumit, iterator(powch));
+							newch->fl.bracket=str_node::b_round;
+							}
+						else {
+							expsum.append_child(expsumit, str_node("1", str_node::b_round));
+							}
+						factor_hash_iterator_t tmp=thisbin2;
+						++tmp;
+						if(*(tr.parent((*thisbin2).second)->name)=="\\pow")
+							tr.erase(tr.parent((*thisbin2).second));
+						else
+							tr.erase((*thisbin2).second);
+						factor_hash.erase(thisbin2);
+						thisbin2=tmp;
+						expression_modified=true;
 						}
-					else {
-						expsum.append_child(expsumit, str_node("1", str_node::b_round));
-						}
-					factor_hash_iterator_t tmp=thisbin2;
-					++tmp;
-					if(*(tr.parent((*thisbin2).second)->name)=="\\pow")
-						tr.erase(tr.parent((*thisbin2).second));
-					else
-						tr.erase((*thisbin2).second);
-					factor_hash.erase(thisbin2);
-					thisbin2=tmp;
-					expression_modified=true;
+					else ++thisbin2;
 					}
 				else ++thisbin2;
 				}
