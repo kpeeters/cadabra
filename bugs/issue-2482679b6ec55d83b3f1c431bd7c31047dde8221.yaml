@@ -1,0 +1,24 @@
+--- !ditz.rubyforge.org,2008-03-06/issue 
+title: "@collect_factors does not take commutativity properties into account"
+desc: |-
+  The following does not do what is expected:
+  
+  {A,B,C,D,E}::NonCommuting.
+  A B D E B A;
+  @prodsort!(%);
+  @collect_factors!(%);
+type: :bugfix
+component: cadabra
+release: "1.18"
+reporter: Kasper Peeters <kasper.peeters@aei.mpg.de>
+status: :unstarted
+disposition: 
+creation_time: 2010-01-31 19:29:11.881146 Z
+references: []
+
+id: 2482679b6ec55d83b3f1c431bd7c31047dde8221
+log_events: 
+- - 2010-01-31 19:29:12.696847 Z
+  - Kasper Peeters <kasper.peeters@aei.mpg.de>
+  - created
+  - ""

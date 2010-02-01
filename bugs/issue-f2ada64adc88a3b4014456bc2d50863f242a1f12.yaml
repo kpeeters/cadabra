@@ -1,0 +1,32 @@
+--- !ditz.rubyforge.org,2008-03-06/issue 
+title: Conversion of / to \frac misplaces bracket types.
+desc: |-
+  An expression of the form
+  
+    ( 1/\sqrt{2 B b**2} )**2
+  
+  gets translated to 
+  
+    { \frac(1)(\sqrt{2 B b**2}) }**2
+  
+  whereas it should have been
+  
+    ( \frac{1}{\sqrt{2 B b**2}} )**2
+  
+  I.e. the brackets around the '/' should sit on the \frac, not
+  on each of the children of \frac.
+type: :bugfix
+component: cadabra
+release: "1.18"
+reporter: Kasper Peeters <kasper.peeters@aei.mpg.de>
+status: :unstarted
+disposition: 
+creation_time: 2010-01-30 20:41:08.452071 Z
+references: []
+
+id: f2ada64adc88a3b4014456bc2d50863f242a1f12
+log_events: 
+- - 2010-01-30 20:41:09.011596 Z
+  - Kasper Peeters <kasper.peeters@aei.mpg.de>
+  - created
+  - ""
