@@ -210,3 +210,16 @@ obj10:= g_{m p} g^{p m};
 tst10:= 10 - @(obj10);
 @collect_terms!(%);
 @assert(tst10);
+
+# Test 11: Eliminating metrics again
+#
+# @reset.
+# {m, n, p, q, r}::Indices(vector).
+# g_{m n}::Metric.
+# g^{m n}::InverseMetric.
+# obj10:= 3 g_{m p} g^{m p};
+# @eliminate_metric!(%);
+# 
+# 
+# @collect_terms!(%);
+# @assert(tst10);

@@ -80,6 +80,7 @@ void exptree_output::setup_handlers(bool infix)
 				printers_["\\factorial"]    =&create<print_factorial>;
 				printers_["\\sequence"]     =&create<print_sequence>;
 				printers_["\\commutator"]   =&create<print_commutator>;
+				printers_["\\anticommutator"]=&create<print_commutator>;
 				printers_["\\indexbracket"] =&create<print_indexbracket>;
 				printers_["\\pow"]          =&create<print_pow>;
 				printers_["\\sqrt"]         =&create<print_sqrt>;
@@ -753,21 +754,33 @@ void print_commutator::print_infix(std::ostream& str, exptree::iterator it)
 		parent.output_format!=exptree_output::out_texmacs ) 
 		prettyform=false;
 	else prettyform=true;
+	
+	bool anticommutator=true;
+	if(*it->name=="\\commutator") anticommutator=false;
 
 	if(*it->multiplier!=1) 
 		print_multiplier(str, it);
 	sibling_iterator ch=tr.begin(it);
-	if(prettyform)	str << "[";
-	else str << "\\commutator{";
+	if(prettyform)	{
+		if(anticommutator) str << "\\{";
+		else               str << "[";
+		}
+	else {
+		str << *it->name << "{";
+		}
 
 	parent.get_printer(ch)->print_infix(str, ch);
+
 	if(prettyform)	str << ",";
 	else str << "}{";
 
 	++ch;
 	parent.get_printer(ch)->print_infix(str, ch);
 
-	if(prettyform)	str << "]";
+	if(prettyform)	{
+		if(anticommutator) str << "\\}";
+		else               str << "]";
+		}
 	else str << "}";
 	}
 
