@@ -137,6 +137,9 @@ void pop::description() const
 
 bool pop::can_apply(iterator st)
 	{
+	if(! tr.is_valid(st) )
+		return false;
+
 	iterator top=tr.named_parent(st, "\\history");
 	sibling_iterator sit=tr.begin(top);
 	unsigned int num=0;
