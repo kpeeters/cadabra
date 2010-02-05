@@ -122,12 +122,16 @@ class ActionAddCell : public ActionBase {
 	public:
 		ActionAddCell(Glib::RefPtr<DataCell>, Glib::RefPtr<DataCell> ref_, bool before_);
 
+		/// Executing will also show the cell and grab its focus.
 		virtual void execute(XCadabra&);
 		virtual void revert(XCadabra&);
 
 	private:
-		Glib::RefPtr<DataCell> ref; 
+		// Keep track of the location where this cell is inserted into
+		// the notebook. 
+		Glib::RefPtr<DataCell> ref;
 		bool                   before;
+		std::vector<Glib::RefPtr<DataCell> > associated_cells; // output and comment cells
 };
 
 class ActionRemoveCell : public ActionBase {
@@ -195,9 +199,6 @@ class NotebookCanvas : public Gtk::VPaned {
 		VisualCell* add_cell(Glib::RefPtr<DataCell>, Glib::RefPtr<DataCell> ref, bool before=true);
 		
 		void show_cell(Glib::RefPtr<DataCell>);
-
-      /// As add_cell, but keep the cell hidden from view (for use during load)
-//		VisualCell* add_cell_hidden(Glib::RefPtr<DataCell>, Glib::RefPtr<DataCell> ref);
 
 		/// Remove a VisualCell corresponding to the given DataCell.
 		void         remove_cell(Glib::RefPtr<DataCell>);
@@ -316,9 +317,19 @@ class XCadabra : public Gtk::Window {
 		/// The DataCell ownership is handled by the XCadabra class once
 		/// it has been added here. 
 		/// These functions do _not_ grab focus or make the new cell active.
+		/// The add_cell member also does _not_ call show_cell: cells will not
+		/// automatically become visible.
 		Glib::RefPtr<DataCell> add_cell(Glib::RefPtr<DataCell>, Glib::RefPtr<DataCell> ref, bool before=true);
+
+		/// Show the datacell in all canvasses.
 		void         show_cell(Glib::RefPtr<DataCell>);
+
+		/// Add another notebook canvas to the window.
 		void         add_canvas();
+
+		/// Call this to determine which cell will scroll into view as soon as the Gtk main loop
+		/// regains control.
+		void         set_next_into_view(VisualCell *);
 
 		/// Signals from Gtk, such as closing windows or changing the text
 		/// of an input cell.
@@ -327,6 +338,7 @@ class XCadabra : public Gtk::Window {
 		void         on_signal_exception();
 		void         input_cell_modified();
 		void         tex_cell_modified();
+
 
 		/// Display of error messages.
 		void         generic_error_popup(const std::string&) const;
@@ -389,6 +401,9 @@ class XCadabra : public Gtk::Window {
 		/// Storage of document data. This data is not managed by smart
 		/// pointers and should thus be deleted by the XCadabra
 		/// destructor.
+		/// The order in which pointers to datacells appear reflects the
+		/// order in the document. We never use iterators directly in this
+		/// list to refer to a cell (always use the RefPtr<DataCell> pointers).
 		typedef std::list<Glib::RefPtr<DataCell> > DataCells_t;
 		DataCells_t                   datacells;
 
@@ -421,6 +436,13 @@ class XCadabra : public Gtk::Window {
 
 		friend class ActionRemoveCell;
 		friend class ActionAddCell;
+
+		/// When the main loop is idle, this function will get called and will check
+		/// all 'to_scroll_to' cells of the canvasses.
+		bool         on_idle();
+
+		/// Cell to scroll into view as soon as the main loop is idle. 
+		VisualCell  *to_scroll_to;
 };
 
 

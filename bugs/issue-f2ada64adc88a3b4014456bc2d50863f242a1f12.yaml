@@ -15,6 +15,17 @@ desc: |-
   
   I.e. the brackets around the '/' should sit on the \frac, not
   on each of the children of \frac.
+  
+  The actual problem sits in preprocessor.cc, which does
+  
+  [a*b]    ->   \prod[a][b]
+  [a/b]    ->   \frac[a][b]
+  [a/b]**2 ->   \pow{\frac[a][b]}{2}
+  
+  but 
+  
+  [\frac{a}{b}]  -> \frac{a}{b}
+  [\frac{a}{b}]**2 -> \pow[\frac{a}{b}]
 type: :bugfix
 component: cadabra
 release: "1.18"
@@ -29,4 +40,8 @@ log_events:
 - - 2010-01-30 20:41:09.011596 Z
   - Kasper Peeters <kasper.peeters@aei.mpg.de>
   - created
+  - ""
+- - 2010-02-05 00:26:59.500718 Z
+  - Kasper Peeters <kasper.peeters@aei.mpg.de>
+  - edited description
   - ""
