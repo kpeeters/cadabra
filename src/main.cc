@@ -22,7 +22,7 @@
     \author   Kasper Peeters
     \version  development
     \date     latest
-    \see      http://www.aei.mpg.de/~peekas/cadabra/
+    \see      http://cadabra.phi-sci.com/
 
 	 Cadabra: an extendable open-source symbolic tensor algebra system.
 
@@ -214,7 +214,7 @@ int main(int argc, char **argv)
 			txtout << "static, ";
 #endif		 
 			txtout << "built on " << HOSTNAME << " " << DATETIME << ")\\\\" << std::endl;
-			txtout << "Copyright (c) 2001-2009  Kasper Peeters <kasper.peeters@aei.mpg.de>\\\\" << std::endl; 
+			txtout << "Copyright (c) 2001-2010  Kasper Peeters <kasper.peeters@aei.mpg.de>\\\\" << std::endl; 
 			txtout << "Available under the terms of the GNU General Public License.\\\\" << std::endl;
 			}
 		else {
@@ -223,8 +223,8 @@ int main(int argc, char **argv)
 			txtout << "static, ";
 #endif
 			txtout  << "built on " << HOSTNAME << " " << DATETIME << ")" << std::endl
-					  << "Copyright (C) 2001-2009  Kasper Peeters <kasper.peeters@aei.mpg.de>" << std::endl
-					  << "Info at http://www.aei.mpg.de/~peekas/cadabra/" << std::endl
+					  << "Copyright (C) 2001-2010  Kasper Peeters <kasper.peeters@aei.mpg.de>" << std::endl
+					  << "Info at http://cadabra.phi-sci.com/" << std::endl
 					  << "Available under the terms of the GNU General Public License." << std::endl << std::endl;
 			}
 		debugout << "-----" << std::endl
