@@ -337,6 +337,8 @@ void ActionRemoveCell::revert(XCadabra& xc)
 			previous_cell=associated_cells[i];
 			}
 		}
+
+	xc.active_canvas->cell_grab_focus(cell);
 	}
 
 DataCell::DataCell(cell_t ct, const std::string& str, bool texhidden)

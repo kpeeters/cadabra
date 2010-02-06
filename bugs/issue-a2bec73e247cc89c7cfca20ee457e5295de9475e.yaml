@@ -7,8 +7,8 @@ type: :bugfix
 component: cadabra
 release: "1.18"
 reporter: Kasper Peeters <kasper.peeters@aei.mpg.de>
-status: :unstarted
-disposition: 
+status: :closed
+disposition: :fixed
 creation_time: 2009-11-16 08:16:47.368237 Z
 references: []
 
@@ -22,3 +22,10 @@ log_events:
   - Kasper Peeters <kasper.peeters@aei.mpg.de>
   - assigned to release 1.18 from 1.17
   - Not quite debugged yet, a few issues remaining.
+- - 2010-02-05 23:17:55.325477 Z
+  - Kasper Peeters <kasper.peeters@aei.mpg.de>
+  - closed with disposition fixed
+  - |-
+    Also most likely fixes various other redo/undo bugs. Also goes
+    along with removing calls to gtk_update_pending which seems to
+    be problematic in many respects. Might fix the OS X segfaults.

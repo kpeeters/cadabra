@@ -1,0 +1,35 @@
+--- !ditz.rubyforge.org,2008-03-06/issue 
+title: Eliminate metric acts on non-tensors.
+desc: |-
+  Calling eliminate_metric on expressions which are not actually
+  tensors still raises/lowers the indices, e.g.
+  
+  {m,n,o}::Indices.
+  \partial{#}::PartialDerivative.
+  g_{m n}::Metric.
+  g^{m n}::InverseMetric.
+  
+  \partial_{i}{g_{m n}} g^{n o};
+  @eliminate_metric!(%);
+  
+  Fix requires associating a metric wrt. a derivative, e.g.
+  
+  \partial{#}::PartialDerivative(metric=g).
+  \nabla{#}::Derivative(metric=g).
+  
+  etc.
+type: :bugfix
+component: cadabra
+release: 
+reporter: Kasper Peeters <kasper.peeters@aei.mpg.de>
+status: :unstarted
+disposition: 
+creation_time: 2010-02-06 15:33:24.898627 Z
+references: []
+
+id: db53ba8697972d02ee83a31fb26a798f4ef0a7d0
+log_events: 
+- - 2010-02-06 15:33:25.388250 Z
+  - Kasper Peeters <kasper.peeters@aei.mpg.de>
+  - created
+  - ""

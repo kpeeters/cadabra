@@ -430,6 +430,8 @@ bool manipulator::handle_input()
 		   again:
 			while(pos>0 && isblank(oneline[pos]))
 				--pos;
+			if(oneline[pos]==';' && pos>0 && oneline[pos-1]=='\"')
+				--pos; // hack to allow <"filename"; with the semi-colon at the end
 			switch(oneline[pos]) {
 				case '\"':{
 					int quotepos=pos;

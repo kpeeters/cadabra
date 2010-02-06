@@ -194,6 +194,24 @@ tst18b:= X Y + Q - @(obj18b);
 @collect_terms!(%);
 @assert(tst18b); 
 
+@reset.
+{i,j,k,l,m{#}}::Indices.
+subs := a_{i} b?_{j k} -> c_{i} b?_{j k}:
+obj18c:= a_{i} d_{i j};
+@substitute!(%)( @(subs) );
+tst18c:= c_{i} d_{i j} - @(obj18c);
+@collect_terms!(%);
+@assert(tst18c);
+
+{i,j,k,l,m{#}}::Indices.
+subs := a_{i} d_{j k} -> c_{i} d_{j k}:
+obj18c:= a_{i} d_{i j};
+@substitute!(%)( @(subs) );
+tst18c:= c_{i} d_{i j} - @(obj18c);
+@collect_terms!(%);
+@assert(tst18c);
+
+
 
 # Test 19: Regular expressions
 
