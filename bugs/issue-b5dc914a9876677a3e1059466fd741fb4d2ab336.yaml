@@ -7,8 +7,8 @@ type: :bugfix
 component: cadabra
 release: 
 reporter: Kasper Peeters <kasper.peeters@aei.mpg.de>
-status: :unstarted
-disposition: 
+status: :closed
+disposition: :fixed
 creation_time: 2010-02-05 21:08:13.684425 Z
 references: []
 
@@ -18,3 +18,9 @@ log_events:
   - Kasper Peeters <kasper.peeters@aei.mpg.de>
   - created
   - ""
+- - 2010-02-07 21:16:01.735817 Z
+  - Kasper Peeters <kasper.peeters@aei.mpg.de>
+  - closed with disposition fixed
+  - |-
+    Was related to @vary which should now no longer be applied recursively;
+    dropping the exclamation mark did the trick.

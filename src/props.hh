@@ -140,11 +140,19 @@ property_base *create_property()
 class properties {
 	public:
 		// Registering property types.
-		typedef std::map<std::string, property_base* (*)()> registered_property_map_t;
+		class registered_property_map_t {
+			public:
+				~registered_property_map_t();
+
+				typedef std::map<std::string, property_base* (*)()> internal_property_map_t;
+				typedef internal_property_map_t::iterator iterator;
+
+				internal_property_map_t store;
+		};
 
 		static void                          register_property(property_base* (*)());
 		static void                          register_properties();
-		static  registered_property_map_t    registered_properties;
+		static registered_property_map_t     registered_properties;
 
 		// Registering properties.
 		// When inserting a property or list_property, ownership of the

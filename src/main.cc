@@ -24,7 +24,7 @@
     \date     latest
     \see      http://cadabra.phi-sci.com/
 
-	 Cadabra: an extendable open-source symbolic tensor algebra system.
+	 Cadabra: a field-theory motivated approach to computer algebra.
 
     The core of the manipulator is stored in the following files
 

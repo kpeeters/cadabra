@@ -890,8 +890,8 @@ exptree::iterator manipulator::handle_active_nodes_(exptree::iterator original_e
 			return expressions.end();
 			}
 		else if(*it->name=="@properties") {
-			 properties::registered_property_map_t::iterator pit=properties::registered_properties.begin();
-			 while(pit!=properties::registered_properties.end()) {
+			 properties::registered_property_map_t::iterator pit=properties::registered_properties.store.begin();
+			 while(pit!=properties::registered_properties.store.end()) {
 				  if(eo.output_format==exptree_output::out_xcadabra)
 						txtout << "<property>\n";
 				  txtout << "::" << pit->first << std::endl;

@@ -46,6 +46,16 @@ void properties::register_properties()
 	register_property(&create_property<CommutingAsSum>);
 	}
 
+properties::registered_property_map_t::~registered_property_map_t()
+	{
+	properties::clear();
+// 	internal_property_map_t::iterator it=store.begin();
+//	while(it!=store.end()) {
+//		delete (*it).second;
+//		++it;
+//		}
+	}
+
 pattern::pattern()
 	{
 	}
@@ -164,7 +174,7 @@ void properties::clear()
 void properties::register_property(property_base* (*fun)())
 	{
 	property_base *tmp=fun(); // need a property object of this type temporarily to retrieve the name
-	registered_properties[tmp->name()]=fun;
+	registered_properties.store[tmp->name()]=fun;
 	delete tmp; 
 	}
 

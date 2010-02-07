@@ -128,7 +128,7 @@ std::auto_ptr<node_base_printer> exptree_output::get_printer(exptree::iterator i
 	printmap_prop_t::iterator pp=printers_prop_.begin();
 	while(pp!=printers_prop_.end()) {
 		properties::registered_property_map_t::iterator pit=
-			properties::registered_properties.find((*pp).first);
+			properties::registered_properties.store.find((*pp).first);
 
 		const property_base *aprop=pit->second();
 		bool ret=properties::has(aprop, it);
@@ -1024,6 +1024,7 @@ void node_printer::print_children(std::ostream& str, exptree::iterator it, int s
 	while(ch!=tr.end(it)) {
 		current_bracket_   =(*ch).fl.bracket;
 		current_parent_rel_=(*ch).fl.parent_rel;
+		const Accent *is_accent=properties::get<Accent>(it);
 		
 		if(current_bracket_!=str_node::b_none || previous_bracket_!=current_bracket_ || previous_parent_rel_!=current_parent_rel_) {
 			if(parent.output_format==exptree_output::out_plain ||
@@ -1031,9 +1032,12 @@ void node_printer::print_children(std::ostream& str, exptree::iterator it, int s
 				parent.output_format==exptree_output::out_texmacs )
 				print_parent_rel(str, current_parent_rel_, ch==tr.begin(it));
 			if(parent.output_format!=exptree_output::out_reduce) {
-				print_opening_bracket(str, (number_of_nonindex_children>1 /* &&number_of_index_children>0 */ &&
-													 current_parent_rel_!=str_node::p_sub && 
-													 current_parent_rel_!=str_node::p_super ? str_node::b_round:current_bracket_), current_parent_rel_);
+				if(is_accent==0) 
+					print_opening_bracket(str, (number_of_nonindex_children>1 /* &&number_of_index_children>0 */ &&
+														 current_parent_rel_!=str_node::p_sub && 
+														 current_parent_rel_!=str_node::p_super ? str_node::b_round:current_bracket_), 
+												 current_parent_rel_);
+				else str << "{";
 				}
 			else
 				str << zwnbsp << "(" << zwnbsp;
@@ -1055,10 +1059,14 @@ void node_printer::print_children(std::ostream& str, exptree::iterator it, int s
 		++ch;
 		if(ch==tr.end(it) || current_bracket_!=str_node::b_none ||
 			current_bracket_!=(*ch).fl.bracket || current_parent_rel_!=(*ch).fl.parent_rel) {
-			if(parent.output_format!=exptree_output::out_reduce)
-				print_closing_bracket(str,  (number_of_nonindex_children>1 /* &&number_of_index_children>0 */ && 
-													  current_parent_rel_!=str_node::p_sub && 
-													  current_parent_rel_!=str_node::p_super ? str_node::b_round:current_bracket_), current_parent_rel_);
+			if(parent.output_format!=exptree_output::out_reduce) {
+				if(is_accent==0) 
+					print_closing_bracket(str,  (number_of_nonindex_children>1 /* &&number_of_index_children>0 */ && 
+														  current_parent_rel_!=str_node::p_sub && 
+														  current_parent_rel_!=str_node::p_super ? str_node::b_round:current_bracket_), 
+												 current_parent_rel_);
+				else str  << "}";
+				}
 			else
 				str << ")";
 			}
