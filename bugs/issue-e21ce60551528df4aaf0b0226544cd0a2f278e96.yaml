@@ -1,0 +1,23 @@
+--- !ditz.rubyforge.org,2008-03-06/issue 
+title: Superfluous square brackets with [..] action
+desc: |-
+  This produces extra square brackets:
+  
+  @distribute[a*(b+c)];
+  
+  Wrong flag gets copied somewhere.
+type: :bugfix
+component: cadabra
+release: 
+reporter: Kasper Peeters <kasper.peeters@aei.mpg.de>
+status: :unstarted
+disposition: 
+creation_time: 2010-02-08 21:17:01.758698 Z
+references: []
+
+id: e21ce60551528df4aaf0b0226544cd0a2f278e96
+log_events: 
+- - 2010-02-08 21:17:02.089206 Z
+  - Kasper Peeters <kasper.peeters@aei.mpg.de>
+  - created
+  - ""

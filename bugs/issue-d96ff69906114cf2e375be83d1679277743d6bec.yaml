@@ -1,0 +1,23 @@
+--- !ditz.rubyforge.org,2008-03-06/issue 
+title: Repeated divisions are buggy
+desc: |-
+  Constructions of the type 1/a/b are broken,
+  
+  1/2/3;1/2/(3+4);1/2/(x+y);1/x/(x+y);1/x/(3+4);
+  
+  will only parse correctly for the first three.
+type: :bugfix
+component: cadabra
+release: 
+reporter: Kasper Peeters <kasper.peeters@aei.mpg.de>
+status: :unstarted
+disposition: 
+creation_time: 2010-02-08 15:47:47.597689 Z
+references: []
+
+id: d96ff69906114cf2e375be83d1679277743d6bec
+log_events: 
+- - 2010-02-08 15:47:48.127740 Z
+  - Kasper Peeters <kasper.peeters@aei.mpg.de>
+  - created
+  - ""

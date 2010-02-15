@@ -210,6 +210,9 @@ bool TableauSymmetry::parse(exptree& tr, exptree::iterator pat, exptree::iterato
 			  int rowind=0;
 			  unsigned int tabdown=to_long(*si->multiplier);
 			  unsigned int numindices=tr.number_of_indices(pat);
+			  // FIXME: we get the wrong pattern in case of a list! We should have
+			  // been fed each individual item in the list, not the list itself.
+//			  std::cout << numindices << " " << *pat->name << std::endl;
 			  while(ii!=indices.end()) {
 					if(tabdown+1 > numindices) return false;
 					if(si==shape.end()) return false;
