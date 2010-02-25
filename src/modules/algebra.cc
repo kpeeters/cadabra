@@ -3297,7 +3297,7 @@ algorithm::result_t canonicalise::apply(iterator& it)
 							 // between indices which do not have the same parent rel. However, this is
 							 // full of subtleties; better to disable this altogether for indices which
 							 // have fixed position (which is, however, tricky with wildcards like \Gamma{#}).
-//					ri->fl.parent_rel=theind->begin()->fl.parent_rel;
+							 ri->fl.parent_rel=theind->begin()->fl.parent_rel;
 							 theset.erase(theind);
 							 }
 						else {
