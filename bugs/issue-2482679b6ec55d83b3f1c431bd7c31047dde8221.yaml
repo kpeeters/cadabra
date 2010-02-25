@@ -11,8 +11,8 @@ type: :bugfix
 component: cadabra
 release: "1.18"
 reporter: Kasper Peeters <kasper.peeters@aei.mpg.de>
-status: :unstarted
-disposition: 
+status: :closed
+disposition: :fixed
 creation_time: 2010-01-31 19:29:11.881146 Z
 references: []
 
@@ -21,4 +21,8 @@ log_events:
 - - 2010-01-31 19:29:12.696847 Z
   - Kasper Peeters <kasper.peeters@aei.mpg.de>
   - created
+  - ""
+- - 2010-02-05 23:18:30.942177 Z
+  - Kasper Peeters <kasper.peeters@aei.mpg.de>
+  - closed with disposition fixed
   - ""

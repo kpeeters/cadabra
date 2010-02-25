@@ -43,8 +43,8 @@ algorithm::result_t extract_properties::apply(iterator& st)
 		if(it->fl.parent_rel==str_node::p_property) {
 			std::string propname=*it->name;
 			properties::registered_property_map_t::iterator pit=
-				properties::registered_properties.find(*it->name);
-			if(pit==properties::registered_properties.end()) {
+				properties::registered_properties.store.find(*it->name);
+			if(pit==properties::registered_properties.store.end()) {
 				throw consistency_error("Property \"" + *it->name + "\" not registered.");
 //				tr.erase(it);
 				}

@@ -369,9 +369,11 @@ void algorithm::apply(unsigned int lue, bool multiple, bool until_nochange, bool
 //			debugout << "no marks" << std::endl;
 			iterator dummy=tr.end();
 			++number_of_calls;
-			result_t res=apply(dummy);
-			if(is_output_module || res!=l_error)
-				global_success=g_applied;
+			if( can_apply(dummy) ) {
+				result_t res=apply(dummy);
+				if(is_output_module || res!=l_error)
+					global_success=g_applied;
+				}
 			}
 		discard_command_node=true;
 		}

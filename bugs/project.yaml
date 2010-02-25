@@ -87,10 +87,23 @@ releases:
     - Released on PPA and as source only.
 - !ditz.rubyforge.org,2008-03-06/release 
   name: "1.18"
-  status: :unreleased
-  release_time: 
+  status: :released
+  release_time: 2010-02-06 18:10:31.298472 Z
   log_events: 
   - - 2010-01-28 13:41:27.478216 Z
     - Kasper Peeters <kasper.peeters@aei.mpg.de>
     - created
     - to be uploaded to Debian in time for Ubuntu Lucid freeze
+  - - 2010-02-06 18:10:31.298499 Z
+    - Kasper Peeters <kasper.peeters@aei.mpg.de>
+    - released
+    - ""
+- !ditz.rubyforge.org,2008-03-06/release 
+  name: "1.21"
+  status: :unreleased
+  release_time: 
+  log_events: 
+  - - 2010-02-07 21:17:02.868424 Z
+    - Kasper Peeters <kasper.peeters@aei.mpg.de>
+    - created
+    - ""

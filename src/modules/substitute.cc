@@ -1,7 +1,7 @@
 /* 
 
 	Cadabra: a field-theory motivated computer algebra system.
-	Copyright (C) 2001-2009  Kasper Peeters <kasper.peeters@aei.mpg.de>
+	Copyright (C) 2001-2010  Kasper Peeters <kasper.peeters@aei.mpg.de>
 
    This program is free software: you can redistribute it and/or
    modify it under the terms of the GNU General Public License as
@@ -209,6 +209,7 @@ algorithm::result_t substitute::apply(iterator& st)
 	std::vector<iterator> subtree_insertion_points;
 	while(it!=repl.end()) { 
 		bool is_stripped=false;
+//		tr.print_recursive_treeform(std::cerr, repl.begin());
 
 //		For some reason 'a?' is not found!?! Well, that's presumably because _{a?} does not
 //      match ^{a?}. (though this does match when we write 'i' instead of a?. 
@@ -222,8 +223,9 @@ algorithm::result_t substitute::apply(iterator& st)
 			 }
 
 		if(loc!=comparator.replacement_map.end()) { // name wildcards
-//			std::cerr << "rule : " << *((*loc).first.begin()->name) << " -> " << std::endl;
-//			std::cerr << "going to replace " << *it->name << " with " << *((*loc).second.begin()->name) << std::endl;
+//		std::cerr << "rule : " << *((*loc).first.begin()->name) << " -> " 
+//					 << *((*loc).second.begin()->name) << std::endl;
+//		std::cerr << "going to replace " << *it->name << " with " << *((*loc).second.begin()->name) << std::endl;
 
 			// When a replacement is made here, and the index is actually
 			// a dummy in the replacement, we screw up the ind_dummy
@@ -236,8 +238,13 @@ algorithm::result_t substitute::apply(iterator& st)
 			ind_dummy.erase(exptree(it));
 
 			str_node::bracket_t remember_br=it->fl.bracket;
-			if(is_stripped)
-				 it->name=(*loc).second.begin()->name;
+			if(is_stripped || (it->is_name_wildcard() && !it->is_index()) ) { 
+            // a?_{i j k} type patterns should only replace the head
+				// TODO: should we replace brackets here too?
+				it->name=(*loc).second.begin()->name;
+				it->multiplier=(*loc).second.begin()->multiplier;
+				it->fl=(*loc).second.begin()->fl;
+				}
 			else
 				 it=tr.replace_index(it, (*loc).second.begin());
 			it->fl.bracket=remember_br;
@@ -264,6 +271,7 @@ algorithm::result_t substitute::apply(iterator& st)
 			}
 		else ++it;
 		}
+//	tr.print_recursive_treeform(std::cerr, repl.begin());
 
 	// If the replacement contains dummies, avoid clashes introduced when
 	// free indices in the replacement (induced from the original expression)

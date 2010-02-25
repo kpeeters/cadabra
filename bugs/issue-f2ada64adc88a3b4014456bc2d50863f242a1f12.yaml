@@ -15,9 +15,25 @@ desc: |-
   
   I.e. the brackets around the '/' should sit on the \frac, not
   on each of the children of \frac.
+  
+  The actual problem sits in preprocessor.cc, which does
+  
+  [a*b]    ->   \prod[a][b]
+  [a/b]    ->   \frac[a][b]
+  [a/b]**2 ->   \pow{\frac[a][b]}{2}
+  
+  but 
+  
+  [\frac{a}{b}]  -> \frac{a}{b}
+  [\frac{a}{b}]**2 -> \pow[\frac{a}{b}]
+  
+  So the 'bug' is working the other way around: if you enter
+  things in [\frac{a}{b}] notation, you should expect it to 
+  be different from [a/b]. Not sure whether this should be
+  'fixed'; postponing for the time being.
 type: :bugfix
 component: cadabra
-release: "1.18"
+release: 
 reporter: Kasper Peeters <kasper.peeters@aei.mpg.de>
 status: :unstarted
 disposition: 
@@ -29,4 +45,16 @@ log_events:
 - - 2010-01-30 20:41:09.011596 Z
   - Kasper Peeters <kasper.peeters@aei.mpg.de>
   - created
+  - ""
+- - 2010-02-05 00:26:59.500718 Z
+  - Kasper Peeters <kasper.peeters@aei.mpg.de>
+  - edited description
+  - ""
+- - 2010-02-06 18:10:20.472757 Z
+  - Kasper Peeters <kasper.peeters@aei.mpg.de>
+  - unassigned from release 1.18
+  - ""
+- - 2010-02-06 18:12:03.561252 Z
+  - Kasper Peeters <kasper.peeters@aei.mpg.de>
+  - edited description
   - ""

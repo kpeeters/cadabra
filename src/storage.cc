@@ -1850,8 +1850,8 @@ bool exptree_comparator::satisfies_conditions(exptree::iterator conditions, std:
 			exptree::sibling_iterator rhs=lhs;
 			++rhs;
 			properties::registered_property_map_t::iterator pit=
-				properties::registered_properties.find(*rhs->name);
-			if(pit==properties::registered_properties.end()) {
+				properties::registered_properties.store.find(*rhs->name);
+			if(pit==properties::registered_properties.store.end()) {
 				std::ostringstream str;
 				str << "Property \"" << *rhs->name << "\" not registered." << std::endl;
 				error=str.str();

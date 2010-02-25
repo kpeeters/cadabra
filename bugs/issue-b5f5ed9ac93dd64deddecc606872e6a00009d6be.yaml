@@ -1,0 +1,21 @@
+--- !ditz.rubyforge.org,2008-03-06/issue 
+title: Kernel hang
+desc: |-
+  A kernel hang has been reported by Kevin Horton, involving loading
+  a notebook while another one is still in memory. Reproducible on
+  Linux, reported 7-Feb-2010.
+type: :bugfix
+component: cadabra
+release: 
+reporter: Kasper Peeters <kasper.peeters@aei.mpg.de>
+status: :unstarted
+disposition: 
+creation_time: 2010-02-07 21:49:16.741366 Z
+references: []
+
+id: b5f5ed9ac93dd64deddecc606872e6a00009d6be
+log_events: 
+- - 2010-02-07 21:49:17.343213 Z
+  - Kasper Peeters <kasper.peeters@aei.mpg.de>
+  - created
+  - ""

@@ -211,6 +211,18 @@ ActionAddCell::ActionAddCell(Glib::RefPtr<DataCell> toadd, Glib::RefPtr<DataCell
 void ActionAddCell::execute(XCadabra& xc)
 	{
 	xc.add_cell(cell, ref, before);
+	xc.show_cell(cell);
+	xc.active_canvas->cell_grab_focus(cell);
+
+	// Then insert the associated cells, if there are any
+	if(associated_cells.size()>0) {
+		Glib::RefPtr<DataCell> previous_cell=cell;
+		for(size_t i=0; i<associated_cells.size(); ++i) {
+			xc.add_cell(associated_cells[i], previous_cell, false); 
+			xc.show_cell(associated_cells[i]);
+			previous_cell=associated_cells[i];
+			}
+		}
 	}
 
 void ActionAddCell::revert(XCadabra& xc)
@@ -223,10 +235,14 @@ void ActionAddCell::revert(XCadabra& xc)
 	--prevcell;
 
 	// Reverting a cell add operation should also remove all cells which got
-	// generated from it. We don't keep their info though (contrast this with remove cell).
+	// generated from it. We store a list of these associated cells, in case we
+	// get re-done again.
+	associated_cells.clear();
 	while(fnd!=xc.datacells.end()) {
 		for(unsigned int i=0; i<xc.canvasses.size(); ++i)  
 			xc.canvasses[i]->remove_cell(*fnd);
+		if(*fnd != cell)
+			associated_cells.push_back(*fnd);
 		fnd=xc.datacells.erase(fnd);
 		if(fnd==xc.datacells.end() || (*fnd)->cell_type==DataCell::c_input || (*fnd)->cell_type==DataCell::c_tex)
 			 break;
@@ -235,8 +251,7 @@ void ActionAddCell::revert(XCadabra& xc)
 	// We have to put the cursor in the previous input cell or in the previous open TeX cell.
 	// So walk up the cells until we meet this condition.
 	while((*prevcell)->cell_type!=DataCell::c_input 
-			&& !( ( (*prevcell)->cell_type==DataCell::c_comment || (*prevcell)->cell_type==DataCell::c_texcomment ) 
-					&& (*prevcell)->tex_hidden==false) )
+			&& !( (*prevcell)->cell_type==DataCell::c_tex && (*prevcell)->tex_hidden==false) )
 		--prevcell;
 	
 	xc.active_canvas->cell_grab_focus(*prevcell);
@@ -282,8 +297,7 @@ void ActionRemoveCell::execute(XCadabra& xc)
 		// So walk down the cells until we meet this condition (or end).
 		while(fnd!=xc.datacells.end() 
 				&& (*fnd)->cell_type!=DataCell::c_input 
-				&& !( ( (*fnd)->cell_type==DataCell::c_comment || (*fnd)->cell_type==DataCell::c_texcomment) 
-						&& (*fnd)->tex_hidden==false) )
+				&& !( (*fnd)->cell_type==DataCell::c_tex && (*fnd)->tex_hidden==false) )
 			 ++fnd;
 
 		if(fnd!=xc.datacells.end())
@@ -297,11 +311,9 @@ void ActionRemoveCell::execute(XCadabra& xc)
 		--fnd;
 		while(fnd!=xc.datacells.begin() 
 				&& (*fnd)->cell_type!=DataCell::c_input 
-				&& !( ( (*fnd)->cell_type==DataCell::c_comment || (*fnd)->cell_type==DataCell::c_texcomment) 
-						&& (*fnd)->tex_hidden==false) ) {
+				&& !( (*fnd)->cell_type==DataCell::c_tex && (*fnd)->tex_hidden==false) ) {
 			--fnd;
 			}
-		
 		xc.active_canvas->cell_grab_focus(*fnd);
 		}
 	}
@@ -312,13 +324,21 @@ void ActionRemoveCell::revert(XCadabra& xc)
 	XCadabra::DataCells_t::iterator fnd=std::find(xc.datacells.begin(), xc.datacells.end(), prev_cell);
 	assert(fnd!=xc.datacells.end());
 
-	// Re-insert all these cells back into the tree.
+	// Re-insert the input cell back into the tree.
 	xc.add_cell(cell, (*fnd), false);
-//	std::cerr << associated_cells.size() << " cells to add" << std::endl;
-	for(size_t i=0; i<associated_cells.size(); ++i)
-		xc.add_cell(associated_cells[i], (*fnd), false);
+	xc.show_cell(cell);
 
-//	WHY DO THESE CELLS NOT SHOW UP?
+	// Then insert the associated cells.
+	if(associated_cells.size()>0) {
+		Glib::RefPtr<DataCell> previous_cell=cell;
+		for(size_t i=0; i<associated_cells.size(); ++i) {
+			xc.add_cell(associated_cells[i], previous_cell, false); 
+			xc.show_cell(associated_cells[i]);
+			previous_cell=associated_cells[i];
+			}
+		}
+
+	xc.active_canvas->cell_grab_focus(cell);
 	}
 
 DataCell::DataCell(cell_t ct, const std::string& str, bool texhidden)
@@ -473,8 +493,8 @@ VisualCell *NotebookCanvas::add_cell(Glib::RefPtr<DataCell> dc, Glib::RefPtr<Dat
 			gtk_box_set_child_packing(((Gtk::Box *)(&scrollbox))->gobj(), 
 											  ((Gtk::Widget *)(newcell->inbox))->gobj(),
 											  false, false, 10, GTK_PACK_START);
-			while (gtk_events_pending ())
-				gtk_main_iteration ();
+//			while (gtk_events_pending ())
+//				gtk_main_iteration ();
 
 			// Connect to signal for 'ctrl-enter pressed', i.e. 'feed this cell to the kernel'.
 			newcell->inbox->edit.emitter.connect(
@@ -489,7 +509,7 @@ VisualCell *NotebookCanvas::add_cell(Glib::RefPtr<DataCell> dc, Glib::RefPtr<Dat
 			newcell->inbox->edit.content_changed.connect(
 				 sigc::bind<VisualCell *>(
 					 sigc::mem_fun(this, &NotebookCanvas::scroll_into_view_callback), newcell));
-	
+
 			break;
 			}
 		case DataCell::c_error:
@@ -672,13 +692,13 @@ bool NotebookCanvas::scroll_into_view(VisualCell *vc, bool center)
 		 va->set_value(aim);
 		 }
 	else {
-		 if(al.get_y() + rect.get_y() < upper_visible) 
-			  va->set_value(std::max(0.0, (double)(al.get_y() + rect.get_y() - LINE_SPACING)));
-		 else {
-			  if(al.get_y() + rect.get_y() + rect.get_height() > lower_visible) 
-					va->set_value(al.get_y() + rect.get_y() + rect.get_height() - va->get_page_size());
-			  }
-		 }
+		if(al.get_y() + rect.get_y() < upper_visible) // cell is above top of view
+			va->set_value(std::max(0.0, (double)(al.get_y() + rect.get_y() - LINE_SPACING)));
+		else {
+			if(al.get_y() + rect.get_y() + rect.get_height() > lower_visible) // cell is below bottom of view
+				va->set_value(al.get_y() + rect.get_y() + rect.get_height() - va->get_page_size() + 20);
+			}
+		}
 
 	return false;
 	}
@@ -749,7 +769,7 @@ XCadabra::XCadabra(modglue::ext_process& cdbproc, const std::string& filename, m
 	  b_kernelversion("Kernel version: not running"),
 	  b_help(Gtk::Stock::HELP), b_stop(Gtk::Stock::STOP), b_undo(Gtk::Stock::UNDO), b_redo(Gtk::Stock::REDO),
 	  last_configure_width(0),
-     cdb(cdbproc), selected(0)
+     cdb(cdbproc), selected(0), to_scroll_to(0)
 	{
 	std::string res=load_config();
 	if(res.size()>0) 
@@ -1031,7 +1051,8 @@ bool XCadabra::on_key_press_event(GdkEventKey* event)
 			return true; // if we don't return immediately, selections will go away
 		case 108:
 			if( (event->state&Gdk::CONTROL_MASK) ) { // Ctrl-L: center display
-				active_canvas->scroll_into_view(active_cell, true);
+				set_next_into_view(active_cell);
+//				active_canvas->scroll_into_view(active_cell, true);
 				return true; // if we don't return immediately, selections will go away
 				}
 			break;
@@ -1058,7 +1079,8 @@ bool XCadabra::on_key_press_event(GdkEventKey* event)
 	// etc. After that we update the notebook position if required.
 	bool retval=Window::on_key_press_event(event);
 	if(active_cell && event->keyval < 65000) // FIXME: how to find dead keys?
-		 active_canvas->scroll_into_view(active_cell);
+		set_next_into_view(active_cell);
+		//active_canvas->scroll_into_view(active_cell);
 	
 	return retval;
 	}
@@ -1683,10 +1705,11 @@ void XCadabra::handle_on_grab_focus(NotebookCanvas *can, VisualCell *vis)
 	if(running && vis) {
 		if(running_last==active_cell->datacell) {
 			kernel_idle();
-			while (gtk_events_pending ())
-				gtk_main_iteration ();
+//			while (gtk_events_pending ())
+//				gtk_main_iteration ();
 			// make sure this last cell is in view
-			active_canvas->scroll_into_view(active_cell);
+//			active_canvas->scroll_into_view(active_cell);
+			set_next_into_view(active_cell);
 			}
 		else {
 			Glib::RefPtr<Gtk::TextBuffer> textbuf=active_cell->datacell->textbuf;
@@ -1696,10 +1719,11 @@ void XCadabra::handle_on_grab_focus(NotebookCanvas *can, VisualCell *vis)
 				std::cerr << "cell does not end with delimiter" << std::endl;
 #endif
 				kernel_idle();
-				while (gtk_events_pending ())
-					 gtk_main_iteration ();
+//				while (gtk_events_pending ())
+//					 gtk_main_iteration ();
 				// running stops, so we scroll this cell into view
-				active_canvas->scroll_into_view(active_cell);
+//				active_canvas->scroll_into_view(active_cell);
+				set_next_into_view(active_cell);
 				}
 			else {
 #ifdef DEBUG
@@ -2200,9 +2224,10 @@ bool XCadabra::receive(modglue::ipipe& p)
 // FIXME: FOCUS
 //								  active_canvas->cell_grab_focus(datacells.back());
 								  }
-							 while (gtk_events_pending ())
-								  gtk_main_iteration ();
-							 active_canvas->scroll_into_view(active_cell);
+//							 while (gtk_events_pending ())
+//								  gtk_main_iteration ();
+//							 active_canvas->scroll_into_view(active_cell);
+							 set_next_into_view(active_cell);
 							 }
 						else { // this last cell is not an input cell; add a new input cell
 							Glib::RefPtr<DataCell> newcell(new DataCell(DataCell::c_input, ""));
@@ -2216,9 +2241,10 @@ bool XCadabra::receive(modglue::ipipe& p)
 							restarting_kernel=false;
 							active_canvas->cell_grab_focus(active_cell);
 							}
-						while (gtk_events_pending ())
-							gtk_main_iteration ();
-						active_canvas->scroll_into_view(active_cell);
+//						while (gtk_events_pending ())
+//							gtk_main_iteration ();
+//						active_canvas->scroll_into_view(active_cell);
+						set_next_into_view(active_cell);
 						// re-enable original cell (mark it non-running)
 						if(origcell) {
 							origcell->running=false;
@@ -2267,9 +2293,10 @@ bool XCadabra::receive(modglue::ipipe& p)
 								++it;
 								}
 							if(!running) { // put cell in view
-								 while (gtk_events_pending ())
-									  gtk_main_iteration ();
-								 active_canvas->scroll_into_view(active_cell);
+//								 while (gtk_events_pending ())
+//									  gtk_main_iteration ();
+//								 active_canvas->scroll_into_view(active_cell);
+								set_next_into_view(active_cell);
 								 }
 							}
 						}
@@ -2338,8 +2365,8 @@ bool XCadabra::receive(modglue::ipipe& p)
 			Glib::RefPtr<DataCell> newcell(new DataCell(DataCell::c_input));
 			add_cell(newcell, Glib::RefPtr<DataCell>());
 			show_cell(newcell);
-			while (gtk_events_pending ())
-				gtk_main_iteration ();
+//			while (gtk_events_pending ())
+//				gtk_main_iteration ();
 
 			active_canvas->select_first_input_cell();
 			}
@@ -2889,8 +2916,8 @@ std::string XCadabra::load(const std::string& fn, bool ignore_nonexistence)
 		generic_error_popup(std::string(ex.what()));
 		}
 	show_all();
-	while (gtk_events_pending ())
-		gtk_main_iteration ();
+//	while (gtk_events_pending ())
+//		gtk_main_iteration ();
 	
 //	active_canvas->select_first_input_cell();
 
@@ -2956,10 +2983,11 @@ void XCadabra::on_edit_insert_tex_above()
 	Glib::RefPtr<DataCell> newcell(new DataCell(DataCell::c_tex, "[empty TeX cell]"));
 	action_add(Glib::RefPtr<ActionBase>(new ActionAddCell(newcell, active_cell->datacell, true)));
 	show_cell(newcell);
-	while (gtk_events_pending ())
-		 gtk_main_iteration ();
+//	while (gtk_events_pending ())
+//		 gtk_main_iteration ();
 	active_canvas->cell_grab_focus(newcell);
-	active_canvas->scroll_into_view(newcell);
+	set_next_into_view(active_cell);
+//	active_canvas->scroll_into_view(newcell);
 	}
 
 void XCadabra::on_edit_insert_tex_below()
@@ -2967,10 +2995,11 @@ void XCadabra::on_edit_insert_tex_below()
 	Glib::RefPtr<DataCell> newcell(new DataCell(DataCell::c_tex, "[empty TeX cell]"));
 	action_add(Glib::RefPtr<ActionBase>(new ActionAddCell(newcell, active_cell->datacell, false)));
 	show_cell(newcell);
-	while (gtk_events_pending ())
-		 gtk_main_iteration ();
+//	while (gtk_events_pending ())
+//		 gtk_main_iteration ();
 	active_canvas->cell_grab_focus(newcell);
-	active_canvas->scroll_into_view(newcell);
+	set_next_into_view(active_cell);
+//	active_canvas->scroll_into_view(newcell);
 	}
 
 void XCadabra::on_edit_insert_input_above()
@@ -2978,10 +3007,11 @@ void XCadabra::on_edit_insert_input_above()
 	Glib::RefPtr<DataCell> newcell(new DataCell(DataCell::c_input, ""));
 	action_add(Glib::RefPtr<ActionBase>(new ActionAddCell(newcell, active_cell->datacell, true)));
 	show_cell(newcell);
-	while (gtk_events_pending ())
-		 gtk_main_iteration ();
+//	while (gtk_events_pending ())
+//		 gtk_main_iteration ();
 	active_canvas->cell_grab_focus(newcell);
-	active_canvas->scroll_into_view(newcell);
+	set_next_into_view(active_cell);
+//	active_canvas->scroll_into_view(newcell);
 	}
 
 void XCadabra::on_edit_insert_input_below()
@@ -2989,10 +3019,11 @@ void XCadabra::on_edit_insert_input_below()
 	Glib::RefPtr<DataCell> newcell(new DataCell(DataCell::c_input, ""));
 	action_add(Glib::RefPtr<ActionBase>(new ActionAddCell(newcell, active_cell->datacell, false)));
 	show_cell(newcell);
-	while (gtk_events_pending ())
-		 gtk_main_iteration ();
+//	while (gtk_events_pending ())
+//		 gtk_main_iteration ();
 	active_canvas->cell_grab_focus(newcell);
-	active_canvas->scroll_into_view(newcell);
+	set_next_into_view(active_cell);
+//	active_canvas->scroll_into_view(newcell);
 	}
 
 void XCadabra::on_edit_insert_section_above()
@@ -3123,6 +3154,24 @@ void XCadabra::on_clipboard_get(Gtk::SelectionData& selection_data, guint info)
 
 void XCadabra::on_clipboard_clear()
 	{
+	}
+
+void XCadabra::set_next_into_view(VisualCell *vc)
+	{
+	to_scroll_to=vc;
+	// Activate the on_idle handler so that we can handle this request.
+	Glib::signal_idle().connect( sigc::mem_fun(*this, &XCadabra::on_idle) );
+	}
+
+bool XCadabra::on_idle()
+	{
+	if(active_canvas!=0) {
+		if(to_scroll_to!=0) {
+			active_canvas->scroll_into_view(to_scroll_to, false);
+			to_scroll_to=0;
+			}
+		}
+	return false;
 	}
 
 std::string XCadabra::save_config() const
