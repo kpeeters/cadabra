@@ -72,3 +72,6 @@ tst:= - 1/4 * \partial_{m}{\phi} * \partial_{n}{\phi} * \phi**(-1) + 1/4 * \part
 @collect_terms!(%);
 @assert(tst);
 
+# 1/2 * \partial_{n}{\phi} * \partial^{p}{\phi} * \phi**(-2) * g_{m}^{q} * h_{p q}
+# versus
+# 

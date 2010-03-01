@@ -17,6 +17,9 @@ tst3:= a_{m m};
 @canonicalise!(%);
 @assert(tst3);
 
+@reset.
+a_{#}::AntiSymmetric.
+s_{#}::Symmetric.
 obj4:= s_{m n m n};
 @canonicalise!(%);
 tst4:= s_{m m n n}-@(obj4);
@@ -450,3 +453,26 @@ Y_{i j}::AntiSymmetric.
 obj40:= X_{i} = Y_{j i} Z_{j};
 @canonicalise!(%);
 
+# Test 41: upper/lower indices.
+#
+@reset.
+{m,n}::Indices.
+obj41:= R^{m}_{m} - R_{m}^{m};
+@canonicalise!(%);
+tst41:= 
+
+# Test 42: like in xAct
+#
+@reset.
+K^{a}_{a};
+@canonicalise!(%);
+
+K_{a}^{a};
+@canonicalise!(%);
+
+@reset.
+K_{a}^{a}_{b}^{b};
+@canonicalise!(%);
+
+K^{a}_{a}_{b}^{b};
+@canonicalise!(%);

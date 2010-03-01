@@ -20,7 +20,7 @@
 
 #define NEW_XPERM 
 #define XPERM_USE_EXT 
-//#define XPERM_DEBUG
+#define XPERM_DEBUG
 
 #include "algebra.hh"
 #include "display.hh"
@@ -2954,16 +2954,51 @@ algorithm::result_t canonicalise::apply(iterator& it)
 	perm[total_number_of_indices]=total_number_of_indices+1;
 	perm[total_number_of_indices+1]=total_number_of_indices+2;
 //			txtout << "dummy:" << std::endl;
-	sorted_it=ind_dummy.begin();
 	curr_index=0;
+
+	sorted_it=ind_dummy.begin();
 	while(sorted_it!=ind_dummy.end()) {
+		// We insert the dummy indices in pairs (canonicalise only acts on
+		// expressions which have dummies coming in doublets, not the more
+		// general cadabra dummy concept).
+		// The lower index come first, and then the upper index. 
+
 		index_position_map_t::iterator ii=ind_pos_dummy.find(sorted_it->second);
-//				txtout << *(ii->first->name) << " at pos " << ii->second+1 << std::endl;
-		num_to_it_map[ii->second+1]=ii->first;
-		dummies[curr_index++]=ii->second+1;
-		perm[curr_pos++]=ii->second+1;
+		index_map_t::iterator next_it=sorted_it;
+		++next_it;
+		index_position_map_t::iterator i2=ind_pos_dummy.find(next_it->second);
+
+#ifdef XPERM_DEBUG
+		txtout << *(ii->first->name) << " at pos " << ii->second+1 << std::endl;
+#endif
 		
-		// Setup index information FIXME: remove once xperm.c is fixed.
+		switch(ii->first->fl.parent_rel) {
+			case str_node::p_super:
+			case str_node::p_none:
+				perm[curr_pos++]=ii->second+1;
+				perm[curr_pos++]=i2->second+1;
+				num_to_it_map[ii->second+1]=ii->first;
+				num_to_it_map[i2->second+1]=i2->first;
+				break;
+			case str_node::p_sub:
+				perm[curr_pos++]=i2->second+1;
+				perm[curr_pos++]=ii->second+1;
+				num_to_it_map[ii->second+1]=i2->first;
+				num_to_it_map[i2->second+1]=ii->first;
+				break;
+			}
+		dummies[curr_index++]=ii->second+1;
+		dummies[curr_index++]=i2->second+1;
+		
+		// Can increment by two now, since we treat all dummies in pairs.
+		++sorted_it;
+		++sorted_it;
+		}
+		
+	// Setup index information FIXME: remove once xperm.c is fixed.
+	sorted_it=ind_dummy.begin();
+	while(sorted_it!=ind_dummy.end()) {	
+		index_position_map_t::iterator ii=ind_pos_dummy.find(sorted_it->second);
 		const Indices *ind=properties::get<Indices>(ii->first);
 //		const Coordinate *coo=properties::get<Coordinate>(ii->first);
 		if(!ind /* && !coo */) { 
@@ -3005,8 +3040,9 @@ algorithm::result_t canonicalise::apply(iterator& it)
 			const TableauBase *tba=properties::get_composite<TableauBase>(facit);
 			if(tba) {
 				unsigned int number_of_indices=tr.number_of_indices(facit);
-//					txtout << "loop over tabs for " << *facit->name << " " << number_of_indices << std::endl;
-				// add indices (except the last one) to the base
+
+				// Add indices to the base. We used to add everything except the last one, but that
+				// seems to be the wrong thing to do after the XPERM -> XPERM_EXT upgrade (see Jose's email).
 				for(unsigned int kk=0; kk<number_of_indices; ++kk) 
 					base_here.push_back(curr_pos+kk+1);
 				
@@ -3093,19 +3129,26 @@ algorithm::result_t canonicalise::apply(iterator& it)
 		}
 	// End of construction of generating set.
 
-	if(generating_set.size()>0 && *it->multiplier!=0) {
-		// Fill data for the xperm routines.
-		int *gs=new int[generating_set.size()*generating_set[0].size()];
-		for(unsigned int i=0; i<generating_set.size(); ++i) {
-			for(unsigned int j=0; j<total_number_of_indices+2; ++j) {
-				gs[i*(total_number_of_indices+2)+j]=generating_set[i][j];
 #ifdef XPERM_DEBUG
-				txtout << gs[i*(total_number_of_indices+2)+j] << " ";
-#endif				
-				}
-#ifdef XPERM_DEBUG
-			txtout << std::endl;
+	txtout << generating_set.size() << " " << *it->multiplier << std::endl;
 #endif
+	if(/* generating_set.size()>0  &&*/  *it->multiplier!=0) {
+		// Fill data for the xperm routines.
+		int *gs=0;
+
+		if(generating_set.size()>0) {
+			gs=new int[generating_set.size()*generating_set[0].size()];
+			for(unsigned int i=0; i<generating_set.size(); ++i) {
+				for(unsigned int j=0; j<total_number_of_indices+2; ++j) {
+					gs[i*(total_number_of_indices+2)+j]=generating_set[i][j];
+#ifdef XPERM_DEBUG
+					txtout << gs[i*(total_number_of_indices+2)+j] << " ";
+#endif				
+					}
+#ifdef XPERM_DEBUG
+				txtout << std::endl;
+#endif
+				}
 			}
 		
 		// Fill the dummysetlabels array with information about dummy sets.
@@ -3175,7 +3218,8 @@ algorithm::result_t canonicalise::apply(iterator& it)
 		metric_signatures[0]=1;
 		lengths_of_repeated_sets[0]=0;
 
-		// JMM now uses a different convention
+		// JMM now uses a different convention. The 'perm' array gives us a list of 
+		// integers where the n-th integer..
 		int *perm1 = new int[total_number_of_indices+2];
 		int *perm2 = new int[total_number_of_indices+2];
 		int *free_indices_new_order = new int[ind_free.size()];
@@ -3188,6 +3232,13 @@ algorithm::result_t canonicalise::apply(iterator& it)
 		for(size_t i=0; i<ind_dummy.size(); i++) {
 			dummies_new_order[i] = onpoints(dummies[i], perm1, total_number_of_indices+2);
 			}
+#ifdef XPERM_DEBUG
+		txtout << "perm1: ";
+		for(unsigned int i=0; i<total_number_of_indices; ++i) {
+			txtout << perm1[i] << " ";
+			}
+		txtout << std::endl;
+#endif
 
 		canonical_perm_ext(perm1,                       // permutation to be canonicalised
 								 total_number_of_indices+2,  // degree (+2 for the overall sign)
@@ -3277,7 +3328,7 @@ algorithm::result_t canonicalise::apply(iterator& it)
 						// set (as indicated in dummysetlabels.
 						
 						// Meanwhile, a hack:
-						if(index_sets.size()>0 && !using_free) {
+						if(false && index_sets.size()>0 && !using_free) {
 							 // We are going to put an index into position "cperm[i]-1". We need to figure
 							 // out its type, because we have to take a dummy from the right set. We can do this
 							 // by looking at the type of the index which sat in this position. However, that
@@ -3285,8 +3336,6 @@ algorithm::result_t canonicalise::apply(iterator& it)
 							 // somewhere above, but it only works when there is one index type...
 							 
 							 std::string required_type=indexpos_to_indextype[cperm[i]-1];
-//					if(required_type==" undeclared")
-//						txtout << "indexpos " << cperm[i]-1 << std::endl;
 							 assert(required_type!=" undeclared");
 							 assert(index_sets.find(required_type)!=index_sets.end());
 							 std::multiset<exptree, tree_exact_less_mod_prel_obj>& theset=index_sets[required_type];
@@ -3301,6 +3350,14 @@ algorithm::result_t canonicalise::apply(iterator& it)
 							 theset.erase(theind);
 							 }
 						else {
+                      // In the new final permutation
+                      // 
+                      // 1 5 6 8 7 2 3 4 10 9
+                      //  
+                      // we place first the first index (m), which goes to the first slot. Then
+                      // we put n, which can only go the fifth slot. Then we put p, which can go
+                      // to 6,7,8, so that it goes to 6. Then we put r (not q), which can go to 7
+                      // and 8, and so we put it at 7, etc.
 							 iterator ri = tr.replace_index(num_to_it_map[cperm[i]], freeit->first.begin());
 							 ri->fl.parent_rel=freeit->first.begin()->fl.parent_rel;
 							 }
@@ -3313,7 +3370,8 @@ algorithm::result_t canonicalise::apply(iterator& it)
 			expression_modified=true;
 			}
 		
-		delete [] gs;
+		if(gs) 
+			delete [] gs;
 		delete [] base;
 		}
 //	else txtout << "no generating set" << std::endl;

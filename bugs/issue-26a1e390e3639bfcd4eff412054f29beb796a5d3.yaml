@@ -1,0 +1,24 @@
+--- !ditz.rubyforge.org,2008-03-06/issue 
+title: "@sym/@asym duplicate symbols in tree symmetrisation"
+desc: |-
+  The example
+  
+  A_{a b} B_{c};
+  @sym!(%){A_{a b}, B_{c}};
+  
+  leads to a spurious 'B' appearing in the second term.
+type: :bugfix
+component: cadabra
+release: 
+reporter: Kasper Peeters <kasper.peeters@aei.mpg.de>
+status: :unstarted
+disposition: 
+creation_time: 2010-02-27 09:26:56.223896 Z
+references: []
+
+id: 26a1e390e3639bfcd4eff412054f29beb796a5d3
+log_events: 
+- - 2010-02-27 09:26:57.519750 Z
+  - Kasper Peeters <kasper.peeters@aei.mpg.de>
+  - created
+  - ""
