@@ -476,3 +476,14 @@ K_{a}^{a}_{b}^{b};
 
 K^{a}_{a}_{b}^{b};
 @canonicalise!(%);
+
+# Test 42: more upper/lower indices
+#
+@reset.
+{n,r}::Indices.
+\delta{#}::KroneckerDelta.
+\partial{#}::PartialDerivative.
+obj42:= \delta_{n}^{r} \partial_{r}{ u^{n} };
+@canonicalise!(%);
+# \delta_{n}^{r} * \partial^{n}{u_{r}};
+
