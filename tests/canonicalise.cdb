@@ -450,3 +450,12 @@ Y_{i j}::AntiSymmetric.
 obj40:= X_{i} = Y_{j i} Z_{j};
 @canonicalise!(%);
 
+# Test 41: upper/lower indices
+#
+@reset.
+{n,r}::Indices.
+\delta{#}::KroneckerDelta.
+\partial{#}::PartialDerivative.
+obj41:= \delta_{n}^{r} \partial_{r}{ u^{n} };
+@canonicalise!(%);
+# \delta_{n}^{r} * \partial^{n}{u_{r}};

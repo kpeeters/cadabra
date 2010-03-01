@@ -1,3 +1,8 @@
+2010-03-01  Kasper Peeters  <kasper.peeters@aei.mpg.de>
+
+	* Fixed handling of stuck kernels (both on exit of xcadabra as
+	well as on restart).
+
 2010-02-06  Kasper Peeters  <kasper.peeters@aei.mpg.de>
 
 	* Fixed a substitute bug with a?_{i j} type patterns (would mess

@@ -17,7 +17,7 @@
 
 */
 
-// #define DEBUG 1
+#define DEBUG 1
 
 #include <modglue/pipe.hh>
 #include <modglue/process.hh>
@@ -1125,7 +1125,12 @@ void XCadabra::on_stop()
 void XCadabra::on_kill()
 	{
 	restarting_kernel=true;
-	*(cdb.output_pipe("stdin")) << "@quit;\n" << std::flush;
+//	*(cdb.output_pipe("stdin")) << "@quit;\n" << std::flush;
+	// There is no point in shutting down cadabra nicely; instead, we send a full
+	// blown SIGKILL.
+	if(kill(cdb.get_pid(),0)==0)
+		kill(cdb.get_pid(), SIGKILL);
+
 	b_cdbstatus.set_text(" Status: Restarting kernel...");
 	b_kernelversion.set_text("Kernel: not running");
 
@@ -1437,8 +1442,17 @@ bool XCadabra::on_kernel_exit(modglue::ext_process& pr)
 	connect_io_signals();
 
 	*(cdb.output_pipe("stdin")) << "@print_status{true};\n" << std::flush;
+	kernel_idle();
 	b_cdbstatus.set_text(" Status: Kernel restarted, idle.");
-
+	
+	// Remove the 'running' flag from all cells, since we have a new kernel
+	// now.
+	DataCells_t::iterator dit=datacells.begin();
+	while(dit!=datacells.end()) {
+		(*dit)->running=false;
+		++dit;
+		}
+	
 
 	// return 'false' to keep the main loop running.
 	return false;
@@ -1646,7 +1660,7 @@ bool XCadabra::handle_editbox_output(std::string str, NotebookCanvas *can, Visua
 											 << str << "\n"
 											 << "#cellend\n" << std::flush;
 #ifdef DEBUG
-		std::cerr << "sending done" << std::endl;
+		std::cerr << "sending of cell # " << last_used_id << " done" << std::endl;
 #endif
 		}
 	return true;
@@ -1858,7 +1872,11 @@ bool XCadabra::on_configure_event(GdkEventConfigure *cfg)
 bool XCadabra::on_delete_event(GdkEventAny* event)
 	{
 	if(quit_safeguard()) {
-		cdb.terminate();
+		// cdb.terminate();
+		// Ensure that the kernel is really gone, not just stuck in a loop.
+  		if(cdb.get_pid()!=0) 
+			if(kill(cdb.get_pid(), 0)==0)
+				kill(cdb.get_pid(), SIGKILL);
 		Gtk::Window::on_delete_event(event);
 		Gtk::Main::quit();
 		return false;
@@ -2928,7 +2946,11 @@ std::string XCadabra::load(const std::string& fn, bool ignore_nonexistence)
 void XCadabra::on_file_quit()
 	{
 	if(quit_safeguard()) {
-		cdb.terminate();
+		// cdb.terminate();
+		// Ensure that the kernel is really gone, not just stuck in an infinite loop.
+  		if(cdb.get_pid()!=0) 
+			if(kill(cdb.get_pid(), 0)==0)
+				kill(cdb.get_pid(), SIGKILL);
 		Gtk::Main::quit();
 		}
 	}
