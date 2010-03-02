@@ -15,6 +15,9 @@
 	* Fixed a bunch of undo/redo bugs and associated gtk subtleties
 	which may have been the cause of the OS X segfaults.
 
+	There are still problems on OS X due to incompatible library
+	versions between Apple and MacPorts/Fink.
+
 2010-02-04  Kasper Peeters  <kasper.peeters@aei.mpg.de>
 
 	* Fixed display of \anticommutator.

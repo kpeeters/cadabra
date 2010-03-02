@@ -17,7 +17,7 @@
 
 */
 
-#define DEBUG 1
+// #define DEBUG 1
 
 #include <modglue/pipe.hh>
 #include <modglue/process.hh>
@@ -1125,8 +1125,11 @@ void XCadabra::on_stop()
 void XCadabra::on_kill()
 	{
 	restarting_kernel=true;
-//	*(cdb.output_pipe("stdin")) << "@quit;\n" << std::flush;
-	// There is no point in shutting down cadabra nicely; instead, we send a full
+
+   //	*(cdb.output_pipe("stdin")) << "@quit;\n" << std::flush;
+
+	// There is no point in shutting down cadabra nicely (as we did with
+	// the statement above in earlier versions); instead, we send a full
 	// blown SIGKILL.
 	if(kill(cdb.get_pid(),0)==0)
 		kill(cdb.get_pid(), SIGKILL);
@@ -1445,13 +1448,18 @@ bool XCadabra::on_kernel_exit(modglue::ext_process& pr)
 	kernel_idle();
 	b_cdbstatus.set_text(" Status: Kernel restarted, idle.");
 	
+	// Remove all cell-id to datacell pointer mappings, since any of those
+	// which we are still waiting for are now invalid.
+	id_to_datacell.clear();
+
 	// Remove the 'running' flag from all cells, since we have a new kernel
-	// now.
+	// now, and none of the cells are being processed anymore.
 	DataCells_t::iterator dit=datacells.begin();
 	while(dit!=datacells.end()) {
 		(*dit)->running=false;
 		++dit;
 		}
+	restarting_kernel=false;
 	
 
 	// return 'false' to keep the main loop running.
@@ -1642,6 +1650,9 @@ void XCadabra::show_cell(Glib::RefPtr<DataCell> datacell)
 
 bool XCadabra::handle_editbox_output(std::string str, NotebookCanvas *can, VisualCell *vis)
 	{
+#ifdef DEBUG
+	std::cerr << "handling edit box" << std::endl;
+#endif
 	// Disable this cell until output has been received, so we
 	// don't get it twice.
 	if(vis->datacell->running==false) {
@@ -1960,8 +1971,11 @@ void XCadabra::remove_noninput_below(Glib::RefPtr<DataCell> dc)
 						(*it)->cell_type==DataCell::c_texcomment ||
 						(*it)->cell_type==DataCell::c_error) ) {
 				 for(unsigned int i=0; i<canvasses.size(); ++i) {
-					  canvasses[i]->remove_cell(*it);
-					  }
+#ifdef DEBUG
+					 std::cerr << "removing cell" << std::endl;
+#endif
+					 canvasses[i]->remove_cell(*it);
+					 }
 				it=datacells.erase(it);
 				}
 			return;
@@ -2002,6 +2016,9 @@ bool XCadabra::receive(modglue::ipipe& p)
 			ss >> help;
 			assert(id_to_datacell.find(help)!=id_to_datacell.end());
 			cp=id_to_datacell[help];
+#ifdef DEBUG
+			std::cerr << "original cell = " << cp->textbuf->get_text() << std::endl;
+#endif
 			remove_noninput_below(cp);
 			origcell=cp;
 			in_cell=true;
