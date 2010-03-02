@@ -3313,12 +3313,10 @@ algorithm::result_t canonicalise::apply(iterator& it)
 				  
 				  index_map_t::iterator freeit=ind_free.begin();
 				  bool using_free=true;
-				  unsigned int firstdummy=0;
 				  for(unsigned int i=0; i<total_number_of_indices; ++i) {
 						if(freeit==ind_free.end()) {
 							 freeit=ind_dummy.begin(); // continue with the dummies
 							 using_free=false;
-							 firstdummy=i;
 							 }
 						// xPerm assumes that all indices are in the same set, but
 						// we do not want that, it mixes up dummies in different sets. 
@@ -3328,7 +3326,7 @@ algorithm::result_t canonicalise::apply(iterator& it)
 						// set (as indicated in dummysetlabels.
 						
 						// Meanwhile, a hack:
-						if(false && index_sets.size()>0 && !using_free) {
+						if(index_sets.size()>0 && !using_free) {
 							 // We are going to put an index into position "cperm[i]-1". We need to figure
 							 // out its type, because we have to take a dummy from the right set. We can do this
 							 // by looking at the type of the index which sat in this position. However, that
