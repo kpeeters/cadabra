@@ -2812,7 +2812,7 @@ algorithm::result_t order::doit(iterator& st, bool sign)
 	}
 
 canonicalise::canonicalise(exptree& tr, iterator it)
-	: algorithm(tr, it), reuse_generating_set(false) //, method(adjacency)
+	: algorithm(tr, it), reuse_generating_set(false) 
 	{
 	}
 
