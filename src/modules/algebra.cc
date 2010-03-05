@@ -3356,9 +3356,12 @@ algorithm::result_t canonicalise::apply(iterator& it)
                       // we put n, which can only go the fifth slot. Then we put p, which can go
                       // to 6,7,8, so that it goes to 6. Then we put r (not q), which can go to 7
                       // and 8, and so we put it at 7, etc.
-							 iterator ri = tr.replace_index(num_to_it_map[cperm[i]], freeit->first.begin());
-							 ri->fl.parent_rel=freeit->first.begin()->fl.parent_rel;
-							 }
+
+							txtout << "putting index " << i << "(" << *num_to_it_map[i]->name << ") in slot " << cperm[i] << std::endl;
+
+							iterator ri = tr.replace_index(num_to_it_map[cperm[i]], freeit->first.begin());
+							ri->fl.parent_rel=freeit->first.begin()->fl.parent_rel;
+							}
 						++freeit;
 						}
 				  }
