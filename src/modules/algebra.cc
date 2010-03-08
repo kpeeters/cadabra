@@ -19,8 +19,9 @@
 */
 
 #define NEW_XPERM 
-#define XPERM_USE_EXT 
 #define XPERM_DEBUG
+// Do not turn this one off
+#define XPERM_USE_EXT  
 
 #include "algebra.hh"
 #include "display.hh"
@@ -2830,16 +2831,8 @@ bool canonicalise::can_apply(iterator it)
 	return true;
 	}
 
-algorithm::result_t canonicalise::apply(iterator& it)
+bool canonicalise::remove_traceless_traces(iterator& it)
 	{
-//	txtout << "canonicalising the following expression:" << std::endl;
-//	tr.print_recursive_treeform(txtout, it);
-
-	stopwatch totalsw;
-	totalsw.start();
-	prod_wrap_single_term(it);
-	
-
 	// Remove any traces of traceless tensors (this is best done early).
 	sibling_iterator facit=tr.begin(it);
 	while(facit!=tr.end(it)) {
@@ -2855,15 +2848,19 @@ algorithm::result_t canonicalise::apply(iterator& it)
 				else {
 					zero(it->multiplier);
 					expression_modified=true;
-					return l_applied;
+					return true;
 					}
 				}
 			}
 		++facit;
 		}
-	
+	return false;
+	}
+
+bool canonicalise::remove_vanishing_numericals(iterator& it)
+	{
 	// Remove Diagonal objects with numerical indices which are not all the same.
-	facit=tr.begin(it);
+	sibling_iterator facit=tr.begin(it);
 	while(facit!=tr.end(it)) {
 		const Diagonal *dgl=properties::get_composite<Diagonal>(facit);
 		if(dgl) {
@@ -2876,7 +2873,7 @@ algorithm::result_t canonicalise::apply(iterator& it)
 					if(indit2->multiplier!=indit->multiplier) {
 						zero(it->multiplier);
 						expression_modified=true;
-						return l_applied;
+						return true;
 						}
 					++indit2;
 					}
@@ -2884,6 +2881,24 @@ algorithm::result_t canonicalise::apply(iterator& it)
 			}
 		++facit;
 		}	
+	return false;
+	}
+
+algorithm::result_t canonicalise::apply(iterator& it)
+	{
+//	txtout << "canonicalising the following expression:" << std::endl;
+//	tr.print_recursive_treeform(txtout, it);
+
+	stopwatch totalsw;
+	totalsw.start();
+	prod_wrap_single_term(it);
+	
+	if(remove_traceless_traces(it)) 
+		return l_applied;
+
+	if(remove_vanishing_numericals(it)) 
+		return l_applied;
+
 
 	// Now the real thing...
 	index_map_t ind_free, ind_dummy;
@@ -2915,10 +2930,13 @@ algorithm::result_t canonicalise::apply(iterator& it)
 	std::map<std::string, std::multiset<exptree, tree_exact_less_mod_prel_obj> > index_sets;
 	std::vector<std::string> indexpos_to_indextype(total_number_of_indices, " undeclared");
 	
+
+	// FIXME: it seems to me that we only need a vector of iterators, in such a way
+	// that the order of elements corresponds to the preferred order (essentially: 
+	// base to iterator).
 	std::map<int, exptree::iterator> num_to_it_map;
 	
 	int curr_pos=0;
-//			txtout << "free:" << std::endl;
 	index_map_t::iterator sorted_it=ind_free.begin();
 	int curr_index=0;
 	while(sorted_it!=ind_free.end()) {
@@ -3034,7 +3052,7 @@ algorithm::result_t canonicalise::apply(iterator& it)
 	if(!reuse_generating_set || generating_set.size()==0) {
 		generating_set.clear();
 		// Symmetry of individual tensors.
-		facit=tr.begin(it);
+		sibling_iterator facit=tr.begin(it);
 		curr_pos=0;
 		while(facit!=tr.end(it)) {
 			const TableauBase *tba=properties::get_composite<TableauBase>(facit);
@@ -3132,7 +3150,7 @@ algorithm::result_t canonicalise::apply(iterator& it)
 #ifdef XPERM_DEBUG
 	txtout << generating_set.size() << " " << *it->multiplier << std::endl;
 #endif
-	if(/* generating_set.size()>0  &&*/  *it->multiplier!=0) {
+	if(*it->multiplier!=0) {
 		// Fill data for the xperm routines.
 		int *gs=0;
 
@@ -3213,7 +3231,6 @@ algorithm::result_t canonicalise::apply(iterator& it)
 		stopwatch sw;
 		sw.start();
 
-#ifdef XPERM_USE_EXT
 		lengths_of_dummy_sets[0]=ind_dummy.size();
 		metric_signatures[0]=1;
 		lengths_of_repeated_sets[0]=0;
@@ -3267,25 +3284,7 @@ algorithm::result_t canonicalise::apply(iterator& it)
 		delete [] free_indices_new_order;
 		delete [] perm1;
 		delete [] perm2;
-#else
-		canonical_perm(perm, 
-							1,                // strong generating set
-							base,             // base for the group
-							base_here.size(), // base length
-							gs,
-							generating_set.size(), 
-							total_number_of_indices+2,
-							free_indices,
-							ind_free.size(),
-							dummies,
-							ind_dummy.size()/2,
-#ifndef NEW_XPERM
- 							dummysetlabels, 
-#endif
-							1,               // use an ordered base (what does this mean?)
-							1,               // symmetric metric
-							cperm);
-#endif
+
 		sw.stop();
 //		txtout << "xperm took " << sw << std::endl;
 
@@ -3326,7 +3325,7 @@ algorithm::result_t canonicalise::apply(iterator& it)
 						// set (as indicated in dummysetlabels.
 						
 						// Meanwhile, a hack:
-						if(index_sets.size()>0 && !using_free) {
+						if(false && index_sets.size()>0 && !using_free) {
 							 // We are going to put an index into position "cperm[i]-1". We need to figure
 							 // out its type, because we have to take a dummy from the right set. We can do this
 							 // by looking at the type of the index which sat in this position. However, that
@@ -3357,7 +3356,9 @@ algorithm::result_t canonicalise::apply(iterator& it)
                       // to 6,7,8, so that it goes to 6. Then we put r (not q), which can go to 7
                       // and 8, and so we put it at 7, etc.
 
-							txtout << "putting index " << i << "(" << *num_to_it_map[i]->name << ") in slot " << cperm[i] << std::endl;
+							txtout << "putting index " << i+1 << "(" << *num_to_it_map[i+1]->name 
+									 << ", " << num_to_it_map[i+1]->fl.parent_rel 
+									 << ") in slot " << cperm[i] << std::endl;
 
 							iterator ri = tr.replace_index(num_to_it_map[cperm[i]], freeit->first.begin());
 							ri->fl.parent_rel=freeit->first.begin()->fl.parent_rel;

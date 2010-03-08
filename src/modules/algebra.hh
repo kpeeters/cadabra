@@ -452,6 +452,9 @@ class canonicalise : public algorithm {
 		bool             reuse_generating_set;
 
 //		enum method_t { xperm, adjacency } method;
+	private:
+		bool remove_traceless_traces(iterator&);
+		bool remove_vanishing_numericals(iterator&);
 };
 
 class reduce : public algorithm {
