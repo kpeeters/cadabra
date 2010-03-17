@@ -2934,7 +2934,9 @@ algorithm::result_t canonicalise::apply(iterator& it)
 	// FIXME: it seems to me that we only need a vector of iterators, in such a way
 	// that the order of elements corresponds to the preferred order (essentially: 
 	// base to iterator).
-	std::map<int, exptree::iterator> num_to_it_map;
+	//std::map<int, exptree::iterator> num_to_it_map;
+	std::vector<exptree::iterator> num_to_it_map(total_number_of_indices);
+	std::vector<exptree>           num_to_tree_map;
 	
 	int curr_pos=0;
 	index_map_t::iterator sorted_it=ind_free.begin();
@@ -2942,7 +2944,9 @@ algorithm::result_t canonicalise::apply(iterator& it)
 	while(sorted_it!=ind_free.end()) {
 		index_position_map_t::iterator ii=ind_pos_free.find(sorted_it->second);
 //		txtout << *(ii->first->name)/* << "_" << *(ii->first.begin()->name)*/ << " at pos " << ii->second+1 << std::endl;
-		num_to_it_map[ii->second+1]=ii->first;
+		num_to_it_map[ii->second]=ii->first;
+		num_to_tree_map.push_back(exptree(ii->first));
+//		num_to_it_map[ii->second+1]=ii->first;
 		free_indices[curr_index++]=ii->second+1;
 		perm[curr_pos++]=ii->second+1;
 		// Setup index information FIXME: remove once xperm.c is fixed.
@@ -2995,16 +2999,18 @@ algorithm::result_t canonicalise::apply(iterator& it)
 			case str_node::p_none:
 				perm[curr_pos++]=ii->second+1;
 				perm[curr_pos++]=i2->second+1;
-				num_to_it_map[ii->second+1]=ii->first;
-				num_to_it_map[i2->second+1]=i2->first;
+				num_to_tree_map.push_back(exptree(ii->first));
+				num_to_tree_map.push_back(exptree(i2->first));
 				break;
 			case str_node::p_sub:
 				perm[curr_pos++]=i2->second+1;
 				perm[curr_pos++]=ii->second+1;
-				num_to_it_map[ii->second+1]=i2->first;
-				num_to_it_map[i2->second+1]=ii->first;
+				num_to_tree_map.push_back(exptree(i2->first));
+				num_to_tree_map.push_back(exptree(ii->first));
 				break;
 			}
+		num_to_it_map[ii->second]=ii->first;
+		num_to_it_map[i2->second]=i2->first;
 		dummies[curr_index++]=ii->second+1;
 		dummies[curr_index++]=i2->second+1;
 		
@@ -3235,8 +3241,7 @@ algorithm::result_t canonicalise::apply(iterator& it)
 		metric_signatures[0]=1;
 		lengths_of_repeated_sets[0]=0;
 
-		// JMM now uses a different convention. The 'perm' array gives us a list of 
-		// integers where the n-th integer..
+		// JMM now uses a different convention. 
 		int *perm1 = new int[total_number_of_indices+2];
 		int *perm2 = new int[total_number_of_indices+2];
 		int *free_indices_new_order = new int[ind_free.size()];
@@ -3256,6 +3261,43 @@ algorithm::result_t canonicalise::apply(iterator& it)
 			}
 		txtout << std::endl;
 #endif
+		// Brief reminder of the meaning of the various arrays, using the example in
+		// Jose's xPerm paper (not yet updated to reflect the _ext version which allows
+		// for multiple dummy sets and repeated (numerical) indices):
+		//
+      // expression        = R_{b}^{1d1} R_{c}^{bac}
+		//
+      // sorted_index_set  = {a,d,b,-b,c,-c,1,1}
+		// base              = {1,2,3, 4,5, 6,7,8}
+		// dummies           = {3,4,5,6}
+		//    sorted_index_set[3] and [4] is a dummy pair
+		//    sorted_index_set[5] and [6] is a dummy pair
+		//    these can just be in sorted order, i.e. only referring
+		//    to the sorted_index_set.
+		//
+		// frees             = {1,2}
+		//    sorted_index_set[1] and [2] are free indices
+		//
+		// dummies_new_order = {dn[1], dn[2], ...}
+		//    slot dn[1] and dn[2] form a dummy pair ?
+		//
+		// free_indices_new_order = {...}
+		//    these slots contain free indices ?
+		//
+		// perm = {4,7,2,8,6,3,1,5,9,10}
+      //    1st slot contains sorted_index_set[4] ( = -b )
+      //    2nd slot contains sorted_index_set[7] ( = 1 )
+      //    etc.
+      //
+      // perm1 = {p1[1], p1[2], ...}
+		//
+		//    1st index sits in slot p1[1] ?
+		//
+		// cperm = {1,3,4,5,2,7,6,8,9,10}
+		//
+		//    1st slot gets sorted_index_set[1] ( = a )
+      //    2nd slot gets sorted_index_set[3] ( = b )
+		//    ...
 
 		canonical_perm_ext(perm1,                       // permutation to be canonicalised
 								 total_number_of_indices+2,  // degree (+2 for the overall sign)
@@ -3338,13 +3380,15 @@ algorithm::result_t canonicalise::apply(iterator& it)
 							 std::multiset<exptree, tree_exact_less_mod_prel_obj>& theset=index_sets[required_type];
 							 std::multiset<exptree, tree_exact_less_mod_prel_obj>::iterator theind=theset.begin();
 							 assert(theind!=theset.end());
-							 iterator ri = tr.replace_index(num_to_it_map[cperm[i]], theind->begin());
+//							 iterator ri = tr.replace_index(num_to_it_map[cperm[i]], theind->begin());
+	
 							 // FIXME: The following is tempting, because it enables objects with symmetries
 							 // between indices which do not have the same parent rel. However, this is
 							 // full of subtleties; better to disable this altogether for indices which
 							 // have fixed position (which is, however, tricky with wildcards like \Gamma{#}).
-							 ri->fl.parent_rel=theind->begin()->fl.parent_rel;
-							 theset.erase(theind);
+
+//							 ri->fl.parent_rel=theind->begin()->fl.parent_rel;
+//							 theset.erase(theind);
 							 }
 						else {
                       // In the new final permutation
@@ -3356,12 +3400,18 @@ algorithm::result_t canonicalise::apply(iterator& it)
                       // to 6,7,8, so that it goes to 6. Then we put r (not q), which can go to 7
                       // and 8, and so we put it at 7, etc.
 
-							txtout << "putting index " << i+1 << "(" << *num_to_it_map[i+1]->name 
-									 << ", " << num_to_it_map[i+1]->fl.parent_rel 
+							txtout << "putting index " << i+1 << "(" << *num_to_tree_map[i].begin()->name 
+									 << ", " << num_to_tree_map[i].begin()->fl.parent_rel 
 									 << ") in slot " << cperm[i] << std::endl;
 
-							iterator ri = tr.replace_index(num_to_it_map[cperm[i]], freeit->first.begin());
-							ri->fl.parent_rel=freeit->first.begin()->fl.parent_rel;
+//							We need two arrays: one which maps from the order in which slots appear in 
+//								the tensor to the corresponding iterator (this is provided by the standard
+//																						index routines already), and one 
+//								which maps from the order in which the indices appear in the base map
+//								to an exptree object (so that we can replace).
+
+							iterator ri = tr.replace_index(num_to_it_map[cperm[i]-1], num_to_tree_map[i].begin());
+							ri->fl.parent_rel=num_to_tree_map[i].begin()->fl.parent_rel;
 							}
 						++freeit;
 						}
@@ -3376,7 +3426,6 @@ algorithm::result_t canonicalise::apply(iterator& it)
 			delete [] gs;
 		delete [] base;
 		}
-//	else txtout << "no generating set" << std::endl;
 
 	cleanup_expression(tr, it);
 

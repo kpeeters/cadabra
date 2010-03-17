@@ -1,0 +1,940 @@
+(* Content-type: application/mathematica *)
+
+(*** Wolfram Notebook File ***)
+(* http://www.wolfram.com/nb *)
+
+(* CreatedBy='Mathematica 7.0' *)
+
+(*CacheID: 234*)
+(* Internal cache information:
+NotebookFileLineBreakTest
+NotebookFileLineBreakTest
+NotebookDataPosition[       145,          7]
+NotebookDataLength[     32567,        931]
+NotebookOptionsPosition[     29295,        828]
+NotebookOutlinePosition[     29633,        843]
+CellTagsIndexPosition[     29590,        840]
+WindowFrame->Normal*)
+
+(* Beginning of Notebook Content *)
+Notebook[{
+Cell["\<\
+This notebook is to verify that we are feeding the xperm routines correctly; \
+we use the xTensor interface with Verbose->True to get a view on the required \
+input to canonical_perm_ext.\
+\>", "Text",
+ CellChangeTimes->{{3.477558440265489*^9, 3.477558485407468*^9}}],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{"<<", "xAct`xTensor`"}]], "Input",
+ CellChangeTimes->{{3.477553000148336*^9, 3.477553004186784*^9}}],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"General", "::", "\<\"cdir\"\>"}], 
+  RowBox[{
+  ":", " "}], "\<\"\\!\\(\\*StyleBox[\\\"\\\\\\\"Cannot set current directory \
+to \\\\\\\"\\\", \
+\\\"MT\\\"]\\)\[NoBreak]\\!\\(\\*StyleBox[\\!\\(\\\"Paclets\\\"\\), \
+\\\"MT\\\"]\\)\[NoBreak]\\!\\(\\*StyleBox[\\\"\\\\\\\".\\\\\\\"\\\", \\\"MT\\\
+\"]\\)\"\>"}]], "Message", "MSG",
+ CellChangeTimes->{3.477558300309192*^9}],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"Get", "::", "\<\"noopen\"\>"}], 
+  RowBox[{
+  ":", " "}], "\<\"\\!\\(\\*StyleBox[\\\"\\\\\\\"Cannot open \\\\\\\"\\\", \\\
+\"MT\\\"]\\)\[NoBreak]\\!\\(\\*StyleBox[\\!\\(\\\"JLink`\\\"\\), \
+\\\"MT\\\"]\\)\[NoBreak]\\!\\(\\*StyleBox[\\\"\\\\\\\".\\\\\\\"\\\", \\\"MT\\\
+\"]\\)\"\>"}]], "Message", "MSG",
+ CellChangeTimes->{3.477558306467509*^9}],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"Needs", "::", "\<\"nocont\"\>"}], 
+  RowBox[{
+  ":", " "}], "\<\"\\!\\(\\*StyleBox[\\\"\\\\\\\"Context \\\\\\\"\\\", \\\"MT\
+\\\"]\\)\[NoBreak]\\!\\(\\*StyleBox[\\!\\(\\\"JLink`\\\"\\), \\\"MT\\\"]\\)\
+\[NoBreak]\\!\\(\\*StyleBox[\\\"\\\\\\\" was not created when Needs was \
+evaluated.\\\\\\\"\\\", \\\"MT\\\"]\\)\"\>"}]], "Message", "MSG",
+ CellChangeTimes->{3.477558306474064*^9}],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"Get", "::", "\<\"noopen\"\>"}], 
+  RowBox[{
+  ":", " "}], "\<\"\\!\\(\\*StyleBox[\\\"\\\\\\\"Cannot open \\\\\\\"\\\", \\\
+\"MT\\\"]\\)\[NoBreak]\\!\\(\\*StyleBox[\\!\\(\\\"JLink`\\\"\\), \
+\\\"MT\\\"]\\)\[NoBreak]\\!\\(\\*StyleBox[\\\"\\\\\\\".\\\\\\\"\\\", \\\"MT\\\
+\"]\\)\"\>"}]], "Message", "MSG",
+ CellChangeTimes->{3.477558306762381*^9}],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"Needs", "::", "\<\"nocont\"\>"}], 
+  RowBox[{
+  ":", " "}], "\<\"\\!\\(\\*StyleBox[\\\"\\\\\\\"Context \\\\\\\"\\\", \\\"MT\
+\\\"]\\)\[NoBreak]\\!\\(\\*StyleBox[\\!\\(\\\"JLink`\\\"\\), \\\"MT\\\"]\\)\
+\[NoBreak]\\!\\(\\*StyleBox[\\\"\\\\\\\" was not created when Needs was \
+evaluated.\\\\\\\"\\\", \\\"MT\\\"]\\)\"\>"}]], "Message", "MSG",
+ CellChangeTimes->{3.477558306765708*^9}],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"$GeoLocation", "::", "\<\"dloff\"\>"}], 
+  RowBox[{
+  ":", " "}], "\<\"\\!\\(\\*StyleBox[\\\"\\\\\\\"Mathematica is currently \
+configured not to use the internet, and could not download data for \
+\\\\\\\"\\\", \
+\\\"MT\\\"]\\)\[NoBreak]\\!\\(\\*StyleBox[\\!\\(\\\"$GeoLocation\\\"\\), \
+\\\"MT\\\"]\\)\[NoBreak]\\!\\(\\*StyleBox[\\\"\\\\\\\". To allow internet \
+access, use Help > Internet Connectivity...\\\\\\\"\\\", \
+\\\"MT\\\"]\\)\"\>"}]], "Message", "MSG",
+ CellChangeTimes->{3.477558308452268*^9}],
+
+Cell[CellGroupData[{
+
+Cell[BoxData["\<\"------------------------------------------------------------\
+\"\>"], "Print",
+ CellChangeTimes->{3.477558308732259*^9}],
+
+Cell[BoxData[
+ InterpretationBox[
+  RowBox[{"\<\"Package xAct`xPerm`  version \"\>", 
+   "\[InvisibleSpace]", "\<\"1.0.3\"\>", "\[InvisibleSpace]", "\<\", \"\>", 
+   "\[InvisibleSpace]", 
+   RowBox[{"{", 
+    RowBox[{"2009", ",", "9", ",", "9"}], "}"}]}],
+  SequenceForm["Package xAct`xPerm`  version ", "1.0.3", ", ", {2009, 9, 9}],
+  Editable->False]], "Print",
+ CellChangeTimes->{3.477558308949677*^9}],
+
+Cell[BoxData["\<\"CopyRight (C) 2003-2010, Jose M. Martin-Garcia, under the \
+General Public License.\"\>"], "Print",
+ CellChangeTimes->{3.477558308955469*^9}],
+
+Cell[BoxData["\<\"Connecting to external linux executable...\"\>"], "Print",
+ CellChangeTimes->{3.477558308960744*^9}],
+
+Cell[BoxData["\<\"Connection established.\"\>"], "Print",
+ CellChangeTimes->{3.47755830896575*^9}],
+
+Cell[BoxData["\<\"------------------------------------------------------------\
+\"\>"], "Print",
+ CellChangeTimes->{3.477558308971072*^9}],
+
+Cell[BoxData[
+ InterpretationBox[
+  RowBox[{"\<\"Package xAct`xTensor`  version \"\>", 
+   "\[InvisibleSpace]", "\<\"0.9.9\"\>", "\[InvisibleSpace]", "\<\", \"\>", 
+   "\[InvisibleSpace]", 
+   RowBox[{"{", 
+    RowBox[{"2010", ",", "1", ",", "10"}], "}"}]}],
+  SequenceForm[
+  "Package xAct`xTensor`  version ", "0.9.9", ", ", {2010, 1, 10}],
+  Editable->False]], "Print",
+ CellChangeTimes->{3.477558308976452*^9}],
+
+Cell[BoxData["\<\"CopyRight (C) 2002-2010, Jose M. Martin-Garcia, under the \
+General Public License.\"\>"], "Print",
+ CellChangeTimes->{3.477558308982088*^9}],
+
+Cell[BoxData["\<\"------------------------------------------------------------\
+\"\>"], "Print",
+ CellChangeTimes->{3.477558308987423*^9}],
+
+Cell[BoxData["\<\"These packages come with ABSOLUTELY NO WARRANTY; for \
+details type Disclaimer[]. This is free software, and you are welcome to \
+redistribute it under certain conditions. See the General Public License for \
+details.\"\>"], "Print",
+ CellChangeTimes->{3.477558308993634*^9}],
+
+Cell[BoxData["\<\"------------------------------------------------------------\
+\"\>"], "Print",
+ CellChangeTimes->{3.477558309228697*^9}]
+}, Open  ]]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{"DefManifold", "[", 
+  RowBox[{"M3", ",", " ", "3", ",", " ", 
+   RowBox[{"{", 
+    RowBox[{
+    "a", ",", "b", ",", "c", ",", "d", ",", "e", ",", "f", ",", "g", ",", 
+     "h"}], "}"}]}], "]"}]], "Input"],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ InterpretationBox[
+  RowBox[{"\<\"** \"\>", "\[InvisibleSpace]", "DefManifold", 
+   "\[InvisibleSpace]", "\<\": Defining \"\>", 
+   "\[InvisibleSpace]", "\<\"manifold \"\>", "\[InvisibleSpace]", "M3", 
+   "\[InvisibleSpace]", "\<\". \"\>", "\[InvisibleSpace]", "\<\"\"\>"}],
+  SequenceForm[
+  "** ", xAct`xTensor`DefManifold, ": Defining ", 
+   "manifold ", $CellContext`M3, ". ", ""],
+  Editable->False]], "Print",
+ CellChangeTimes->{3.477558315248362*^9}],
+
+Cell[BoxData[
+ InterpretationBox[
+  RowBox[{"\<\"** \"\>", "\[InvisibleSpace]", "DefVBundle", 
+   "\[InvisibleSpace]", "\<\": Defining \"\>", 
+   "\[InvisibleSpace]", "\<\"vbundle \"\>", "\[InvisibleSpace]", "TangentM3", 
+   "\[InvisibleSpace]", "\<\". \"\>", "\[InvisibleSpace]", "\<\"\"\>"}],
+  SequenceForm[
+  "** ", xAct`xTensor`DefVBundle, ": Defining ", 
+   "vbundle ", $CellContext`TangentM3, ". ", ""],
+  Editable->False]], "Print",
+ CellChangeTimes->{3.477558315452766*^9}]
+}, Open  ]]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{"DefMetric", "[", 
+  RowBox[{
+   RowBox[{"-", "1"}], ",", 
+   RowBox[{"metricg", "[", 
+    RowBox[{
+     RowBox[{"-", "a"}], ",", 
+     RowBox[{"-", "b"}]}], "]"}], ",", "CD", ",", 
+   RowBox[{"PrintAs", "->", "\"\<g\>\""}]}], "]"}]], "Input"],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ InterpretationBox[
+  RowBox[{"\<\"** \"\>", "\[InvisibleSpace]", "DefTensor", 
+   "\[InvisibleSpace]", "\<\": Defining \"\>", 
+   "\[InvisibleSpace]", "\<\"symmetric metric tensor \"\>", 
+   "\[InvisibleSpace]", 
+   RowBox[{"metricg", "[", 
+    RowBox[{
+     RowBox[{"-", "a"}], ",", 
+     RowBox[{"-", "b"}]}], "]"}], "\[InvisibleSpace]", "\<\". \"\>", 
+   "\[InvisibleSpace]", "\<\"\"\>"}],
+  SequenceForm[
+  "** ", xAct`xTensor`DefTensor, ": Defining ", "symmetric metric tensor ", 
+   $CellContext`metricg[-$CellContext`a, -$CellContext`b], ". ", ""],
+  Editable->False]], "Print",
+ CellChangeTimes->{3.477558317383238*^9}],
+
+Cell[BoxData[
+ InterpretationBox[
+  RowBox[{"\<\"** \"\>", "\[InvisibleSpace]", "DefTensor", 
+   "\[InvisibleSpace]", "\<\": Defining \"\>", 
+   "\[InvisibleSpace]", "\<\"antisymmetric tensor \"\>", "\[InvisibleSpace]", 
+   
+   RowBox[{"epsilonmetricg", "[", 
+    RowBox[{"a", ",", "b", ",", "c"}], "]"}], 
+   "\[InvisibleSpace]", "\<\". \"\>", "\[InvisibleSpace]", "\<\"\"\>"}],
+  SequenceForm[
+  "** ", xAct`xTensor`DefTensor, ": Defining ", "antisymmetric tensor ", 
+   $CellContext`epsilonmetricg[$CellContext`a, $CellContext`b, \
+$CellContext`c], ". ", ""],
+  Editable->False]], "Print",
+ CellChangeTimes->{3.477558317518192*^9}],
+
+Cell[BoxData[
+ InterpretationBox[
+  RowBox[{"\<\"** \"\>", "\[InvisibleSpace]", "DefCovD", 
+   "\[InvisibleSpace]", "\<\": Defining \"\>", 
+   "\[InvisibleSpace]", "\<\"covariant derivative \"\>", "\[InvisibleSpace]", 
+   
+   RowBox[{"CD", "[", 
+    RowBox[{"-", "a"}], "]"}], "\[InvisibleSpace]", "\<\". \"\>", 
+   "\[InvisibleSpace]", "\<\"\"\>"}],
+  SequenceForm[
+  "** ", xAct`xTensor`DefCovD, ": Defining ", "covariant derivative ", 
+   $CellContext`CD[-$CellContext`a], ". ", ""],
+  Editable->False]], "Print",
+ CellChangeTimes->{3.477558317525181*^9}],
+
+Cell[BoxData[
+ InterpretationBox[
+  RowBox[{"\<\"** \"\>", "\[InvisibleSpace]", "DefTensor", 
+   "\[InvisibleSpace]", "\<\": Defining \"\>", 
+   "\[InvisibleSpace]", "\<\"vanishing torsion tensor \"\>", 
+   "\[InvisibleSpace]", 
+   RowBox[{"TorsionCD", "[", 
+    RowBox[{"a", ",", 
+     RowBox[{"-", "b"}], ",", 
+     RowBox[{"-", "c"}]}], "]"}], "\[InvisibleSpace]", "\<\". \"\>", 
+   "\[InvisibleSpace]", "\<\"\"\>"}],
+  SequenceForm[
+  "** ", xAct`xTensor`DefTensor, ": Defining ", "vanishing torsion tensor ", 
+   $CellContext`TorsionCD[$CellContext`a, -$CellContext`b, -$CellContext`c], 
+   ". ", ""],
+  Editable->False]], "Print",
+ CellChangeTimes->{3.477558317530781*^9}],
+
+Cell[BoxData[
+ InterpretationBox[
+  RowBox[{"\<\"** \"\>", "\[InvisibleSpace]", "DefTensor", 
+   "\[InvisibleSpace]", "\<\": Defining \"\>", 
+   "\[InvisibleSpace]", "\<\"symmetric Christoffel tensor \"\>", 
+   "\[InvisibleSpace]", 
+   RowBox[{"ChristoffelCD", "[", 
+    RowBox[{"a", ",", 
+     RowBox[{"-", "b"}], ",", 
+     RowBox[{"-", "c"}]}], "]"}], "\[InvisibleSpace]", "\<\". \"\>", 
+   "\[InvisibleSpace]", "\<\"\"\>"}],
+  SequenceForm[
+  "** ", xAct`xTensor`DefTensor, ": Defining ", 
+   "symmetric Christoffel tensor ", 
+   $CellContext`ChristoffelCD[$CellContext`a, -$CellContext`b, \
+-$CellContext`c], ". ", ""],
+  Editable->False]], "Print",
+ CellChangeTimes->{3.477558317536536*^9}],
+
+Cell[BoxData[
+ InterpretationBox[
+  RowBox[{"\<\"** \"\>", "\[InvisibleSpace]", "DefTensor", 
+   "\[InvisibleSpace]", "\<\": Defining \"\>", 
+   "\[InvisibleSpace]", "\<\"Riemann tensor \"\>", "\[InvisibleSpace]", 
+   RowBox[{"RiemannCD", "[", 
+    RowBox[{
+     RowBox[{"-", "a"}], ",", 
+     RowBox[{"-", "b"}], ",", 
+     RowBox[{"-", "c"}], ",", 
+     RowBox[{"-", "d"}]}], "]"}], "\[InvisibleSpace]", "\<\". \"\>", 
+   "\[InvisibleSpace]", "\<\"\"\>"}],
+  SequenceForm[
+  "** ", xAct`xTensor`DefTensor, ": Defining ", "Riemann tensor ", 
+   $CellContext`RiemannCD[-$CellContext`a, -$CellContext`b, -$CellContext`c, \
+-$CellContext`d], ". ", ""],
+  Editable->False]], "Print",
+ CellChangeTimes->{3.477558317542215*^9}],
+
+Cell[BoxData[
+ InterpretationBox[
+  RowBox[{"\<\"** \"\>", "\[InvisibleSpace]", "DefTensor", 
+   "\[InvisibleSpace]", "\<\": Defining \"\>", 
+   "\[InvisibleSpace]", "\<\"symmetric Ricci tensor \"\>", 
+   "\[InvisibleSpace]", 
+   RowBox[{"RicciCD", "[", 
+    RowBox[{
+     RowBox[{"-", "a"}], ",", 
+     RowBox[{"-", "b"}]}], "]"}], "\[InvisibleSpace]", "\<\". \"\>", 
+   "\[InvisibleSpace]", "\<\"\"\>"}],
+  SequenceForm[
+  "** ", xAct`xTensor`DefTensor, ": Defining ", "symmetric Ricci tensor ", 
+   $CellContext`RicciCD[-$CellContext`a, -$CellContext`b], ". ", ""],
+  Editable->False]], "Print",
+ CellChangeTimes->{3.477558317547962*^9}],
+
+Cell[BoxData["\<\"** DefCovD:  Contractions of Riemann automatically replaced \
+by Ricci.\"\>"], "Print",
+ CellChangeTimes->{3.477558317745049*^9}],
+
+Cell[BoxData[
+ InterpretationBox[
+  RowBox[{"\<\"** \"\>", "\[InvisibleSpace]", "DefTensor", 
+   "\[InvisibleSpace]", "\<\": Defining \"\>", 
+   "\[InvisibleSpace]", "\<\"Ricci scalar \"\>", "\[InvisibleSpace]", 
+   RowBox[{"RicciScalarCD", "[", "]"}], "\[InvisibleSpace]", "\<\". \"\>", 
+   "\[InvisibleSpace]", "\<\"\"\>"}],
+  SequenceForm[
+  "** ", xAct`xTensor`DefTensor, ": Defining ", "Ricci scalar ", 
+   $CellContext`RicciScalarCD[], ". ", ""],
+  Editable->False]], "Print",
+ CellChangeTimes->{3.477558318130119*^9}],
+
+Cell[BoxData["\<\"** DefCovD:  Contractions of Ricci automatically replaced \
+by RicciScalar.\"\>"], "Print",
+ CellChangeTimes->{3.477558318308976*^9}],
+
+Cell[BoxData[
+ InterpretationBox[
+  RowBox[{"\<\"** \"\>", "\[InvisibleSpace]", "DefTensor", 
+   "\[InvisibleSpace]", "\<\": Defining \"\>", 
+   "\[InvisibleSpace]", "\<\"symmetric Einstein tensor \"\>", 
+   "\[InvisibleSpace]", 
+   RowBox[{"EinsteinCD", "[", 
+    RowBox[{
+     RowBox[{"-", "a"}], ",", 
+     RowBox[{"-", "b"}]}], "]"}], "\[InvisibleSpace]", "\<\". \"\>", 
+   "\[InvisibleSpace]", "\<\"\"\>"}],
+  SequenceForm[
+  "** ", xAct`xTensor`DefTensor, ": Defining ", 
+   "symmetric Einstein tensor ", 
+   $CellContext`EinsteinCD[-$CellContext`a, -$CellContext`b], ". ", ""],
+  Editable->False]], "Print",
+ CellChangeTimes->{3.477558318506463*^9}],
+
+Cell[BoxData[
+ InterpretationBox[
+  RowBox[{"\<\"** \"\>", "\[InvisibleSpace]", "DefTensor", 
+   "\[InvisibleSpace]", "\<\": Defining \"\>", 
+   "\[InvisibleSpace]", "\<\"vanishing Weyl tensor \"\>", "\[InvisibleSpace]", 
+   RowBox[{"WeylCD", "[", 
+    RowBox[{
+     RowBox[{"-", "a"}], ",", 
+     RowBox[{"-", "b"}], ",", 
+     RowBox[{"-", "c"}], ",", 
+     RowBox[{"-", "d"}]}], "]"}], "\[InvisibleSpace]", "\<\". \"\>", 
+   "\[InvisibleSpace]", "\<\"\"\>"}],
+  SequenceForm[
+  "** ", xAct`xTensor`DefTensor, ": Defining ", "vanishing Weyl tensor ", 
+   $CellContext`WeylCD[-$CellContext`a, -$CellContext`b, -$CellContext`c, \
+-$CellContext`d], ". ", ""],
+  Editable->False]], "Print",
+ CellChangeTimes->{3.477558318852673*^9}],
+
+Cell[BoxData[
+ InterpretationBox[
+  RowBox[{"\<\"** \"\>", "\[InvisibleSpace]", "DefTensor", 
+   "\[InvisibleSpace]", "\<\": Defining \"\>", 
+   "\[InvisibleSpace]", "\<\"symmetric TFRicci tensor \"\>", 
+   "\[InvisibleSpace]", 
+   RowBox[{"TFRicciCD", "[", 
+    RowBox[{
+     RowBox[{"-", "a"}], ",", 
+     RowBox[{"-", "b"}]}], "]"}], "\[InvisibleSpace]", "\<\". \"\>", 
+   "\[InvisibleSpace]", "\<\"\"\>"}],
+  SequenceForm[
+  "** ", xAct`xTensor`DefTensor, ": Defining ", "symmetric TFRicci tensor ", 
+   $CellContext`TFRicciCD[-$CellContext`a, -$CellContext`b], ". ", ""],
+  Editable->False]], "Print",
+ CellChangeTimes->{3.477558319212433*^9}],
+
+Cell[BoxData[
+ InterpretationBox[
+  RowBox[{"\<\"** \"\>", "\[InvisibleSpace]", "DefTensor", 
+   "\[InvisibleSpace]", "\<\": Defining \"\>", 
+   "\[InvisibleSpace]", "\<\"Kretschmann scalar \"\>", "\[InvisibleSpace]", 
+   RowBox[{"KretschmannCD", "[", "]"}], "\[InvisibleSpace]", "\<\". \"\>", 
+   "\[InvisibleSpace]", "\<\"\"\>"}],
+  SequenceForm[
+  "** ", xAct`xTensor`DefTensor, ": Defining ", "Kretschmann scalar ", 
+   $CellContext`KretschmannCD[], ". ", ""],
+  Editable->False]], "Print",
+ CellChangeTimes->{3.477558319632501*^9}],
+
+Cell[BoxData[
+ InterpretationBox[
+  RowBox[{"\<\"** DefCovD:  Computing RiemannToWeylRules for dim \"\>", 
+   "\[InvisibleSpace]", "3"}],
+  SequenceForm["** DefCovD:  Computing RiemannToWeylRules for dim ", 3],
+  Editable->False]], "Print",
+ CellChangeTimes->{3.477558320047561*^9}],
+
+Cell[BoxData[
+ InterpretationBox[
+  RowBox[{"\<\"** DefCovD:  Computing RicciToTFRicci for dim \"\>", 
+   "\[InvisibleSpace]", "3"}],
+  SequenceForm["** DefCovD:  Computing RicciToTFRicci for dim ", 3],
+  Editable->False]], "Print",
+ CellChangeTimes->{3.477558320409797*^9}],
+
+Cell[BoxData[
+ InterpretationBox[
+  RowBox[{"\<\"** DefCovD:  Computing RicciToEinsteinRules for dim \"\>", 
+   "\[InvisibleSpace]", "3"}],
+  SequenceForm["** DefCovD:  Computing RicciToEinsteinRules for dim ", 3],
+  Editable->False]], "Print",
+ CellChangeTimes->{3.477558320785704*^9}],
+
+Cell[BoxData[
+ InterpretationBox[
+  RowBox[{"\<\"** \"\>", "\[InvisibleSpace]", "DefTensor", 
+   "\[InvisibleSpace]", "\<\": Defining \"\>", 
+   "\[InvisibleSpace]", "\<\"weight +2 density \"\>", "\[InvisibleSpace]", 
+   RowBox[{"Detmetricg", "[", "]"}], "\[InvisibleSpace]", "\<\". \"\>", 
+   "\[InvisibleSpace]", "\<\"Determinant.\"\>"}],
+  SequenceForm[
+  "** ", xAct`xTensor`DefTensor, ": Defining ", "weight +2 density ", 
+   $CellContext`Detmetricg[], ". ", "Determinant."],
+  Editable->False]], "Print",
+ CellChangeTimes->{3.477558321242839*^9}]
+}, Open  ]]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{"DefTensor", "[", 
+  RowBox[{
+   RowBox[{"K", "[", 
+    RowBox[{
+     RowBox[{"-", "a"}], ",", "b"}], "]"}], ",", 
+   RowBox[{"{", "M3", "}"}]}], "]"}]], "Input",
+ CellChangeTimes->{{3.477553093632021*^9, 3.477553104741367*^9}}],
+
+Cell[BoxData[
+ InterpretationBox[
+  RowBox[{"\<\"** \"\>", "\[InvisibleSpace]", "DefTensor", 
+   "\[InvisibleSpace]", "\<\": Defining \"\>", 
+   "\[InvisibleSpace]", "\<\"tensor \"\>", "\[InvisibleSpace]", 
+   RowBox[{"K", "[", 
+    RowBox[{
+     RowBox[{"-", "a"}], ",", "b"}], "]"}], "\[InvisibleSpace]", "\<\". \"\>",
+    "\[InvisibleSpace]", "\<\"\"\>"}],
+  SequenceForm["** ", xAct`xTensor`DefTensor, ": Defining ", "tensor ", 
+   K[-$CellContext`a, $CellContext`b], ". ", ""],
+  Editable->False]], "Print",
+ CellChangeTimes->{3.477553105059203*^9, 3.477558326387298*^9}]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{"ToCanonical", "[", 
+  RowBox[{
+   RowBox[{"K", "[", 
+    RowBox[{
+     RowBox[{"-", "a"}], ",", "a"}], "]"}], ",", 
+   RowBox[{"Verbose", "\[Rule]", "True"}]}], "]"}]], "Input",
+ CellChangeTimes->{{3.477553107972811*^9, 3.477553133814329*^9}}],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ InterpretationBox[
+  RowBox[{"\<\"ToCanonicalOne:: Actual configuration: \"\>", 
+   "\[InvisibleSpace]", 
+   RowBox[{"{", 
+    RowBox[{
+     RowBox[{"-", "a"}], ",", "a"}], "}"}]}],
+  SequenceForm["ToCanonicalOne:: Actual configuration: ", 
+   xAct`xTensor`IndexList[-$CellContext`a, $CellContext`a]],
+  Editable->False]], "Print",
+ CellChangeTimes->{3.477553134114295*^9, 3.477558328169052*^9}],
+
+Cell[BoxData[
+ InterpretationBox[
+  RowBox[{"\<\"ToCanonicalOne:: Standard configuration: \"\>", 
+   "\[InvisibleSpace]", 
+   RowBox[{"{", 
+    RowBox[{"a", ",", 
+     RowBox[{"-", "a"}]}], "}"}]}],
+  SequenceForm["ToCanonicalOne:: Standard configuration: ", 
+   xAct`xTensor`IndexList[$CellContext`a, -$CellContext`a]],
+  Editable->False]], "Print",
+ CellChangeTimes->{3.477553134114295*^9, 3.477558328181335*^9}],
+
+Cell[BoxData[
+ InterpretationBox[
+  RowBox[{"\<\"ToCanonicalOne:: Repeated indices: \"\>", "\[InvisibleSpace]", 
+   
+   RowBox[{"{", "}"}]}],
+  SequenceForm["ToCanonicalOne:: Repeated indices: ", 
+   xAct`xTensor`IndexList[]],
+  Editable->False]], "Print",
+ CellChangeTimes->{3.477553134114295*^9, 3.477558328187094*^9}],
+
+Cell[BoxData[
+ InterpretationBox[
+  RowBox[{"\<\"ToCanonicalOne:: Repeated indices: \"\>", "\[InvisibleSpace]", 
+   
+   RowBox[{"{", "}"}]}],
+  SequenceForm["ToCanonicalOne:: Repeated indices: ", {}],
+  Editable->False]], "Print",
+ CellChangeTimes->{3.477553134114295*^9, 3.477558328192679*^9}],
+
+Cell[BoxData[
+ InterpretationBox[
+  RowBox[{"\<\"ToCanonicalOne:: Permutation to be canonicalized: \"\>", 
+   "\[InvisibleSpace]", 
+   RowBox[{"Images", "[", 
+    RowBox[{"{", 
+     RowBox[{"2", ",", "1"}], "}"}], "]"}]}],
+  SequenceForm["ToCanonicalOne:: Permutation to be canonicalized: ", 
+   xAct`xPerm`Images[{2, 1}]],
+  Editable->False]], "Print",
+ CellChangeTimes->{3.477553134114295*^9, 3.477558328198019*^9}],
+
+Cell[BoxData[
+ InterpretationBox[
+  RowBox[{"\<\"dummies: \"\>", "\[InvisibleSpace]", 
+   RowBox[{"{", "a", "}"}]}],
+  SequenceForm["dummies: ", 
+   xAct`xTensor`IndexList[$CellContext`a]],
+  Editable->False]], "Print",
+ CellChangeTimes->{3.477553134114295*^9, 3.477558328203057*^9}],
+
+Cell[BoxData[
+ InterpretationBox[
+  RowBox[{"\<\"ToCanonicalOne:: dummysets_tmp: \"\>", "\[InvisibleSpace]", 
+   RowBox[{"{", 
+    RowBox[{"DummySet", "[", 
+     RowBox[{"TangentM3", ",", 
+      RowBox[{"{", "a", "}"}], ",", "1"}], "]"}], "}"}]}],
+  SequenceForm["ToCanonicalOne:: dummysets_tmp: ", {
+    xAct`xPerm`DummySet[$CellContext`TangentM3, {$CellContext`a}, 1]}],
+  Editable->False]], "Print",
+ CellChangeTimes->{3.477553134114295*^9, 3.477558328447033*^9}],
+
+Cell[BoxData[
+ InterpretationBox[
+  RowBox[{"\<\"ToCanonicalOne:: dummysets: \"\>", "\[InvisibleSpace]", 
+   RowBox[{"{", 
+    RowBox[{"DummySet", "[", 
+     RowBox[{"TangentM3", ",", 
+      RowBox[{"{", 
+       RowBox[{"{", 
+        RowBox[{"1", ",", "2"}], "}"}], "}"}], ",", "1"}], "]"}], "}"}]}],
+  SequenceForm["ToCanonicalOne:: dummysets: ", {
+    xAct`xPerm`DummySet[$CellContext`TangentM3, {{1, 2}}, 1]}],
+  Editable->False]], "Print",
+ CellChangeTimes->{3.477553134114295*^9, 3.477558328927886*^9}],
+
+Cell[BoxData[
+ InterpretationBox[
+  RowBox[{"\<\"ToCanonicalOne:: Free indices: \"\>", "\[InvisibleSpace]", 
+   RowBox[{"{", "}"}]}],
+  SequenceForm["ToCanonicalOne:: Free indices: ", {}],
+  Editable->False]], "Print",
+ CellChangeTimes->{3.477553134114295*^9, 3.47755832939668*^9}],
+
+Cell[BoxData[
+ InterpretationBox[
+  RowBox[{"\<\"ToCanonicalOne:: calling: \"\>", 
+   "\[InvisibleSpace]", "\<\"CanonicalPerm[\"\>", "\[InvisibleSpace]", 
+   RowBox[{"Images", "[", 
+    RowBox[{"{", 
+     RowBox[{"2", ",", "1"}], "}"}], "]"}], "\[InvisibleSpace]", "\<\",\"\>", 
+   "\[InvisibleSpace]", "2", "\[InvisibleSpace]", "\<\",\"\>", 
+   "\[InvisibleSpace]", 
+   RowBox[{"StrongGenSet", "[", 
+    RowBox[{
+     RowBox[{"{", "}"}], ",", 
+     RowBox[{"GenSet", "[", "]"}]}], "]"}], "\[InvisibleSpace]", "\<\",\"\>", 
+   "\[InvisibleSpace]", 
+   RowBox[{"{", "}"}], "\[InvisibleSpace]", "\<\",\"\>", "\[InvisibleSpace]", 
+   
+   RowBox[{"{", 
+    RowBox[{"DummySet", "[", 
+     RowBox[{"TangentM3", ",", 
+      RowBox[{"{", 
+       RowBox[{"{", 
+        RowBox[{"1", ",", "2"}], "}"}], "}"}], ",", "1"}], "]"}], "}"}], 
+   "\[InvisibleSpace]", "\<\",\"\>", "\[InvisibleSpace]", 
+   RowBox[{"Verbose", "\[Rule]", "True"}], "\[InvisibleSpace]", "\<\"]\"\>"}],
+  
+  SequenceForm["ToCanonicalOne:: calling: ", "CanonicalPerm[", 
+   xAct`xPerm`Images[{2, 1}], ",", 2, ",", 
+   xAct`xPerm`StrongGenSet[{}, 
+    xAct`xPerm`GenSet[]], ",", {}, ",", {
+    xAct`xPerm`DummySet[$CellContext`TangentM3, {{1, 2}}, 1]}, ",", Verbose -> 
+   True, "]"],
+  Editable->False]], "Print",
+ CellChangeTimes->{3.477553134114295*^9, 3.477558329877726*^9}],
+
+Cell[BoxData[
+ InterpretationBox[
+  RowBox[{"\<\"ToCanonicalOne:: Canonical permutation: \"\>", 
+   "\[InvisibleSpace]", 
+   RowBox[{"Images", "[", 
+    RowBox[{"{", 
+     RowBox[{"1", ",", "2"}], "}"}], "]"}]}],
+  SequenceForm["ToCanonicalOne:: Canonical permutation: ", 
+   xAct`xPerm`Images[{1, 2}]],
+  Editable->False]], "Print",
+ CellChangeTimes->{3.477553134114295*^9, 3.477558330350803*^9}]
+}, Open  ]],
+
+Cell[BoxData[
+ InterpretationBox[
+  StyleBox[
+   SubsuperscriptBox["K", 
+    RowBox[{" ", "a"}], 
+    RowBox[{"a", " "}]],
+   AutoSpacing->False],
+  K[$CellContext`a, -$CellContext`a],
+  Editable->False]], "Output",
+ CellChangeTimes->{{3.477553120844582*^9, 3.477553134658614*^9}, 
+   3.477558330937072*^9}]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{"ToCanonical", "[", 
+  RowBox[{
+   RowBox[{"K", "[", 
+    RowBox[{"a", ",", 
+     RowBox[{"-", "a"}]}], "]"}], ",", 
+   RowBox[{"Verbose", "\[Rule]", "True"}]}], "]"}]], "Input",
+ CellChangeTimes->{{3.477553107972811*^9, 3.477553139652616*^9}}],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ InterpretationBox[
+  RowBox[{"\<\"ToCanonicalOne:: Actual configuration: \"\>", 
+   "\[InvisibleSpace]", 
+   RowBox[{"{", 
+    RowBox[{"a", ",", 
+     RowBox[{"-", "a"}]}], "}"}]}],
+  SequenceForm["ToCanonicalOne:: Actual configuration: ", 
+   xAct`xTensor`IndexList[$CellContext`a, -$CellContext`a]],
+  Editable->False]], "Print",
+ CellChangeTimes->{3.477553139945665*^9, 3.477558333200656*^9}],
+
+Cell[BoxData[
+ InterpretationBox[
+  RowBox[{"\<\"ToCanonicalOne:: Standard configuration: \"\>", 
+   "\[InvisibleSpace]", 
+   RowBox[{"{", 
+    RowBox[{"a", ",", 
+     RowBox[{"-", "a"}]}], "}"}]}],
+  SequenceForm["ToCanonicalOne:: Standard configuration: ", 
+   xAct`xTensor`IndexList[$CellContext`a, -$CellContext`a]],
+  Editable->False]], "Print",
+ CellChangeTimes->{3.477553139945665*^9, 3.477558333280906*^9}],
+
+Cell[BoxData[
+ InterpretationBox[
+  RowBox[{"\<\"ToCanonicalOne:: Repeated indices: \"\>", "\[InvisibleSpace]", 
+   
+   RowBox[{"{", "}"}]}],
+  SequenceForm["ToCanonicalOne:: Repeated indices: ", 
+   xAct`xTensor`IndexList[]],
+  Editable->False]], "Print",
+ CellChangeTimes->{3.477553139945665*^9, 3.477558333476301*^9}],
+
+Cell[BoxData[
+ InterpretationBox[
+  RowBox[{"\<\"ToCanonicalOne:: Repeated indices: \"\>", "\[InvisibleSpace]", 
+   
+   RowBox[{"{", "}"}]}],
+  SequenceForm["ToCanonicalOne:: Repeated indices: ", {}],
+  Editable->False]], "Print",
+ CellChangeTimes->{3.477553139945665*^9, 3.477558333689287*^9}],
+
+Cell[BoxData[
+ InterpretationBox[
+  RowBox[{"\<\"ToCanonicalOne:: Permutation to be canonicalized: \"\>", 
+   "\[InvisibleSpace]", 
+   RowBox[{"Images", "[", 
+    RowBox[{"{", 
+     RowBox[{"1", ",", "2"}], "}"}], "]"}]}],
+  SequenceForm["ToCanonicalOne:: Permutation to be canonicalized: ", 
+   xAct`xPerm`Images[{1, 2}]],
+  Editable->False]], "Print",
+ CellChangeTimes->{3.477553139945665*^9, 3.477558333711472*^9}],
+
+Cell[BoxData[
+ InterpretationBox[
+  RowBox[{"\<\"dummies: \"\>", "\[InvisibleSpace]", 
+   RowBox[{"{", "a", "}"}]}],
+  SequenceForm["dummies: ", 
+   xAct`xTensor`IndexList[$CellContext`a]],
+  Editable->False]], "Print",
+ CellChangeTimes->{3.477553139945665*^9, 3.477558333744224*^9}],
+
+Cell[BoxData[
+ InterpretationBox[
+  RowBox[{"\<\"ToCanonicalOne:: dummysets_tmp: \"\>", "\[InvisibleSpace]", 
+   RowBox[{"{", 
+    RowBox[{"DummySet", "[", 
+     RowBox[{"TangentM3", ",", 
+      RowBox[{"{", "a", "}"}], ",", "1"}], "]"}], "}"}]}],
+  SequenceForm["ToCanonicalOne:: dummysets_tmp: ", {
+    xAct`xPerm`DummySet[$CellContext`TangentM3, {$CellContext`a}, 1]}],
+  Editable->False]], "Print",
+ CellChangeTimes->{3.477553139945665*^9, 3.477558333773666*^9}],
+
+Cell[BoxData[
+ InterpretationBox[
+  RowBox[{"\<\"ToCanonicalOne:: dummysets: \"\>", "\[InvisibleSpace]", 
+   RowBox[{"{", 
+    RowBox[{"DummySet", "[", 
+     RowBox[{"TangentM3", ",", 
+      RowBox[{"{", 
+       RowBox[{"{", 
+        RowBox[{"1", ",", "2"}], "}"}], "}"}], ",", "1"}], "]"}], "}"}]}],
+  SequenceForm["ToCanonicalOne:: dummysets: ", {
+    xAct`xPerm`DummySet[$CellContext`TangentM3, {{1, 2}}, 1]}],
+  Editable->False]], "Print",
+ CellChangeTimes->{3.477553139945665*^9, 3.477558333807016*^9}],
+
+Cell[BoxData[
+ InterpretationBox[
+  RowBox[{"\<\"ToCanonicalOne:: Free indices: \"\>", "\[InvisibleSpace]", 
+   RowBox[{"{", "}"}]}],
+  SequenceForm["ToCanonicalOne:: Free indices: ", {}],
+  Editable->False]], "Print",
+ CellChangeTimes->{3.477553139945665*^9, 3.477558333840153*^9}],
+
+Cell[BoxData[
+ InterpretationBox[
+  RowBox[{"\<\"ToCanonicalOne:: calling: \"\>", 
+   "\[InvisibleSpace]", "\<\"CanonicalPerm[\"\>", "\[InvisibleSpace]", 
+   RowBox[{"Images", "[", 
+    RowBox[{"{", 
+     RowBox[{"1", ",", "2"}], "}"}], "]"}], "\[InvisibleSpace]", "\<\",\"\>", 
+   "\[InvisibleSpace]", "2", "\[InvisibleSpace]", "\<\",\"\>", 
+   "\[InvisibleSpace]", 
+   RowBox[{"StrongGenSet", "[", 
+    RowBox[{
+     RowBox[{"{", "}"}], ",", 
+     RowBox[{"GenSet", "[", "]"}]}], "]"}], "\[InvisibleSpace]", "\<\",\"\>", 
+   "\[InvisibleSpace]", 
+   RowBox[{"{", "}"}], "\[InvisibleSpace]", "\<\",\"\>", "\[InvisibleSpace]", 
+   
+   RowBox[{"{", 
+    RowBox[{"DummySet", "[", 
+     RowBox[{"TangentM3", ",", 
+      RowBox[{"{", 
+       RowBox[{"{", 
+        RowBox[{"1", ",", "2"}], "}"}], "}"}], ",", "1"}], "]"}], "}"}], 
+   "\[InvisibleSpace]", "\<\",\"\>", "\[InvisibleSpace]", 
+   RowBox[{"Verbose", "\[Rule]", "True"}], "\[InvisibleSpace]", "\<\"]\"\>"}],
+  
+  SequenceForm["ToCanonicalOne:: calling: ", "CanonicalPerm[", 
+   xAct`xPerm`Images[{1, 2}], ",", 2, ",", 
+   xAct`xPerm`StrongGenSet[{}, 
+    xAct`xPerm`GenSet[]], ",", {}, ",", {
+    xAct`xPerm`DummySet[$CellContext`TangentM3, {{1, 2}}, 1]}, ",", Verbose -> 
+   True, "]"],
+  Editable->False]], "Print",
+ CellChangeTimes->{3.477553139945665*^9, 3.477558333876254*^9}],
+
+Cell[BoxData[
+ InterpretationBox[
+  RowBox[{"\<\"ToCanonicalOne:: Canonical permutation: \"\>", 
+   "\[InvisibleSpace]", 
+   RowBox[{"Images", "[", 
+    RowBox[{"{", 
+     RowBox[{"1", ",", "2"}], "}"}], "]"}]}],
+  SequenceForm["ToCanonicalOne:: Canonical permutation: ", 
+   xAct`xPerm`Images[{1, 2}]],
+  Editable->False]], "Print",
+ CellChangeTimes->{3.477553139945665*^9, 3.477558333930378*^9}]
+}, Open  ]],
+
+Cell[BoxData[
+ InterpretationBox[
+  StyleBox[
+   SubsuperscriptBox["K", 
+    RowBox[{" ", "a"}], 
+    RowBox[{"a", " "}]],
+   AutoSpacing->False],
+  K[$CellContext`a, -$CellContext`a],
+  Editable->False]], "Output",
+ CellChangeTimes->{{3.47755312861273*^9, 3.477553141079528*^9}, 
+   3.47755833398521*^9}]
+}, Open  ]]
+},
+WindowSize->{908, 750},
+WindowMargins->{{156, Automatic}, {10, Automatic}},
+FrontEndVersion->"7.0 for Linux x86 (32-bit) (November 10, 2008)",
+StyleDefinitions->"Default.nb"
+]
+(* End of Notebook Content *)
+
+(* Internal cache information *)
+(*CellTagsOutline
+CellTagsIndex->{}
+*)
+(*CellTagsIndex
+CellTagsIndex->{}
+*)
+(*NotebookFileOutline
+Notebook[{
+Cell[545, 20, 277, 5, 51, "Text"],
+Cell[CellGroupData[{
+Cell[847, 29, 123, 2, 32, "Input"],
+Cell[973, 33, 404, 9, 24, "Message"],
+Cell[1380, 44, 379, 8, 24, "Message"],
+Cell[1762, 54, 418, 8, 24, "Message"],
+Cell[2183, 64, 379, 8, 24, "Message"],
+Cell[2565, 74, 418, 8, 24, "Message"],
+Cell[2986, 84, 542, 11, 65, "Message"],
+Cell[CellGroupData[{
+Cell[3553, 99, 138, 2, 24, "Print"],
+Cell[3694, 103, 405, 9, 24, "Print"],
+Cell[4102, 114, 159, 2, 24, "Print"],
+Cell[4264, 118, 118, 1, 24, "Print"],
+Cell[4385, 121, 98, 1, 24, "Print"],
+Cell[4486, 124, 138, 2, 24, "Print"],
+Cell[4627, 128, 414, 10, 24, "Print"],
+Cell[5044, 140, 159, 2, 24, "Print"],
+Cell[5206, 144, 138, 2, 24, "Print"],
+Cell[5347, 148, 293, 4, 65, "Print"],
+Cell[5643, 154, 138, 2, 24, "Print"]
+}, Open  ]]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[5830, 162, 228, 6, 32, "Input"],
+Cell[CellGroupData[{
+Cell[6083, 172, 472, 10, 24, "Print"],
+Cell[6558, 184, 482, 10, 24, "Print"]
+}, Open  ]]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[7089, 200, 266, 8, 32, "Input"],
+Cell[CellGroupData[{
+Cell[7380, 212, 642, 15, 24, "Print"],
+Cell[8025, 229, 634, 14, 24, "Print"],
+Cell[8662, 245, 558, 13, 24, "Print"],
+Cell[9223, 260, 678, 16, 24, "Print"],
+Cell[9904, 278, 696, 17, 24, "Print"],
+Cell[10603, 297, 722, 17, 24, "Print"],
+Cell[11328, 316, 640, 15, 24, "Print"],
+Cell[11971, 333, 147, 2, 24, "Print"],
+Cell[12121, 337, 524, 11, 24, "Print"],
+Cell[12648, 350, 151, 2, 24, "Print"],
+Cell[12802, 354, 656, 16, 24, "Print"],
+Cell[13461, 372, 730, 17, 24, "Print"],
+Cell[14194, 391, 648, 15, 24, "Print"],
+Cell[14845, 408, 536, 11, 24, "Print"],
+Cell[15384, 421, 282, 6, 24, "Print"],
+Cell[15669, 429, 274, 6, 24, "Print"],
+Cell[15946, 437, 286, 6, 24, "Print"],
+Cell[16235, 445, 552, 11, 24, "Print"]
+}, Open  ]]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[16836, 462, 251, 7, 32, "Input"],
+Cell[17090, 471, 576, 12, 24, "Print"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[17703, 488, 267, 7, 32, "Input"],
+Cell[CellGroupData[{
+Cell[17995, 499, 410, 10, 24, "Print"],
+Cell[18408, 511, 414, 10, 24, "Print"],
+Cell[18825, 523, 320, 8, 24, "Print"],
+Cell[19148, 533, 294, 7, 24, "Print"],
+Cell[19445, 542, 417, 10, 24, "Print"],
+Cell[19865, 554, 283, 7, 24, "Print"],
+Cell[20151, 563, 466, 10, 24, "Print"],
+Cell[20620, 575, 507, 12, 24, "Print"],
+Cell[21130, 589, 281, 6, 24, "Print"],
+Cell[21414, 597, 1337, 32, 45, "Print"],
+Cell[22754, 631, 397, 10, 24, "Print"]
+}, Open  ]],
+Cell[23166, 644, 307, 10, 31, "Output"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[23510, 659, 267, 7, 32, "Input"],
+Cell[CellGroupData[{
+Cell[23802, 670, 410, 10, 24, "Print"],
+Cell[24215, 682, 414, 10, 24, "Print"],
+Cell[24632, 694, 320, 8, 24, "Print"],
+Cell[24955, 704, 294, 7, 24, "Print"],
+Cell[25252, 713, 417, 10, 24, "Print"],
+Cell[25672, 725, 283, 7, 24, "Print"],
+Cell[25958, 734, 466, 10, 24, "Print"],
+Cell[26427, 746, 507, 12, 24, "Print"],
+Cell[26937, 760, 282, 6, 24, "Print"],
+Cell[27222, 768, 1337, 32, 45, "Print"],
+Cell[28562, 802, 397, 10, 24, "Print"]
+}, Open  ]],
+Cell[28974, 815, 305, 10, 31, "Output"]
+}, Open  ]]
+}
+]
+*)
+
+(* End of internal cache information *)
