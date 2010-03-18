@@ -19,7 +19,7 @@
 */
 
 #define NEW_XPERM 
-#define XPERM_DEBUG
+//#define XPERM_DEBUG
 // Do not turn this one off
 #define XPERM_USE_EXT  
 
@@ -3319,10 +3319,12 @@ algorithm::result_t canonicalise::apply(iterator& it)
 					// we put n, which can only go the fifth slot. Then we put p, which can go
 					// to 6,7,8, so that it goes to 6. Then we put r (not q), which can go to 7
 					// and 8, and so we put it at 7, etc.
-					
+
+#ifdef XPERM_DEBUG					
 					txtout << "putting index " << i+1 << "(" << *num_to_tree_map[i].begin()->name 
 							 << ", " << num_to_tree_map[i].begin()->fl.parent_rel 
 							 << ") in slot " << cperm[i] << std::endl;
+#endif
 					
 					iterator ri = tr.replace_index(num_to_it_map[cperm[i]-1], num_to_tree_map[i].begin());
 					ri->fl.parent_rel=num_to_tree_map[i].begin()->fl.parent_rel;
