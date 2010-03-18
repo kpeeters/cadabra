@@ -451,10 +451,12 @@ class canonicalise : public algorithm {
 		std::vector<std::vector<int> > generating_set;
 		bool             reuse_generating_set;
 
-//		enum method_t { xperm, adjacency } method;
 	private:
 		bool remove_traceless_traces(iterator&);
 		bool remove_vanishing_numericals(iterator&);
+		std::string get_index_set_name(iterator) const;
+//		void collect_dummy_info(const index_map_t&, const index_position_map_t&, 
+//										std::vector<int>&, std::vector<int>&);
 };
 
 class reduce : public algorithm {

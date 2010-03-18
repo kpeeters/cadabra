@@ -424,7 +424,7 @@ tst36:= \Gamma_{a}^{b}_{c}^{d} + @(obj36);
 {a,b,c,d,e}::Indices(vector, position=fixed).
 obj37:= B^{b} B_{b} A_{a} A^{a};
 @canonicalise!(%);
-tst37:= B^{b} B_{b} A_{a} A^{a} - @(obj37);
+tst37:= B^{a} B_{a} A^{b} A_{b} - @(obj37);
 @collect_terms!(%);
 @assert(tst37);
 

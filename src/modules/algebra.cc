@@ -2884,6 +2884,16 @@ bool canonicalise::remove_vanishing_numericals(iterator& it)
 	return false;
 	}
 
+std::string canonicalise::get_index_set_name(iterator it) const
+	{
+	const Indices *ind=properties::get<Indices>(it);
+	if(ind) {
+		if(ind->parent_name!="") return ind->parent_name;
+		else                     return ind->set_name;
+		}
+	else return " undeclared";
+	}
+
 algorithm::result_t canonicalise::apply(iterator& it)
 	{
 //	txtout << "canonicalising the following expression:" << std::endl;
@@ -2911,72 +2921,46 @@ algorithm::result_t canonicalise::apply(iterator& it)
 	// Construct the "name to slot" map from the order in ind_free & ind_dummy.
 	// Also construct the free and dummy lists.
 	// And a map from index number to iterator (for later).
-	int                      *perm=new int[total_number_of_indices+2];
-	int                     *cperm=new int[total_number_of_indices+2];
-	int                   *dummies=new int[ind_dummy.size()];
-	int            *dummysetlabels=new int[total_number_of_indices]; 
+	std::vector<int> vec_perm;
 	int              *free_indices=new int[ind_free.size()];
-	int     *lengths_of_dummy_sets=new int[1];
-	int         *metric_signatures=new int[1];
-	int  *lengths_of_repeated_sets=new int[1];
-	int          *repeated_indices=new int[1];
 
-	std::vector<unsigned int> base_here;
-	// setlabels is a list of numbers such that indices from the same index set
-	// have the same number associated to them. 
-	
-	// The key in the maps below is the set_name of the Indices property, or the
-	// set_name of the parent if applicable.
-	std::map<std::string, std::multiset<exptree, tree_exact_less_mod_prel_obj> > index_sets;
-	std::vector<std::string> indexpos_to_indextype(total_number_of_indices, " undeclared");
+
+
 	
 
-	// FIXME: it seems to me that we only need a vector of iterators, in such a way
-	// that the order of elements corresponds to the preferred order (essentially: 
-	// base to iterator).
-	//std::map<int, exptree::iterator> num_to_it_map;
+	// We need two arrays: one which maps from the order in which slots appear in 
+	//	the tensor to the corresponding iterator (this is provided by the standard
+	// index routines already), and one which maps from the order in which the indices 
+	// appear in the base map to an exptree object (so that we can replace).
+
 	std::vector<exptree::iterator> num_to_it_map(total_number_of_indices);
 	std::vector<exptree>           num_to_tree_map;
+
+	// Handle free indices.
 	
-	int curr_pos=0;
 	index_map_t::iterator sorted_it=ind_free.begin();
 	int curr_index=0;
 	while(sorted_it!=ind_free.end()) {
 		index_position_map_t::iterator ii=ind_pos_free.find(sorted_it->second);
-//		txtout << *(ii->first->name)/* << "_" << *(ii->first.begin()->name)*/ << " at pos " << ii->second+1 << std::endl;
 		num_to_it_map[ii->second]=ii->first;
 		num_to_tree_map.push_back(exptree(ii->first));
-//		num_to_it_map[ii->second+1]=ii->first;
 		free_indices[curr_index++]=ii->second+1;
-		perm[curr_pos++]=ii->second+1;
-		// Setup index information FIXME: remove once xperm.c is fixed.
-		if(ii->first->is_rational() || properties::get<Coordinate>(ii->first)
-			|| properties::get<Symbol>(ii->first) ) {
-			indexpos_to_indextype[ii->second]="numerical";
-//			index_sets["numerical"].insert(ii->first);
-			}
-		else {
-			const Indices *ind=properties::get<Indices>(ii->first);
-			if(!ind) { 
-				if(index_sets.size()>0) {
-					txtout << "didn't find an Indices for " << *(ii->first->name) << std::endl;
-					throw consistency_error("All indices need to have an Indices property.");
-					}
-				}
-			else {
-				assert(ii->second<(int)total_number_of_indices);
-				assert(indexpos_to_indextype[ii->second]==" undeclared");
-				if(ind->parent_name!="") indexpos_to_indextype[ii->second]=ind->parent_name;
-				else                     indexpos_to_indextype[ii->second]=ind->set_name;
-				}
-			}
+		vec_perm.push_back(ii->second+1);
 		
 		++sorted_it;
 		}
-	perm[total_number_of_indices]=total_number_of_indices+1;
-	perm[total_number_of_indices+1]=total_number_of_indices+2;
-//			txtout << "dummy:" << std::endl;
 	curr_index=0;
+
+
+	// Handle dummy indices
+	// In order to ensure that dummy indices from different index types do not
+	// get mixed up, we need to collect information about the types of all
+	// dummy indices.
+	// The key in the maps below is the set_name of the Indices property, or the
+	// set_name of the parent if applicable. If none, it will be ' undeclared'.
+
+	typedef std::map<std::string, std::vector<int> > dummy_set_t;
+	dummy_set_t dummy_sets;
 
 	sorted_it=ind_dummy.begin();
 	while(sorted_it!=ind_dummy.end()) {
@@ -2985,81 +2969,62 @@ algorithm::result_t canonicalise::apply(iterator& it)
 		// general cadabra dummy concept).
 		// The lower index come first, and then the upper index. 
 
-		index_position_map_t::iterator ii=ind_pos_dummy.find(sorted_it->second);
-		index_map_t::iterator next_it=sorted_it;
+		index_position_map_t::const_iterator ii=ind_pos_dummy.find(sorted_it->second);
+		index_map_t::const_iterator          next_it=sorted_it;
 		++next_it;
-		index_position_map_t::iterator i2=ind_pos_dummy.find(next_it->second);
+		index_position_map_t::const_iterator i2=ind_pos_dummy.find(next_it->second);
 
 #ifdef XPERM_DEBUG
-		txtout << *(ii->first->name) << " at pos " << ii->second+1 << std::endl;
+		txtout << *(ii->first->name) << " at pos " << ii->second+1 << " " << ii->first->fl.parent_rel << std::endl;
 #endif
 		
 		switch(ii->first->fl.parent_rel) {
 			case str_node::p_super:
 			case str_node::p_none:
-				perm[curr_pos++]=ii->second+1;
-				perm[curr_pos++]=i2->second+1;
+				vec_perm.push_back(ii->second+1);
+				vec_perm.push_back(i2->second+1);
 				num_to_tree_map.push_back(exptree(ii->first));
 				num_to_tree_map.push_back(exptree(i2->first));
 				break;
 			case str_node::p_sub:
-				perm[curr_pos++]=i2->second+1;
-				perm[curr_pos++]=ii->second+1;
+				vec_perm.push_back(i2->second+1);
+				vec_perm.push_back(ii->second+1);
 				num_to_tree_map.push_back(exptree(i2->first));
 				num_to_tree_map.push_back(exptree(ii->first));
 				break;
 			}
 		num_to_it_map[ii->second]=ii->first;
 		num_to_it_map[i2->second]=i2->first;
-		dummies[curr_index++]=ii->second+1;
-		dummies[curr_index++]=i2->second+1;
-		
-		// Can increment by two now, since we treat all dummies in pairs.
+
+		dummy_sets[get_index_set_name(ii->first)].push_back(ii->second+1);
+		dummy_sets[get_index_set_name(i2->first)].push_back(i2->second+1);
+
 		++sorted_it;
-		++sorted_it;
-		}
-		
-	// Setup index information FIXME: remove once xperm.c is fixed.
-	sorted_it=ind_dummy.begin();
-	while(sorted_it!=ind_dummy.end()) {	
-		index_position_map_t::iterator ii=ind_pos_dummy.find(sorted_it->second);
-		const Indices *ind=properties::get<Indices>(ii->first);
-//		const Coordinate *coo=properties::get<Coordinate>(ii->first);
-		if(!ind /* && !coo */) { 
-			if(index_sets.size()>0) {
-				txtout << "dum: didn't find an Indices for " << *(ii->first->name) << std::endl;
-				throw consistency_error("All indices need to have an Indices property.");
-				}
-			}
-		else {
-			if(ind->parent_name!="") index_sets[ind->parent_name].insert(ii->first);
-			else                     index_sets[ind->set_name].insert(ii->first);
-//			txtout << ii->second << " vs " << total_number_of_indices << std::endl;
-			assert(ii->second<(int)total_number_of_indices);
-			assert(indexpos_to_indextype[ii->second]==" undeclared");
-			if(ind->parent_name!="") indexpos_to_indextype[ii->second]=ind->parent_name;
-			else                     indexpos_to_indextype[ii->second]=ind->set_name;
-			}
 		++sorted_it;
 		}
 
+	// FIXME: handle 'repeated' sets (numerical indices)
 	// FIXME: kludge to handle numerical indices; should be done through lookup
 	// in Integer properties. This one does NOT work when there is more than
 	// one index set; we would need more clever logic to figure out which
 	// index type the numerical index corresponds to.
 //	debugout << index_sets.size() << std::endl;
-	if(index_sets.size()==1) {
-		for(unsigned int kk=0; kk<indexpos_to_indextype.size(); ++kk) 
-			if(indexpos_to_indextype[kk]=="numerical")
-				indexpos_to_indextype[kk]=index_sets.begin()->first;
-		}
+//	if(index_sets.size()==1) {
+//		for(unsigned int kk=0; kk<indexpos_to_indextype.size(); ++kk) 
+//			if(indexpos_to_indextype[kk]=="numerical")
+//				indexpos_to_indextype[kk]=index_sets.begin()->first;
+//		}
+//
 	
 	// Construct the generating set.
+
+	std::vector<unsigned int> base_here;
+
 	if(!reuse_generating_set || generating_set.size()==0) {
 		generating_set.clear();
 		// Symmetry of individual tensors.
 		sibling_iterator facit=tr.begin(it);
-		curr_pos=0;
+		int curr_pos=0;
 		while(facit!=tr.end(it)) {
 			const TableauBase *tba=properties::get_composite<TableauBase>(facit);
 			if(tba) {
@@ -3175,15 +3140,39 @@ algorithm::result_t canonicalise::apply(iterator& it)
 				}
 			}
 		
-		// Fill the dummysetlabels array with information about dummy sets.
-		for(unsigned int i=0; i<ind_free.size(); ++i)
-			dummysetlabels[i]=0;
-		for(unsigned int i=0; i<ind_dummy.size(); ++i)
-			dummysetlabels[i+ind_free.size()]=1;
-		// Ditto for base.
-		int *base=new int[base_here.size()];
+		// Setup the arrays for xperm from our own data structures.
+
+		int    *base=new int[base_here.size()];
+		int    *perm=new int[total_number_of_indices+2];
+		int   *cperm=new int[total_number_of_indices+2];
+
 		for(unsigned int i=0; i<base_here.size(); ++i)
 			base[i]=base_here[i];
+		assert(vec_perm.size()==total_number_of_indices);
+		for(unsigned int i=0; i<total_number_of_indices; ++i) 
+			perm[i]=vec_perm[i];
+		perm[total_number_of_indices]=total_number_of_indices+1;
+		perm[total_number_of_indices+1]=total_number_of_indices+2;
+
+		int  *lengths_of_dummy_sets=new int[dummy_sets.size()];
+		int  *dummies              =new int[ind_dummy.size()];
+		int  *metric_signatures    =new int[dummy_sets.size()];
+		int  dsi=0; 
+		int  cdi=0;
+		dummy_set_t::iterator ds=dummy_sets.begin();
+		while(ds!=dummy_sets.end()) {
+			lengths_of_dummy_sets[dsi]=ds->second.size();
+			for(unsigned int k=0; k<ds->second.size(); ++k) 
+				dummies[cdi++]=(ds->second)[k];
+			metric_signatures[dsi]=1;
+			++ds;
+			++dsi;
+			}
+
+		int  *lengths_of_repeated_sets=new int[1];
+		int          *repeated_indices=new int[1];
+
+		lengths_of_repeated_sets[0]=0;
 		
 #ifdef XPERM_DEBUG
 			txtout << "perm:" << std::endl;
@@ -3198,48 +3187,18 @@ algorithm::result_t canonicalise::apply(iterator& it)
 			for(unsigned int i=0; i<ind_free.size(); ++i)
 			txtout << free_indices[i] << " "; 
 			txtout << std::endl;
+			txtout << "lengths_of_dummy_sets:" << std::endl;
+			for(unsigned int i=0; i<dummy_sets.size(); ++i)
+				txtout << lengths_of_dummy_sets[i] << " "; 
+			txtout << std::endl;
 			txtout << "dummies:" << std::endl;
 			for(unsigned int i=0; i<ind_dummy.size(); ++i)
 				txtout << dummies[i] << " "; 
 			txtout << std::endl;
 #endif
 
-// FIXME: Temporarily disabled until xperm.c is fixed.
-/*				index_map_t::iterator ii=ind_dummy.begin();
-				int i=0;
-				std::vector<const Indices *> known_index_sets;
-				while(ii!=ind_dummy.end()) {
-					const Indices *ind=properties::get<Indices>(ii->second);
-					if(ind==false) {
-						if(known_index_sets.size()>0)
-							throw consistency_error("Need Indices property for all indices.");
-						}
-					else { 
-						unsigned int fi;
-						for(fi=0; fi<known_index_sets.size(); ++fi) 
-							if(known_index_sets[fi]==ind) 
-								break;
-						if(fi==known_index_sets.size()) 
-							known_index_sets.push_back(ind);
-
-						dummysetlabels[i+ind_free.size()]=fi+1;
-						}
-					++i;
-					++ii;
-					}
-*/
-
-//				txtout << "dummysetlabels = ";
-//				for(unsigned int fi=0; fi<total_number_of_indices; ++fi)
-//					txtout << dummysetlabels[fi] << " ";
-//				txtout << std::endl;
-
 		stopwatch sw;
 		sw.start();
-
-		lengths_of_dummy_sets[0]=ind_dummy.size();
-		metric_signatures[0]=1;
-		lengths_of_repeated_sets[0]=0;
 
 		// JMM now uses a different convention. 
 		int *perm1 = new int[total_number_of_indices+2];
@@ -3309,7 +3268,7 @@ algorithm::result_t canonicalise::apply(iterator& it)
 								 free_indices_new_order,     // free indices
 								 ind_free.size(),            // number of free indices
 								 lengths_of_dummy_sets,      // list of lengths of dummy sets
-								 1,                          //    its length
+								 dummy_sets.size(),          //    its length
 								 dummies_new_order,          // list with pairs of dummies
 								 ind_dummy.size(),           //    its length
 								 metric_signatures,          // list of symmetries of metric
@@ -3338,85 +3297,38 @@ algorithm::result_t canonicalise::apply(iterator& it)
 #endif
 
 		if(cperm[0]!=0) {
-			 bool has_changed=false;
-			 for(unsigned int i=0; i<total_number_of_indices+1; ++i) {
-				  if(perm[i]!=cperm[i]) {
-						has_changed=true;
-						break;
-						}
-				  }
-			 if(has_changed) {
-				  if(static_cast<unsigned int>(cperm[total_number_of_indices+1])==total_number_of_indices+1) {
-//					txtout << "- ";
-						flip_sign(it->multiplier);
-						}
-				  expression_modified=true;
-				  
-				  index_map_t::iterator freeit=ind_free.begin();
-				  bool using_free=true;
-				  for(unsigned int i=0; i<total_number_of_indices; ++i) {
-						if(freeit==ind_free.end()) {
-							 freeit=ind_dummy.begin(); // continue with the dummies
-							 using_free=false;
-							 }
-						// xPerm assumes that all indices are in the same set, but
-						// we do not want that, it mixes up dummies in different sets. 
-						
-						// Hopefully fixed in the near future with a modified xperm.c, 
-						// which only exchanges dummy pairs if they come from the same 
-						// set (as indicated in dummysetlabels.
-						
-						// Meanwhile, a hack:
-						if(false && index_sets.size()>0 && !using_free) {
-							 // We are going to put an index into position "cperm[i]-1". We need to figure
-							 // out its type, because we have to take a dummy from the right set. We can do this
-							 // by looking at the type of the index which sat in this position. However, that
-							 // will fail if the index which sat there was numerical. There is a hack for this
-							 // somewhere above, but it only works when there is one index type...
-							 
-							 std::string required_type=indexpos_to_indextype[cperm[i]-1];
-							 assert(required_type!=" undeclared");
-							 assert(index_sets.find(required_type)!=index_sets.end());
-							 std::multiset<exptree, tree_exact_less_mod_prel_obj>& theset=index_sets[required_type];
-							 std::multiset<exptree, tree_exact_less_mod_prel_obj>::iterator theind=theset.begin();
-							 assert(theind!=theset.end());
-//							 iterator ri = tr.replace_index(num_to_it_map[cperm[i]], theind->begin());
-	
-							 // FIXME: The following is tempting, because it enables objects with symmetries
-							 // between indices which do not have the same parent rel. However, this is
-							 // full of subtleties; better to disable this altogether for indices which
-							 // have fixed position (which is, however, tricky with wildcards like \Gamma{#}).
-
-//							 ri->fl.parent_rel=theind->begin()->fl.parent_rel;
-//							 theset.erase(theind);
-							 }
-						else {
-                      // In the new final permutation
-                      // 
-                      // 1 5 6 8 7 2 3 4 10 9
-                      //  
-                      // we place first the first index (m), which goes to the first slot. Then
-                      // we put n, which can only go the fifth slot. Then we put p, which can go
-                      // to 6,7,8, so that it goes to 6. Then we put r (not q), which can go to 7
-                      // and 8, and so we put it at 7, etc.
-
-							txtout << "putting index " << i+1 << "(" << *num_to_tree_map[i].begin()->name 
-									 << ", " << num_to_tree_map[i].begin()->fl.parent_rel 
-									 << ") in slot " << cperm[i] << std::endl;
-
-//							We need two arrays: one which maps from the order in which slots appear in 
-//								the tensor to the corresponding iterator (this is provided by the standard
-//																						index routines already), and one 
-//								which maps from the order in which the indices appear in the base map
-//								to an exptree object (so that we can replace).
-
-							iterator ri = tr.replace_index(num_to_it_map[cperm[i]-1], num_to_tree_map[i].begin());
-							ri->fl.parent_rel=num_to_tree_map[i].begin()->fl.parent_rel;
-							}
-						++freeit;
-						}
-				  }
-			 }
+			bool has_changed=false;
+			for(unsigned int i=0; i<total_number_of_indices+1; ++i) {
+				if(perm[i]!=cperm[i]) {
+					has_changed=true;
+					break;
+					}
+				}
+			if(has_changed) {
+				if(static_cast<unsigned int>(cperm[total_number_of_indices+1])==total_number_of_indices+1) {
+					flip_sign(it->multiplier);
+					}
+				expression_modified=true;
+				
+				for(unsigned int i=0; i<total_number_of_indices; ++i) {
+					// In the new final permutation, e.g.
+					// 
+					// 1 5 6 8 7 2 3 4 10 9
+					//  
+					// we place first the first index (m), which goes to the first slot. Then
+					// we put n, which can only go the fifth slot. Then we put p, which can go
+					// to 6,7,8, so that it goes to 6. Then we put r (not q), which can go to 7
+					// and 8, and so we put it at 7, etc.
+					
+					txtout << "putting index " << i+1 << "(" << *num_to_tree_map[i].begin()->name 
+							 << ", " << num_to_tree_map[i].begin()->fl.parent_rel 
+							 << ") in slot " << cperm[i] << std::endl;
+					
+					iterator ri = tr.replace_index(num_to_it_map[cperm[i]-1], num_to_tree_map[i].begin());
+					ri->fl.parent_rel=num_to_tree_map[i].begin()->fl.parent_rel;
+					}
+				}
+			}
 		else {
 			zero(it->multiplier);
 			expression_modified=true;
@@ -3425,19 +3337,19 @@ algorithm::result_t canonicalise::apply(iterator& it)
 		if(gs) 
 			delete [] gs;
 		delete [] base;
-		}
 
+		delete [] repeated_indices;
+		delete [] lengths_of_repeated_sets;
+		delete [] metric_signatures;
+		delete [] lengths_of_dummy_sets;
+		delete [] dummies;
+		delete [] cperm;
+		delete [] perm;
+		}
+	
 	cleanup_expression(tr, it);
 
-	delete [] repeated_indices;
-	delete [] lengths_of_repeated_sets;
-	delete [] metric_signatures;
-	delete [] lengths_of_dummy_sets;
 	delete [] free_indices;
-	delete [] dummies;
-	delete [] dummysetlabels;
-	delete [] cperm;
-	delete [] perm;
 
 	totalsw.stop();
 //	txtout << "total canonicalise took " << totalsw << std::endl;
