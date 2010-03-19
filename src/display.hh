@@ -262,12 +262,12 @@ class print_filled_tableau : public node_printer {
 		virtual void print_infix(std::ostream&, iterator );
 };
 
-// class print_derivative : public node_printer {
-// 	public:
-// 		print_derivative(exptree_output&);
-// 		virtual ~print_derivative() {};
-// 		virtual void print_infix(std::ostream&, iterator );
-// };
+class print_derivative : public node_printer {
+	public:
+		print_derivative(exptree_output&);
+		virtual ~print_derivative() {};
+		virtual void print_infix(std::ostream&, iterator );
+};
 
 
 /* ------------------------------------------------------------------------------- */

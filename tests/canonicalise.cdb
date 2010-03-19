@@ -487,3 +487,13 @@ obj42:= \delta_{n}^{r} \partial_{r}{ u^{n} };
 @canonicalise!(%);
 # \delta_{n}^{r} * \partial^{n}{u_{r}};
 
+# Test 43: prevent raising/lowering if there is a Derivative
+# in the way. For the time being we do not even allow this
+# if there is a full covariant derivative.
+@reset.
+\partial{#}::Derivative.
+obj43:= A_{m n} \partial_{k}{ B^{m n} };
+@canonicalise!(%);
+tst43:= A_{m n} \partial_{k}{ B^{m n} } - @(obj43);
+@collect_terms!(%);
+@assert(tst43);

@@ -71,3 +71,11 @@ tst7b:= 1/2 R_{m n p q} + 1/2 R_{n m p q} - @(obj7b);
 @collect_terms!(%);
 @assert(tst7b);
 
+# Test 8: sym/asym on whole tensors, with different index lengths
+#
+obj8:=A_{a b} B_{c};
+@sym!(%){A_{a b}, B_{c}};
+tst8:=1/2 A_{a b} B_{c} + 1/2 B_{c} A_{a b} - @(obj8);
+@collect_terms!(%);
+@assert(tst8);
+			 

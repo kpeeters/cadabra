@@ -1,3 +1,8 @@
+2010-03-19  Kasper Peeters  <kasper.peeters@aei.mpg.de>
+
+	* Fixed display of Derivatives and PartialDerivatives (had too
+	many brackets). 
+
 2010-03-01  Kasper Peeters  <kasper.peeters@aei.mpg.de>
 
 	* Fixed handling of stuck kernels (both on exit of xcadabra as

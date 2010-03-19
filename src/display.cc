@@ -87,7 +87,8 @@ void exptree_output::setup_handlers(bool infix)
 				if(output_format==out_xcadabra) {
 					printers_prop_["Tableau"]       = &create<print_tableau>;
 					printers_prop_["FilledTableau"] = &create<print_filled_tableau>;
-//					printers_prop_["Derivative"]    = &create<print_derivative>;
+					printers_prop_["Derivative"]    = &create<print_derivative>;
+					printers_prop_["PartialDerivative"]    = &create<print_derivative>;
 					}
 				break;
 			}
@@ -695,38 +696,69 @@ void print_filled_tableau::print_infix(std::ostream& str, exptree::iterator it)
 	}
 
 
-//print_derivative::print_derivative(exptree_output& eo)
-//	: node_printer(eo)
-//	{
-//	}
-//
-//void print_derivative::print_infix(std::ostream& str, exptree::iterator it)
-//	{
-//	if(*it->multiplier!=1) 
-//		print_multiplier(str, it);
-//
-//	if(parent.output_format==exptree_output::out_xcadabra) {
-//		const LaTeXForm *lf=properties::get<LaTeXForm>(it);
-//		bool needs_extra_brackets=false;
-//		const Accent *ac=properties::get<Accent>(it);
-//		if(!ac) { // accents should never get additional curly brackets, {\bar}{g} does not print.
-//			sibling_iterator sib=tr.begin(it);
-//			while(sib!=tr.end(it)) {
-//				if(sib->is_index()) 
-//					needs_extra_brackets=true;
-//				++sib;
-//				}
-//			}
-//		
-//		if(needs_extra_brackets) str << "{"; // to prevent double sup/sub script errors
-//		if(lf) str << lf->latex;
-//		else   str << texify(*it->name);
-//		if(needs_extra_brackets) str << "}";
-//		}
-//	else str << *it->name;
-//	
-//	print_children(str, it);
-//	}
+print_derivative::print_derivative(exptree_output& eo)
+	: node_printer(eo)
+	{
+	}
+
+void print_derivative::print_infix(std::ostream& str, exptree::iterator it)
+	{
+	if(*it->multiplier!=1) 
+		print_multiplier(str, it);
+
+	const LaTeXForm *lf=properties::get<LaTeXForm>(it);
+	bool needs_extra_brackets=false;
+	const Accent *ac=properties::get<Accent>(it);
+	if(!ac) { // accents should never get additional curly brackets, {\bar}{g} does not print.
+		sibling_iterator sib=tr.begin(it);
+		while(sib!=tr.end(it)) {
+			if(sib->is_index()) 
+				needs_extra_brackets=true;
+			++sib;
+			}
+		}
+	
+	if(needs_extra_brackets) str << "{"; // to prevent double sup/sub script errors
+	if(lf) str << lf->latex;
+	else   str << texify(*it->name);
+	if(needs_extra_brackets) str << "}";
+
+	sibling_iterator idx=tr.begin(it);
+	int count=0;
+	previous_parent_rel_=str_node::p_none;
+	
+	while(idx!=tr.end(it)) {
+		sibling_iterator nxt=idx;
+		++nxt;
+
+		if(idx->is_index()) {
+			if(idx->fl.parent_rel!=previous_parent_rel_) {
+				print_parent_rel(str, idx->fl.parent_rel, idx==tr.begin(it));
+				str << "{";
+				previous_parent_rel_=idx->fl.parent_rel;
+				parent.get_printer(idx)->print_infix(str, idx);
+				}
+			else
+				parent.get_printer(idx)->print_infix(str, idx);
+
+			if(nxt==tr.end(it) || nxt->fl.parent_rel!=previous_parent_rel_)
+				str << "}";
+			else 
+				str << " ";
+			}
+		else {
+			if(*idx->name=="\\prod" || *idx->name=="\\sum")
+				str << "(";
+
+			parent.get_printer(idx)->print_infix(str, idx);
+
+			if(*idx->name=="\\prod" || *idx->name=="\\sum")
+				str << ")";
+			}
+		++idx;
+		++count;
+		}
+	}
 
 print_sequence::print_sequence(exptree_output& eo)
 	: node_printer(eo)

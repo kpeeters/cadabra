@@ -2709,13 +2709,12 @@ algorithm::result_t sym_asym::doit(sibling_iterator& st, sibling_iterator& nd, b
 	sibling_iterator dummy=rep.append_child(top, str_node("dummy"));
 
 	for(unsigned int i=0; i<raw_ints.size(); ++i) {
-//		for(unsigned int kk=0; kk<raw_ints.original.size(); ++kk) {
-//			txtout << raw_ints[i][kk] << " ";
-//			}
-//		txtout << std::endl;
 		exptree copytree(tr.parent(st));// CORRECT?
 		copytree.begin()->fl.bracket=str_node::b_none;
 		copytree.begin()->fl.parent_rel=str_node::p_none;
+		
+		std::map<iterator, iterator, exptree::iterator_base_less> replacement_map;
+		
 		for(unsigned int j=0; j<raw_ints[i].size(); ++j) {
 			iterator repl=copytree.begin(), orig=tr.parent(st); // CORRECT?
 			++repl; ++orig;
@@ -2723,19 +2722,37 @@ algorithm::result_t sym_asym::doit(sibling_iterator& st, sibling_iterator& nd, b
 				++orig;
 			for(unsigned int k=0; k<argloc_2_treeloc[raw_ints.original[j]]; ++k)
 				++repl;
-			str_node::bracket_t cbr=repl->fl.bracket;
-//			str_node::parent_rel_t cpr=repl->fl.parent_rel;
+
+			// We cannot just replace here, because then walking along the tree
+			// in the next step may no longer work (we may be swapping objects
+			// with different numbers of indices, as in
+			//
+			//   A_{a b} B_{c};
+			//   @sym!(%){A_{a b}, B_{c}};
+			// 
+			// so we store iterators first.
+
 			if((*orig->name).size()==0)
-				repl=copytree.replace(repl, tr.begin(orig));
+				replacement_map[repl]=tr.begin(orig);
 			else
-				repl=copytree.replace(repl, orig);
+				replacement_map[repl]=orig;
+			}
+
+		// All replacement rules now figured out, let's do them.
+		std::map<iterator, iterator>::iterator rit=replacement_map.begin();
+		while(rit!=replacement_map.end()) {
+			str_node::bracket_t cbr=rit->first->fl.bracket;
+			iterator repl=copytree.replace(rit->first, rit->second);
 			// FIXME: think about whether this is what we want: the bracket
 			// type 'stays', while the parent rel is moved together with the
 			// index. A(x)*Z[y] -> A(y)*Z[x] ,
 			//        A^m_n     -> A_n^m .
 			repl->fl.bracket=cbr;
-//			repl->fl.parent_rel=cpr;
+			++rit;
 			}
+
+		// Some final multiplier stuff and cleanup
+
 		multiply(copytree.begin()->multiplier, 1/multiplier_t(raw_ints.total_permutations()));
 //		multiply(copytree.begin()->multiplier, *st->multiplier);
 		if(sign)
@@ -2894,6 +2911,40 @@ std::string canonicalise::get_index_set_name(iterator it) const
 	else return " undeclared";
 	}
 
+bool canonicalise::separated_by_derivative(iterator i1, iterator i2) const
+	{
+	std::set<iterator> parents;
+
+	// Walk up the tree until we hit the top or a Derivative node; store all 
+	// pointers.
+
+	iterator walk=tr.parent(i1);
+	while(*walk->name!="\\expression" && tr.is_valid(tr.parent(walk)) ) {
+		walk=tr.parent(walk);
+		const Derivative *der=properties::get<Derivative>(walk);
+		if(der)
+			break;
+		parents.insert(walk);
+		}
+
+	// Do the same from the other index; if we find a node which was
+	// already encountered, this means that the indices are not separated
+	// by a derivative.
+
+	walk=tr.parent(i2);
+	while(*walk->name!="\\expression" && tr.is_valid(tr.parent(walk)) ) {
+		walk=tr.parent(walk);
+		const Derivative *der=properties::get<Derivative>(walk);
+		if(der)
+			break;
+
+		if( parents.find(walk)!=parents.end() )
+			return false;
+		}
+	
+	return true;
+	}
+
 algorithm::result_t canonicalise::apply(iterator& it)
 	{
 //	txtout << "canonicalising the following expression:" << std::endl;
@@ -2923,9 +2974,6 @@ algorithm::result_t canonicalise::apply(iterator& it)
 	// And a map from index number to iterator (for later).
 	std::vector<int> vec_perm;
 	int              *free_indices=new int[ind_free.size()];
-
-
-
 	
 
 	// We need two arrays: one which maps from the order in which slots appear in 
@@ -2977,22 +3025,34 @@ algorithm::result_t canonicalise::apply(iterator& it)
 #ifdef XPERM_DEBUG
 		txtout << *(ii->first->name) << " at pos " << ii->second+1 << " " << ii->first->fl.parent_rel << std::endl;
 #endif
-		
-		switch(ii->first->fl.parent_rel) {
-			case str_node::p_super:
-			case str_node::p_none:
-				vec_perm.push_back(ii->second+1);
-				vec_perm.push_back(i2->second+1);
-				num_to_tree_map.push_back(exptree(ii->first));
-				num_to_tree_map.push_back(exptree(i2->first));
-				break;
-			case str_node::p_sub:
-				vec_perm.push_back(i2->second+1);
-				vec_perm.push_back(ii->second+1);
-				num_to_tree_map.push_back(exptree(i2->first));
-				num_to_tree_map.push_back(exptree(ii->first));
-				break;
+
+		// If the indices are not in canonical order and they are separated 
+		// by a Derivative, we cannot raise/lower, so they should stay in this order.
+		if(ii->first->fl.parent_rel == str_node::p_sub  &&
+			separated_by_derivative(ii->first, i2->first) ) {
+			vec_perm.push_back(ii->second+1);
+			vec_perm.push_back(i2->second+1);
+			num_to_tree_map.push_back(exptree(ii->first));
+			num_to_tree_map.push_back(exptree(i2->first));
 			}
+		else {
+			switch(ii->first->fl.parent_rel) {
+				case str_node::p_super:
+				case str_node::p_none:
+					vec_perm.push_back(ii->second+1);
+					vec_perm.push_back(i2->second+1);
+					num_to_tree_map.push_back(exptree(ii->first));
+					num_to_tree_map.push_back(exptree(i2->first));
+					break;
+				case str_node::p_sub:
+					vec_perm.push_back(i2->second+1);
+					vec_perm.push_back(ii->second+1);
+					num_to_tree_map.push_back(exptree(i2->first));
+					num_to_tree_map.push_back(exptree(ii->first));
+					break;
+				}
+			}
+
 		num_to_it_map[ii->second]=ii->first;
 		num_to_it_map[i2->second]=i2->first;
 
