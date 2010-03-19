@@ -485,7 +485,9 @@ K^{a}_{a}_{b}^{b};
 \partial{#}::PartialDerivative.
 obj42:= \delta_{n}^{r} \partial_{r}{ u^{n} };
 @canonicalise!(%);
-# \delta_{n}^{r} * \partial^{n}{u_{r}};
+tst42:= \delta^{n r} * \partial_{n}{u_{r}} - @(obj42);
+@collect_terms!(%);
+@assert(tst42);
 
 # Test 43: prevent raising/lowering if there is a Derivative
 # in the way. For the time being we do not even allow this
