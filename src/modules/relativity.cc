@@ -322,7 +322,7 @@ algorithm::result_t eliminate_metric::apply(iterator& it)
 					++locs.first;
 					}
 				}
-			
+
 			// 2nd index to 1st index conversion?
 			locs=ind_dummy.equal_range(exptree(ind2));
 			if(std::distance(locs.first, locs.second)==2) {

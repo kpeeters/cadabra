@@ -2,6 +2,8 @@
 
 	* Released 1.21
 
+	* Fixed canonicalising expressions with anti-commuting indices.
+	
 	* Fixed automatic raising/lowering of indices in canonicalise, and
 	added `position=independent' option for Indices to prevent this
 	from happening when it is not wanted.

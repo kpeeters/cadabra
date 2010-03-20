@@ -537,3 +537,14 @@ obj45d:= A_{p} \partial_{n}{ g^{m1 p} } B_{m1};
 tst45d:= A_{m1} \partial_{n}{ g^{m1 p} } B_{p} - @(obj45d);
 @collect_terms!(%);
 @assert(tst45d);
+
+# Test 46: spinor indices
+#
+@reset.
+{a,b,c,d}::Indices.
+{a,b,c,d}::AntiCommuting.
+tst46:= \chi_{a} \psi^{a} + \chi^{a} \psi_{a};
+@canonicalise!(%);
+@collect_terms!(%);
+@assert(tst46);
+

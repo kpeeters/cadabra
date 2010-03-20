@@ -3086,8 +3086,14 @@ algorithm::result_t canonicalise::apply(iterator& it)
 			dummy_sets[" NR "+get_index_set_name(i2->first)].push_back(i2->second+1);
 			}
 		else {
-			dummy_sets[get_index_set_name(ii->first)].push_back(ii->second+1);
-			dummy_sets[get_index_set_name(i2->first)].push_back(i2->second+1);
+			if( properties::get<AntiCommuting>(ii->first) != 0 ) {
+				dummy_sets[" AC "+get_index_set_name(ii->first)].push_back(ii->second+1);
+				dummy_sets[" AC "+get_index_set_name(i2->first)].push_back(i2->second+1);
+				}
+			else {
+				dummy_sets[get_index_set_name(ii->first)].push_back(ii->second+1);
+				dummy_sets[get_index_set_name(i2->first)].push_back(i2->second+1);
+				}
 			}
 
 		++sorted_it;
@@ -3257,8 +3263,12 @@ algorithm::result_t canonicalise::apply(iterator& it)
 				dummies[cdi++]=(ds->second)[k];
 			if(ds->first.substr(0,4)==" NR ")
 				metric_signatures[dsi]=0;
-			else
-				metric_signatures[dsi]=1;
+			else {
+				if(ds->first.substr(0,4)==" AC ")
+					metric_signatures[dsi]=-1;
+				else
+					metric_signatures[dsi]=1;
+				}
 			++ds;
 			++dsi;
 			}
