@@ -1027,7 +1027,7 @@ int subtree_compare(exptree::iterator one, exptree::iterator two,
 	int  mult=1;
 	if(one->is_index() && two->is_index() && one->is_rational() && two->is_rational()) mult=2;
 
-	bool position_free=true;
+	Indices::position_t position_type=Indices::free;
 	if(one->is_index() && two->is_index() && checksets) {
 		const Indices *ind1=properties::get<Indices>(one);
 		const Indices *ind2=properties::get<Indices>(two);
@@ -1042,11 +1042,11 @@ int subtree_compare(exptree::iterator one, exptree::iterator two,
 			}
 //		else std::cout << *one->name << " and " << *two->name << " in same set" << std::endl;
 		if(ind1!=0 && ind1==ind2) 
-			position_free=ind1->position_free;
+			position_type=ind1->position_type;
 		}
 	
 	// Compare sub/superscript relations.
-	if((mod_prel==-2 && !position_free) && one->is_index()) {
+	if((mod_prel==-2 && position_type!=Indices::free) && one->is_index()) {
 		if(one->fl.parent_rel!=two->fl.parent_rel) {
 			if(one->fl.parent_rel==str_node::p_sub) return 2;
 			else return -2;

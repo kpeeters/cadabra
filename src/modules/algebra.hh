@@ -455,8 +455,10 @@ class canonicalise : public algorithm {
 		bool remove_traceless_traces(iterator&);
 		bool remove_vanishing_numericals(iterator&);
 		bool separated_by_derivative(iterator index1, iterator index2) const;
+		bool only_one_on_derivative(iterator index1, iterator index2) const;
 
 		std::string get_index_set_name(iterator) const;
+		Indices::position_t  position_type(iterator) const;
 //		void collect_dummy_info(const index_map_t&, const index_position_map_t&, 
 //										std::vector<int>&, std::vector<int>&);
 };

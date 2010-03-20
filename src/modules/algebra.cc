@@ -2901,6 +2901,14 @@ bool canonicalise::remove_vanishing_numericals(iterator& it)
 	return false;
 	}
 
+Indices::position_t canonicalise::position_type(iterator it) const
+	{
+	const Indices *ind=properties::get<Indices>(it);
+	if(ind) 
+		return ind->position_type;
+	return Indices::free;
+	}
+
 std::string canonicalise::get_index_set_name(iterator it) const
 	{
 	const Indices *ind=properties::get<Indices>(it);
@@ -2943,6 +2951,21 @@ bool canonicalise::separated_by_derivative(iterator i1, iterator i2) const
 		}
 	
 	return true;
+	}
+
+bool canonicalise::only_one_on_derivative(iterator i1, iterator i2) const
+	{
+	int num=0;
+	iterator p1=tr.parent(i1);
+	const Derivative *der1=properties::get<Derivative>(p1);
+	if(der1) ++num;
+
+	iterator p2=tr.parent(i2);
+	const Derivative *der2=properties::get<Derivative>(p2);
+	if(der2) ++num;
+
+	if(num==1) return true;
+	else return false;
 	}
 
 algorithm::result_t canonicalise::apply(iterator& it)
@@ -3029,18 +3052,24 @@ algorithm::result_t canonicalise::apply(iterator& it)
 		switch(ii->first->fl.parent_rel) {
 			case str_node::p_super:
 			case str_node::p_none:
-				vec_perm.push_back(ii->second+1);
-				vec_perm.push_back(i2->second+1);
-				num_to_tree_map.push_back(exptree(ii->first));
-				num_to_tree_map.push_back(exptree(i2->first));
+//				vec_perm.push_back(ii->second+1);
+//				vec_perm.push_back(i2->second+1);
+//				num_to_tree_map.push_back(exptree(ii->first));
+//				num_to_tree_map.push_back(exptree(i2->first));
 				break;
 			case str_node::p_sub:
-				vec_perm.push_back(i2->second+1);
-				vec_perm.push_back(ii->second+1);
-				num_to_tree_map.push_back(exptree(i2->first));
-				num_to_tree_map.push_back(exptree(ii->first));
+				std::swap(ii, i2);
+//				vec_perm.push_back(i2->second+1);
+//				vec_perm.push_back(ii->second+1);
+//				num_to_tree_map.push_back(exptree(i2->first));
+//				num_to_tree_map.push_back(exptree(ii->first));
 				break;
 			}
+
+		vec_perm.push_back(ii->second+1);
+		vec_perm.push_back(i2->second+1);
+		num_to_tree_map.push_back(exptree(ii->first));
+		num_to_tree_map.push_back(exptree(i2->first));
 
 		num_to_it_map[ii->second]=ii->first;
 		num_to_it_map[i2->second]=i2->first;
@@ -3048,8 +3077,11 @@ algorithm::result_t canonicalise::apply(iterator& it)
 		// If the indices are not in canonical order and they are separated 
 		// by a Derivative, we cannot raise/lower, so they should stay in this order.
 		// Have to do this by putting those indices in a different set and then
-		// setting the metric flag to 0.
-		if(true || separated_by_derivative(ii->first, i2->first) ) {
+		// setting the metric flag to 0. Ditto when only one index is on a derivative
+		// (canonicalising usually makes the expression uglier in that case).
+		if( ( (separated_by_derivative(ii->first, i2->first) || only_one_on_derivative(ii->first, i2->first) )
+				&& position_type(ii->first)==Indices::fixed ) ||
+			 position_type(ii->first)==Indices::independent ) {
 			dummy_sets[" NR "+get_index_set_name(ii->first)].push_back(ii->second+1);
 			dummy_sets[" NR "+get_index_set_name(i2->first)].push_back(i2->second+1);
 			}
@@ -3226,7 +3258,7 @@ algorithm::result_t canonicalise::apply(iterator& it)
 			if(ds->first.substr(0,4)==" NR ")
 				metric_signatures[dsi]=0;
 			else
-				metric_signatures[dsi]=0;
+				metric_signatures[dsi]=1;
 			++ds;
 			++dsi;
 			}
@@ -3251,7 +3283,8 @@ algorithm::result_t canonicalise::apply(iterator& it)
 			txtout << std::endl;
 			txtout << "lengths_of_dummy_sets:" << std::endl;
 			for(unsigned int i=0; i<dummy_sets.size(); ++i)
-				txtout << lengths_of_dummy_sets[i] << " "; 
+				txtout << lengths_of_dummy_sets[i] 
+						 << " (metric=" << metric_signatures[i] << ") "; 
 			txtout << std::endl;
 			txtout << "dummies:" << std::endl;
 			for(unsigned int i=0; i<ind_dummy.size(); ++i)
@@ -3389,6 +3422,7 @@ algorithm::result_t canonicalise::apply(iterator& it)
 #endif
 					
 					iterator ri = tr.replace_index(num_to_it_map[cperm[i]-1], num_to_tree_map[i].begin());
+//					assert(ri->fl.parent_rel==num_to_tree_map[i].begin()->fl.parent_rel);
 					ri->fl.parent_rel=num_to_tree_map[i].begin()->fl.parent_rel;
 					}
 				}

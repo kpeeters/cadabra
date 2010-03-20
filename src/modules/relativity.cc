@@ -468,7 +468,7 @@ algorithm::result_t rewrite_indices::apply(iterator& it)
 
 				if(newtype->set_name == origtype->set_name) {
 //					txtout << "index already has same type" << std::endl;
-					if(origtype->position_free || walk->fl.parent_rel==dit->second->fl.parent_rel) {
+					if(origtype->position_type==Indices::free || walk->fl.parent_rel==dit->second->fl.parent_rel) {
 //						txtout << "and position is also already fine" << std::endl;
 						continue; // already fine
 						}
@@ -481,8 +481,8 @@ algorithm::result_t rewrite_indices::apply(iterator& it)
 
 				if(origtype->set_name == itype1->set_name && newtype->set_name == itype2->set_name) {
 //					txtout << "hit 1" << std::endl;
-					if( itype1->position_free || dit->second->fl.parent_rel == pr1 ) {
-						if( itype2->position_free || walk->fl.parent_rel != pr2 ) {
+					if( itype1->position_type==Indices::free || dit->second->fl.parent_rel == pr1 ) {
+						if( itype2->position_type==Indices::free || walk->fl.parent_rel != pr2 ) {
 //							txtout << "activate" << std::endl;
 							tr.replace_index(vbi1, dit->second);
 							exptree nd=get_dummy(itype2, par);
@@ -495,8 +495,8 @@ algorithm::result_t rewrite_indices::apply(iterator& it)
 					}
 				else if(origtype->set_name == itype2->set_name && newtype->set_name == itype1->set_name) {
 //					txtout << "hit 2" << std::endl;
-					if( itype2->position_free || dit->second->fl.parent_rel == pr2 ) {
-						if( itype1->position_free || walk->fl.parent_rel != pr1 ) {
+					if( itype2->position_type==Indices::free || dit->second->fl.parent_rel == pr2 ) {
+						if( itype1->position_type==Indices::free || walk->fl.parent_rel != pr1 ) {
 							tr.replace_index(vbi2, dit->second);
 							exptree nd=get_dummy(itype1, par);
 							tr.replace_index(vbi1,nd.begin());

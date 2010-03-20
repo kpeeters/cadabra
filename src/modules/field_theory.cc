@@ -1133,7 +1133,7 @@ algorithm::result_t dualise_tensor::apply(iterator& st)
 		iterator tmpit=rep.append_child(eps,  dummy.begin());
 		generated_indices.insert(index_map_t::value_type(dummy, tmpit));
 		tmpit->fl.bracket=str_node::b_none;
-		if(dums->position_free)
+		if(dums->position_type==Indices::free)
 			 tmpit->fl.parent_rel=str_node::p_sub;
 		else
 			 tmpit->fl.parent_rel=str_node::p_super;

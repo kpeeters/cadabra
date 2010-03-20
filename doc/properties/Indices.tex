@@ -1,5 +1,5 @@
 \cdbproperty{Indices}{\it name={\sf set name}, parent={\sf parent set
-name}, position=free$\vert$fixed}
+name}, position=free$\vert$fixed$\vert$independent}
 
 Declare index names to be usable for dummy index
 purposes. Typical usage is of the form
@@ -14,7 +14,9 @@ Indices can occur as subscripts or superscripts, and you may use this
 to indicate e.g.~covariant and contravariant transformation
 behaviour. In this case, use the additional
 argument \verb|position=fixed| to indicate that the position carries
-meaning.
+meaning. If you do not want cadabra to automatically raise or lower
+indices when canonicalising expressions, or if upper and lower indices
+are not related at all, use \verb|position=independent|.
 
 When you work with vector spaces which are subspaces of larger spaces,
 it is possible to indicate that a given set of indices take values in

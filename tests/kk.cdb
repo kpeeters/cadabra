@@ -1,7 +1,7 @@
 # Test 10: Kaluza-Klein related stuff
 #
-{\mu,\nu,\rho,\sigma,\kappa,\lambda,\eta,\chi#}::Indices(full, position=fixed).
-{m,n,p,q,r,s,t,u,v,m#}::Indices(subspace, position=fixed, parent=full).
+{\mu,\nu,\rho,\sigma,\kappa,\lambda,\eta,\chi#}::Indices(full, position=independent).
+{m,n,p,q,r,s,t,u,v,m#}::Indices(subspace, position=independent, parent=full).
 \partial{#}::PartialDerivative.
 g_{\mu\nu}::Metric.
 g^{\mu\nu}::InverseMetric.

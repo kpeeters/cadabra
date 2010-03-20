@@ -1,3 +1,11 @@
+2010-03-20  Kasper Peeters  <kasper.peeters@aei.mpg.de>
+
+	* Released 1.21
+
+	* Fixed automatic raising/lowering of indices in canonicalise, and
+	added `position=independent' option for Indices to prevent this
+	from happening when it is not wanted.
+
 2010-03-19  Kasper Peeters  <kasper.peeters@aei.mpg.de>
 
 	* Fixed display of Derivatives and PartialDerivatives (had too

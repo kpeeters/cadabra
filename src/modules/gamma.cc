@@ -1072,7 +1072,7 @@ algorithm::result_t fierz::apply(iterator& it)
 			exptree newdum=get_dummy(indprop, &ind_free, &ind_dummy, &ind_added);
 			iterator loc1=cpyterm.append_child(locgam1, newdum.begin());
 			ind_added.insert(index_map_t::value_type(newdum, loc1));
-			if(indprop->position_free)
+			if(indprop->position_type==Indices::free)
 				loc1->fl.parent_rel=str_node::p_sub;
 			else
 				loc1->fl.parent_rel=str_node::p_super;

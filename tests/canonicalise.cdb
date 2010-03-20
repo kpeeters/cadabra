@@ -464,6 +464,7 @@ tst41:=
 # Test 42: like in xAct
 #
 @reset.
+{a,b}::Indices(position=fixed).
 K^{a}_{a};
 @canonicalise!(%);
 
@@ -471,6 +472,7 @@ K_{a}^{a};
 @canonicalise!(%);
 
 @reset.
+{a,b}::Indices(position=fixed).
 K_{a}^{a}_{b}^{b};
 @canonicalise!(%);
 
@@ -480,12 +482,12 @@ K^{a}_{a}_{b}^{b};
 # Test 42: more upper/lower indices
 #
 @reset.
-{n,r}::Indices.
+{n,r}::Indices(position=fixed).
 \delta{#}::KroneckerDelta.
 \partial{#}::PartialDerivative.
 obj42:= \delta_{n}^{r} \partial_{r}{ u^{n} };
 @canonicalise!(%);
-tst42:= \delta^{n r} * \partial_{n}{u_{r}} - @(obj42);
+tst42:= \delta^{n}_{r} * \partial_{n}{u^{r}} - @(obj42);
 @collect_terms!(%);
 @assert(tst42);
 
@@ -493,6 +495,7 @@ tst42:= \delta^{n r} * \partial_{n}{u_{r}} - @(obj42);
 # in the way. For the time being we do not even allow this
 # if there is a full covariant derivative.
 @reset.
+{m,n,k}::Indices(position=fixed).
 \partial{#}::Derivative.
 obj43:= A_{m n} \partial_{k}{ B^{m n} };
 @canonicalise!(%);
@@ -513,6 +516,7 @@ obj44:= \partial_{m}{ A_{p q} } F^{p} D_{a} E^{a};
 \partial{#}::PartialDerivative.
 g_{\mu? \nu?}::Symmetric.
 g^{\mu? \nu?}::Symmetric.
+
 obj45a:= \partial_{4 n}{ g_{p 4} } g_{m1 m} g^{m1 p};
 @canonicalise!(%);
 tst45a:= \partial_{4 n}{ g_{4 p} } g_{m}^{m1} g_{m1}^{p} - @(obj45a);
@@ -526,3 +530,10 @@ tst45b:= \partial_{4 n}{ g_{4 p} } g_{m}^{m1} g_{m1}^{p} - @(obj45b);
 
 obj45c:= \partial_{p}{g_{4 q}} \partial_{n}{ g_{4 4} } g^{4 p} g_{m r} g^{r q};
 @canonicalise!(%);
+# todo 
+
+obj45d:= A_{p} \partial_{n}{ g^{m1 p} } B_{m1};
+@canonicalise!(%);
+tst45d:= A_{m1} \partial_{n}{ g^{m1 p} } B_{p} - @(obj45d);
+@collect_terms!(%);
+@assert(tst45d);

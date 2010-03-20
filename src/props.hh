@@ -522,7 +522,7 @@ class Indices : public list_property {
 		virtual match_t equals(const property_base *) const;
 		
 		std::string set_name, parent_name;
-		bool        position_free;
+		enum position_t { free, fixed, independent } position_type;
 		exptree     values;
 };
 

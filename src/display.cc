@@ -758,6 +758,7 @@ void print_derivative::print_infix(std::ostream& str, exptree::iterator it)
 		++idx;
 		++count;
 		}
+	str << "\\, ";
 	}
 
 print_sequence::print_sequence(exptree_output& eo)

@@ -502,7 +502,7 @@ std::string Coordinate::name() const
 	}
 
 Indices::Indices()
-	: position_free(true)
+	: position_type(free)
 	{
 	}
 
@@ -516,7 +516,7 @@ property_base::match_t Indices::equals(const property_base *other) const
 	const Indices *cast_other = dynamic_cast<const Indices *>(other);
 	if(cast_other) {
 		 if(set_name == cast_other->set_name) {
-			  if(parent_name == cast_other->parent_name && position_free == cast_other->position_free)
+			  if(parent_name == cast_other->parent_name && position_type == cast_other->position_type)
 					return exact_match;
 			  else
 					return id_match;
@@ -541,8 +541,13 @@ bool Indices::parse(exptree& tr, exptree::iterator pat, exptree::iterator prop, 
 			parent_name=*ki->second->name;
 			}
 		else if(ki->first=="position") {
-			if(*ki->second->name!="free")
-				position_free=false;
+			if(*ki->second->name=="free")
+				position_type=free;
+			else if(*ki->second->name=="fixed")
+				position_type=fixed;
+			else if(*ki->second->name=="independent")
+				position_type=independent;
+			else throw consistency_error("Position type should be fixed, free or independent.");
 			}
 		else if(ki->first=="values") {
 			values=*ki->second;
