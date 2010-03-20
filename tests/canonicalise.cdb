@@ -499,3 +499,30 @@ obj43:= A_{m n} \partial_{k}{ B^{m n} };
 tst43:= A_{m n} \partial_{k}{ B^{m n} } - @(obj43);
 @collect_terms!(%);
 @assert(tst43);
+
+# Test 44: more complicated version
+#
+@reset.
+\partial{#}::Derivative.
+obj44:= \partial_{m}{ A_{p q} } F^{p} D_{a} E^{a};
+@canonicalise!(%);
+
+@reset.
+{\mu,\nu,\rho,\sigma,\kappa,\lambda,\eta,\chi#}::Indices(full, position=fixed).
+{m,n,p,q,r,s,t,u,v,m#}::Indices(subspace, position=fixed, parent=full).
+\partial{#}::PartialDerivative.
+g_{\mu? \nu?}::Symmetric.
+g^{\mu? \nu?}::Symmetric.
+obj45a:= \partial_{4 n}{ g_{p 4} } g_{m1 m} g^{m1 p};
+@canonicalise!(%);
+tst45a:= \partial_{4 n}{ g_{4 p} } g_{m}^{m1} g_{m1}^{p} - @(obj45a);
+@collect_terms!(%);
+@assert(tst45a);
+obj45b:= \partial_{4 n}{ g_{4 p} } g_{m1 m} g^{m1 p};
+@canonicalise!(%);
+tst45b:= \partial_{4 n}{ g_{4 p} } g_{m}^{m1} g_{m1}^{p} - @(obj45b);
+@collect_terms!(%);
+@assert(tst45b);
+
+obj45c:= \partial_{p}{g_{4 q}} \partial_{n}{ g_{4 4} } g^{4 p} g_{m r} g^{r q};
+@canonicalise!(%);

@@ -2913,7 +2913,7 @@ std::string canonicalise::get_index_set_name(iterator it) const
 
 bool canonicalise::separated_by_derivative(iterator i1, iterator i2) const
 	{
-	std::set<iterator> parents;
+	std::set<iterator, exptree::iterator_base_less> parents;
 
 	// Walk up the tree until we hit the top or a Derivative node; store all 
 	// pointers.
@@ -3026,38 +3026,37 @@ algorithm::result_t canonicalise::apply(iterator& it)
 		txtout << *(ii->first->name) << " at pos " << ii->second+1 << " " << ii->first->fl.parent_rel << std::endl;
 #endif
 
-		// If the indices are not in canonical order and they are separated 
-		// by a Derivative, we cannot raise/lower, so they should stay in this order.
-		if(ii->first->fl.parent_rel == str_node::p_sub  &&
-			separated_by_derivative(ii->first, i2->first) ) {
-			vec_perm.push_back(ii->second+1);
-			vec_perm.push_back(i2->second+1);
-			num_to_tree_map.push_back(exptree(ii->first));
-			num_to_tree_map.push_back(exptree(i2->first));
-			}
-		else {
-			switch(ii->first->fl.parent_rel) {
-				case str_node::p_super:
-				case str_node::p_none:
-					vec_perm.push_back(ii->second+1);
-					vec_perm.push_back(i2->second+1);
-					num_to_tree_map.push_back(exptree(ii->first));
-					num_to_tree_map.push_back(exptree(i2->first));
-					break;
-				case str_node::p_sub:
-					vec_perm.push_back(i2->second+1);
-					vec_perm.push_back(ii->second+1);
-					num_to_tree_map.push_back(exptree(i2->first));
-					num_to_tree_map.push_back(exptree(ii->first));
-					break;
-				}
+		switch(ii->first->fl.parent_rel) {
+			case str_node::p_super:
+			case str_node::p_none:
+				vec_perm.push_back(ii->second+1);
+				vec_perm.push_back(i2->second+1);
+				num_to_tree_map.push_back(exptree(ii->first));
+				num_to_tree_map.push_back(exptree(i2->first));
+				break;
+			case str_node::p_sub:
+				vec_perm.push_back(i2->second+1);
+				vec_perm.push_back(ii->second+1);
+				num_to_tree_map.push_back(exptree(i2->first));
+				num_to_tree_map.push_back(exptree(ii->first));
+				break;
 			}
 
 		num_to_it_map[ii->second]=ii->first;
 		num_to_it_map[i2->second]=i2->first;
 
-		dummy_sets[get_index_set_name(ii->first)].push_back(ii->second+1);
-		dummy_sets[get_index_set_name(i2->first)].push_back(i2->second+1);
+		// If the indices are not in canonical order and they are separated 
+		// by a Derivative, we cannot raise/lower, so they should stay in this order.
+		// Have to do this by putting those indices in a different set and then
+		// setting the metric flag to 0.
+		if(true || separated_by_derivative(ii->first, i2->first) ) {
+			dummy_sets[" NR "+get_index_set_name(ii->first)].push_back(ii->second+1);
+			dummy_sets[" NR "+get_index_set_name(i2->first)].push_back(i2->second+1);
+			}
+		else {
+			dummy_sets[get_index_set_name(ii->first)].push_back(ii->second+1);
+			dummy_sets[get_index_set_name(i2->first)].push_back(i2->second+1);
+			}
 
 		++sorted_it;
 		++sorted_it;
@@ -3224,7 +3223,10 @@ algorithm::result_t canonicalise::apply(iterator& it)
 			lengths_of_dummy_sets[dsi]=ds->second.size();
 			for(unsigned int k=0; k<ds->second.size(); ++k) 
 				dummies[cdi++]=(ds->second)[k];
-			metric_signatures[dsi]=1;
+			if(ds->first.substr(0,4)==" NR ")
+				metric_signatures[dsi]=0;
+			else
+				metric_signatures[dsi]=0;
 			++ds;
 			++dsi;
 			}
