@@ -708,20 +708,24 @@ void print_derivative::print_infix(std::ostream& str, exptree::iterator it)
 
 	const LaTeXForm *lf=properties::get<LaTeXForm>(it);
 	bool needs_extra_brackets=false;
-	const Accent *ac=properties::get<Accent>(it);
-	if(!ac) { // accents should never get additional curly brackets, {\bar}{g} does not print.
-		sibling_iterator sib=tr.begin(it);
-		while(sib!=tr.end(it)) {
-			if(sib->is_index()) 
-				needs_extra_brackets=true;
-			++sib;
+
+	if(parent.output_format==exptree_output::out_xcadabra) {
+		const Accent *ac=properties::get<Accent>(it);
+		if(!ac) { // accents should never get additional curly brackets, {\bar}{g} does not print.
+			sibling_iterator sib=tr.begin(it);
+			while(sib!=tr.end(it)) {
+				if(sib->is_index()) 
+					needs_extra_brackets=true;
+				++sib;
+				}
 			}
+		
+		if(needs_extra_brackets) str << "{"; // to prevent double sup/sub script errors
+		if(lf) str << lf->latex;
+		else   str << texify(*it->name);
+		if(needs_extra_brackets) str << "}";
 		}
-	
-	if(needs_extra_brackets) str << "{"; // to prevent double sup/sub script errors
-	if(lf) str << lf->latex;
-	else   str << texify(*it->name);
-	if(needs_extra_brackets) str << "}";
+	else str << *it->name;
 
 	sibling_iterator idx=tr.begin(it);
 	int count=0;
@@ -747,6 +751,7 @@ void print_derivative::print_infix(std::ostream& str, exptree::iterator it)
 				str << " ";
 			}
 		else {
+			str << "{";
 			if(*idx->name=="\\prod" || *idx->name=="\\sum")
 				str << "(";
 
@@ -754,11 +759,13 @@ void print_derivative::print_infix(std::ostream& str, exptree::iterator it)
 
 			if(*idx->name=="\\prod" || *idx->name=="\\sum")
 				str << ")";
+			str << "}";
 			}
 		++idx;
 		++count;
 		}
-	str << "\\, ";
+	if(parent.output_format==exptree_output::out_xcadabra)
+		str << "\\, ";
 	}
 
 print_sequence::print_sequence(exptree_output& eo)

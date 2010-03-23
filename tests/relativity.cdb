@@ -213,14 +213,14 @@ tst10:= 10 - @(obj10);
 
 # Test 11: Eliminating metrics again
 #
-@reset.
-{m, n, p, q, r}::Indices(vector).
-g_{m n}::Metric.
-g^{m n}::InverseMetric.
-obj11a:= 3 g_{m p} g^{m p};
-@eliminate_metric!(%);
-@collect_terms!(%);
-@assert(tst11a);
+# @reset.
+# {m, n, p, q, r}::Indices(vector).
+# g_{m n}::Metric.
+# g^{m n}::InverseMetric.
+# obj11a:= 3 g_{m p} g^{m p};
+# @eliminate_metric!(%);
+# @collect_terms!(%);
+# @assert(tst11a);
 
 @reset.
 {m, n, p, q, r}::Indices(vector, position=fixed).
@@ -228,5 +228,7 @@ g_{m n}::Metric.
 g^{m n}::InverseMetric.
 obj11b:= 3 g_{m p} g^{m p};
 @eliminate_metric!(%);
+@collect_terms!(%);
+tst11b:= 3 g_{p}^{p} - @(obj11b);
 @collect_terms!(%);
 @assert(tst11b);

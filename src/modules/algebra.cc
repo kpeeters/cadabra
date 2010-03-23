@@ -2970,8 +2970,11 @@ bool canonicalise::only_one_on_derivative(iterator i1, iterator i2) const
 
 algorithm::result_t canonicalise::apply(iterator& it)
 	{
-//	txtout << "canonicalising the following expression:" << std::endl;
-//	tr.print_recursive_treeform(txtout, it);
+#ifdef XPERM_DEBUG
+	txtout << "canonicalising the following expression:" << std::endl;
+	tr.print_recursive_treeform(txtout, it);
+	txtout << is_single_term(it) << std::endl;
+#endif
 
 	stopwatch totalsw;
 	totalsw.start();
@@ -2992,6 +2995,12 @@ algorithm::result_t canonicalise::apply(iterator& it)
 	fill_index_position_map(it, ind_dummy, ind_pos_dummy);
 	const unsigned int total_number_of_indices=ind_free.size()+ind_dummy.size();
 	
+	// If there are no indices, there is nothing to do here...
+	if(total_number_of_indices==0) {
+		prod_unwrap_single_term(it);
+		return l_no_action;
+		}
+
 	// Construct the "name to slot" map from the order in ind_free & ind_dummy.
 	// Also construct the free and dummy lists.
 	// And a map from index number to iterator (for later).

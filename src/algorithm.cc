@@ -1612,7 +1612,7 @@ algorithm::range_vector_t::iterator algorithm::find_arg_superset(range_vector_t&
 bool algorithm::is_single_term(iterator it)
 	{
 	if(*it->name!="\\prod" && *it->name!="\\sum" && *it->name!="\\asymimplicit" && *it->name!="\\comma" 
-		&& *it->name!="\\equals") {
+		&& *it->name!="\\equals" && *it->name!="\\arrow") {
 		if(tr.is_valid(tr.parent(it))) {
 			if(*tr.parent(it)->name=="\\sum" || *tr.parent(it)->name=="\\expression" || tr.parent(it)->is_command())
 				return true;

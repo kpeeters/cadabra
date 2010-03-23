@@ -548,3 +548,8 @@ tst46:= \chi_{a} \psi^{a} + \chi^{a} \psi_{a};
 @collect_terms!(%);
 @assert(tst46);
 
+# Test 47: regression in 1.21
+#
+@reset.
+B0:=B_{\alpha \mu} -> \Delta_{\mu \nu}*F_{\theta \alpha};
+@canonicalise!(%);
