@@ -1735,12 +1735,16 @@ void cleanup_nests_below(exptree&tr, exptree::iterator it, bool ignore_bracket_t
 
 	while(now!=stop) {
 		cleanup_nests(tr, now, ignore_bracket_types);
+// Iterators should always be valid when we return here, so this test is not required.	  
+//		if(tr.is_valid(now)==false)
+//			break;
 		++now;
 		}
 	}
 
 void cleanup_nests(exptree&tr, exptree::iterator &it, bool ignore_bracket_types)
 	{
+	if(!tr.is_valid(it)) return;
 	if(!tr.is_valid(tr.parent(it))) return;
 //	tr.print_recursive_treeform(txtout, tr.begin());
 	if(*(it->name)=="\\prod") {
@@ -1771,6 +1775,7 @@ void cleanup_nests(exptree&tr, exptree::iterator &it, bool ignore_bracket_types)
 				++terms;
 				}
 			tr.flatten(it);
+			// FIXME: this is dangerous:
 			it=tr.parent(tr.erase(it));
 			}
 		return;

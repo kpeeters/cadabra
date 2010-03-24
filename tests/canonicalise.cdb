@@ -553,3 +553,10 @@ tst46:= \chi_{a} \psi^{a} + \chi^{a} \psi_{a};
 @reset.
 B0:=B_{\alpha \mu} -> \Delta_{\mu \nu}*F_{\theta \alpha};
 @canonicalise!(%);
+
+# Test 48: derivatives without arguments
+#
+#@reset.
+#\nabla{#}::PartialDerivative.
+#A_{m} \nabla_{n} B_{k};
+#@canonicalise!(%);

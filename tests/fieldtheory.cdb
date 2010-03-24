@@ -125,9 +125,16 @@ tst9:= DF_{a b c d} DG_{m a b c d};
 #  which is to be integrated).
 #
 @reset;
-obj10:= a*b_{m} + \diff{e}_{m}*c*d*f + g*h*\diff{k}_{m};
+obj10a:= c*\diff_{m}{e};
 @pintegrate!(%){\diff};
-tst10:= a*b_{m} - \diff{c*d*f}_{m}*e - \diff{g*h}_{m}*k - @(obj10);
+tst10a:= \diff_{m}{c}*e + @(obj10a);
+@collect_terms!(%);
+@assert(tst10a);
+
+@reset;
+obj10:= a*b_{m} + \diff_{m}{e}*c*d*f + g*h*\diff_{m}{k};
+@pintegrate!(%){\diff};
+tst10:= a*b_{m} - \diff_{m}{c*d*f}*e - \diff_{m}{g*h}*k - @(obj10);
 @prodsort!(%);
 @collect_terms!(%);
 @assert(tst10);

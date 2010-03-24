@@ -1561,6 +1561,8 @@ algorithm::result_t pintegrate::apply(iterator& it)
 
 				// Clean up nests of \partial if present.
 //				iterator tmpit=tr.begin(newdiff);
+//				iterator tmp=newdiff;
+//				cleanup_nests(tr, tmp);
 				cleanup_nests_below(tr, (iterator)newdiff);
 				}
 
@@ -1607,6 +1609,8 @@ algorithm::result_t pintegrate::apply(iterator& it)
 
 				// Clean up nests of \partial if present.
 				cleanup_nests_below(tr, (iterator)newdiff);
+//				iterator tmp=newdiff;
+//				cleanup_nests(tr, tmp);
 //				sibling_iterator tmpit=tr.begin(newdiff);
 //				cleanup_nests(tr, tmpit);
 				}
