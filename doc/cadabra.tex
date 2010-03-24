@@ -185,7 +185,7 @@
 \pagestyle{empty}
 \begin{flushright}
 original: July 2006\\
-this version: February 7th, 2010\\
+this version: March 24th, 2010\\
 AEI-2006-038
 \end{flushright}
 \vspace{6ex}
@@ -1140,8 +1140,20 @@ pasting, a \LaTeX{} one which is useful to paste into a paper, and a
 pasted back into the program. 
 
 In most cases, the format will be selected correctly
-automatically. Under Emacs, you can choose either one. The list of
-formats can be inspected using
+automatically. Under Emacs, a middle-mouse paste will paste the
+\LaTeX{} version. You can paste the internal \cdb format by adding the
+following to your \verb|.emacs| file:
+\begin{screen}{0}
+(defun pastecdb ()
+   (interactive)
+   (insert (x-get-selection-internal 'PRIMARY 'cadabra)))
+
+(global-set-key (kbd "C-x p") 'pastecdb)
+\end{screen}
+This will make the combination ``Ctrl-x p'' insert the current
+selection in \cdb internal format.
+
+For more advanced users: the list of formats can be inspected using
 \begin{screen}{1}
 (x-get-selection-internal 'PRIMARY 'TARGETS)
 [TIMESTAMP TARGETS MULTIPLE cadabra UTF8_STRING TEXT]
