@@ -85,3 +85,14 @@ obj10:= A B D q E B A q;
 tst10:= A B D q**2 E B A - @(obj10);
 @collect_terms!(%);
 @assert(tst10);
+
+# Test 11: multipliers inside pow
+#
+@reset.
+obj11:= x**2;
+@substitute!(%)( x -> -u );
+@expand_power!(%);
+@collect_factors!(%);
+tst11:= u**2 - @(obj11);
+@collect_terms!(%);
+@assert(tst11);

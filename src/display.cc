@@ -1,7 +1,7 @@
 /* 
 
 	Cadabra: a field-theory motivated computer algebra system.
-	Copyright (C) 2001-2009  Kasper Peeters <kasper.peeters@aei.mpg.de>
+	Copyright (C) 2001-2010  Kasper Peeters <kasper.peeters@aei.mpg.de>
 
    This program is free software: you can redistribute it and/or
    modify it under the terms of the GNU General Public License as
@@ -314,18 +314,20 @@ void print_pow::print_infix(std::ostream& str, exptree::iterator it)
 
 	bool close_bracket=false;
 	sibling_iterator st=tr.begin(it);
-	while(st!=tr.end(it)) {
-		if(*st->name=="\\sum") {
-			str << "(";
-			close_bracket=true;
-			break;
-			}
-		if(tr.number_of_children(st)!=tr.number_of_indices(st)) {
-			str << "(";
-			close_bracket=true;
-			break;
-			 }
-		++st;
+
+	// The first argument of \pow is to be examined for special
+	// cases which require brackets around the entire argument.
+	if(*st->name=="\\sum") {
+		str << "(";
+		close_bracket=true;
+		}
+	else if(tr.number_of_children(st)!=tr.number_of_indices(st)) {
+		str << "(";
+		close_bracket=true;
+		}
+	else if(*st->multiplier!=1) {
+		str << "(";
+		close_bracket=true;
 		}
 
 	sibling_iterator ch=tr.begin(it);
