@@ -279,6 +279,7 @@ class XCadabra : public Gtk::Window {
 		void on_view_split();
 		void on_view_close();
 		void on_settings_font_size(int);
+		void on_settings_brain(int);
 		void on_tutorial_open(unsigned int);
 		void on_help_about();
 		void on_help_citing();
@@ -347,6 +348,7 @@ class XCadabra : public Gtk::Window {
 		void         disconnect_io_signals();	
 
 		int          font_step;
+		int          brain_wired;
 	private:
 		/// Variables for the undo/redo mechanism.
 		ActionStack      undo_stack, redo_stack;
@@ -393,6 +395,7 @@ class XCadabra : public Gtk::Window {
 		Glib::RefPtr<Gtk::Action>      undo_action_menu, redo_action_menu;
 		Glib::RefPtr<Gtk::UIManager>   uimanager;
 		Glib::RefPtr<Gtk::RadioAction> font_action0, font_action1, font_action2, font_action3;
+		Glib::RefPtr<Gtk::RadioAction> brain_wired_action0, brain_wired_action1;
 		Gtk::HBox                      statusbox;
 		Gtk::Label                     b_cdbstatus, b_kernelversion;
 		Gtk::Button                    b_kill, b_run, b_run_to, b_run_from, b_help, b_stop, b_undo, b_redo;

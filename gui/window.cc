@@ -761,7 +761,7 @@ void NotebookCanvas::show()
 
 
 XCadabra::XCadabra(modglue::ext_process& cdbproc, const std::string& filename, modglue::main *mm)
-	: font_step(0), disable_stacks(false), hglass(Gdk::WATCH),
+	: font_step(0), brain_wired(0), disable_stacks(false), hglass(Gdk::WATCH),
 	  load_file(false), have_received(false), cmm(mm), name(filename), modified(false), running(false),
 	  running_last(0), restarting_kernel(false),
 	  last_used_id(0),
@@ -817,6 +817,7 @@ XCadabra::XCadabra(modglue::ext_process& cdbproc, const std::string& filename, m
 	actiongroup->add( Gtk::Action::create("MenuSettings", "_Settings") );
 	actiongroup->add( Gtk::Action::create("MenuTutorial", "_Tutorial") );
 	actiongroup->add( Gtk::Action::create("MenuFontSize", "Font size") );
+	actiongroup->add( Gtk::Action::create("MenuBrainWired", "Brain wired for") );
 	actiongroup->add( Gtk::Action::create("MenuHelp", "_Help") );
 
 	actiongroup->add( Gtk::Action::create("New", Gtk::Stock::NEW),
@@ -888,6 +889,22 @@ XCadabra::XCadabra(modglue::ext_process& cdbproc, const std::string& filename, m
 	actiongroup->add( font_action3, sigc::bind(sigc::mem_fun(*this, &XCadabra::on_settings_font_size), 4));
 	if(font_step==4) font_action3->set_active();
 
+	// Key wiring
+
+	Gtk::RadioAction::Group group_brain_wired;
+
+	brain_wired_action0=Gtk::RadioAction::create(group_brain_wired, "BrainEmacs", "Emacs keys");
+	brain_wired_action0->property_value() = 0;
+	actiongroup->add( brain_wired_action0, sigc::bind(sigc::mem_fun(*this, &XCadabra::on_settings_brain), 0 ));
+	if(brain_wired==0) brain_wired_action0->set_active();
+
+	brain_wired_action1=Gtk::RadioAction::create(group_brain_wired, "BrainWindoze", "Windoze keys");
+	brain_wired_action1->property_value() = 1;
+	actiongroup->add( brain_wired_action1, sigc::bind(sigc::mem_fun(*this, &XCadabra::on_settings_brain), 1 ));
+	if(brain_wired==1) brain_wired_action1->set_active();
+
+	// Construct menu
+
 	actiongroup->add( Gtk::Action::create("Basics", "Basics"),
 								  sigc::bind(sigc::mem_fun(*this, &XCadabra::on_tutorial_open),0) );   
 	actiongroup->add( Gtk::Action::create("Derivatives", "Derivatives"),
@@ -950,6 +967,10 @@ XCadabra::XCadabra(modglue::ext_process& cdbproc, const std::string& filename, m
 		"         <menuitem action='FontMedium'/>"
 		"         <menuitem action='FontLarge'/>"
 		"         <menuitem action='FontExtraLarge'/>"
+      "      </menu>"
+		"      <menu action='MenuBrainWired'>"
+		"         <menuitem action='BrainEmacs'/>"
+		"         <menuitem action='BrainWindoze'/>"
       "      </menu>"
 		"    </menu>"
 		"    <menu action='MenuHelp'>"
@@ -1038,11 +1059,17 @@ bool XCadabra::on_key_press_event(GdkEventKey* event)
 	{
 	switch(event->keyval) {
 		case GDK_Home:
-			active_canvas->scroll_to_start();
-			return true; // if we don't return immediately, selections will go away
+			if(brain_wired==0 || (event->state&Gdk::CONTROL_MASK) ) {
+				active_canvas->scroll_to_start();
+				return true; // if we don't return immediately, selections will go away
+				}
+			else break;
 		case GDK_End:
-			active_canvas->scroll_to_end();
-			return true; // if we don't return immediately, selections will go away
+			if(brain_wired==0 || (event->state&Gdk::CONTROL_MASK) ) {
+				active_canvas->scroll_to_end();
+				return true; // if we don't return immediately, selections will go away
+				}
+			else break;
 		case GDK_Page_Up:
 			active_canvas->scroll_up();
 			return true; // if we don't return immediately, selections will go away
@@ -3172,6 +3199,21 @@ void XCadabra::on_settings_font_size(int num)
 		canvasses[i]->redraw_cells();
 	}
 
+void XCadabra::on_settings_brain(int num)
+	{
+	if(brain_wired==num) return;
+
+	brain_wired=num;
+
+	std::string res=save_config();
+	if(res.size()>0) {
+		 Gtk::MessageDialog md("Error");
+		 md.set_secondary_text(res);
+		 md.set_type_hint(Gdk::WINDOW_TYPE_HINT_DIALOG);
+		 md.run();
+		 }
+	}
+
 void XCadabra::on_tutorial_open(unsigned int num)
 	{
 	Gtk::MessageDialog md("Tutorial information");
@@ -3223,6 +3265,7 @@ std::string XCadabra::save_config() const
 
 	conf << "# XCadabra configuration file version 1.0" << std::endl;
 	conf << "font_step:=" << font_step << std::endl;
+	conf << "brain_wired:=" << brain_wired << std::endl;
 	conf.close();
 	return "";
 	}
@@ -3253,6 +3296,15 @@ std::string XCadabra::load_config()
 						 return str.str();
 						 }
 					font_step=tmp;
+					}
+			  else if(rl.substr(0,pos)=="brain_wired") {
+					int tmp=atoi(rl.substr(pos+2).c_str());
+					if(tmp<0 || tmp>1) {
+						 str << "Out-of-bounds value for " << rl.substr(0,pos) 
+							  << " in ~/.xcadabra on line " << line << std::endl;
+						 return str.str();
+						 }
+					brain_wired=tmp;
 					}
 			  else {
 					str << "Unknown identifier " << rl.substr(0,pos) 
