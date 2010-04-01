@@ -821,22 +821,7 @@ algorithm::result_t prodrule::apply(iterator& it)
 				  else ++theDargs;
 				  }
 			  
-//			  // Now determine how 'emptyD' commutes with its argument.
-//			  if(theD.begin()->is_index()) {
-//				  iterator der_wrt=theD.begin();
-//
-//				  int ret=subtree_compare(der_wrt, repch, 0, true, -2, false);
-//				  if(abs(ret)<=1) {
-//					  const SelfAntiCommuting *sac=properties::get_composite<SelfAntiCommuting>(repch);
-//					  if(sac)
-//						  sign*=-1;
-//					  }
-//				  else {
-//					  const Indices *ind=properties::get_composite<Indices>(der_wrt);
-//					  if(ind) {
-//						  // All commutation rules are now handled centrally.
-
-//					  HERE: 
+			  // HERE
 
 			  int stc=subtree_compare(emptyD.begin(), repch);
 //			  txtout << "trying to move " << *emptyD.begin()->name << " through " << *repch->name 
@@ -4083,12 +4068,16 @@ algorithm::result_t expand_power::apply(iterator& it)
 	it=tr.erase(it);
 
 	// Now duplicate the factor num-1 times.
-	// FIXME: handle symbolic and rational exponents gracefully.
+	multiplier_t tot=*argument->multiplier;
 	for(int i=0; i<num-1; ++i) {
 		iterator tmp=tr.append_child(prodn);
+		tot *= *argument->multiplier;
 		iterator ins=tr.replace(tmp, argument);
+		one(ins->multiplier);
 		rename_replacement_dummies(ins);
 		}
+	one(argument->multiplier);
+	multiply(prodn->multiplier, tot);
 
 	cleanup_nests_below(tr,it);
 	cleanup_nests(tr,it);

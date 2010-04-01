@@ -65,14 +65,14 @@ tst8b:= A**(3/2) - @(obj8b);
 @reset.
 obj9:= b**2 c**3 e;
 @substitute!(%)(b -> 2*B*C, c -> (2*A*C + B**2), e -> A**2 );
-max9:= expand( @(obj9) );
+# max9:= expand( @(obj9) );
 @expand_power!(obj9);
 @distribute!(%);
 @prodsort!(%);
 @collect_terms!(%);
 @collect_factors!(%);
-@maxima(max9);
-tst9:= @(max9) - @(obj9);
+# @maxima(max9);
+tst9:= 4 A**2 B**8 C**2 + 24 A**3 B**6 C**3 + 48 A**4 B**4 C**4 + 32 A**5 B**2 C**5 - @(obj9);
 @collect_terms!(%);
 @assert(tst9);
 
@@ -89,10 +89,19 @@ tst10:= A B D q**2 E B A - @(obj10);
 # Test 11: multipliers inside pow
 #
 @reset.
-obj11:= x**2;
+obj11a:= x**2;
 @substitute!(%)( x -> -u );
 @expand_power!(%);
 @collect_factors!(%);
-tst11:= u**2 - @(obj11);
+tst11a:= u**2 - @(obj11a);
 @collect_terms!(%);
-@assert(tst11);
+@assert(tst11a);
+
+@reset.
+obj11b:= x**3;
+@substitute!(%)( x -> - 3 u );
+@expand_power!(%);
+@collect_factors!(%);
+tst11b:= - 27 u**3 - @(obj11b);
+@collect_terms!(%);
+@assert(tst11b);
