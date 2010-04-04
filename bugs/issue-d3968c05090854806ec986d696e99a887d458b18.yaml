@@ -3,6 +3,13 @@ title: Fix dependence on numbers
 desc: |-
   A declaration of the type a::Depends(0) will introduce dependence on
   all rationals (as the overall constant is always ignored).
+  
+  Edit: can be circumvented by using a notation with \partial
+  which mentions the coordinate name, i.e.
+  
+     \partial_{x^{0}}{a} + \partial_{x^{1}}{a};
+  
+  (see test 37 in tests/fieldtheory.cdb)
 type: :bugfix
 component: cadabra
 release: 
@@ -17,4 +24,8 @@ log_events:
 - - 2009-11-18 00:52:35.807835 Z
   - Kasper Peeters <kasper.peeters@aei.mpg.de>
   - created
+  - ""
+- - 2010-04-04 19:44:50.433906 Z
+  - Kasper Peeters <kasper.peeters@aei.mpg.de>
+  - edited description
   - ""

@@ -451,3 +451,12 @@ obj35:= \delta_{m}^{n} ( A_{n p} + B_{n q} F_{q p} ) E^{m s};
 tst35:= (A_{m p} + B_{m q} F_{q p} ) E^{m s} - @(obj35);
 @collect_terms!(%);
 @assert(tst35);
+
+# Test 37: Depends on explicit coordinates.
+#
+@reset.
+{ x^{0}, x^{1} }::Coordinate.
+a::Depends(x^{0}).
+\partial{#}::Derivative.
+\partial_{x^{0}}{a} + \partial_{x^{1}}{a};
+@unwrap!(%);

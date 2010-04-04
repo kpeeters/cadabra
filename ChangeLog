@@ -1,3 +1,7 @@
+2010-04-04  Kasper Peeters  <kasper.peeters@aei.mpg.de>
+
+	* Released 1.23
+
 2010-04-01  Kasper Peeters  <kasper.peeters@aei.mpg.de>
 
 	* Fixed bug in @expand_power which would mess up numerical factors.
