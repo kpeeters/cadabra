@@ -18,6 +18,15 @@ desc: |-
   \nabla{#}::Derivative(metric=g).
   
   etc.
+  
+  Edit: can also fix this by adding a Depends, which looks 
+  less clumsy and requires no additional notation:
+  
+  g_{m n}::Depends(\partial).
+  
+  That way we can even handle special cases in which the
+  metric does not depend on coordinates even though in
+  general it would.
 type: :bugfix
 component: cadabra
 release: 
@@ -32,4 +41,8 @@ log_events:
 - - 2010-02-06 15:33:25.388250 Z
   - Kasper Peeters <kasper.peeters@aei.mpg.de>
   - created
+  - ""
+- - 2010-04-06 14:10:45.734101 Z
+  - Kasper Peeters <kasper.peeters@aei.mpg.de>
+  - edited description
   - ""
