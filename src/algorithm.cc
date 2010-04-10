@@ -1667,6 +1667,41 @@ bool algorithm::prod_unwrap_single_term(iterator& it)
 	return false;
 	}
 
+bool algorithm::separated_by_derivative(iterator i1, iterator i2) const
+	{
+	std::set<iterator, exptree::iterator_base_less> parents;
+
+	// Walk up the tree until we hit the top or a Derivative node; store all 
+	// pointers.
+
+	iterator walk=tr.parent(i1);
+	while(*walk->name!="\\expression" && tr.is_valid(tr.parent(walk)) ) {
+		walk=tr.parent(walk);
+		const Derivative *der=properties::get<Derivative>(walk);
+		if(der)
+			break;
+		parents.insert(walk);
+		}
+
+	// Do the same from the other index; if we find a node which was
+	// already encountered, this means that the indices are not separated
+	// by a derivative.
+
+	walk=tr.parent(i2);
+	while(*walk->name!="\\expression" && tr.is_valid(tr.parent(walk)) ) {
+		walk=tr.parent(walk);
+		const Derivative *der=properties::get<Derivative>(walk);
+		if(der)
+			break;
+
+		if( parents.find(walk)!=parents.end() )
+			return false;
+		}
+	
+	return true;
+	}
+
+
 void cleanup_expression(exptree& tr)
 	{
 	exptree::iterator it=tr.begin();

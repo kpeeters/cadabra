@@ -1,7 +1,7 @@
 /* 
 
 	Cadabra: a field-theory motivated computer algebra system.
-	Copyright (C) 2001-2009  Kasper Peeters <kasper.peeters@aei.mpg.de>
+	Copyright (C) 2001-2010  Kasper Peeters <kasper.peeters@aei.mpg.de>
 
    This program is free software: you can redistribute it and/or
    modify it under the terms of the GNU General Public License as
@@ -173,7 +173,7 @@ manipulator::manipulator()
 
 	// numerical
 	numerical::register_properties();
-	algorithms["@numerical_flatten"] = new algo_info(&create<numerical_flatten>);
+	algorithms["@numerical_flatten"] = new algo_info(&create<numerical::numerical_flatten>);
 
 	// properties
 	algorithms["@props"]          =new algo_info(&create<extract_properties>); // internal: not documented yet

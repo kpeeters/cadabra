@@ -22,6 +22,8 @@
 #include "manipulator.hh"
 #include "algebra.hh"
 
+using namespace numerical;
+
 void numerical::register_properties()
 	{
 	properties::register_property(&create_property<Integer>);	

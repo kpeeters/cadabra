@@ -327,7 +327,7 @@ algorithm::result_t join::apply(iterator& st)
 	long number_of_dimensions=-1; // i.e. not known.
 	exptree::index_iterator firstind=tr.begin_index(gam1);
 	while(firstind!=tr.end_index(gam1)) {  // select the maximum value; FIXME: be more refined...
-		const Integer *ipr=properties::get<Integer>(firstind);
+		const numerical::Integer *ipr=properties::get<numerical::Integer>(firstind);
 		if(ipr) {
 			if(ipr->difference.begin()->is_integer()) {
 				number_of_dimensions=std::max(number_of_dimensions, to_long(*ipr->difference.begin()->multiplier));
@@ -342,7 +342,7 @@ algorithm::result_t join::apply(iterator& st)
 	if(number_of_dimensions!=-1) {
 		firstind=tr.begin_index(gam2);
 		while(firstind!=tr.end_index(gam2)) {  // select the maximum value; FIXME: be more refined...
-			const Integer *ipr=properties::get<Integer>(firstind);
+			const numerical::Integer *ipr=properties::get<numerical::Integer>(firstind);
 			if(ipr) {
 				if(ipr->difference.begin()->is_integer()) {
 					number_of_dimensions=std::max(number_of_dimensions, to_long(*ipr->difference.begin()->multiplier));
@@ -681,7 +681,7 @@ bool projweyl::can_apply(iterator st)
 		while(it!=tr.end(st)) {
 			const GammaMatrix *gm=properties::get<GammaMatrix>(it);
 			if(gm) {
-				const Integer *isint=properties::get<Integer>(tr.begin(gamma_loc_));
+				const numerical::Integer *isint=properties::get<numerical::Integer>(tr.begin(gamma_loc_));
 				if(isint) {
 					 if(isint->difference.begin()->is_rational()) {
 						  ++numgamma;
@@ -901,7 +901,7 @@ bool fierz::can_apply(iterator it)
 	// to find the gamma matrix, fermion and second fermi bilinear.
 
 	sibling_iterator sib=tr.begin(it);
-	const Integer *indit=0;
+	const numerical::Integer *indit=0;
 	while(sib!=tr.end(it)) {
 		const DiracBar *db=properties::get_composite<DiracBar>(sib);
 		if(db) {
@@ -920,7 +920,7 @@ bool fierz::can_apply(iterator it)
 			if(gmnxt) {
 //				txtout << "found gam" << std::endl;
 				// FIXME: should also work when there is a unit matrix in between.
-				indit=properties::get_composite<Integer>(ch.begin());
+				indit=properties::get_composite<numerical::Integer>(ch.begin());
 				indprop=properties::get_composite<Indices>(ch.begin());
 				if(!indit || !indprop) return false;
 				dim=to_long(*indit->difference.begin()->multiplier);

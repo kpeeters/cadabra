@@ -133,7 +133,7 @@ unsigned int exchange::possible_singlets(exptree& tr, exptree::iterator it)
 	LiE::LiE_t lie;
 	// Figure out the algebra from one of the indices.
 	exptree::index_iterator indit=tr.begin_index(idts[0].tensors[0]);
-	const Integer *iprop=properties::get<Integer>(indit);
+	const numerical::Integer *iprop=properties::get<numerical::Integer>(indit);
 	if(!iprop) 
 		throw consistency_error("Need to know about the range of the " + *indit->name + " index.");
 

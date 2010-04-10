@@ -87,6 +87,14 @@ class active_node {
 													sibling_iterator, sibling_iterator, BinaryPredicate) const;
 };
 
+/// \brief Base class for all algorithms, containing generic routines and in particular
+///        the logic for index classification.
+///
+/// All commands in cadabra are classes which derive from the algorithm class. An object
+/// gets instantiated by the logic in the manipulator class, which then activates the
+/// algorithm.
+/// This base class contains various functions that are quite generic and often needed.
+/// In particular, all logic that deals with index classification is located here.
 class algorithm : public active_node {
 	public:
 		algorithm(exptree&, iterator);
@@ -180,6 +188,10 @@ class algorithm : public active_node {
 		bool     is_nonprod_factor_in_prod(iterator);
 		bool     prod_wrap_single_term(iterator&);
 		bool     prod_unwrap_single_term(iterator&);
+
+		/// Figure out whether two objects (commonly indices) are separated by a derivative
+		/// operator, as in \partial_{a}{A_{b}} C^{b}.
+		bool     separated_by_derivative(iterator, iterator) const;
 
 		// Given a node with non-zero multiplier, distribute this
 		// multiplier up the tree when the node is a \sum node, or push it into the

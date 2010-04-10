@@ -220,7 +220,7 @@ class Derivative : public IndexInherit,
 						 public Inherit<Spinor>,
 						 public Inherit<SortOrder>,
 						 public CommutingAsProduct, 
-						 public NumericalFlat,
+						 public numerical::NumericalFlat,
 						 public WeightBase,
 						 public TableauBase,
 						 public Distributable, virtual public property {
@@ -454,7 +454,6 @@ class canonicalise : public algorithm {
 	private:
 		bool remove_traceless_traces(iterator&);
 		bool remove_vanishing_numericals(iterator&);
-		bool separated_by_derivative(iterator index1, iterator index2) const;
 		bool only_one_on_derivative(iterator index1, iterator index2) const;
 
 		std::string get_index_set_name(iterator) const;

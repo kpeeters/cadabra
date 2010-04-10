@@ -728,8 +728,8 @@ algorithm::result_t eliminate_kronecker::apply(iterator& st)
 			sibling_iterator ii1=tr.begin(it);
 			sibling_iterator ii2=ii1; ++ii2;
 			if(subtree_compare(ii1, ii2, 1, false, true)==0) { // a self-contracted Kronecker delta
-				 const Integer *itg1=properties::get<Integer>(ii1);
-				 const Integer *itg2=properties::get<Integer>(ii2);
+				 const numerical::Integer *itg1=properties::get<numerical::Integer>(ii1);
+				 const numerical::Integer *itg2=properties::get<numerical::Integer>(ii2);
 				 if(itg1 && itg2 && ii1->is_rational()==false && ii2->is_rational()==false) {
 					  if(itg1->from.begin()!=itg1->from.end() && itg2->from.begin()!=itg2->from.end()) {
 							if(itg1->difference.begin()->name==onept) {
@@ -873,7 +873,7 @@ bool reduce_gendelta::one_step_(sibling_iterator dl)
 //	tr.print_recursive_treeform(debugout, dl, num) << std::endl;}
 	// FIXME: use properties for the dimension!
 //	txtout << *dl->multiplier << std::endl;
-	const Integer *itg=properties::get<Integer>(up);
+	const numerical::Integer *itg=properties::get<numerical::Integer>(up);
 	int dim;
 	if(itg) {
 		const nset_t::iterator onept=name_set.insert("1").first;

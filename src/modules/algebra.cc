@@ -2904,40 +2904,6 @@ std::string canonicalise::get_index_set_name(iterator it) const
 	else return " undeclared";
 	}
 
-bool canonicalise::separated_by_derivative(iterator i1, iterator i2) const
-	{
-	std::set<iterator, exptree::iterator_base_less> parents;
-
-	// Walk up the tree until we hit the top or a Derivative node; store all 
-	// pointers.
-
-	iterator walk=tr.parent(i1);
-	while(*walk->name!="\\expression" && tr.is_valid(tr.parent(walk)) ) {
-		walk=tr.parent(walk);
-		const Derivative *der=properties::get<Derivative>(walk);
-		if(der)
-			break;
-		parents.insert(walk);
-		}
-
-	// Do the same from the other index; if we find a node which was
-	// already encountered, this means that the indices are not separated
-	// by a derivative.
-
-	walk=tr.parent(i2);
-	while(*walk->name!="\\expression" && tr.is_valid(tr.parent(walk)) ) {
-		walk=tr.parent(walk);
-		const Derivative *der=properties::get<Derivative>(walk);
-		if(der)
-			break;
-
-		if( parents.find(walk)!=parents.end() )
-			return false;
-		}
-	
-	return true;
-	}
-
 bool canonicalise::only_one_on_derivative(iterator i1, iterator i2) const
 	{
 	int num=0;
@@ -3964,7 +3930,7 @@ algorithm::result_t young_project_tensor::apply(iterator& it)
 		// Figure out the properties of the indices for which we want dummy partners.
 		exptree::index_iterator iit=tr.begin_index(it);
 		iit+=tab(0,abs(tab.selfdual_column)-1);
-		const Integer *itg=properties::get<Integer>(iit);
+		const numerical::Integer *itg=properties::get<numerical::Integer>(iit);
 		const Indices *ind=properties::get<Indices>(iit);
 		if(itg==0)
 			throw consistency_error("Need to know the range of the indices.");

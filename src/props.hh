@@ -67,13 +67,10 @@ class keyval_t {
 		kvlist_t keyvals;
 };
 
+/// Base class for all properties, handling argument parsing and defining the
+/// interface.
 class property_base {
 	public:
-//		typedef std::multimap<std::string, exptree::iterator>     keyval_t;
-//		typedef std::pair<keyval_t::iterator, keyval_t::iterator> keyval_range_t;
-//		typedef std::multimap<std::string, exptree::iterator>     keyval_t;
-//		typedef std::pair<keyval_t::iterator, keyval_t::iterator> keyval_range_t;
-
 		virtual ~property_base() {};
 		virtual bool        core_parse(keyval_t&);
 		virtual bool        parse(exptree&, exptree::iterator pat, exptree::iterator prop, keyval_t& keyvals);
@@ -94,6 +91,8 @@ class property_base {
 		bool                parse_one_argument(exptree::iterator arg, keyval_t& keyvals);
 };
 
+/// Placeholder.
+/// \bug Should be merged with property_base.
 class property : public property_base {
 	public:
 };

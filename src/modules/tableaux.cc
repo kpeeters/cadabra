@@ -671,7 +671,8 @@ bool decompose_product::can_apply(iterator it)
 							f2=fc;
 							ind2=indices_equivalent(fc);
 							if(ind2 && ind1==ind2) {
-								const Integer *itg=properties::get<Integer>( tr.begin_index(fc) );
+								const numerical::Integer *itg=
+									properties::get<numerical::Integer>( tr.begin_index(fc) );
 								if(itg) {
 									dim=to_long(*itg->difference.begin()->multiplier);
 									if(dim>0)
