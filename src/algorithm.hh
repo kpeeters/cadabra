@@ -191,7 +191,9 @@ class algorithm : public active_node {
 
 		/// Figure out whether two objects (commonly indices) are separated by a derivative
 		/// operator, as in \partial_{a}{A_{b}} C^{b}.
-		bool     separated_by_derivative(iterator, iterator) const;
+		/// If the last iterator is pointing to a valid node, check whether it is
+		/// independent of the derivative (using the Depends property).
+		bool     separated_by_derivative(iterator, iterator, iterator check_dependence) const;
 
 		// Given a node with non-zero multiplier, distribute this
 		// multiplier up the tree when the node is a \sum node, or push it into the

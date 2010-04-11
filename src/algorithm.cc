@@ -1667,38 +1667,39 @@ bool algorithm::prod_unwrap_single_term(iterator& it)
 	return false;
 	}
 
-bool algorithm::separated_by_derivative(iterator i1, iterator i2) const
+bool algorithm::separated_by_derivative(iterator i1, iterator i2, iterator check_dependence) const
 	{
-	std::set<iterator, exptree::iterator_base_less> parents;
+	iterator lca = tr.lowest_common_ancestor(i1, i2);
 
-	// Walk up the tree until we hit the top or a Derivative node; store all 
-	// pointers.
+	// Walk up the tree from the first node until the LCA, flag any derivatives
+	// with which we do not commute.
 
-	iterator walk=tr.parent(i1);
-	while(*walk->name!="\\expression" && tr.is_valid(tr.parent(walk)) ) {
-		walk=tr.parent(walk);
+	iterator walk=i1;
+	do {
+		walk=exptree::parent(walk);
+		if(walk == lca) break;
+		const Derivative *der=properties::get<Derivative>(walk);
+		if(der) {
+			const DependsBase *dep = properties::get_composite<DependsBase>(check_dependence);
+			if(dep) {
+				// FIXME: use logic in unwrap
+
+				return true;
+				}
+			}
+		} while(walk != lca);
+
+	// Ditto for second node.
+
+   walk=i2;
+	do {
+		walk=exptree::parent(walk);
 		const Derivative *der=properties::get<Derivative>(walk);
 		if(der)
-			break;
-		parents.insert(walk);
-		}
+			return true;
+		} while(walk != lca);
 
-	// Do the same from the other index; if we find a node which was
-	// already encountered, this means that the indices are not separated
-	// by a derivative.
-
-	walk=tr.parent(i2);
-	while(*walk->name!="\\expression" && tr.is_valid(tr.parent(walk)) ) {
-		walk=tr.parent(walk);
-		const Derivative *der=properties::get<Derivative>(walk);
-		if(der)
-			break;
-
-		if( parents.find(walk)!=parents.end() )
-			return false;
-		}
-	
-	return true;
+	return false;
 	}
 
 

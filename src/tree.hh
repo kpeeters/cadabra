@@ -1,13 +1,13 @@
 
 //	STL-like templated tree class.
 //
-// Copyright (C) 2001-2009 Kasper Peeters <kasper.peeters@aei.mpg.de>
+// Copyright (C) 2001-2010 Kasper Peeters <kasper.peeters@aei.mpg.de>
 // Distributed under the GNU General Public License version 3.
 
 /** \mainpage tree.hh
     \author   Kasper Peeters
-    \version  2.70
-    \date     24-Mar-2010
+    \version  2.8
+    \date     11-Apr-2010
     \see      http://tree.phi-sci.com/
     \see      http://tree.phi-sci.com/ChangeLog
 
@@ -380,6 +380,9 @@ class tree {
 									  const iterator_base& end) const;
 		/// Determine whether the iterator is an 'end' iterator and thus not actually pointing to a node.
 		bool     is_valid(const iterator_base&) const;
+		/// Find the lowest common ancestor of two nodes, that is, the deepest node such that
+		/// both nodes are descendants of it.
+		iterator lowest_common_ancestor(const iterator_base&, const iterator_base &) const;
 
 		/// Determine the index of a node in the range of siblings to which it belongs.
 		unsigned int index(sibling_iterator it) const;
@@ -1829,6 +1832,29 @@ bool tree<T, tree_node_allocator>::is_valid(const iterator_base& it) const
 	{
 	if(it.node==0 || it.node==feet || it.node==head) return false;
 	else return true;
+	}
+
+template <class T, class tree_node_allocator>
+typename tree<T, tree_node_allocator>::iterator tree<T, tree_node_allocator>::lowest_common_ancestor(
+	const iterator_base& one, const iterator_base& two) const
+	{
+	std::set<iterator, iterator_base_less> parents;
+
+	// Walk up from 'one' storing all parents.
+	iterator walk=one;
+	do {
+		walk=parent(walk);
+		parents.insert(walk);
+		} while( is_valid(parent(walk)) );
+
+	// Walk up from 'two' until we encounter a node in parents.
+	walk=two;
+	do {
+		walk=parent(walk);
+		if(parents.find(walk) != parents.end()) break;
+		} while( is_valid(parent(walk)) );
+
+	return walk;
 	}
 
 template <class T, class tree_node_allocator>

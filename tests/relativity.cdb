@@ -232,3 +232,22 @@ obj11b:= 3 g_{m p} g^{m p};
 tst11b:= 3 g_{p}^{p} - @(obj11b);
 @collect_terms!(%);
 @assert(tst11b);
+
+# Test 12: Eliminating metrics in presence of derivatives.
+#
+@reset.
+{m, n, p, q, r}::Indices(vector, position=fixed).
+g_{m n}::Metric.
+\partial{#}::Derivative.
+obj12a:= g_{m n} \partial_{p}{ A^{n} };
+@eliminate_metric!(%);
+tst12a:= \partial_{p}{ A_{m} } - @(obj12a);
+@collect_terms!(%);
+@assert(tst12a);
+
+g_{m n}::Depends(\partial).
+obj12b:= g_{m n} \partial_{p}{ A^{n} };
+@eliminate_metric!(%);
+tst12b:= g_{m n} \partial_{p}{ A^{n} } - @(obj12b);
+@collect_terms!(%);
+@assert(tst12b);

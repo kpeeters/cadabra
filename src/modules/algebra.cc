@@ -3039,7 +3039,9 @@ algorithm::result_t canonicalise::apply(iterator& it)
 		// Have to do this by putting those indices in a different set and then
 		// setting the metric flag to 0. Ditto when only one index is on a derivative
 		// (canonicalising usually makes the expression uglier in that case).
-		if( ( (separated_by_derivative(ii->first, i2->first) || only_one_on_derivative(ii->first, i2->first) )
+		iterator tmp;
+		if( ( (separated_by_derivative(ii->first, i2->first,tmp) 
+				 || only_one_on_derivative(ii->first, i2->first) )
 				&& position_type(ii->first)==Indices::fixed ) ||
 			 position_type(ii->first)==Indices::independent ) {
 			dummy_sets[" NR "+get_index_set_name(ii->first)].push_back(ii->second+1);

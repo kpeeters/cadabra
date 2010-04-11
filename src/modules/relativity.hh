@@ -89,6 +89,10 @@ class eliminate_metric : public algorithm {
 		virtual void     description() const;
 		virtual bool     can_apply(iterator);
 		virtual result_t apply(iterator&);
+
+	private:
+		index_map_t ind_dummy, ind_free;
+		bool handle_one_index(iterator, iterator, iterator, sibling_iterator);
 };
 
 class rewrite_indices : public algorithm {
