@@ -245,6 +245,10 @@ tst12a:= \partial_{p}{ A_{m} } - @(obj12a);
 @collect_terms!(%);
 @assert(tst12a);
 
+@reset.
+{m, n, p, q, r}::Indices(vector, position=fixed).
+g_{m n}::Metric.
+\partial{#}::Derivative.
 g_{m n}::Depends(\partial).
 obj12b:= g_{m n} \partial_{p}{ A^{n} };
 @eliminate_metric!(%);

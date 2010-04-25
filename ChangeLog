@@ -1,3 +1,13 @@
+2010-04-25  Kasper Peeters  <kasper.peeters@aei.mpg.de>
+
+	* Released 1.24
+
+	* Added handling of dependency information in
+	@eliminate_metric and @eliminate_vielbein.
+
+	* Fixed parser bug for x**{2} and related expressions, which would
+	introduce spurious brackets.
+
 2010-04-04  Kasper Peeters  <kasper.peeters@aei.mpg.de>
 
 	* Released 1.23

@@ -105,3 +105,21 @@ obj11b:= x**3;
 tst11b:= - 27 u**3 - @(obj11b);
 @collect_terms!(%);
 @assert(tst11b);
+
+@reset.
+obj11c:= x**{m} x**{-m};
+@collect_factors!(%);
+tst11c:= 1 - @(obj11c);
+@collect_terms!(%);
+@assert(tst11c);
+
+@reset.
+obj11d:= x**2 - x**{2};
+@collect_terms!(%);
+@assert(obj11d);
+
+@reset.
+obj11e:= x**{-2} - x**{(-2)};
+@collect_terms!(%);
+@assert(obj11e);
+

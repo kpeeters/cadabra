@@ -73,26 +73,36 @@ class RiemannTensor : public TableauSymmetry, virtual public property {
 		virtual bool        parse(exptree&, exptree::iterator, exptree::iterator, keyval_t&);
 };
 
-class eliminate_vielbein : public algorithm {
+class eliminate_converter : public algorithm {
 	public:
-		eliminate_vielbein(exptree&, iterator);
-		
-		virtual void     description() const;
-		virtual bool     can_apply(iterator);
-		virtual result_t apply(iterator&);
-};
+		eliminate_converter(exptree&, iterator);
 
-class eliminate_metric : public algorithm {
-	public:
-		eliminate_metric(exptree&, iterator);
-		
 		virtual void     description() const;
 		virtual bool     can_apply(iterator);
 		virtual result_t apply(iterator&);
+
+	protected:
+		virtual bool is_conversion_object(iterator) const=0; 
 
 	private:
 		index_map_t ind_dummy, ind_free;
 		bool handle_one_index(iterator, iterator, iterator, sibling_iterator);
+};
+
+class eliminate_vielbein : public eliminate_converter {
+	public:
+		eliminate_vielbein(exptree&, iterator);
+
+	protected:
+		virtual bool is_conversion_object(iterator) const;
+};
+
+class eliminate_metric : public eliminate_converter {
+	public:
+		eliminate_metric(exptree&, iterator);
+
+	protected:
+		virtual bool is_conversion_object(iterator) const;
 };
 
 class rewrite_indices : public algorithm {

@@ -153,7 +153,7 @@ int main(int argc, char **argv)
 
 		regression*=testit(
 			"Tensor[F,{}]",
-			"Tensor[\\comma{F}{{}}]");
+			"Tensor[\\comma{F}{}]");
 
 		regression*=testit(
 			"a^{} b",
@@ -250,6 +250,14 @@ int main(int argc, char **argv)
 		regression*=testit(
 			"3.14",
 			"3.14");
+
+		regression*=testit(
+			"x**{2}",
+			"\\pow{x}{2}");
+
+		regression*=testit(
+			"x**(2)",
+			"\\pow{x}(2)");
 
 //		  regression*=testit(
 //			  "@substitute!(%){b_{p}->c_{p m n} A^{m n} + c_{p} }",

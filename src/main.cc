@@ -187,6 +187,23 @@ int main(int argc, char **argv)
 		else if(strcmp(argv[i],"--nowarnings")==0) {
 			nowarnings=true;
 			}
+		else if(strcmp(argv[i],"--help")==0) {
+			std::cout << "Usage: cadabra [options] input\n\n"
+						 << "where [options] can be any of \n"
+						 << "   --bare             : disable ~/.cadabra\n"
+						 << "   --nodefaults       : disable default settings\n"
+						 << "   --silent           : disable output\n"
+						 << "   --loginput         : repeat input to output\n"
+						 << "   --texmacs          : enable texmacs output format\n"
+						 << "   --xcadabra         : enable xcadabra output format\n"
+						 << "   --mathml           : enable matheml output format (experimental)\n"
+						 << "   --input [filename] : read given file as input\n"
+						 << "   --prompt [string]  : set the prompt string\n"
+						 << "   --silentfail       : do not report errors upon failure\n"
+						 << "   --nowarnings       : disable warnings\n"
+						 << "   --help             : this help\n" << std::endl;
+			return -1;
+			}
 		else {
 			cmdline_arguments.push_back(argv[i]);
 //			std::cerr << "argument: " << cmdline_arguments.back() << std::endl;

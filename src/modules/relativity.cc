@@ -147,119 +147,49 @@ bool RiemannTensor::parse(exptree& tr, exptree::iterator pat, exptree::iterator 
 	}
 
 eliminate_vielbein::eliminate_vielbein(exptree& tr, iterator it)
-	: algorithm(tr, it)
+	: eliminate_converter(tr, it)
 	{
-	}
-
-void eliminate_vielbein::description() const
-	{
-	txtout << "Bla" << std::endl;
-	}
-
-bool eliminate_vielbein::can_apply(iterator it)
-	{
-	if(*it->name=="\\prod") return true;
-	return false;
-	}
-
-algorithm::result_t eliminate_vielbein::apply(iterator& it)
-	{
-	// Put arguments in canonical form.
-
-	sibling_iterator objs=args_begin();
-//	sibling_iterator vielb=objs;
-//	++vielb;
-	if(*objs->name!="\\comma")
-		objs=tr.wrap(objs, str_node("\\comma"));
-
-	index_map_t ind_dummy, ind_free;
-	classify_indices(it, ind_free, ind_dummy);
-
-	// Run over all factors, find vielbeine, figure out whether they can
-	// be used to turn the indices on the other tensors to preferred type.
-
-	sibling_iterator fit=tr.begin(it);
-	while(fit!=tr.end(it)) {
-		const Vielbein         *vb=properties::get<Vielbein>(fit);
-		const InverseVielbein *ivb=properties::get<InverseVielbein>(fit);
-		bool replaced=false;
-		if(vb || ivb) {
-	      sibling_iterator ind1=tr.begin(fit), ind2=ind1; // the 1st and 2nd index of the vielbein
-			++ind2;
-			// The contracted index can be either ind1 or ind2. Hence two similar loops:
-
-			// 1st index to 2nd index conversion?
-			std::pair<index_map_t::const_iterator,index_map_t::const_iterator> 
-				 locs= ind_dummy.equal_range(exptree(ind1));
-			while(locs.first!=locs.second) {
-				 if(locs.first->second!=(iterator)ind1) {
-					  // Does this index sit on an object in the "preferred form" list?
-					  iterator par=tr.parent(locs.first->second);
-					  sibling_iterator prefit=tr.begin(objs);
-					  while(prefit!=tr.end(objs)) {
-							if(subtree_equal(prefit, par, -2, false)) {
-								 tr.replace_index(locs.first->second, ind2);
-								 fit=tr.erase(fit);
-								 expression_modified=true;
-								 replaced=true;
-								 break;
-								 }
-							++prefit;
-							}
-					  }
-				 if(replaced) break;
-				 }
-			if(replaced) break;
-			
-         // 2nd index to 1st index conversion?
-			locs=ind_dummy.equal_range(exptree(ind2));
-			while(locs.first!=locs.second) {
-				 if(locs.first->second!=(iterator)ind2) {
-					  // Does this index sit on an object in the "preferred form" list?
-					  iterator par=tr.parent(locs.first->second);
-					  sibling_iterator prefit=tr.begin(objs);
-					  while(prefit!=tr.end(objs)) {
-							if(subtree_equal(prefit, par, -2, false)) {
-								 tr.replace_index(locs.first->second, ind1);
-								 fit=tr.erase(fit);
-								 expression_modified=true;
-								 replaced=true;
-								 break;
-								 }
-							++prefit;
-							}
-					  }
-				 if(replaced) break;
-				 ++locs.first;
-				 }
-			 }
-		if(!replaced)
-			 ++fit;
-		}
-	if(expression_modified) {
-		cleanup_sums_products(tr, it);
-		return l_applied;
-		}
-	else return l_no_action;
 	}
 
 eliminate_metric::eliminate_metric(exptree& tr, iterator it)
+	: eliminate_converter(tr, it)
+	{
+	}
+
+bool eliminate_vielbein::is_conversion_object(iterator fit) const 
+	{
+	const Vielbein        *vb=properties::get<Vielbein>(fit);
+	const InverseVielbein *ivb=properties::get<InverseVielbein>(fit);
+	
+	if(vb || ivb)  return true;
+	else return false;
+	}
+
+bool eliminate_metric::is_conversion_object(iterator fit) const 
+	{
+	const Metric        *vb=properties::get<Metric>(fit);
+	const InverseMetric *ivb=properties::get<InverseMetric>(fit);
+	
+	if(vb || ivb)  return true;
+	else return false;
+	}
+
+eliminate_converter::eliminate_converter(exptree& tr, iterator it)
 	: algorithm(tr, it)
 	{
 	}
 
-void eliminate_metric::description() const
+void eliminate_converter::description() const
 	{
-	txtout << "Eliminate metrics." << std::endl;
 	}
 
-bool eliminate_metric::can_apply(iterator it)
+bool eliminate_converter::can_apply(iterator it)
 	{
 	if(*it->name=="\\prod") return true;
 	return false;
 	}
 
-bool eliminate_metric::handle_one_index(iterator ind1, iterator ind2, iterator fit, sibling_iterator objs)
+bool eliminate_converter::handle_one_index(iterator ind1, iterator ind2, iterator fit, sibling_iterator objs)
 	{
 	bool replaced=false;
 
@@ -271,8 +201,7 @@ bool eliminate_metric::handle_one_index(iterator ind1, iterator ind2, iterator f
 			if(locs.first->second!=(iterator)ind1) {
 				// Does this index sit on an object in the "preferred form" list?
 				// (if there is no preferred form, always eliminate)
-				iterator tmp;
-				if(separated_by_derivative(locs.first->second, ind2, tmp)==false) {
+				if(separated_by_derivative(locs.first->second, ind2, fit)==false) {
 					if(objs==args_end()) { // no
 						tr.move_ontop(locs.first->second, iterator(ind2))->fl.parent_rel=ind2->fl.parent_rel;;
 						fit=tr.erase(fit);
@@ -303,7 +232,8 @@ bool eliminate_metric::handle_one_index(iterator ind1, iterator ind2, iterator f
 	return false;
 	}
 
-algorithm::result_t eliminate_metric::apply(iterator& it)
+
+algorithm::result_t eliminate_converter::apply(iterator& it)
 	{
 	// Put arguments in canonical form.
 
@@ -320,10 +250,7 @@ algorithm::result_t eliminate_metric::apply(iterator& it)
 
 	sibling_iterator fit=tr.begin(it);
 	while(fit!=tr.end(it)) {
-		const Metric        *vb=properties::get<Metric>(fit);
-		const InverseMetric *ivb=properties::get<InverseMetric>(fit);
-
-		if(vb || ivb) {
+		if(is_conversion_object(fit)) {
 			sibling_iterator ind1=tr.begin(fit), ind2=ind1;
 			++ind2;
 			

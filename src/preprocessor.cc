@@ -163,7 +163,7 @@ unsigned int preprocessor::is_bracket_(unsigned char c) const
 bool preprocessor::is_already_bracketed_(const std::string& str) const
 	{
 	if(str.size()>=2) 
-		if(is_bracket_(str[0]) && str[0]!='{')
+		if(is_bracket_(str[0])) // && str[0]!='{')
 			if(is_opening_bracket_(str[0])==is_closing_bracket_(str[str.size()-1]))
 				return true;
 	return false;
@@ -352,7 +352,7 @@ bool preprocessor::unwind_(unsigned int onum, unsigned int bracketgoal, bool use
 			}
 		else bracket_strings_(cb, obrack, cbrack);
 
-		if(cur.parts.size()>1 || cur.order==order_factorial) {
+		if(cur.parts.size()>1 || cur.order==order_factorial) { // More than one argument to the function.
 			if(cur.order<sizeof(orders)) {
 				tmp+=order_names[cur.order];
 				for(unsigned int k=0; k<cur.parts.size(); ++k) 
@@ -376,9 +376,10 @@ bool preprocessor::unwind_(unsigned int onum, unsigned int bracketgoal, bool use
 				tmp+=cbrack;
 				}
 			}
-		else {
+		else { // Function with only one argument.
 			if(cur.parts.size()>0) {
 				bracket_strings_(cb, obrack, cbrack);
+//				std::cout << cur.parts[0] << " : " << is_already_bracketed_(cur.parts[0]) << std::endl;
 				if(onum!=sizeof(orders) || 
 					( is_already_bracketed_(cur.parts[0]) && ( cur.parts[0][0]==obrack[0] || obrack[0]=='{')))
 					tmp=cur.parts[0];

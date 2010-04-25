@@ -1692,7 +1692,7 @@ algorithm::result_t unwrap::apply(iterator& it)
 				const DependsBase *dep=properties::get_composite<DependsBase>(factor);
 				if(dep!=0) {
 //					txtout << *factor->name << " depends" << std::endl;
-					exptree deps=dep->dependencies(it);
+					exptree deps=dep->dependencies(factor /* it */);
 					sibling_iterator depobjs=deps.begin(deps.begin());
 					while(depobjs!=deps.end(deps.begin())) {
 //						txtout << "?" << *it->name << " == " << *depobjs->name << std::endl;

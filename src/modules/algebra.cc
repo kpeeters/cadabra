@@ -193,44 +193,51 @@ bool TableauSymmetry::parse(exptree& tr, exptree::iterator pat, exptree::iterato
 			  indices=kvit->second;
 
 		 if(shape!=tr.end() && indices!=tr.end()) {
-
-			  exptree::sibling_iterator si=shape.begin();
-			  exptree::sibling_iterator ii=indices.begin();
-
-			  tab_t tab;
-
-			  keyval_t::const_iterator tmp=kvit;
-			  ++tmp;
-			  if(tmp!=keyvals.end()) {
-					if(tmp->first=="selfdual")
-						 tab.selfdual_column=1;
-					else if(tmp->first=="antiselfdual")
-						 tab.selfdual_column=-1;
-					}
-
-			  int rowind=0;
-			  unsigned int tabdown=to_long(*si->multiplier);
-			  unsigned int numindices=tr.number_of_indices(pat);
-			  // FIXME: we get the wrong pattern in case of a list! We should have
-			  // been fed each individual item in the list, not the list itself.
+			 // Make sure the shape and indices lists have a \comma node.
+			 tr.list_wrap_single_element(shape);
+			 tr.list_wrap_single_element(indices);
+			 
+			 exptree::sibling_iterator si=shape.begin();
+			 exptree::sibling_iterator ii=indices.begin();
+			 
+			 tab_t tab;
+			 
+			 keyval_t::const_iterator tmp=kvit;
+			 ++tmp;
+			 if(tmp!=keyvals.end()) {
+				 if(tmp->first=="selfdual")
+					 tab.selfdual_column=1;
+				 else if(tmp->first=="antiselfdual")
+					 tab.selfdual_column=-1;
+				 }
+			 
+			 int rowind=0;
+			 unsigned int tabdown=to_long(*si->multiplier);
+			 unsigned int numindices=tr.number_of_indices(pat);
+			 // FIXME: we get the wrong pattern in case of a list! We should have
+			 // been fed each individual item in the list, not the list itself.
 //			  std::cout << numindices << " " << *pat->name << std::endl;
-			  while(ii!=indices.end()) {
-					if(tabdown+1 > numindices) return false;
-					if(si==shape.end()) return false;
-					tab.add_box(rowind, to_long(*ii->multiplier));
-					++ii;
-					if((--tabdown)==0 && ii!=indices.end()) {
-						 ++si;
-						 ++rowind;
-						 tabdown=to_long(*si->multiplier);
-						 }
-					}
-			  tabs.push_back(tab);
-			  shape=tr.end();
-			  indices=tr.end();
-			  }
+			 while(ii!=indices.end()) {
+				 if(tabdown+1 > numindices) return false;
+				 if(si==shape.end()) return false;
+				 tab.add_box(rowind, to_long(*ii->multiplier));
+				 ++ii;
+				 if((--tabdown)==0 && ii!=indices.end()) {
+					 ++si;
+					 ++rowind;
+					 tabdown=to_long(*si->multiplier);
+					 }
+				 }
+			 tabs.push_back(tab);
+
+			 tr.list_unwrap_single_element(shape);
+			 tr.list_unwrap_single_element(indices);
+
+			 shape=tr.end();
+			 indices=tr.end();
+			 }
 		 ++kvit;
-		 }
+		}
 	
 	return true;
 	}
@@ -777,11 +784,13 @@ algorithm::result_t prodrule::apply(iterator& it)
 		 // a number of cases:
 		 //
 		 //    D_{a}{\theta^{b}}                    with \theta^{a} Coordinate & SelfAntiCommuting
-       //    D_{\theta^{a}}{\theta^{b}}           not yet handled !!
+       //    D_{\theta^{a}}{\theta^{b}}           with \theta^{a} Coordinate and a,b,c AntiCommuting
 		 //    D_{a}{D_{b}{G}}                      handled by making indices AntiCommuting.
 		 //    D_{a}{D_{\dot{b}}{G}}                handled by making indices AntiCommuting.
 		 //    D_{a}{T^{a b}}                       handled by making indices AntiCommuting.
 		 //    D_{a}{\theta}                        with \theta having an ImplicitIndex of type 'a' 
+		 //    D{ A B }                             not yet handled (problem is to give scalar anti-commutativity
+       //                                            property to D, A, B).
 
 		 while(chl!=tr.end(prodnode)) { // iterate over all factors in the product
 			  // Add the whole product node to the replacement sum.

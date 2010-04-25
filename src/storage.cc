@@ -515,6 +515,27 @@ exptree::iterator exptree::move_index(iterator pos, const iterator& from)
 	return from;
 	}
 
+void exptree::list_wrap_single_element(iterator& it)
+	{
+	if(*it->name!="\\comma") {
+		iterator commanode=insert(it, str_node("\\comma"));
+		sibling_iterator fr=it, to=it;
+		++to;
+		reparent(commanode, fr, to);
+		it=commanode;
+		}
+	}
+
+void exptree::list_unwrap_single_element(iterator& it)
+	{
+	if(*it->name=="\\comma") {
+		if(number_of_children(it)==1) {
+			flatten(it);
+			it=erase(it);
+			}
+		}
+	}
+
 exptree::iterator exptree::flatten_and_erase(iterator pos)
 	{
 	multiplier_t tmp=*pos->multiplier;

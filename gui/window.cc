@@ -2427,8 +2427,6 @@ bool XCadabra::receive(modglue::ipipe& p)
 			Glib::RefPtr<DataCell> newcell(new DataCell(DataCell::c_input));
 			add_cell(newcell, Glib::RefPtr<DataCell>());
 			show_cell(newcell);
-//			while (gtk_events_pending ())
-//				gtk_main_iteration ();
 
 			active_canvas->select_first_input_cell();
 			}

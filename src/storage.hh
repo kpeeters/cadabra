@@ -162,6 +162,11 @@ class exptree : public tree<str_node> {
 		/// pointing to the original remain valid).
 		iterator         move_index(iterator position, const iterator& from);
 
+		/// Make sure that the node pointed to is a \comma object, i.e. wrap the node if not already
+		/// inside such a \comma.
+		void             list_wrap_single_element(iterator&);
+		void             list_unwrap_single_element(iterator&);
+
 		/// Replace the node with the only child of the node, useful for e.g.
 		/// \prod{A} -> A. This algorithm takes care of the multiplier of the 
 		/// top node, i.e. it does 2\prod{A} -> 2 A.

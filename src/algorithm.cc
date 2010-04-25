@@ -1674,30 +1674,48 @@ bool algorithm::separated_by_derivative(iterator i1, iterator i2, iterator check
 	// Walk up the tree from the first node until the LCA, flag any derivatives
 	// with which we do not commute.
 
-	iterator walk=i1;
-	do {
-		walk=exptree::parent(walk);
-		if(walk == lca) break;
-		const Derivative *der=properties::get<Derivative>(walk);
-		if(der) {
-			const DependsBase *dep = properties::get_composite<DependsBase>(check_dependence);
-			if(dep) {
-				// FIXME: use logic in unwrap
-
-				return true;
-				}
-			}
-		} while(walk != lca);
-
-	// Ditto for second node.
-
-   walk=i2;
-	do {
-		walk=exptree::parent(walk);
-		const Derivative *der=properties::get<Derivative>(walk);
-		if(der)
-			return true;
-		} while(walk != lca);
+	struct {
+		bool operator()(exptree& tr, iterator walk, iterator lca, iterator check_dependence) {
+		   do {
+				walk=exptree::parent(walk);
+				if(walk == lca) break;
+				const Derivative *der=properties::get<Derivative>(walk);
+				if(der) {
+					if(tr.is_valid(check_dependence) ) {
+						const DependsBase *dep = properties::get_composite<DependsBase>(check_dependence);
+						if(dep) {
+							exptree deps=dep->dependencies(check_dependence);
+							sibling_iterator depobjs=deps.begin(deps.begin());
+							while(depobjs!=deps.end(deps.begin())) {
+								if(walk->name == depobjs->name) {
+									return true;
+									}
+								else {
+									// compare all indices
+									sibling_iterator indit=tr.begin(walk);
+									while(indit!=tr.end(walk)) {
+										if(indit->is_index()) {
+											if(subtree_exact_equal(indit, depobjs))
+												return true;
+											}
+										++indit;
+										}
+									}
+								++depobjs;
+								} 
+							return false; // Dependence found but not relevant here.
+							}
+						else return false; // No dependence property found at all.
+						}
+					else return true; // Should not check for dependence.
+					}
+				} while(walk != lca);
+			return false;
+		   }
+	} one_run;
+	
+	if(one_run(tr, i1, lca, check_dependence)) return true;
+	if(one_run(tr, i2, lca, check_dependence)) return true;
 
 	return false;
 	}
