@@ -243,6 +243,9 @@ algorithm::result_t eliminate_converter::apply(iterator& it)
 		if(*objs->name!="\\comma")
 			objs=tr.wrap(objs, str_node("\\comma"));
 
+	ind_free.clear();
+	ind_dummy.clear();
+
 	classify_indices(it, ind_free, ind_dummy);
 
 	// Run over all factors, find metrics, figure out whether they can
@@ -253,7 +256,7 @@ algorithm::result_t eliminate_converter::apply(iterator& it)
 		if(is_conversion_object(fit)) {
 			sibling_iterator ind1=tr.begin(fit), ind2=ind1;
 			++ind2;
-			
+
          // 1st index to 2nd index conversion?
 			if(handle_one_index(ind1, ind2, fit, objs))
 				break;
@@ -264,7 +267,7 @@ algorithm::result_t eliminate_converter::apply(iterator& it)
 			}
 		++fit;
 		}
-//	exptree::print_recursive_treeform(txtout, it);
+
 	if(expression_modified) {
 		cleanup_sums_products(tr, it);
 		return l_applied;

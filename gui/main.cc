@@ -99,7 +99,7 @@ int main (int argc, char *argv[])
 	std::string cdbname="cadabra";
 #endif
 	modglue::ext_process ls_proc(cdbname);
-	ls_proc << "--xcadabra" << "--bare";
+	ls_proc << "--xcadabra" << "--bare" << "--nowarnings";
 	ls_proc.setup_pipes(); // FIXME: need cleaner error messages if this is forgotten
 	mm.add(&ls_proc);
 

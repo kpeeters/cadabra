@@ -1000,7 +1000,8 @@ exptree::iterator manipulator::handle_active_nodes_(exptree::iterator original_e
 					collect_after=to_long(*args->multiplier);
 				iterator newit=run_procedure(procit,collect_after);
 				expressions.erase_expression(original_expression);
-				txtout << "procedure completed." << std::endl;
+				if(!nowarnings)
+					txtout << "procedure completed." << std::endl;
 				return newit;
 				}
 			}
@@ -1054,6 +1055,9 @@ exptree::iterator manipulator::handle_active_nodes_(exptree::iterator original_e
 
 exptree::iterator manipulator::run_procedure(exptree::iterator proc, long collect_after)
 	{
+	bool remember_silentfail=silentfail;
+	silentfail=true;
+
 	collect_terms collector(expressions, expressions.end());
 	long termcount=0;
 	long collectcount=0;
@@ -1112,9 +1116,11 @@ exptree::iterator manipulator::run_procedure(exptree::iterator proc, long collec
 			}
 		// statistics output
 		expired_so_far.stop();
-		txtout << "term " << termcount << " of " << totalterms;
-		txtout << " remains " << expired_so_far.seconds()*(float)(totalterms-termcount)/(float)(termcount)/60
-				 << " min" << std::endl;
+		if(!nowarnings) {
+			txtout << "term " << termcount << " of " << totalterms;
+			txtout << " remains " << expired_so_far.seconds()*(float)(totalterms-termcount)/(float)(termcount)/60
+					 << " min" << std::endl;
+			}
 		expired_so_far.start();
 
 		// replace term with new current expression.
@@ -1153,8 +1159,13 @@ exptree::iterator manipulator::run_procedure(exptree::iterator proc, long collec
 	if(collected)
 		cleanup_expression(expressions, act); // to remove possible zeroes
 	last_used_equation_number=backup_last_used;
-	for(unsigned int i=0; i<timers.size(); ++i)
-		txtout << "line " << i << " total " << timers[i] << std::endl;
+	if(!nowarnings) 
+		for(unsigned int i=0; i<timers.size(); ++i) 
+			txtout << "line " << i << " total " << timers[i] << std::endl;
+
+	// Restore settings for warning/failure messages.
+	silentfail=remember_silentfail;
+
 	return expressions.active_expression(expressions.equation_by_number(last_used_equation_number));
 	}
 

@@ -255,3 +255,13 @@ obj12b:= g_{m n} \partial_{p}{ A^{n} };
 tst12b:= g_{m n} \partial_{p}{ A^{n} } - @(obj12b);
 @collect_terms!(%);
 @assert(tst12b);
+
+# Test 13: reported bug with eliminate_metric.
+#
+@reset.
+{a,b,c,d,e,i,j,k}::Indices(curved).
+g^{a b}::InverseMetric.
+\nabla{#}::Derivative.
+h_{a b}::Symmetric.
+g^{a k} * \nabla_{b}{h_{k c}} +g^{a k} * \nabla_{c}{h_{k b}};
+@eliminate_metric!(%);

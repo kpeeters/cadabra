@@ -1,3 +1,12 @@
+2010-04-26  Kasper Peeters  <kasper.peeters@aei.mpg.de>
+
+	* Released 1.25
+
+	* Disabled messy output of procedure calls in the GUI.
+
+	* Fixed bug in @eliminate_metric/vielbein which would fail to
+	reset internal variables and thus mess up expressions.
+
 2010-04-25  Kasper Peeters  <kasper.peeters@aei.mpg.de>
 
 	* Released 1.24
