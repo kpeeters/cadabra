@@ -1,29 +1,125 @@
 
 
-- install cygwin plus a bunch of its packages (see list)
-- install libsigc++
-- fetch, compile and install modglue
-- install libgmp NEW: is in cygwin now
+The windows version of Cadabra is built using Cygwin, with GTK
+libraries built to use native Windows widgets instead of an X11
+server. This means that I did not use the Cygwin-supplied GTK
+libraries, but instead compiled my own set from source. A detailed
+log of the steps required to build Cadabra under Cygwin is given below
+(note that this may take several hours to complete due to the large
+number of dependencies of the gtkmm library).
 
-At this stage cadabra builds without GUI, provided the autoconf test
-for LiE is disabled.
+- install cygwin 1.7.5 or higher plus the packages
+   Libs/
+     libpcrecpp-devel
+	  libgmp-devel
+     libgmp3
+     libgmpxx4 
+     libiconv
+	  gettext-devel
+     libpng12-devel
+	  libtiff-devel
+   Devel/
+     autoconf2.5
+	  gcc4-g++
+     pkg-config
+	  make
+	  libtool
+	Editors/
+	  emacs
+   Utils/
+	  time
+   Web/
+     wget
 
-- install latest glibd
-- install latest pixman
-- install latest cairo (--enable-xlib=no, versions above 1.8.0 are broken)
-- install latest pango with cairo backend (--without-x --with-included-modules=yes )
+- launch cygwin
 
-   (in configure, add [_]* to the --export-symbols-regex for pango,
-   and export LIBS=-no-undefined too.)
+   mkdir build
+	cd build
+ 
+   # Install libsigc++
+	wget http://ftp.gnome.org/pub/GNOME/sources/libsigc++/2.2/libsigc++-2.2.6.tar.bz2
+   tar jxvf libsigc++-2.2.6.tar.bz2
+   cd libsigc++-2.2.6
+   ./configure
+   make
+	make install
+   # add 'export PKG_CONFIG_PATH=/usr/local/lib/pkgconfig' to ~/.bashrc
+	
+	# Install modglue
+   wget http://cadabra.phi-sci.com/modglue-1.16.tar.gz
+   tar zxvf modglue-1.16.tar.gz
+   cd modglue-1.16
+   ./configure
+   make
+	make install
 
-- install latest atk
+   # Cadabra without GUI
+   wget http://cadabra.phi-sci.com/cadabra-1.25.tar.gz
+   tar zxvf cadabra-1.25.tar.gz
+   cd cadabra-1.25
+   ./configure --disable-gui --disable-runtime-dependency-check
+   make
+   # 'make test' will now work but hang on fieldtheory.cdb because lie
+   # is missing.
+ 
+   # GUI prerequisites:
+   # glib
+   wget http://ftp.gnome.org/pub/gnome/sources/glib/2.25/glib-2.25.3.tar.bz2
+   tar jxf glib-2.25.3.tar.bz2
+   cd glib-2.25.3
+   # On line 1414 of glib/gstrfuncs.c remove 'extern const' from the declaration.
+   ./configure; make; make install
+
+   # pixman
+   wget http://cairographics.org/releases/pixman-0.18.0.tar.gz
+   tar zxf pixman-0.18.0.tar.gz
+   cd pixman-0.18.0
+   ./configure; make; make install
+
+   # cairo (previously, versions above 1.8.0 were broken?)
+   wget http://cairographics.org/releases/cairo-1.8.10.tar.gz
+   tar zxf cairo-1.8.10.tar.gz
+	cd cairo-1.8.10
+   ./configure --enable-xlib=no
+   make; make install
+
+   # pango with cairo backend
+   # (previously, in configure, add [_]* to the --export-symbols-regex for pango,
+   #   and export LIBS=-no-undefined too.)
+   wget http://ftp.gnome.org/pub/GNOME/sources/pango/1.28/pango-1.28.0.tar.bz2
+   tar jxf pango-1.28.0.tar.bz2
+   cd pango-1.28.0.tar.bz2
+   ./configure --without-x --with-included-modules=yes   
+   make; make install
+
+   # atk
+   wget http://ftp.gnome.org/pub/GNOME/sources/atk/1.30/atk-1.30.0.tar.bz2
+   tar jxf atk-1.30.0.tar.bz2
+   cd atk-1.30.0
+   ./configure; make; make install
+   
+   # gtk
+   wget http://ftp.gnome.org/pub/GNOME/sources/gtk+/2.20/gtk+-2.20.0.tar.bz2
+   tar jxf gtk+-2.20.0.tar.bz2
+	cd gtk+-2.20.0
+	./configure --without-x
+	# on line 243 of gdk/win32/rc/Makefile, set WINDRES = windres.
+	# on line 698, remove the -export-symbols $(srcdir)/gdk.def argument (already 
+   #   covered by the -export-symbols-regex argument).
+	make   
+
+   # glibmm
+
+   # cairomm
+ 
+   # pangomm
+
+   # gtkmm
+
+
+
 
 - install latest gtk (--without-x)
-     - had to fix one WINDRES in gdk/win32/rc/Makefile (was unset, should be
-       windres)
-     - had to kill a 'LD_EXPORT_...' flag in gdk/Makefile (chose the 
-       regex one as the ./gdk.def seems to contain all the defs;
-       later: regex seems safer to keep)
      - had to fix an issue with the deprecated
        gtk_scale_button_set_orientation, re-enable in .h file.
 
@@ -43,62 +139,3 @@ at gdkevents-win32.c:3268
 3268 if(_sizemove_in_progress &&
 
 
-
-=========================================================================
-OLD:
-
-
-
-
-
-Cadabra does not yet compile on Windows, but this will change in the
-near future. Below is a list of dependencies which will have to be
-sorted out for a Windows port. Many GNU tools are available for
-Windows through
-
-  http://gnuwin32.sourceforge.net/
-
-We will use MinGW and the MSYS shell
-
-  http://www.mingw.org/
-  http://mingw.org/wiki/msys
-
-to build.
-
---------------------------------------------------------------------
-kernel only:
-
-+ PCRE.
-
-  Available through gnuwin32.
-
-+ GMP. 
-
-  http://fp.gladman.plus.com/computing/gmp4win.htm
-
-- Modglue.
-
-  The modglue methods will be replaced with Glib ones (not as nice but
-  more portable).
-
-- LiE.
-
-  We may decide to simply drop this, disabling a little bit of
-  cadabra functionality for the time being.
-
---------------------------------------------------------------------
-gui:
-
-+ SigC/Gtk+/Gtkmm and friends.
-
-  http://live.gnome.org/gtkmm/MSWindows
-
-+ TeX & dvipng
-
-  http://www.tug.org/texlive/windows.html
-
---------------------------------------------------------------------
-build tools:
-
-+ libtool
-+ pkg-config
