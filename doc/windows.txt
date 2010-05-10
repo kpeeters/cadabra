@@ -94,9 +94,6 @@ number of dependencies of the gtkmm library).
 
    # atk
    wget http://ftp.gnome.org/pub/GNOME/sources/atk/1.30/atk-1.30.0.tar.bz2
-   tar jxf atk-1.30.0.tar.bz2
-   cd atk-1.30.0
-   ./configure; make; make install
    
    # gtk
    wget http://ftp.gnome.org/pub/GNOME/sources/gtk+/2.20/gtk+-2.20.0.tar.bz2
@@ -106,17 +103,24 @@ number of dependencies of the gtkmm library).
 	# on line 243 of gdk/win32/rc/Makefile, set WINDRES = windres.
 	# on line 698, remove the -export-symbols $(srcdir)/gdk.def argument (already 
    #   covered by the -export-symbols-regex argument).
-	make   
+	make; make install
 
    # glibmm
+   wget http://ftp.gnome.org/pub/GNOME/sources/glibmm/2.22/glibmm-2.22.2.tar.bz2
 
    # cairomm
- 
+	wget http://cairographics.org/releases/cairomm-1.8.4.tar.gz
+
    # pangomm
+	wget http://ftp.gnome.org/pub/GNOME/sources/pangomm/2.26/pangomm-2.26.1.tar.bz2
 
    # gtkmm
+   wget http://ftp.gnome.org/pub/GNOME/sources/gtkmm/2.18/gtkmm-2.18.2.tar.bz2
 
 
+- install base miktex
+- set root
+- 
 
 
 - install latest gtk (--without-x)
