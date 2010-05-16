@@ -1,0 +1,20 @@
+--- !ditz.rubyforge.org,2008-03-06/issue 
+title: Pasting from PDF can introduce spurious ctrl-M
+desc: |-
+  When pasting from PDF on a Mac (and possibly elsewhere), there are
+  spurious ctrl-M characters which mess up the parser. Remove.
+type: :bugfix
+component: cadabra
+release: 
+reporter: Kasper Peeters <kasper.peeters@aei.mpg.de>
+status: :unstarted
+disposition: 
+creation_time: 2010-05-16 19:31:09.815936 Z
+references: []
+
+id: ca0ea385450a3a152cc01829d27cb86d945aca1d
+log_events: 
+- - 2010-05-16 19:31:10.942725 Z
+  - Kasper Peeters <kasper.peeters@aei.mpg.de>
+  - created
+  - ""
