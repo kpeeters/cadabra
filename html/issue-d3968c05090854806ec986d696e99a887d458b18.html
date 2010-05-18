@@ -4,7 +4,7 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head>
-<title>Automatic index raising/lowering not handled in @canonicalise</title>
+<title>Fix dependence on numbers</title>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <link rel="stylesheet" href="style.css" type="text/css" />
 </head>
@@ -13,14 +13,14 @@
 
 <div class="main">
 
-<h1>Automatic index raising/lowering not handled in @canonicalise</h1>
+<h1>Fix dependence on numbers</h1>
 <div class="backptr"><a href="index.html">&laquo; cadabra project page</a></div>
 
 
   <div class="description">
-  <p>The @canonicalise algorithm does not yet use the xperm routines which
-deal with automatic switching of contracted index pairs from upper/lower
-to lower/upper, e.g. v_a w^a = v^a w_a.</p>
+  <p>A declaration of the type a::Depends(0) will introduce dependence on
+all rationals (as the overall constant is always ignored).</p><p>Edit: can be circumvented by using a notation with \partial
+which mentions the coordinate name, i.e.</p><p>   \partial_{x^{0}}{a} + \partial_{x^{1}}{a};</p><p>(see test 37 in tests/fieldtheory.cdb)</p>
   </div>
 
 
@@ -29,7 +29,7 @@ to lower/upper, e.g. v_a w^a = v^a w_a.</p>
   <tbody>
     <tr>
       <td class="attrname">Id:</td>
-      <td class="attrval"><span class="id">5c264626947a0e6a9f8b454746ecf7a017f429d0</span></td>
+      <td class="attrval"><span class="id">d3968c05090854806ec986d696e99a887d458b18</span></td>
     </tr>
 
     <tr>
@@ -39,7 +39,7 @@ to lower/upper, e.g. v_a w^a = v^a w_a.</p>
 
     <tr>
       <td class="attrname">Creation time:</td>
-      <td class="attrval">2009-06-03 21:14 GMT</td>
+      <td class="attrval">2009-11-18 00:52 GMT</td>
     </tr>
 
     <tr>
@@ -66,8 +66,8 @@ to lower/upper, e.g. v_a w^a = v^a w_a.</p>
     <tr>
       <td class="attrname">Status:</td>
       <td class="attrval">
-        closed: fixed
-        <img class="inline-status-image" alt="fixed" src="green-check.png" title="fixed"/>
+        unstarted
+        
       </td>
     </tr>
 
@@ -83,19 +83,15 @@ to lower/upper, e.g. v_a w^a = v^a w_a.</p>
   <tbody>
   
     <tr class="even-row">
-      <td class="date">2010-04-04 19:45 GMT</td>
+      <td class="date">2010-04-04 19:44 GMT</td>
       <td class="person">Kasper Peeters &lt;kasper.peeters@...&gt;</td>
-      <td class="message">closed with disposition fixed</td>
+      <td class="message">edited description</td>
     </tr>
-    
-      <tr><td colspan="3" class="logcomment">
-      Fixed since 1.21.
-      </td></tr>
     
     <tr><td></td></tr>
   
     <tr class="odd-row">
-      <td class="date">2009-06-03 21:14 GMT</td>
+      <td class="date">2009-11-18 00:52 GMT</td>
       <td class="person">Kasper Peeters &lt;kasper.peeters@...&gt;</td>
       <td class="message">created</td>
     </tr>

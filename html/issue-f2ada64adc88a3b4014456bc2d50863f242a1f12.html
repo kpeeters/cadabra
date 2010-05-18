@@ -4,7 +4,7 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head>
-<title>Automatic index raising/lowering not handled in @canonicalise</title>
+<title>Conversion of / to \frac misplaces bracket types.</title>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <link rel="stylesheet" href="style.css" type="text/css" />
 </head>
@@ -13,14 +13,19 @@
 
 <div class="main">
 
-<h1>Automatic index raising/lowering not handled in @canonicalise</h1>
+<h1>Conversion of / to \frac misplaces bracket types.</h1>
 <div class="backptr"><a href="index.html">&laquo; cadabra project page</a></div>
 
 
   <div class="description">
-  <p>The @canonicalise algorithm does not yet use the xperm routines which
-deal with automatic switching of contracted index pairs from upper/lower
-to lower/upper, e.g. v_a w^a = v^a w_a.</p>
+  <p>An expression of the form</p><p>  ( 1/\sqrt{2 B b**2} )**2</p><p>gets translated to </p><p>  { \frac(1)(\sqrt{2 B b**2}) }**2</p><p>whereas it should have been</p><p>  ( \frac{1}{\sqrt{2 B b**2}} )**2</p><p>I.e. the brackets around the '/' should sit on the \frac, not
+on each of the children of \frac.</p><p>The actual problem sits in preprocessor.cc, which does</p><p>[a*b]    -&gt;   \prod[a][b]
+[a/b]    -&gt;   \frac[a][b]
+[a/b]**2 -&gt;   \pow{\frac[a][b]}{2}</p><p>but </p><p>[\frac{a}{b}]  -&gt; \frac{a}{b}
+[\frac{a}{b}]**2 -&gt; \pow[\frac{a}{b}]</p><p>So the 'bug' is working the other way around: if you enter
+things in [\frac{a}{b}] notation, you should expect it to 
+be different from [a/b]. Not sure whether this should be
+'fixed'; postponing for the time being.</p>
   </div>
 
 
@@ -29,7 +34,7 @@ to lower/upper, e.g. v_a w^a = v^a w_a.</p>
   <tbody>
     <tr>
       <td class="attrname">Id:</td>
-      <td class="attrval"><span class="id">5c264626947a0e6a9f8b454746ecf7a017f429d0</span></td>
+      <td class="attrval"><span class="id">f2ada64adc88a3b4014456bc2d50863f242a1f12</span></td>
     </tr>
 
     <tr>
@@ -39,7 +44,7 @@ to lower/upper, e.g. v_a w^a = v^a w_a.</p>
 
     <tr>
       <td class="attrname">Creation time:</td>
-      <td class="attrval">2009-06-03 21:14 GMT</td>
+      <td class="attrval">2010-01-30 20:41 GMT</td>
     </tr>
 
     <tr>
@@ -66,8 +71,8 @@ to lower/upper, e.g. v_a w^a = v^a w_a.</p>
     <tr>
       <td class="attrname">Status:</td>
       <td class="attrval">
-        closed: fixed
-        <img class="inline-status-image" alt="fixed" src="green-check.png" title="fixed"/>
+        unstarted
+        
       </td>
     </tr>
 
@@ -83,19 +88,31 @@ to lower/upper, e.g. v_a w^a = v^a w_a.</p>
   <tbody>
   
     <tr class="even-row">
-      <td class="date">2010-04-04 19:45 GMT</td>
+      <td class="date">2010-02-06 18:12 GMT</td>
       <td class="person">Kasper Peeters &lt;kasper.peeters@...&gt;</td>
-      <td class="message">closed with disposition fixed</td>
+      <td class="message">edited description</td>
     </tr>
-    
-      <tr><td colspan="3" class="logcomment">
-      Fixed since 1.21.
-      </td></tr>
     
     <tr><td></td></tr>
   
     <tr class="odd-row">
-      <td class="date">2009-06-03 21:14 GMT</td>
+      <td class="date">2010-02-06 18:10 GMT</td>
+      <td class="person">Kasper Peeters &lt;kasper.peeters@...&gt;</td>
+      <td class="message">unassigned from release 1.18</td>
+    </tr>
+    
+    <tr><td></td></tr>
+  
+    <tr class="even-row">
+      <td class="date">2010-02-05 00:26 GMT</td>
+      <td class="person">Kasper Peeters &lt;kasper.peeters@...&gt;</td>
+      <td class="message">edited description</td>
+    </tr>
+    
+    <tr><td></td></tr>
+  
+    <tr class="odd-row">
+      <td class="date">2010-01-30 20:41 GMT</td>
       <td class="person">Kasper Peeters &lt;kasper.peeters@...&gt;</td>
       <td class="message">created</td>
     </tr>

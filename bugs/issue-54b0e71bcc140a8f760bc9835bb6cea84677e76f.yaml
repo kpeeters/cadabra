@@ -1,0 +1,20 @@
+--- !ditz.rubyforge.org,2008-03-06/issue 
+title: Accents mess up @canonicalise
+desc: |-
+  \bar{\psi}_g in an expression messes up the canonicaliser,
+  see email on cadabra-discuss d.d. 17-May-2010.
+type: :bugfix
+component: cadabra
+release: 
+reporter: Kasper Peeters <kasper.peeters@aei.mpg.de>
+status: :unstarted
+disposition: 
+creation_time: 2010-05-18 21:58:20.912820 Z
+references: []
+
+id: 54b0e71bcc140a8f760bc9835bb6cea84677e76f
+log_events: 
+- - 2010-05-18 21:58:21.632451 Z
+  - Kasper Peeters <kasper.peeters@aei.mpg.de>
+  - created
+  - ""

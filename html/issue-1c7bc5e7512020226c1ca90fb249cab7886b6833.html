@@ -4,7 +4,7 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head>
-<title>Automatic index raising/lowering not handled in @canonicalise</title>
+<title>Implicit indices need to come in normal and conjugate forms.</title>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <link rel="stylesheet" href="style.css" type="text/css" />
 </head>
@@ -13,14 +13,17 @@
 
 <div class="main">
 
-<h1>Automatic index raising/lowering not handled in @canonicalise</h1>
+<h1>Implicit indices need to come in normal and conjugate forms.</h1>
 <div class="backptr"><a href="index.html">&laquo; cadabra project page</a></div>
 
 
   <div class="description">
-  <p>The @canonicalise algorithm does not yet use the xperm routines which
-deal with automatic switching of contracted index pairs from upper/lower
-to lower/upper, e.g. v_a w^a = v^a w_a.</p>
+  <p>Right now, two objects with the same implicit index sitting next to
+each other are assumed to be connected. However, for e.g.
+\psi \bar{\chi} with \bar a DiracBar, this is not the case, and the
+lines go in a different way. In order to determine this, we need to
+have the concept of indices and conjugate indices.</p><p>The can_swap routine currently has an exception for DiracBar objects,
+but this needs to be generalised.</p>
   </div>
 
 
@@ -29,7 +32,7 @@ to lower/upper, e.g. v_a w^a = v^a w_a.</p>
   <tbody>
     <tr>
       <td class="attrname">Id:</td>
-      <td class="attrval"><span class="id">5c264626947a0e6a9f8b454746ecf7a017f429d0</span></td>
+      <td class="attrval"><span class="id">1c7bc5e7512020226c1ca90fb249cab7886b6833</span></td>
     </tr>
 
     <tr>
@@ -39,7 +42,7 @@ to lower/upper, e.g. v_a w^a = v^a w_a.</p>
 
     <tr>
       <td class="attrname">Creation time:</td>
-      <td class="attrval">2009-06-03 21:14 GMT</td>
+      <td class="attrval">2009-08-23 09:58 GMT</td>
     </tr>
 
     <tr>
@@ -66,8 +69,8 @@ to lower/upper, e.g. v_a w^a = v^a w_a.</p>
     <tr>
       <td class="attrname">Status:</td>
       <td class="attrval">
-        closed: fixed
-        <img class="inline-status-image" alt="fixed" src="green-check.png" title="fixed"/>
+        unstarted
+        
       </td>
     </tr>
 
@@ -83,19 +86,7 @@ to lower/upper, e.g. v_a w^a = v^a w_a.</p>
   <tbody>
   
     <tr class="even-row">
-      <td class="date">2010-04-04 19:45 GMT</td>
-      <td class="person">Kasper Peeters &lt;kasper.peeters@...&gt;</td>
-      <td class="message">closed with disposition fixed</td>
-    </tr>
-    
-      <tr><td colspan="3" class="logcomment">
-      Fixed since 1.21.
-      </td></tr>
-    
-    <tr><td></td></tr>
-  
-    <tr class="odd-row">
-      <td class="date">2009-06-03 21:14 GMT</td>
+      <td class="date">2009-08-23 09:58 GMT</td>
       <td class="person">Kasper Peeters &lt;kasper.peeters@...&gt;</td>
       <td class="message">created</td>
     </tr>

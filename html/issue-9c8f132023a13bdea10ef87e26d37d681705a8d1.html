@@ -4,7 +4,7 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head>
-<title>Automatic index raising/lowering not handled in @canonicalise</title>
+<title>Derivatives of sums do not always display correctly in notebook</title>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <link rel="stylesheet" href="style.css" type="text/css" />
 </head>
@@ -13,14 +13,14 @@
 
 <div class="main">
 
-<h1>Automatic index raising/lowering not handled in @canonicalise</h1>
+<h1>Derivatives of sums do not always display correctly in notebook</h1>
 <div class="backptr"><a href="index.html">&laquo; cadabra project page</a></div>
 
 
   <div class="description">
-  <p>The @canonicalise algorithm does not yet use the xperm routines which
-deal with automatic switching of contracted index pairs from upper/lower
-to lower/upper, e.g. v_a w^a = v^a w_a.</p>
+  <p>While expressions of the type \nabla_{f}{a_{c} d+b_{c}} print correctly,
+the ones without explicit derivative index, \nabla{a_{c} d+b_{c}}, fail
+to print brackets.</p>
   </div>
 
 
@@ -29,7 +29,7 @@ to lower/upper, e.g. v_a w^a = v^a w_a.</p>
   <tbody>
     <tr>
       <td class="attrname">Id:</td>
-      <td class="attrval"><span class="id">5c264626947a0e6a9f8b454746ecf7a017f429d0</span></td>
+      <td class="attrval"><span class="id">9c8f132023a13bdea10ef87e26d37d681705a8d1</span></td>
     </tr>
 
     <tr>
@@ -39,7 +39,7 @@ to lower/upper, e.g. v_a w^a = v^a w_a.</p>
 
     <tr>
       <td class="attrname">Creation time:</td>
-      <td class="attrval">2009-06-03 21:14 GMT</td>
+      <td class="attrval">2009-09-02 19:08 GMT</td>
     </tr>
 
     <tr>
@@ -53,7 +53,10 @@ to lower/upper, e.g. v_a w^a = v^a w_a.</p>
       <td class="attrname">Release:</td>
       <td class="attrval">
         
-          <a href="unassigned.html">unassigned</a>
+          <a href="release-1.17.html">1.17</a>
+          
+            (released 2010-01-28)
+          
         
       </td>
     </tr>
@@ -83,19 +86,19 @@ to lower/upper, e.g. v_a w^a = v^a w_a.</p>
   <tbody>
   
     <tr class="even-row">
-      <td class="date">2010-04-04 19:45 GMT</td>
+      <td class="date">2010-01-20 21:26 GMT</td>
       <td class="person">Kasper Peeters &lt;kasper.peeters@...&gt;</td>
       <td class="message">closed with disposition fixed</td>
     </tr>
     
       <tr><td colspan="3" class="logcomment">
-      Fixed since 1.21.
+      Hopefully finally fixed now, brackets remain somewhat of a hack...
       </td></tr>
     
     <tr><td></td></tr>
   
     <tr class="odd-row">
-      <td class="date">2009-06-03 21:14 GMT</td>
+      <td class="date">2009-09-02 19:09 GMT</td>
       <td class="person">Kasper Peeters &lt;kasper.peeters@...&gt;</td>
       <td class="message">created</td>
     </tr>
