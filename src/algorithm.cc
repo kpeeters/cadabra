@@ -458,6 +458,7 @@ bool algorithm::apply_recursive(exptree::iterator& st, bool check_cons, int act_
 				count++;
 				++number_of_calls;
 				std::string www=*wit->name;
+				txtout << "applying at " << *start->name << std::endl;
 				result_t res=apply(start);
 //				debugout << "after apply: " << *(start->multiplier) << std::endl;
 //				exptree::print_recursive_treeform(debugout, start);
@@ -523,10 +524,11 @@ bool algorithm::apply_recursive(exptree::iterator& st, bool check_cons, int act_
 								else        wit=nextone;
 								}
 							}
-						
 						else {
-							if(wit!=tr.end()) 
+							if(wit!=tr.end()) {
+								txtout << "THEN HERE" << std::endl;
 								pushup_multiplier(wit); // Ensure a valid tree wrt. multipliers.
+								}
 							wit=nextone;
 							}
 						break;
@@ -688,22 +690,34 @@ void algorithm::pushup_multiplier(iterator it)
 	if(!tr.is_valid(it)) return;
 	if(*it->multiplier!=1) {
 		if(*it->name=="\\sum") {
+			txtout << "SUM" << std::endl;
 			sibling_iterator sib=tr.begin(it);
 			while(sib!=tr.end(it)) {
 				multiply(sib->multiplier, *it->multiplier);
+				txtout << "going up" << std::endl;
+				pushup_multiplier(tr.parent(it));
+				txtout << "back and back up" << std::endl;
 				pushup_multiplier(sib);
+				txtout << "back" << std::endl;
 				++sib;
 				}
 			::one(it->multiplier);
 			}
 		else {
+			txtout << "PUSHUP: " << *it->name << std::endl;
 			if(tr.is_valid(tr.parent(it))) {
+				txtout << "test propinherit" << std::endl;
+				iterator tmp=tr.parent(it);
+				// tmp not always valid?!?
 				const PropertyInherit *pin=properties::get<PropertyInherit>(tr.parent(it));
 				if(pin || *(tr.parent(it)->name)=="\\prod") {
 					multiply(tr.parent(it)->multiplier, *it->multiplier);
+					txtout << "going up" << std::endl;
 					pushup_multiplier(tr.parent(it));
+					txtout << "back" << std::endl;
 					::one(it->multiplier);
 					}
+				else txtout << "not relevant" << std::endl;
 				}
 			}
 		}
@@ -1769,6 +1783,7 @@ bool algorithm::cleanup_anomalous_products(exptree& tr, exptree::iterator& it)
 			  tr.begin(it)->multiplier=it->multiplier;
 			  tr.flatten(it);
 			  exptree::iterator tmp=tr.erase(it);
+			  txtout << "HERRE?" << std::endl;
 			  pushup_multiplier(tmp);
 			  it=tmp;
 			  return true;

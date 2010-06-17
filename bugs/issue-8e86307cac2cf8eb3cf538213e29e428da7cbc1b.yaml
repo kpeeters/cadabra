@@ -1,0 +1,26 @@
+--- !ditz.rubyforge.org,2008-03-06/issue 
+title: "@fierz does not work when there are no gamma matrices"
+desc: |-
+  Fermi-bilinears without gamma matrices do not get handled by
+  @fierz,
+  
+  \bar{\theta} \psi  \bar{\epsilon} \chi ;
+  
+  @fierz!(%){ \theta , \chi, \epsilon, \psi}; returns @fierz: not applicable.
+  
+  See email 14-Jun-2010.
+type: :bugfix
+component: cadabra
+release: 
+reporter: Kasper Peeters <kasper.peeters@aei.mpg.de>
+status: :unstarted
+disposition: 
+creation_time: 2010-06-17 15:05:04.194036 Z
+references: []
+
+id: 8e86307cac2cf8eb3cf538213e29e428da7cbc1b
+log_events: 
+- - 2010-06-17 15:05:05.345678 Z
+  - Kasper Peeters <kasper.peeters@aei.mpg.de>
+  - created
+  - ""
