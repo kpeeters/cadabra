@@ -458,7 +458,7 @@ bool algorithm::apply_recursive(exptree::iterator& st, bool check_cons, int act_
 				count++;
 				++number_of_calls;
 				std::string www=*wit->name;
-				txtout << "applying at " << *start->name << std::endl;
+//				txtout << "applying at " << *start->name << std::endl;
 				result_t res=apply(start);
 //				debugout << "after apply: " << *(start->multiplier) << std::endl;
 //				exptree::print_recursive_treeform(debugout, start);
@@ -526,7 +526,7 @@ bool algorithm::apply_recursive(exptree::iterator& st, bool check_cons, int act_
 							}
 						else {
 							if(wit!=tr.end()) {
-								txtout << "THEN HERE" << std::endl;
+//								txtout << "THEN HERE" << std::endl;
 								pushup_multiplier(wit); // Ensure a valid tree wrt. multipliers.
 								}
 							wit=nextone;
@@ -704,9 +704,9 @@ void algorithm::pushup_multiplier(iterator it)
 			::one(it->multiplier);
 			}
 		else {
-			txtout << "PUSHUP: " << *it->name << std::endl;
+//			txtout << "PUSHUP: " << *it->name << std::endl;
 			if(tr.is_valid(tr.parent(it))) {
-				txtout << "test propinherit" << std::endl;
+//				txtout << "test propinherit" << std::endl;
 				iterator tmp=tr.parent(it);
 				// tmp not always valid?!?
 				const PropertyInherit *pin=properties::get<PropertyInherit>(tr.parent(it));
@@ -717,7 +717,7 @@ void algorithm::pushup_multiplier(iterator it)
 					txtout << "back" << std::endl;
 					::one(it->multiplier);
 					}
-				else txtout << "not relevant" << std::endl;
+//				else txtout << "not relevant" << std::endl;
 				}
 			}
 		}

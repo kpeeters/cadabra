@@ -358,7 +358,7 @@ void manipulator::output_comment(const std::string& comment) const
 
 // Reads and processes input from streamstack.top() until end of stream.
 // Will close and delete the stream if it derives from std::ifstream. 
-bool manipulator::handle_input()
+void manipulator::handle_input()
 	{
 //	long number_of_lines=0;
 	std::string   oneline;
@@ -720,7 +720,6 @@ bool manipulator::handle_input()
 	jumpout:
 	cleanup_stream();
 	if(streamstack.size()>0) goto reinput;
-	return true;
 	}
 
 bool manipulator::receive_command(modglue::ipipe& ip)

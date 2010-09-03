@@ -139,7 +139,7 @@ parser2.tab.o: parser2.tab.c
 	@CXX@ -c -o parser2.tab.o parser2.tab.c
 
 parser2: parser2.tab.o lex.yy.o storage.o props.o 
-	@CXX@ -o parser2 $+ -ll -ly -lgmpxx -lgmp
+	@CXX@ -o parser2 $+ -ll -ly -lgmpxx -lgmp -lpcrecpp
 
 
 

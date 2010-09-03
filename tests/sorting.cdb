@@ -42,3 +42,24 @@ F1_{a b}::AntiSymmetric.
 obj4:= F1_{a b}F_{c d}:
 @prodsort!(%);
 
+# Test 4: sorting by index position
+#
+@reset.
+{a,b}::Indices(position=fixed).
+{ n^a, n_a }::SortOrder.
+obj4:= n_a n_b n^a;
+@prodsort!(%);
+tst4:= n^a n_a n_b - @(obj4);
+@collect_terms!(%);
+@assert(tst4);
+
+# Note: sorting by index name is not supported; the two
+# patterns in the SortOrder declaration below are identical,
+# so that when n_a is searched in the list, it is matched
+# against n_b and given position=0, not position=1.
+#
+@reset.
+{ n_b, n_a }::SortOrder.
+n_a n_b;
+@prodsort!(%);
+

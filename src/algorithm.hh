@@ -207,17 +207,23 @@ class algorithm : public active_node {
 		void     node_one(iterator);
 		void     node_integer(iterator, int);
 
-		// Find all dummy index pairs in an expression. This takes into account
-		// products and sums.
-		// Note: dummy indices do not always come in pairs, for instance
-		//            a_{m n} ( b^{n p} + q^{n p} )
-		// 
 		/// A map from a pattern to the position where it occurs in the tree. 
 		typedef std::multimap<exptree, exptree::iterator, tree_exact_less_no_wildcards_mod_prel_obj> index_map_t;
 		/// A map from the position of each index to the sequential index.
 		typedef std::map<exptree::iterator, int, exptree::iterator_base_less>    index_position_map_t;
 
+		/// @name Index manipulation and classification
+		///
+		/// Routines to find and classify all indices in an expression, taking into account
+		/// sums and products. Note that dummy indices do not always come in pairs, for 
+		/// instance in expressions like
+		///            a_{m n} ( b^{n p} + q^{n p} ) .
+		/// Similarly, free indices can appear multiple times, as in
+		///            a_{m} + b_{m} . 
+		//@{
+		/// One
 		void     fill_index_position_map(iterator, const index_map_t&, index_position_map_t&) const;
+      /// Two
 		void     fill_map(index_map_t&, sibling_iterator, sibling_iterator) const;
 		bool     rename_replacement_dummies(iterator, bool still_inside_algo=false);
 		void     print_classify_indices(iterator) const;
@@ -233,6 +239,7 @@ class algorithm : public active_node {
 											const index_map_t *m3=0, const index_map_t *m4=0, const index_map_t *m5=0) const;
 		exptree get_dummy(const list_property *, iterator) const;
 		exptree get_dummy(const list_property *, iterator, iterator) const;
+      //@}
 
 	private:
 		void     cancel_modification();

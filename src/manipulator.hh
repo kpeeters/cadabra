@@ -51,40 +51,76 @@ extern std::ostream  *fake_forcedout;
 #define txtout (*fake_txtout)
 #define forcedout (*fake_forcedout)
 
+/// Exception thrown when a stream ends (either from an end-of-file condition
+/// or from an explicit \@end statement in the file).
 class stream_end_error {
 	public:
 		stream_end_error();
 };
 
+/// Exception thrown when the user requests complete shutdown of the kernel
+/// using the \@quit command.
 class exit_exception {
 	public:
 		exit_exception();
 };
 
+
+/// Singleton object which pulls in data from the input streams, handles switching
+/// between streams, feeds data to the parser, and calls the algorithm objects
+/// to perform action on the expression tree.
 class manipulator : public sigc::trackable {
 	public:
 		manipulator();
 		~manipulator();
 
+		/// Open the file with name given by the argument string and add to the top of
+		/// the input stream stack.
+		void open_stream(const std::string&);
+
+		/// Add the given stream to the top of the input stream stack.
+		void open_stream(std::istream *);
+
+		/// Entry point for the class; at least one stream should have been opened
+		/// by using the open_stream member before calling this. Will run until
+		/// all streams have reached their end or until an explicit stop is requested
+		/// through a \@quit command.
+		void handle_input();
+
+		/// Callback member to push-receive input from a modglue pipe;
+		/// an alternative entry point.  Upon receiving input this will
+		/// automatically call handle_input to start parsing.
+		bool receive_command(modglue::ipipe&);
+
+		/// Set the prompt to the indicated string. Should be called before the entry points
+		/// handle_input or receive_command are called.
+		void set_prompt(const std::string&);
+		
+		/// Display the prompt. Used when a prompt is needed before any input handling takes
+		/// place.
+		void print_prompt() const;
+
+		exptree_output             eo;
+
+	private:
 		typedef exptree::iterator            iterator;
 		typedef exptree::post_order_iterator post_order_iterator;
 		typedef exptree::sibling_iterator    sibling_iterator;
 
-		void replace_cmdline_args(std::string& oneline);
+		std::stack<std::istream *> streamstack;
+
 		void output_comment(const std::string& comment) const; // wrap in xml nodes if necessary
-		bool handle_input();
-		void open_stream(const std::string&);
-		void open_stream(std::istream *);
-		void cleanup_stream();
-		bool receive_command(modglue::ipipe&);
-		void set_prompt(const std::string&);
-		void print_prompt() const;
 		void output_status() const;
 		void read_program_file();
 
-		std::stack<std::istream *> streamstack;
-		exptree_output             eo;
-	private:
+		/// Cleans up the stream at the top of streamstack. If it derives from ifstream,
+		/// will call close on it as well. Pops the stream off the stack.
+		void cleanup_stream();
+
+		/// Replace \\argv[n] in the input with the n-th command line argument as stored
+		/// in the global cmdline_arguments vector.
+		void replace_cmdline_args(std::string& oneline);
+
 		/// A modified getline which ensures that the return string is one complete
 		/// line of input, and no more than that. Will return false if there is no
 		/// or not enough input (yet).
@@ -107,6 +143,9 @@ class manipulator : public sigc::trackable {
 		bool              handle_external_commands_(exptree::iterator&, exptree::iterator, exptree::iterator&);
 		std::string       texify(const std::string&) const;
 
+		/// Class to hold information about a dynamically added algorithm class.
+		/// Stores a pointer to the member function to create an instance, as well
+		/// as global timing information.
 		class algo_info {
 			public:
 				algo_info(std::auto_ptr<algorithm> (*)(exptree&, iterator));
