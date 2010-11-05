@@ -223,9 +223,12 @@ algorithm::result_t substitute::apply(iterator& st)
 			 }
 
 		if(loc!=comparator.replacement_map.end()) { // name wildcards
-//		std::cerr << "rule : " << *((*loc).first.begin()->name) << " -> " 
-//					 << *((*loc).second.begin()->name) << std::endl;
-//		std::cerr << "going to replace " << *it->name << " with " << *((*loc).second.begin()->name) << std::endl;
+//			if((*loc).first.begin()->fl.parent_rel==str_node::p_sub)
+//				std::cerr << "_";
+//			std::cerr << "rule : " << *((*loc).first.begin()->name) << " -> " 
+//						 << *((*loc).second.begin()->name) << std::endl;
+//			std::cerr << it->fl.parent_rel << " ";
+//			std::cerr << "going to replace " << *it->name << " with " << *((*loc).second.begin()->name) << std::endl;
 
 			// When a replacement is made here, and the index is actually
 			// a dummy in the replacement, we screw up the ind_dummy

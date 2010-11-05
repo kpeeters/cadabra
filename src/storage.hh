@@ -76,6 +76,9 @@ class str_node { // size: 9 bytes (32 bit arch), can be reduced to 5 bytes.
 
 		flag_t fl;
 
+		/// Change the parent relation from sub to super and vice versa (throws error
+		/// when this is not an index).
+		void flip_parent_rel();
 
 		bool is_zero() const;
 		bool is_identity() const;
@@ -344,8 +347,8 @@ class exptree_comparator {
 		bool    satisfies_conditions(exptree::iterator conditions, std::string& error);
 
 		// Maps for replacement of nodes (indices, patterns) and subtrees (object patterns) respectively.
-		typedef std::map<exptree, exptree, tree_exact_less_no_wildcards_mod_prel_obj>  replacement_map_t;
-		typedef std::map<nset_t::iterator, exptree::iterator, nset_it_less> subtree_replacement_map_t;
+		typedef std::map<exptree, exptree, tree_exact_less_no_wildcards_obj>  replacement_map_t;
+		typedef std::map<nset_t::iterator, exptree::iterator, nset_it_less>   subtree_replacement_map_t;
 
 		replacement_map_t                      replacement_map;
 		subtree_replacement_map_t              subtree_replacement_map;

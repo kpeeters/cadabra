@@ -787,6 +787,13 @@ str_node::str_node(const std::string& nm, bracket_t br, parent_rel_t pr)
 //	fl.mark=0;
 	}
 
+void str_node::flip_parent_rel() 
+	{
+	if(fl.parent_rel==p_super)       fl.parent_rel=p_sub;
+	else if(fl.parent_rel==p_sub)    fl.parent_rel=p_super;
+	else throw std::logic_error("flip_parent_rel called on non-index");
+	}
+
 bool str_node::is_zero() const
 	{
 	if(*multiplier==0) return true;
@@ -1041,7 +1048,7 @@ int subtree_compare(exptree::iterator one, exptree::iterator two,
 				else return -2;
 				}
 		 }
-		
+
 	// First lookup some information about the index sets, if any.
 	// (note: to avoid having properties::get enter here recursively, we
 	// perform this check only when both objects are sub/superscripts).
@@ -1067,7 +1074,7 @@ int subtree_compare(exptree::iterator one, exptree::iterator two,
 		}
 	
 	// Compare sub/superscript relations.
-	if((mod_prel==-2 && position_type!=Indices::free) && one->is_index()) {
+	if((mod_prel==-2 && position_type!=Indices::free) && one->is_index() && two->is_index() ) {
 		if(one->fl.parent_rel!=two->fl.parent_rel) {
 			if(one->fl.parent_rel==str_node::p_sub) return 2;
 			else return -2;
@@ -1140,6 +1147,10 @@ int subtree_compare(exptree::iterator one, exptree::iterator two,
 						}
 					}
 				}
+			}
+		else if(one->fl.parent_rel!=two->fl.parent_rel) {
+			if(one->fl.parent_rel < two->fl.parent_rel) return 2;
+			else return -2;
 			}
 		}
  	
@@ -1366,11 +1377,20 @@ exptree_comparator::match_t exptree_comparator::compare(const exptree::iterator&
 		}
 		
 	if(pattern || (implicit_pattern && two->is_integer()==false)) { 
-//		std::cerr << "three" << std::endl;
 		// The above is to ensure that we never match integers to implicit patterns.
 
-		bool tested_full=true;
+		// We want to search the replacement map for replacement rules which we have
+		// constructed earlier, and discard the current match if it conflicts those 
+		// rules. This is to make sure that e.g. a pattern k1_a k2_a does not match 
+		// an expression k1_c k2_d.
+		// 
+		// In order to ensure that a replacement rule for a lower index is also
+		// triggering a rule for an upper index, we simply store both rules (see
+		// below) so that searching for rules can remain simple.
+
 		replacement_map_t::iterator loc=replacement_map.find(one);
+
+		bool tested_full=true;
 
 		// If this is a pattern with a non-zero number of children, 
 		// also search the pattern without the children.
@@ -1384,15 +1404,14 @@ exptree_comparator::match_t exptree_comparator::compare(const exptree::iterator&
 		if(loc!=replacement_map.end()) {
 //			std::cerr << "found!" << std::endl;
 			// If this is an index/pattern, try to match the whole index/pattern.
-			// We want to make sure that e.g. a pattern k1_a k2_a does not match an expression k1_c k2_d.
-
 			int cmp;
+
 			if(tested_full) 
-				cmp=subtree_compare((*loc).second.begin(), two, 0 /* KP: do not switch this to -2 (kk.cdb fails) */); 
+				cmp=subtree_compare((*loc).second.begin(), two, -2 /* KP: do not switch this to -2 (kk.cdb fails) */); 
 			else {
 				exptree tmp2(two);
 				tmp2.erase_children(tmp2.begin());
-				cmp=subtree_compare((*loc).second.begin(), tmp2.begin(), 0 /* KP: see above */); 
+				cmp=subtree_compare((*loc).second.begin(), tmp2.begin(), -2 /* KP: see above */); 
 				}
 //			std::cerr << " pattern " << *two->name
 //						 << " should be " << *((*loc).second.begin()->name)  
@@ -1424,8 +1443,25 @@ exptree_comparator::match_t exptree_comparator::compare(const exptree::iterator&
 					}
 				}
 			// The index types match, so register this replacement rule.
-//			std::cerr << "registering " << *one->name << " " << *two->name << std::endl;
+//			std::cerr << "registering ";
+//			if(one->fl.parent_rel==str_node::p_super) std::cerr << "^";
+//			if(one->fl.parent_rel==str_node::p_sub)   std::cerr << "_";
+//			std::cerr << *one->name << " ";
+//			if(two->fl.parent_rel==str_node::p_super) std::cerr << "^";
+//			if(two->fl.parent_rel==str_node::p_sub)   std::cerr << "_";
+//			std::cerr << *two->name << std::endl;
+
 			replacement_map[one]=two;
+			
+			// if this is an index, also store the pattern with the parent_rel flipped
+			if(one->is_index()) {
+				exptree cmptree1(one);
+				exptree cmptree2(two);
+				cmptree1.begin()->flip_parent_rel();
+				if(two->is_index())
+					cmptree2.begin()->flip_parent_rel();
+				replacement_map[cmptree1]=cmptree2;
+				}
 			
 			// if this is a pattern and the pattern has a non-zero number of children,
 			// also add the pattern without the children

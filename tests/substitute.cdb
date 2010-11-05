@@ -779,3 +779,49 @@ tst73c:= Q*(A*C*A+D*E)*E*A + A*(Q*C*A + A*C*Q)*E*A + A*(A*C*A+D*E)*E*Q - @(obj73
 @collect_terms!(%);
 @assert(tst73c);
 
+# Test 74: matching Indices should not match identically non-Indices objects.
+#
+@reset.
+{A,B,C,D}::Indices.
+obj74:= X_{C D}:
+@substitute!(%)( X_{A B} -> A g_{A B} f(A) );
+tst74:= A g_{C D} f(A) - @(obj74);
+@collect_terms!(%);
+@assert(tst74);
+
+
+# Test 75: long-standing pattern matching bug showing only in kk.cdb.
+#
+@reset.
+{m,n,p,q,r,s,t,u,v,w,x,y,z,m#}::Indices(subspace, position=independent).
+obj75a:= h^{m1 p} * h_{m r} * h^{q r};
+@substitute!(%)( h_{m1 m2} h^{m3 m2} -> \delta_{m1}^{m3} );
+tst75a:= h^{m1 p} \delta_{m}^{q} - @(obj75a);
+@collect_terms!(%);
+@assert(tst75a);
+
+@reset.
+{m,n,p,q,r,s,t,u,v,w,x,y,z,m#}::Indices(subspace, position=fixed).
+obj75b:= h^{m1 p} * h_{m r} * h^{q r};
+@substitute!(%)( h_{m1 m2} h^{m3 m2} -> \delta_{m1}^{m3} );
+tst75b:= h^{m1 p} \delta_{m}^{q} - @(obj75b);
+@collect_terms!(%);
+@assert(tst75b);
+
+# this one was the only one working fine
+@reset.
+{m,n,p,q,r,s,t,u,v,w,x,y,z,m#}::Indices(subspace, position=free).
+obj75c:= h^{m1 p} * h_{m r} * h^{q r};
+@substitute!(%)( h_{m1 m2} h^{m3 m2} -> \delta_{m1}^{m3} );
+tst75c:= h^{m1 p} \delta_{m}^{q} - @(obj75c);
+@collect_terms!(%);
+@assert(tst75c);
+
+@reset.
+{m,n,p,q,r,s,t,u,v,w,x,y,z,m#}::Indices(subspace, position=independent).
+\partial{#}::PartialDerivative.
+obj75d:= \partial_{m1}{\phi} \partial_{n}{h^{m1 p}} h_{m p};
+@substitute!(%)( \partial_{p}{h^{n m}} h_{q m} -> - \partial_{p}{h_{q m}} h^{n m} );
+tst75d:= - \partial_{m1}{\phi} * \partial_{n}{h_{m p}} * h^{m1 p} - @(obj75d);
+@collect_terms!(%);
+@assert(tst75d);

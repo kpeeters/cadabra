@@ -690,15 +690,15 @@ void algorithm::pushup_multiplier(iterator it)
 	if(!tr.is_valid(it)) return;
 	if(*it->multiplier!=1) {
 		if(*it->name=="\\sum") {
-			txtout << "SUM" << std::endl;
+//			txtout << "SUM" << std::endl;
 			sibling_iterator sib=tr.begin(it);
 			while(sib!=tr.end(it)) {
 				multiply(sib->multiplier, *it->multiplier);
-				txtout << "going up" << std::endl;
+//				txtout << "going up" << std::endl;
 				pushup_multiplier(tr.parent(it));
-				txtout << "back and back up" << std::endl;
+//				txtout << "back and back up" << std::endl;
 				pushup_multiplier(sib);
-				txtout << "back" << std::endl;
+//				txtout << "back" << std::endl;
 				++sib;
 				}
 			::one(it->multiplier);
@@ -712,9 +712,9 @@ void algorithm::pushup_multiplier(iterator it)
 				const PropertyInherit *pin=properties::get<PropertyInherit>(tr.parent(it));
 				if(pin || *(tr.parent(it)->name)=="\\prod") {
 					multiply(tr.parent(it)->multiplier, *it->multiplier);
-					txtout << "going up" << std::endl;
+//					txtout << "going up" << std::endl;
 					pushup_multiplier(tr.parent(it));
-					txtout << "back" << std::endl;
+//					txtout << "back" << std::endl;
 					::one(it->multiplier);
 					}
 //				else txtout << "not relevant" << std::endl;
@@ -1783,7 +1783,7 @@ bool algorithm::cleanup_anomalous_products(exptree& tr, exptree::iterator& it)
 			  tr.begin(it)->multiplier=it->multiplier;
 			  tr.flatten(it);
 			  exptree::iterator tmp=tr.erase(it);
-			  txtout << "HERRE?" << std::endl;
+//			  txtout << "HERRE?" << std::endl;
 			  pushup_multiplier(tmp);
 			  it=tmp;
 			  return true;

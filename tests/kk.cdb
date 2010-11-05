@@ -1,7 +1,7 @@
 # Test 10: Kaluza-Klein related stuff
 #
 {\mu,\nu,\rho,\sigma,\kappa,\lambda,\eta,\chi#}::Indices(full, position=independent).
-{m,n,p,q,r,s,t,u,v,m#}::Indices(subspace, position=independent, parent=full).
+{m,n,p,q,r,s,t,u,v,w,x,y,z,m#}::Indices(subspace, position=independent, parent=full).
 \partial{#}::PartialDerivative.
 g_{\mu\nu}::Metric.
 g^{\mu\nu}::InverseMetric.
@@ -52,11 +52,16 @@ todo:= g_{m1 m} R^{m1}_{4 n 4} + g_{4 m} R^{4}_{4 n 4};
 @substitute!!(%)( h_{m1 m2} h^{m3 m2} -> \delta_{m1}^{m3} ):
 @eliminate_kr!(%):
 
-@substitute!(%)( \partial_{m}{\phi**{-1}} -> -\phi**{-2} \partial_{m}{\phi} ):
-@collect_factors!(%):
-@prodsort!(%):
+@substitute!(%)( \partial_{m}{\phi**{-1}} -> -\phi**{-2} \partial_{m}{\phi} );
+@collect_factors!(%);
+@prodsort!(%);
 @substitute!(%)( \partial_{p}{h^{n m}} h_{q m} -> - \partial_{p}{h_{q m}} h^{n m} );
 @canonicalise!(%):
+
+# goes wrong:
+#  h^{m1 p} * h_{m r} * h^{q r};
+# @substitute!(%)( h_{m1 m2} h^{m3 m2} -> \delta_{m1}^{m3} );
+
 @substitute!!(%)( h_{m1 m2} h^{m3 m2} -> \delta_{m1}^{m3} );
 @eliminate_kr!(%);
 

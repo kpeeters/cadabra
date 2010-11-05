@@ -378,7 +378,7 @@ void manipulator::handle_input()
 	while(getline_precut(*(streamstack.top()),oneline)) {
 		replace_cmdline_args(oneline);
 		if(loginput)
-			debugout << oneline << std::endl;
+			txtout << oneline << std::endl;
 		if(oneline.substr(0,10)=="#cellstart" || oneline.substr(0,8)=="#cellend") {
 			txtout << "\n" << oneline << "\n";
 			}

@@ -1,0 +1,20 @@
+--- !ditz.rubyforge.org,2008-03-06/issue 
+title: Code redundancy with lhs_contains_dummies
+desc: |-
+  The lhs_contains_dummies field no longer seems to be used, can it
+  really be discarded?
+type: :bugfix
+component: cadabra
+release: 
+reporter: Kasper Peeters <kasper.peeters@aei.mpg.de>
+status: :unstarted
+disposition: 
+creation_time: 2010-11-05 20:41:59.360362 Z
+references: []
+
+id: bfc91ba71877919c193cd0b819c17f1d824c29af
+log_events: 
+- - 2010-11-05 20:42:00.224235 Z
+  - Kasper Peeters <kasper.peeters@aei.mpg.de>
+  - created
+  - ""
