@@ -1282,7 +1282,7 @@ bool sumsort::should_swap(iterator obj, int subtree_comparison) const
 	int num1, num2;
 	const SortOrder *so1=properties::get_composite<SortOrder>(one,num1);
 	const SortOrder *so2=properties::get_composite<SortOrder>(two,num2);
-	
+
 	if(so1==0 || so2==0) { // No sort order known
 		if(subtree_comparison<0) return true;
 		return false;
@@ -1332,7 +1332,8 @@ algorithm::result_t prodsort::apply(iterator& st)
 		one=tr.begin(st);
 		two=one; ++two;
 		for(unsigned int j=i+1; j<=num; ++j) { // this loops too many times, no?
-			int es=subtree_compare(one, two);
+			int es=subtree_compare(one, two, -2);
+			std::cerr << "hi " << es << std::endl;
 			if(exptree_ordering::should_swap(one, es)) {
 				int canswap=exptree_ordering::can_swap(one, two, es);
 				if(canswap!=0) {
@@ -2897,7 +2898,7 @@ bool canonicalise::remove_vanishing_numericals(iterator& it)
 
 Indices::position_t canonicalise::position_type(iterator it) const
 	{
-	const Indices *ind=properties::get<Indices>(it);
+	const Indices *ind=properties::get<Indices>(it, true);
 	if(ind) 
 		return ind->position_type;
 	return Indices::free;
@@ -2905,7 +2906,7 @@ Indices::position_t canonicalise::position_type(iterator it) const
 
 std::string canonicalise::get_index_set_name(iterator it) const
 	{
-	const Indices *ind=properties::get<Indices>(it);
+	const Indices *ind=properties::get<Indices>(it, true);
 	if(ind) {
 		if(ind->parent_name!="") return ind->parent_name;
 		else                     return ind->set_name;
@@ -3941,8 +3942,8 @@ algorithm::result_t young_project_tensor::apply(iterator& it)
 		// Figure out the properties of the indices for which we want dummy partners.
 		exptree::index_iterator iit=tr.begin_index(it);
 		iit+=tab(0,abs(tab.selfdual_column)-1);
-		const numerical::Integer *itg=properties::get<numerical::Integer>(iit);
-		const Indices *ind=properties::get<Indices>(iit);
+		const numerical::Integer *itg=properties::get<numerical::Integer>(iit, true);
+		const Indices *ind=properties::get<Indices>(iit, true);
 		if(itg==0)
 			throw consistency_error("Need to know the range of the indices.");
 		if(ind==0)

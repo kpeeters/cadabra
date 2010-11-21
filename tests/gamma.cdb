@@ -117,6 +117,7 @@ one:= \GAMMA^{m n p q r}\GAMMA^{a}\GAMMA^{b}\GAMMA^{m n p}\GAMMA^{c}\GAMMA^{q r}
 @prodsort!(%):
 #@asymprop!(%):
 @collect_terms!(%):
+# - 2016 * \GAMMA^{a b c} - 2016 * \GAMMA^{a} * \delta^{b c} + 2016 * \GAMMA^{b} * \delta^{a c} + 18144 * \GAMMA^{c} * \delta^{a b};
 
 two:= \GAMMA^{a}*@(one);
 @distribute!(%):

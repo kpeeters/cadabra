@@ -58,8 +58,11 @@ algorithm::result_t extract_properties::apply(iterator& st)
 
 				if(thepropbase->parse(tr,st,proptree.begin(), keyvals)) {
 					list_property *thelistprop=dynamic_cast<list_property *>(thepropbase);
+					bool is_index=false;
+					if(dynamic_cast<Indices *>(thepropbase)!=0)
+						is_index=true;
 					if(thelistprop) {                   // a list property
-						std::vector<iterator> objs;
+						std::vector<exptree> objs;
 						if(*st->name=="\\comma") {
 							sibling_iterator sib=tr.begin(st);
 							txtout << "Assigning list property " << propname << " to $";
@@ -67,8 +70,18 @@ algorithm::result_t extract_properties::apply(iterator& st)
 							txtout << "$." << std::endl;
 							eo->newline(txtout);
 							while(sib!=tr.end(st)) {
-								if(sib->fl.parent_rel!=str_node::p_property) 
-									objs.push_back(sib);
+								if(sib->fl.parent_rel!=str_node::p_property) {
+//									if(is_index) {
+//										exptree tmp(sib);
+////										std::cerr << "index" << std::endl;
+//										tmp.begin()->fl.parent_rel=str_node::p_super;
+//										objs.push_back(tmp);
+//										tmp.begin()->fl.parent_rel=str_node::p_sub;
+//										objs.push_back(tmp);
+//										}
+//									else 
+										objs.push_back(exptree(sib));
+									}
 								++sib;
 								}
 							}
@@ -93,7 +106,7 @@ algorithm::result_t extract_properties::apply(iterator& st)
 									theprop->core_parse(keyvals);
 									}
 								if(sib->fl.parent_rel!=str_node::p_property) {
-									properties::insert_prop(sib, theprop);
+									properties::insert_prop(exptree(sib), theprop);
 									if(eo) {
 										txtout << "$";
 										eo->print_infix(txtout, sib);
@@ -110,7 +123,7 @@ algorithm::result_t extract_properties::apply(iterator& st)
 								}				
 							}
 						else {
-							properties::insert_prop(st, theprop);
+							properties::insert_prop(exptree(st), theprop);
 							txtout << "Assigning property " << propname;
 							if( *st->name!="" ) {
 								txtout << " to ";

@@ -1057,8 +1057,10 @@ int subtree_compare(exptree::iterator one, exptree::iterator two,
 
 	Indices::position_t position_type=Indices::free;
 	if(one->is_index() && two->is_index() && checksets) {
-		const Indices *ind1=properties::get<Indices>(one);
-		const Indices *ind2=properties::get<Indices>(two);
+		// Strip off the parent_rel because Indices properties are declared without
+		// those.
+		const Indices *ind1=properties::get<Indices>(one, true);
+		const Indices *ind2=properties::get<Indices>(two, true);
 		if(ind1!=ind2) { 
 			// It may still be that one set is a subset of the other, i.e that the
 			// parent argument of Indices has been used.
@@ -1148,7 +1150,7 @@ int subtree_compare(exptree::iterator one, exptree::iterator two,
 					}
 				}
 			}
-		else if(one->fl.parent_rel!=two->fl.parent_rel) {
+		else if(mod_prel==-2 && one->fl.parent_rel!=two->fl.parent_rel) {
 			if(one->fl.parent_rel < two->fl.parent_rel) return 2;
 			else return -2;
 			}
@@ -1628,7 +1630,7 @@ bool exptree_ordering::should_swap(exptree::iterator obj, int subtree_comparison
 	int num1, num2;
 	const SortOrder *so1=properties::get_composite<SortOrder>(one,num1);
 	const SortOrder *so2=properties::get_composite<SortOrder>(two,num2);
-	
+
 	if(so1==0 || so2==0) { // No sort order known
 		if(subtree_comparison<0) return true;
 		return false;
@@ -1638,6 +1640,7 @@ bool exptree_ordering::should_swap(exptree::iterator obj, int subtree_comparison
 		return false;
 		}
 	else {
+		std::cerr << num1 << " " << num2 << std::endl;
 		if(so1==so2) {
 			if(num1>num2) return true;
 			return false;
@@ -1657,14 +1660,15 @@ int exptree_ordering::can_swap_prod_obj(exptree::iterator prod, exptree::iterato
 	int sign=1;
 	exptree::sibling_iterator sib=prod.begin();
 	while(sib!=prod.end()) {
-		const Indices *ind1=properties::get_composite<Indices>(sib);
-		const Indices *ind2=properties::get_composite<Indices>(obj);
+		const Indices *ind1=properties::get_composite<Indices>(sib, true);
+		const Indices *ind2=properties::get_composite<Indices>(obj, true);
 		if(! (ind1!=0 && ind2!=0) ) { // If both objects are actually real indices, 
 			                           // then we do not include their commutativity property
 			                           // in the sign. This is because the routines that use
                                     // can_swap_prod_obj all test for such index-index 
                                     // swaps separately.
-			int es=subtree_compare(sib, obj);
+//			std::cout << "  " << *sib->name << " " << *obj->name << std::endl;
+			int es=subtree_compare(sib, obj, 0);
 			sign*=can_swap(sib, obj, es, ignore_implicit_indices);
 			if(sign==0) break;
 			}
@@ -1751,11 +1755,11 @@ int exptree_ordering::can_swap_ilist_ilist(exptree::iterator obj1, exptree::iter
 		exptree::index_iterator it2=exptree::begin_index(obj2);
 		while(it2!=exptree::end_index(obj2)) {
 			// Only deal with real indices here, i.e. those carrying an Indices property.
-			const Indices *ind1=properties::get_composite<Indices>(it1);
-			const Indices *ind2=properties::get_composite<Indices>(it1);
+			const Indices *ind1=properties::get_composite<Indices>(it1, true);
+			const Indices *ind2=properties::get_composite<Indices>(it1, true);
 			if(ind1!=0 && ind2!=0) {
-				const CommutingBehaviour *com1 =properties::get_composite<CommutingBehaviour>(it1);
-				const CommutingBehaviour *com2 =properties::get_composite<CommutingBehaviour>(it2);
+				const CommutingBehaviour *com1 =properties::get_composite<CommutingBehaviour>(it1, true);
+				const CommutingBehaviour *com2 =properties::get_composite<CommutingBehaviour>(it2, true);
 				
 				if(com1!=0  &&  com1 == com2) 
 					sign *= com1->sign();
@@ -1799,7 +1803,8 @@ int exptree_ordering::can_swap(exptree::iterator one, exptree::iterator two, int
 
 		// First of all, check whether there is an explicit declaration for the commutativity 
 		// of these two symbols.
-		const CommutingBehaviour *com = properties::get_composite<CommutingBehaviour>(one, two);
+//		std::cout << *one->name << " explicit " << *two->name << std::endl;
+		const CommutingBehaviour *com = properties::get_composite<CommutingBehaviour>(one, two, true);
 		
 		if(com) {
 //			std::cout << "explicit " << com->sign() << std::endl;

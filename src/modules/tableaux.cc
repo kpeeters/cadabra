@@ -639,7 +639,7 @@ const Indices *decompose_product::indices_equivalent(iterator it) const
 	exptree::index_iterator ii=tr.begin_index(it);
 	const Indices *ret=0, *tmp=0;
 	while(ii!=tr.end_index(it)) {
-		tmp=properties::get<Indices>(ii);
+		tmp=properties::get<Indices>(ii, true);
 		if(tmp==0) return 0;
 		if(ret==0) ret=tmp;
 		else if(ret!=tmp) return 0;
@@ -671,8 +671,12 @@ bool decompose_product::can_apply(iterator it)
 							f2=fc;
 							ind2=indices_equivalent(fc);
 							if(ind2 && ind1==ind2) {
+								// Strip off the parent rel because Integer properties are
+								// declared as {m,n,p}::Integer, not {_m, _n, _p}::Integer.
+								exptree index(tr.begin_index(fc));
+								index.begin()->fl.parent_rel=str_node::p_none;
 								const numerical::Integer *itg=
-									properties::get<numerical::Integer>( tr.begin_index(fc) );
+									properties::get<numerical::Integer>( index.begin(), true );
 								if(itg) {
 									dim=to_long(*itg->difference.begin()->multiplier);
 									if(dim>0)

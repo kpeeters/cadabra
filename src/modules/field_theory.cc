@@ -59,7 +59,7 @@ bool Depends::parse(exptree& tr, exptree::iterator pat, exptree::iterator prop, 
 		exptree::sibling_iterator sib=tr.begin(frstarg);
 		int num=1;
 		while(sib!=tr.end(frstarg)) {
-			const Indices    *dum=properties::get<Indices>(sib);
+			const Indices    *dum=properties::get<Indices>(sib, true);
 			const Coordinate *crd=properties::get<Coordinate>(sib);
 			const Derivative *der=properties::get<Derivative>(sib);
 			const Accent     *acc=properties::get<Accent>(sib);
@@ -74,7 +74,7 @@ bool Depends::parse(exptree& tr, exptree::iterator pat, exptree::iterator prop, 
 		dependencies_=exptree(frstarg);
 		}
 	else {
-		const Indices    *dum=properties::get<Indices>(frstarg);
+		const Indices    *dum=properties::get<Indices>(frstarg, true);
 		const Coordinate *crd=properties::get<Coordinate>(frstarg);
 		const Derivative *der=properties::get<Derivative>(frstarg);
 		const Accent     *acc=properties::get<Accent>(frstarg);
@@ -270,7 +270,7 @@ algorithm::result_t unique_indices::apply(iterator& it)
 			determine_intersection(tmp_ind_free, ind_free, rename_indices, true);
 			index_map_t::iterator indit=rename_indices.begin();
 			while(indit!=rename_indices.end()) {
-				const Indices *dums=properties::get<Indices>(indit->second);
+				const Indices *dums=properties::get<Indices>(indit->second, true);
 				assert(dums);
 				exptree dum=get_dummy(dums, &ind_free, &ind_dummy, &tmp_ind_free, &tmp_ind_dummy,
 														 &generated_indices);
@@ -326,7 +326,7 @@ algorithm::result_t einsteinify::apply(iterator& it)
 				iterator invmet=tr.append_child(it,str_node(args_begin()->name));
 
 				// get a new dummy index
-				const Indices *dums=properties::get<Indices>(dit->second);
+				const Indices *dums=properties::get<Indices>(dit->second, true);
 				assert(dums);
 				exptree dum=get_dummy(dums, it);
 
@@ -544,7 +544,7 @@ algorithm::result_t expand::apply(iterator& it)
 	// Figure out the type of the indices to be inserted.
 	sibling_iterator origind=prod;
 	++origind;
-	const Indices *dums=properties::get<Indices>(origind);		
+	const Indices *dums=properties::get<Indices>(origind, true);		
 	if(!dums)
 		throw consistency_error("No information about the index types known.");
 
@@ -728,69 +728,69 @@ algorithm::result_t eliminate_kronecker::apply(iterator& st)
 			sibling_iterator ii1=tr.begin(it);
 			sibling_iterator ii2=ii1; ++ii2;
 			if(subtree_compare(ii1, ii2, 1, false, true)==0) { // a self-contracted Kronecker delta
-				 const numerical::Integer *itg1=properties::get<numerical::Integer>(ii1);
-				 const numerical::Integer *itg2=properties::get<numerical::Integer>(ii2);
-				 if(itg1 && itg2 && ii1->is_rational()==false && ii2->is_rational()==false) {
-					  if(itg1->from.begin()!=itg1->from.end() && itg2->from.begin()!=itg2->from.end()) {
-							if(itg1->difference.begin()->name==onept) {
-								 multiply(st->multiplier, *itg1->difference.begin()->multiplier);
-								 it=tr.erase(it);
-								 }
-							else {
-								 it=tr.replace(it, itg1->difference.begin());
-								 }
-							expression_modified=true;
+				const numerical::Integer *itg1=properties::get<numerical::Integer>(ii1, true);
+				const numerical::Integer *itg2=properties::get<numerical::Integer>(ii2, true);
+				if(itg1 && itg2 && ii1->is_rational()==false && ii2->is_rational()==false) {
+					if(itg1->from.begin()!=itg1->from.end() && itg2->from.begin()!=itg2->from.end()) {
+						if(itg1->difference.begin()->name==onept) {
+							multiply(st->multiplier, *itg1->difference.begin()->multiplier);
+							it=tr.erase(it);
 							}
-					  else ++it;
-					  }
-				 else ++it;
-				 }
+						else {
+							it=tr.replace(it, itg1->difference.begin());
+							}
+						expression_modified=true;
+						}
+					else ++it;
+					}
+				else ++it;
+				}
 			else {
-				 sibling_iterator oi=tr.begin(st);
-				 ++looping;
-				 // iterate over all factors in the product
-				 bool doing1=false;
-				 bool doing2=false;
-				 while(!replaced && oi!=tr.end(st)) {
-					  if(oi!=it) { // this is not the delta node
-							// compare delta indices with all indices of this object
-							exptree::index_iterator ind=tr.begin_index(oi);
-							while(ind!=tr.end_index(oi)) {
-								exptree::index_iterator nxt=ind;
-								++nxt;
-								if(ii1->is_rational()==false && subtree_compare(ind, ii1, 1, false, true)==0 ) {
-									if(! (replaced && doing2) ) {
-										tr.replace_index(ind, ii2)->fl.parent_rel=ii2->fl.parent_rel; 
-										replaced=true;
-										doing1=true;
-										}
-									// cannot 'break' here because that would miss cases when the 
-									// delta multiplies a sum.
+				sibling_iterator oi=tr.begin(st);
+				++looping;
+				// iterate over all factors in the product
+				bool doing1=false;
+				bool doing2=false;
+				while(!replaced && oi!=tr.end(st)) {
+					if(oi!=it) { // this is not the delta node
+						// compare delta indices with all indices of this object
+						exptree::index_iterator ind=tr.begin_index(oi);
+						while(ind!=tr.end_index(oi)) {
+							exptree::index_iterator nxt=ind;
+							++nxt;
+							if(ii1->is_rational()==false && subtree_compare(ind, ii1, 1, false, true)==0 ) {
+								if(! (replaced && doing2) ) {
+									tr.replace_index(ind, ii2)->fl.parent_rel=ii2->fl.parent_rel; 
+									replaced=true;
+									doing1=true;
 									}
-								else if(ii2->is_rational()==false && subtree_compare(ind, ii2, 1, false, true)==0) {
-									if(! (replaced && doing1) ) {
-										tr.replace_index(ind, ii1)->fl.parent_rel=ii1->fl.parent_rel;
-										replaced=true;
-										doing2=true;
-										}
-									// no break here either.
-									}
-								ind=nxt;
+								// cannot 'break' here because that would miss cases when the 
+								// delta multiplies a sum.
 								}
+							else if(ii2->is_rational()==false && subtree_compare(ind, ii2, 1, false, true)==0) {
+								if(! (replaced && doing1) ) {
+									tr.replace_index(ind, ii1)->fl.parent_rel=ii1->fl.parent_rel;
+									replaced=true;
+									doing2=true;
+									}
+								// no break here either.
+								}
+							ind=nxt;
 							}
-					  if(!replaced) 
-							++oi;
-					  }
-				 if(replaced) {
-					  expression_modified=true;
-					  it=tr.erase(it);
-					  }
-				 else ++it;
-				 }
-			 }
+						}
+					if(!replaced) 
+						++oi;
+					}
+				if(replaced) {
+					expression_modified=true;
+					it=tr.erase(it);
+					}
+				else ++it;
+				}
+			}
 		else ++it;
 		}
-
+	
 	// the product may have reduced to a single term or even just a constant
 //	txtout << "exiting eliminate" << std::endl;
 //	prod_unwrap_single_term(st);
@@ -873,7 +873,7 @@ bool reduce_gendelta::one_step_(sibling_iterator dl)
 //	tr.print_recursive_treeform(debugout, dl, num) << std::endl;}
 	// FIXME: use properties for the dimension!
 //	txtout << *dl->multiplier << std::endl;
-	const numerical::Integer *itg=properties::get<numerical::Integer>(up);
+	const numerical::Integer *itg=properties::get<numerical::Integer>(up, true);
 	int dim;
 	if(itg) {
 		const nset_t::iterator onept=name_set.insert("1").first;
@@ -1120,7 +1120,7 @@ algorithm::result_t dualise_tensor::apply(iterator& st)
 		}
 	const Indices *dums=0;
 	if(tr.number_of_children(st)>0)
-		dums=properties::get<Indices>(tr.begin(st));
+		dums=properties::get<Indices>(tr.begin(st), true);
 	if(!dums)
 		 throw consistency_error("No information about the index type known.");
 
@@ -1442,7 +1442,7 @@ algorithm::result_t expand_product_shorthand::apply(iterator& it)
 
 	unsigned int i=tr.number_of_children(obj1);
 	const Indices *dums=0;
-	if(i>0) dums=properties::get<Indices>(tr.begin(obj1));
+	if(i>0) dums=properties::get<Indices>(tr.begin(obj1), true);
 	for(; i<fillup_to; ++i) {
 		assert(dums);
 		exptree dum=get_dummy(dums, obj1);
@@ -2171,7 +2171,7 @@ algorithm::result_t all_contractions::apply(iterator& it)
 					}
 				else {
 					// insert the actual indices
-					const Indices *dums=properties::get<Indices>(indit->second);
+					const Indices *dums=properties::get<Indices>(indit->second, true);
 					assert(dums);
 					for(int i=0; i<rval+from; ++i) {
 						// FIXME: once matching to range-wildcard indices is in place, this get

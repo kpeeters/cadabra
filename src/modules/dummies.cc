@@ -58,7 +58,7 @@ algorithm::result_t rename_dummies::apply(iterator& st)
 		if(ind_dummy.find(exptree(ii))!=ind_dummy.end()) {
 			repmap_t::iterator rmi=repmap.find(exptree(ii));
 			if(rmi==repmap.end()) {
-				const Indices *dums=properties::get<Indices>(ii);
+				const Indices *dums=properties::get<Indices>(ii, true);
 				if(!dums)
 					throw consistency_error("No index set for index "+*ii->name+" known.");
 

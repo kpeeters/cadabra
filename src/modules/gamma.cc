@@ -327,7 +327,7 @@ algorithm::result_t join::apply(iterator& st)
 	long number_of_dimensions=-1; // i.e. not known.
 	exptree::index_iterator firstind=tr.begin_index(gam1);
 	while(firstind!=tr.end_index(gam1)) {  // select the maximum value; FIXME: be more refined...
-		const numerical::Integer *ipr=properties::get<numerical::Integer>(firstind);
+		const numerical::Integer *ipr=properties::get<numerical::Integer>(firstind, true);
 		if(ipr) {
 			if(ipr->difference.begin()->is_integer()) {
 				number_of_dimensions=std::max(number_of_dimensions, to_long(*ipr->difference.begin()->multiplier));
@@ -342,7 +342,7 @@ algorithm::result_t join::apply(iterator& st)
 	if(number_of_dimensions!=-1) {
 		firstind=tr.begin_index(gam2);
 		while(firstind!=tr.end_index(gam2)) {  // select the maximum value; FIXME: be more refined...
-			const numerical::Integer *ipr=properties::get<numerical::Integer>(firstind);
+			const numerical::Integer *ipr=properties::get<numerical::Integer>(firstind, true);
 			if(ipr) {
 				if(ipr->difference.begin()->is_integer()) {
 					number_of_dimensions=std::max(number_of_dimensions, to_long(*ipr->difference.begin()->multiplier));
@@ -681,7 +681,7 @@ bool projweyl::can_apply(iterator st)
 		while(it!=tr.end(st)) {
 			const GammaMatrix *gm=properties::get<GammaMatrix>(it);
 			if(gm) {
-				const numerical::Integer *isint=properties::get<numerical::Integer>(tr.begin(gamma_loc_));
+				const numerical::Integer *isint=properties::get<numerical::Integer>(tr.begin(gamma_loc_), true);
 				if(isint) {
 					 if(isint->difference.begin()->is_rational()) {
 						  ++numgamma;
@@ -708,7 +708,7 @@ algorithm::result_t projweyl::apply(iterator& st)
 		gam=rep.append_child(prod, str_node(*gamma_loc_->name));
 
 	txtout << "projweyl: warning, using d=10 implicitly!" << std::endl;
-	const Indices *dums=properties::get<Indices>(tr.begin(gamma_loc_));
+	const Indices *dums=properties::get<Indices>(tr.begin(gamma_loc_), true);
 	assert(dums);
 	for(unsigned int i=0; i<10-numind; ++i) { // FIXME: don't hardcode dimensions
 		exptree nm=get_dummy(dums, prod, st);
@@ -920,8 +920,8 @@ bool fierz::can_apply(iterator it)
 			if(gmnxt) {
 //				txtout << "found gam" << std::endl;
 				// FIXME: should also work when there is a unit matrix in between.
-				indit=properties::get_composite<numerical::Integer>(ch.begin());
-				indprop=properties::get_composite<Indices>(ch.begin());
+				indit=properties::get_composite<numerical::Integer>(ch.begin(), true);
+				indprop=properties::get_composite<Indices>(ch.begin(), true);
 				if(!indit || !indprop) return false;
 				dim=to_long(*indit->difference.begin()->multiplier);
 				if(dim==1)

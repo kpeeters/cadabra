@@ -1,3 +1,16 @@
+2010-11-06  Kasper Peeters  <kasper.peeters@aei.mpg.de>
+
+	* Folding in @factor_out fixes for non-commutative objects
+	received from James Allen (the first proper patches from an
+	outsider, yeah!)
+
+2010-11-05  Kasper Peeters  <kasper.peeters@aei.mpg.de>
+
+	* Fix of pattern matching of indices of different types, resolving
+	some long-standing problems.
+
+	* Cleanup of redundant variables and parameters in a number of places.
+
 2010-04-26  Kasper Peeters  <kasper.peeters@aei.mpg.de>
 
 	* Released 1.25
@@ -46,7 +59,7 @@
 	* Released 1.21
 
 	* Fixed canonicalising expressions with anti-commuting indices.
-	
+
 	* Fixed automatic raising/lowering of indices in canonicalise, and
 	added `position=independent' option for Indices to prevent this
 	from happening when it is not wanted.

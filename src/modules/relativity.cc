@@ -320,10 +320,10 @@ algorithm::result_t rewrite_indices::apply(iterator& it)
 	// converter (i.e. vielbein or metric).
 	
 	sibling_iterator vbind=tr.begin(vielb);
-	const Indices *itype1=properties::get<Indices>(vbind);
+	const Indices *itype1=properties::get<Indices>(vbind, true);
 	str_node::parent_rel_t pr1=vbind->fl.parent_rel;
 	++vbind;
-	const Indices *itype2=properties::get<Indices>(vbind);
+	const Indices *itype2=properties::get<Indices>(vbind, true);
 	str_node::parent_rel_t pr2=vbind->fl.parent_rel;	
 
 	// Since this algorithm works both on dummy indices and on free
@@ -346,7 +346,7 @@ algorithm::result_t rewrite_indices::apply(iterator& it)
 //				txtout << "found " << *par->name << std::endl;
 				// Determine whether the indices are of preferred type or not.
 				int num=std::distance(tr.begin(par), (sibling_iterator)dit->second);
-				const Indices *origtype=properties::get<Indices>(dit->second);
+				const Indices *origtype=properties::get<Indices>(dit->second, true);
 				if(!origtype) {
 					txtout << "Need to know about the index type of index " << *dit->second->name << std::endl;
 					return l_error;
@@ -361,7 +361,7 @@ algorithm::result_t rewrite_indices::apply(iterator& it)
 				while(num-- > 0)
 					++walk;
 
-				const Indices *newtype=properties::get<Indices>(walk);
+				const Indices *newtype=properties::get<Indices>(walk, true);
 				if(!newtype) {
 					txtout << "Need to know about the index type of index " << *walk->name << std::endl;
 					return l_error;
@@ -752,19 +752,19 @@ split_index::split_index(exptree& tr, iterator it)
 			if(tr.number_of_children(args_begin())==3) {
 				iterator trip=args_begin();
 				sibling_iterator iname=tr.begin(trip);
-				full_class=properties::get<Indices>(iname);
+				full_class=properties::get<Indices>(iname, true);
 				++iname;
 				if(iname->is_integer()) {
 					part1_is_number=true;
 					num1=to_long(*(iname->multiplier));
 					}
-				else part1_class=properties::get<Indices>(iname);
+				else part1_class=properties::get<Indices>(iname, true);
 				++iname;
 				if(iname->is_integer()) {
 					part2_is_number=true;
 					num2=to_long(*(iname->multiplier));
 					}
-				else part2_class=properties::get<Indices>(iname);
+				else part2_class=properties::get<Indices>(iname, true);
 				if(full_class && (part1_is_number || part1_class) && (part2_is_number || part2_class) )
 					return;
 				txtout << "The index types of (some of) these indices are not known." << std::endl;
@@ -803,7 +803,7 @@ algorithm::result_t split_index::apply(iterator& it)
 
 	index_map_t::iterator prs=ind_dummy.begin();
 	while(prs!=ind_dummy.end()) {
-		const Indices *tcl=properties::get<Indices>((*prs).second);
+		const Indices *tcl=properties::get<Indices>((*prs).second, true);
 		if(tcl) {
 			if((*tcl).set_name==(*full_class).set_name) {
 				exptree dum1,dum2;

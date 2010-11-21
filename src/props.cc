@@ -60,12 +60,12 @@ pattern::pattern()
 	{
 	}
 
-pattern::pattern(const exptree::iterator_base& it)
-	: obj(it), headnode(it->name)
+pattern::pattern(const exptree& o)
+	: obj(o)
 	{
 	}
 
-bool pattern::match(const exptree::iterator& it) const
+bool pattern::match(const exptree::iterator& it, bool ignore_parent_rel) const
 	{
 	// Special case for range wildcards.
 	// FIXME: move this to storage.cc (see the FIXME there)
@@ -87,7 +87,7 @@ bool pattern::match(const exptree::iterator& it) const
 				seqarg.skip_children();
 				++seqarg;
 				}
-			ind=properties::get<Indices>(stt);
+			ind=properties::get<Indices>(stt, true);
 			}
 		else seqarg=hmarg;
 
@@ -105,7 +105,7 @@ bool pattern::match(const exptree::iterator& it) const
 		if(ind!=0) {
 			exptree::sibling_iterator indit=it.begin();
 			while(indit!=it.end()) {
-				const Indices *gi=properties::get<Indices>(indit);
+				const Indices *gi=properties::get<Indices>(indit, true);
 				if(gi!=ind) {
 					return false;
 					}
@@ -120,7 +120,7 @@ bool pattern::match(const exptree::iterator& it) const
 //	txtout << "comparing " << *it->name << " " << *obj.begin()->name << std::endl;
 //	exptree::print_recursive_treeform(txtout, it);
 //	exptree::print_recursive_treeform(txtout, obj.begin());
-	int res=subtree_compare(it, obj.begin(), 0, true, 0);
+	int res=subtree_compare(it, obj.begin(), ignore_parent_rel?0:-2, false /* true */, 0);
 	if(abs(res)<=1) {
 //		 txtout << "match!" << std::endl;
 		 return true;
@@ -312,14 +312,14 @@ bool operator<(const pattern& one, const pattern& two)
 //	  return one.obj==two.obj; // FIXME: handle dummy indices
 //	  }
 
-void properties::insert_prop(exptree::iterator it, const property *pr)
+void properties::insert_prop(const exptree& et, const property *pr)
 	{
 //	assert(pats.find(pr)==pats.end()); // identical properties have to be assigned through insert_list_prop
 
-	pattern *pat=new pattern(it);
+	pattern *pat=new pattern(et);
 
 	std::pair<property_map_t::iterator, property_map_t::iterator> pit=
-		props.equal_range(it->name);
+		props.equal_range(pat->obj.begin()->name);
 
 	property_map_t::iterator first_nonpattern=pit.first;
 
@@ -329,7 +329,7 @@ void properties::insert_prop(exptree::iterator it, const property *pr)
 			if((*pit.first).second.first->obj.begin().begin()->is_range_wildcard()) 
 				++first_nonpattern;
 			
-		if((*pit.first).second.first->match(it)) { // match found
+		if((*pit.first).second.first->match(et.begin())) { // match found
 			if(typeid(*pr)==typeid(*(*pit.first).second.second)) {
 				const labelled_property *lp   =dynamic_cast<const labelled_property *>(pr);
 				const labelled_property *lpold=dynamic_cast<const labelled_property *>(pit.first->second.second);
@@ -349,10 +349,10 @@ void properties::insert_prop(exptree::iterator it, const property *pr)
 		}
 
 	pats.insert(pattern_map_t::value_type(pr, pat));
-	properties::props.insert(property_map_t::value_type(it->name, pat_prop_pair_t(pat,pr)));
+	properties::props.insert(property_map_t::value_type(pat->obj.begin()->name, pat_prop_pair_t(pat,pr)));
 	}
 
-void properties::insert_list_prop(const std::vector<exptree::iterator>& its, const list_property *pr)
+void properties::insert_list_prop(const std::vector<exptree>& its, const list_property *pr)
 	{
 	assert(pats.find(pr)==pats.end()); // identical properties have to be assigned through insert_list_prop
 	assert(its.size()>0);
@@ -440,7 +440,7 @@ void properties::insert_list_prop(const std::vector<exptree::iterator>& its, con
 		// Now register the property.
 //		txtout << "registering " << *(pat->headnode) << std::endl;
 		pats.insert(pattern_map_t::value_type(pr, pat));
-		properties::props.insert(property_map_t::value_type(its[i]->name, pat_prop_pair_t(pat,pr)));
+		properties::props.insert(property_map_t::value_type(pat->obj.begin()->name, pat_prop_pair_t(pat,pr)));
 		}
 	}
 

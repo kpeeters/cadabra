@@ -290,7 +290,7 @@ algorithm::result_t substitute::apply(iterator& st)
 //		txtout << must_be_empty.size() << " dummies have to be relabelled" << std::endl;
 		while(indit!=must_be_empty.end()) {
 			exptree the_key=indit->first;
-			const Indices *dums=properties::get<Indices>(indit->second);
+			const Indices *dums=properties::get<Indices>(indit->second, true);
 			if(dums==0)
 				throw consistency_error("Need to know an index set for " + *indit->second->name +".");
 			exptree relabel=get_dummy(dums, &ind_dummy, &ind_forced, &added_dummies);
@@ -806,7 +806,7 @@ algorithm::result_t index_rename::apply(iterator& it)
 		std::pair<index_map_t::iterator, index_map_t::iterator> eq=ind_dummy.equal_range(toren->first);
 		index_map_t::iterator dren=eq.first;
 		while(dren!=eq.second) {
-			const Indices *dums=properties::get<Indices>(dren->first.begin());
+			const Indices *dums=properties::get<Indices>(dren->first.begin(), true);
 			if(dums==0)
 				throw consistency_error("Need to know an index set for " + *dren->first.begin()->name +".");
 			exptree relabel=get_dummy(dums, &ind_dummy, &ind_free, &dummies_added);

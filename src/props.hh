@@ -35,13 +35,12 @@
 class pattern { 
 	public:
 		pattern();
-		pattern(const exptree::iterator_base& it);
+		pattern(const exptree&);
 
-		bool match(const exptree::iterator&) const;
+		bool match(const exptree::iterator&, bool ignore_parent_rel=false) const;
 		bool children_wildcard() const;
 
-		exptree          obj;
-		nset_t::iterator headnode;
+		exptree obj;
 };
 
 bool operator<(const pattern& one, const pattern& two);
@@ -158,10 +157,12 @@ class properties {
 		// property gets transferred to this singleton class.
 		typedef std::pair<pattern *, const property_base *>                     pat_prop_pair_t;
 		typedef std::multimap<nset_t::iterator, pat_prop_pair_t, nset_it_less>  property_map_t;
+		/// FIXME: the above contains an iterator, which we now take to be pointing to an element
+		/// in the obj tree of the pattern of the pat_prop_pair_t. However, that is brittle...
 		typedef std::multimap<const property_base *, pattern *>                 pattern_map_t;
 
-		static void            insert_prop(exptree::iterator, const property *);
-		static void            insert_list_prop(const std::vector<exptree::iterator>&, const list_property *);
+		static void            insert_prop(const exptree&, const property *);
+		static void            insert_list_prop(const std::vector<exptree>&, const list_property *);
 		static void            clear();
 
 		/// The following two maps own the pointers to the properties and patterns stored 
@@ -172,17 +173,17 @@ class properties {
 		static pattern_map_t   pats;   // for list properties, objects are stored here in order
 
 		// Normal search: given a pattern, get its property if any.
-		template<class T> static const T*  get(exptree::iterator);
+		template<class T> static const T*  get(exptree::iterator, bool ignore_parent_rel=false);
 		template<class T> static const T*  get(nset_t::iterator);
 		template<class T> static const T*  get();
-		template<class T> static const T*  get_composite(exptree::iterator);
-		template<class T> static const T*  get_composite(exptree::iterator, int& serialnum, bool doserial=true);
+		template<class T> static const T*  get_composite(exptree::iterator, bool ignore_parent_rel=false);
+		template<class T> static const T*  get_composite(exptree::iterator, int& serialnum, bool doserial=true, bool ignore_parent_rel=false);
 		// Ditto for labelled properties
 		template<class T> static const T*  get_composite(exptree::iterator, const std::string& label);
 		template<class T> static const T*  get_composite(exptree::iterator, int& serialnum, const std::string& label, bool doserial=true);
 		// For list properties: given two patterns, get a common property.
-		template<class T> static const T*  get_composite(exptree::iterator, exptree::iterator);
-		template<class T> static const T*  get_composite(exptree::iterator, exptree::iterator, int&, int&);
+		template<class T> static const T*  get_composite(exptree::iterator, exptree::iterator, bool ignore_parent_rel=false);
+		template<class T> static const T*  get_composite(exptree::iterator, exptree::iterator, int&, int&, bool ignore_parent_rel=false);
 
 		// Search through pointers
 		static bool has(const property_base *, exptree::iterator);
@@ -201,7 +202,7 @@ class properties {
 };
 
 template<class T>
-const T* properties::get(exptree::iterator it)
+const T* properties::get(exptree::iterator it, bool ignore_parent_rel)
 	{
 	const T* ret=0;
 
@@ -225,7 +226,7 @@ const T* properties::get(exptree::iterator it)
 		while(walk!=props.end() && walk->first==it->name) {
 			if(wildcards==walk->second.first->children_wildcard()) {
 				ret=dynamic_cast<const T *>(walk->second.second);
-				if(ret && walk->second.first->match(it))  // match found
+				if(ret && walk->second.first->match(it, ignore_parent_rel))  // match found
 					return ret;
 				}
 			++walk;
@@ -253,14 +254,14 @@ const T* properties::get(nset_t::iterator it)
 	}
 
 template<class T>
-const T* properties::get_composite(exptree::iterator it)
+const T* properties::get_composite(exptree::iterator it, bool ignore_parent_rel)
 	{
 	int tmp;
-	return get_composite<T>(it, tmp, false);
+	return get_composite<T>(it, tmp, false, ignore_parent_rel);
 	}
 
 template<class T>
-const T* properties::get_composite(exptree::iterator it, int& serialnum, bool doserial)
+const T* properties::get_composite(exptree::iterator it, int& serialnum, bool doserial, bool ignore_parent_rel)
 	{
 	const T* ret=0;
 	bool inherits=false;
@@ -276,7 +277,7 @@ const T* properties::get_composite(exptree::iterator it, int& serialnum, bool do
 			if(wildcards==(*walk).second.first->children_wildcard()) {
 //				std::cout << "searching " << *it->name << std::endl;
 //				std::cout << "comparing " << *(walk->second.first->obj.begin()->name) << std::endl;
-				if((*walk).second.first->match(it)) { // match found
+				if((*walk).second.first->match(it, ignore_parent_rel)) { // match found
 //					std::cout << "found match" << std::endl;
 					ret=dynamic_cast<const T *>((*walk).second.second);
 					if(ret) { // found! determine serial number
@@ -392,14 +393,14 @@ const T* properties::get_composite(exptree::iterator it, int& serialnum, const s
 	}
 
 template<class T>
-const T* properties::get_composite(exptree::iterator it1, exptree::iterator it2)
+const T* properties::get_composite(exptree::iterator it1, exptree::iterator it2, bool ignore_parent_rel)
 	{
 	int tmp1, tmp2;
-	return get_composite<T>(it1,it2,tmp1,tmp2);
+	return get_composite<T>(it1,it2,tmp1,tmp2, ignore_parent_rel);
 	}
 
 template<class T>
-const T* properties::get_composite(exptree::iterator it1, exptree::iterator it2, int& serialnum1, int& serialnum2)
+const T* properties::get_composite(exptree::iterator it1, exptree::iterator it2, int& serialnum1, int& serialnum2, bool ignore_parent_rel)
 	{
 	const T* ret1=0;
 	const T* ret2=0;
@@ -411,12 +412,12 @@ const T* properties::get_composite(exptree::iterator it1, exptree::iterator it2,
 
 	property_map_t::iterator walk1=pit1.first;
 	while(walk1!=pit1.second) {
-		if((*walk1).second.first->match(it1)) { // match for object 1 found
+		if((*walk1).second.first->match(it1, ignore_parent_rel)) { // match for object 1 found
 			ret1=dynamic_cast<const T *>((*walk1).second.second);
 			if(ret1) { // property of the right type found for object 1
 				property_map_t::iterator walk2=pit2.first;
 				while(walk2!=pit2.second) {
-					if((*walk2).second.first->match(it2)) { // match for object 1 found
+					if((*walk2).second.first->match(it2, ignore_parent_rel)) { // match for object 1 found
 						ret2=dynamic_cast<const T *>((*walk2).second.second);
 						if(ret2) { // property of the right type found for object 2
 							if(ret1==ret2) { 
@@ -449,7 +450,7 @@ const T* properties::get_composite(exptree::iterator it1, exptree::iterator it2,
 			if(inherits2) sib2=it2.begin();
 			else          sib2=it2;
 			do { // 2
-				const T* tmp=get_composite<T>((exptree::iterator)(sib1), (exptree::iterator)(sib2), serialnum1, serialnum2);
+				const T* tmp=get_composite<T>((exptree::iterator)(sib1), (exptree::iterator)(sib2), serialnum1, serialnum2, ignore_parent_rel);
 				if(tmp) {
 					ret1=tmp;
 					found=true;
