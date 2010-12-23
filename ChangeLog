@@ -1,7 +1,9 @@
 2010-12-23  Kasper Peeters  <kasper.peeters@aei.mpg.de>
 
 	* Final fixes for pattern matching with super/sub indices done
-	correctly. 
+	correctly. This now also fixes replacement rules in which objects
+	with the same name appear both as indices and normal objects on
+	the right-hand side. Documentation on this added.
 
 2010-11-06  Kasper Peeters  <kasper.peeters@aei.mpg.de>
 

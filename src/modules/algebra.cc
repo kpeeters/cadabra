@@ -2936,8 +2936,11 @@ std::string canonicalise::get_index_set_name(iterator it) const
 	{
 	const Indices *ind=properties::get<Indices>(it, true);
 	if(ind) {
-		if(ind->parent_name!="") return ind->parent_name;
-		else                     return ind->set_name;
+		return ind->set_name;
+// TODO: The logic was once as below, but it is no longer clear to
+// me why that would ever make sense.
+//		if(ind->parent_name!="") return ind->parent_name;
+//		else                     return ind->set_name;
 		}
 	else return " undeclared";
 	}

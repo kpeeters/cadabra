@@ -560,3 +560,15 @@ B0:=B_{\alpha \mu} -> \Delta_{\mu \nu}*F_{\theta \alpha};
 #\nabla{#}::PartialDerivative.
 #A_{m} \nabla_{n} B_{k};
 #@canonicalise!(%);
+
+@reset.
+{q,r}::Indices(full).
+{i,j}::Indices("subspace1", parent=full).
+{A,B}::Indices("subspace2", parent=full).
+obj49:= X_{q r} Y_{q r};
+@split_index!!(%){q, i, A};
+@canonicalise!(%);
+tst49:= X_{i j} Y_{i j} + X_{i A} Y_{i A} + X_{A i} Y_{A i} + X_{A B} Y_{A B} - @(obj49);
+@collect_terms!(%);
+@assert(tst49);
+
