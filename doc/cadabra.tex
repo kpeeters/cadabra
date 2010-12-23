@@ -2242,7 +2242,7 @@ In many algorithms, patterns can be supplemented by so-called
 conditionals. These are constraints on the objects that appear in the
 pattern. For instance, the substitution command\index{conditionals}
 \begin{screen}{1}
-@substitute!(%)( A_{m n} B_{p q} | n!=p -> 0 );
+@substitute!(%)( A_{m n} B_{p q} | _{n}!=_{p} -> 0 );
 \end{screen}
 applies the substitution rule only if the second index of $A$ and the
 first index of $B$ do not match. Note that the conditional follows
@@ -2291,6 +2291,22 @@ values of the indices explicitly,
 \sigma_{1}\sigma_{2} + \rho_{1} \rho_{2};
 @substitute!(%)( S?_{a?} S?_{b?} | \hasprop{S?_{a?}}{SigmaMatrix} -> I*\epsilon_{a? b? c} \sigma_{c}  );
 I \epsilon_{1 2 c} \sigma_{c} + \rho_{1} \rho_{2};
+\end{screen}
+
+As a general rule of thumb, index patterns include their parent
+relations. That is, patterns on the right-hand side of a substitution
+rule do not get replaced if their parent relation does not match the
+one on the left-hand side,
+\begin{screen}{1,2,3}
+q_{c d};
+@substitute!(%)( q_{a b} -> a Q_{a b} );
+a Q_{c d};
+\end{screen}
+However, the same logic does not hold true for explicit wildcards,
+\begin{screen}{1,2,3}
+q_{c d};
+@substitute!(%)( q_{a? b?} -> a? Q_{a? b?} );
+c Q_{c d};
 \end{screen}
 
 

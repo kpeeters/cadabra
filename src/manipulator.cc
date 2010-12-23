@@ -790,6 +790,11 @@ void manipulator::cleanup_new_expression_(exptree::iterator it)
    // the last algorithm; check consistency too!
 	// Does not do the right job yet, should be called _after_ the
 	// algorithms have been worked out.
+
+	// This one has to come after generate_indexbracket, otherwise
+	// arguments of those brackets get merged too quickly.
+	index_object_cleanup ioc(expressions, expressions.end());
+	ioc.apply_recursive(it, false);
 	}
 
 exptree::iterator manipulator::apply_pre_default_rules_(exptree::iterator it)

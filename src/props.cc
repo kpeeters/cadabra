@@ -120,7 +120,8 @@ bool pattern::match(const exptree::iterator& it, bool ignore_parent_rel) const
 //	txtout << "comparing " << *it->name << " " << *obj.begin()->name << std::endl;
 //	exptree::print_recursive_treeform(txtout, it);
 //	exptree::print_recursive_treeform(txtout, obj.begin());
-	int res=subtree_compare(it, obj.begin(), ignore_parent_rel?0:-2, false /* true */, 0);
+	int res=subtree_compare(it, obj.begin(), ignore_parent_rel?0:-2, true, 0);
+//	txtout << res << std::endl;
 	if(abs(res)<=1) {
 //		 txtout << "match!" << std::endl;
 		 return true;

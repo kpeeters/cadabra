@@ -135,13 +135,11 @@ tst12:= 4 R_{q r a c} @asym[R_{b m a n} R_{d m c n}]{_d,_c} + @(obj12);
 {a,b,c,d,m,n,d1,d2,d3,d4}::Indices(vector).
 R_{a b c d}::RiemannTensor.
 obj13:= R_{a b m n} R_{c b m n};
-@substitute!(%)( R_{a b m n} R_{c d m n} | { c!=a, d!=b }
+@substitute!(%)( R_{a b m n} R_{c d m n} | { _{c}!=_{a}, _{d}!=_{b} }
                       -> 2 R_{a m b n} ( R_{c m d n} - R_{d m c n} ) );
 tst13:= R_{a b m n} R_{c b m n} - @(obj13);
 @collect_terms!(%);
 @assert(tst13);
-@substitute!(obj13)( R_{a b m n} R_{c d m n} 
-                      -> 2 R_{a m b n} ( R_{c m d n} - R_{d m c n} ) );
 
 
 # Test 14: tree.hh bug

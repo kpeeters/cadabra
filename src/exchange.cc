@@ -100,7 +100,7 @@ int exchange::collect_identical_tensors(exptree& tr, exptree::iterator it,
 			}
 		if(i==idts.size()) {
 			identical_tensors_t ngr;
-			ngr.comm=properties::get_composite<SelfCommutingBehaviour>(sib);
+			ngr.comm=properties::get_composite<SelfCommutingBehaviour>(sib, true);
 			ngr.spino=properties::get_composite<Spinor>(sib);
 			ngr.tab=properties::get_composite<TableauBase>(sib);
 			ngr.traceless=properties::get_composite<Traceless>(sib);

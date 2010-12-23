@@ -830,8 +830,6 @@ algorithm::result_t prodrule::apply(iterator& it)
 				  else ++theDargs;
 				  }
 			  
-			  // HERE
-
 			  int stc=subtree_compare(emptyD.begin(), repch);
 //			  txtout << "trying to move " << *emptyD.begin()->name << " through " << *repch->name 
 //						<< " " << stc << std::endl;
@@ -1182,6 +1180,36 @@ algorithm::result_t listflatten::apply(iterator& it)
 	return l_applied;
 	}
 
+index_object_cleanup::index_object_cleanup(exptree& tr, iterator it)
+	: algorithm(tr, it)
+	{
+	}
+
+bool index_object_cleanup::can_apply(iterator it)
+	{
+	if(*it->name=="") {
+		if(tr.number_of_children(it)==1) {
+			sibling_iterator sib=tr.begin(it);
+			if(sib->fl.parent_rel==str_node::p_sub || sib->fl.parent_rel==str_node::p_super)
+				return true;
+			}
+		}
+	return false;
+	}
+
+algorithm::result_t index_object_cleanup::apply(iterator& it)
+	{
+	assert(*it->name=="");
+
+	tr.flatten(it);
+	it=tr.erase(it);
+	expression_modified=true;
+
+	return l_applied;
+	}
+
+
+
 prodcollectnum::prodcollectnum(exptree& tr, iterator it)
 	: algorithm(tr, it)
 	{
@@ -1333,7 +1361,7 @@ algorithm::result_t prodsort::apply(iterator& st)
 		two=one; ++two;
 		for(unsigned int j=i+1; j<=num; ++j) { // this loops too many times, no?
 			int es=subtree_compare(one, two, -2);
-			std::cerr << "hi " << es << std::endl;
+//			std::cerr << "hi " << es << std::endl;
 			if(exptree_ordering::should_swap(one, es)) {
 				int canswap=exptree_ordering::can_swap(one, two, es);
 				if(canswap!=0) {
@@ -3058,7 +3086,7 @@ algorithm::result_t canonicalise::apply(iterator& it)
 			dummy_sets[" NR "+get_index_set_name(i2->first)].push_back(i2->second+1);
 			}
 		else {
-			if( properties::get<AntiCommuting>(ii->first) != 0 ) {
+			if( properties::get<AntiCommuting>(ii->first, true) != 0 ) {
 				dummy_sets[" AC "+get_index_set_name(ii->first)].push_back(ii->second+1);
 				dummy_sets[" AC "+get_index_set_name(i2->first)].push_back(i2->second+1);
 				}

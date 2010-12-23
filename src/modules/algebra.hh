@@ -316,6 +316,14 @@ class reduce_sub : public algorithm {
 		virtual result_t apply(iterator&);
 };
 
+class index_object_cleanup : public algorithm {
+	public:
+		index_object_cleanup(exptree&, iterator);
+
+		virtual bool     can_apply(iterator);
+		virtual result_t apply(iterator&);
+};
+
 class prodflatten : public algorithm {
 	public:
 		prodflatten(exptree&, iterator);

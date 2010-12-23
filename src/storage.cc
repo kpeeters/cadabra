@@ -1070,7 +1070,6 @@ int subtree_compare(exptree::iterator one, exptree::iterator two,
 //				if(ind1->parent_name==ind2->set_name || ind2->parent_name==ind1->set_name)
 //					mult=1;
 			}
-//		else std::cout << *one->name << " and " << *two->name << " in same set" << std::endl;
 		if(ind1!=0 && ind1==ind2) 
 			position_type=ind1->position_type;
 		}
@@ -1088,15 +1087,6 @@ int subtree_compare(exptree::iterator one, exptree::iterator two,
 //		 std::cerr << "is index" << std::endl;
 		if(literal_wildcards==false && (one->is_object_wildcard() || two->is_object_wildcard())) return 0;
 		bool wildcard=(one->is_name_wildcard() || two->is_name_wildcard()) && (literal_wildcards==false);
-//		if(mod_prel2) {
-//		std::cout << *one->name << " vs " << *two->name << " " << mod_prel << " " 
-//					 << checksets << " " << wildcard << std::endl;
-//		if(mod_prel==-2) {
-//			const Coordinate *cdn1=properties::get<Coordinate>(one);
-//			const Coordinate *cdn2=properties::get<Coordinate>(two);
-//			if(cdn1!=0 || cdn2!=0)
-//				wildcard=false;
-//			}
 
 		if(one->name == two->name || wildcard ) {
 			int numch1=exptree::number_of_children(one);
@@ -1373,7 +1363,7 @@ exptree_comparator::match_t exptree_comparator::compare(const exptree::iterator&
 	else if(one->is_object_wildcard())
 		objectpattern=true;
 	else if(is_index && one->is_integer()==false) {
-		const Coordinate *cdn1=properties::get<Coordinate>(one);
+		const Coordinate *cdn1=properties::get<Coordinate>(one, true);
 		if(cdn1==0)
 			implicit_pattern=true;
 		}
@@ -1430,8 +1420,9 @@ exptree_comparator::match_t exptree_comparator::compare(const exptree::iterator&
 
 //			std::cerr << "index check " << *one->name << " " << *two->name << std::endl;
 
-			const Indices *t1=properties::get<Indices>(one);
-			const Indices *t2=properties::get<Indices>(two);
+			const Indices *t1=properties::get<Indices>(one, true);
+			const Indices *t2=properties::get<Indices>(two, true);
+//			std::cerr << t1 << " " << t2 << std::endl;
 			if( (t1 || t2) && implicit_pattern ) {
 				if(t1 && t2) {
 					if((*t1).set_name != (*t2).set_name) {
@@ -1471,6 +1462,13 @@ exptree_comparator::match_t exptree_comparator::compare(const exptree::iterator&
 				exptree tmp1(one), tmp2(two);
 				tmp1.erase_children(tmp1.begin());
 				tmp2.erase_children(tmp2.begin());
+				replacement_map[tmp1]=tmp2;
+				}
+			// and if this is a pattern also insert the one without the parent_rel
+			if(one->is_name_wildcard()) {
+				exptree tmp1(one), tmp2(two);
+				tmp1.begin()->fl.parent_rel=str_node::p_none;
+				tmp2.begin()->fl.parent_rel=str_node::p_none;
 				replacement_map[tmp1]=tmp2;
 				}
 			}
@@ -1631,6 +1629,8 @@ bool exptree_ordering::should_swap(exptree::iterator obj, int subtree_comparison
 	const SortOrder *so1=properties::get_composite<SortOrder>(one,num1);
 	const SortOrder *so2=properties::get_composite<SortOrder>(two,num2);
 
+//	std::cerr << so1 << " " << so2 << " " << subtree_comparison << std::endl;
+
 	if(so1==0 || so2==0) { // No sort order known
 		if(subtree_comparison<0) return true;
 		return false;
@@ -1640,7 +1640,7 @@ bool exptree_ordering::should_swap(exptree::iterator obj, int subtree_comparison
 		return false;
 		}
 	else {
-		std::cerr << num1 << " " << num2 << std::endl;
+//		std::cerr << num1 << " " << num2 << std::endl;
 		if(so1==so2) {
 			if(num1>num2) return true;
 			return false;
@@ -1667,8 +1667,8 @@ int exptree_ordering::can_swap_prod_obj(exptree::iterator prod, exptree::iterato
 			                           // in the sign. This is because the routines that use
                                     // can_swap_prod_obj all test for such index-index 
                                     // swaps separately.
-//			std::cout << "  " << *sib->name << " " << *obj->name << std::endl;
 			int es=subtree_compare(sib, obj, 0);
+//			std::cout << "  " << *sib->name << " " << *obj->name << " " << es << std::endl;
 			sign*=can_swap(sib, obj, es, ignore_implicit_indices);
 			if(sign==0) break;
 			}
@@ -1756,7 +1756,7 @@ int exptree_ordering::can_swap_ilist_ilist(exptree::iterator obj1, exptree::iter
 		while(it2!=exptree::end_index(obj2)) {
 			// Only deal with real indices here, i.e. those carrying an Indices property.
 			const Indices *ind1=properties::get_composite<Indices>(it1, true);
-			const Indices *ind2=properties::get_composite<Indices>(it1, true);
+			const Indices *ind2=properties::get_composite<Indices>(it2, true);
 			if(ind1!=0 && ind2!=0) {
 				const CommutingBehaviour *com1 =properties::get_composite<CommutingBehaviour>(it1, true);
 				const CommutingBehaviour *com2 =properties::get_composite<CommutingBehaviour>(it2, true);
@@ -1827,8 +1827,8 @@ int exptree_ordering::can_swap(exptree::iterator one, exptree::iterator two, int
 		}
 
 	// Do we need to use Self* properties?
-	const SelfCommutingBehaviour *sc1 =properties::get_composite<SelfCommutingBehaviour>(one);
-	const SelfCommutingBehaviour *sc2 =properties::get_composite<SelfCommutingBehaviour>(two);
+	const SelfCommutingBehaviour *sc1 =properties::get_composite<SelfCommutingBehaviour>(one, true);
+	const SelfCommutingBehaviour *sc2 =properties::get_composite<SelfCommutingBehaviour>(two, true);
 	if( (sc1!=0 && sc1==sc2) ) 
 		return sc1->sign();
 
@@ -1869,9 +1869,14 @@ bool exptree_comparator::satisfies_conditions(exptree::iterator conditions, std:
 			exptree::sibling_iterator lhs=cond.begin();
 			exptree::sibling_iterator rhs=lhs;
 			++rhs;
-			// If we have a match, all indices have replacement rules.
+			// Lookup the replacement rules for the two given objects, and return true if 
+			// those rules give a different result. But first check that there are rules
+			// to start with.
+//			std::cerr << *lhs->name  << " !=? " << *rhs->name << std::endl;
+			if(replacement_map.find(exptree(lhs))==replacement_map.end() ||
+				replacement_map.find(exptree(rhs))==replacement_map.end()) return true;
+//			std::cerr << *lhs->name  << " !=?? " << *rhs->name << std::endl;
 			if(tree_exact_equal(replacement_map[exptree(lhs)], replacement_map[exptree(rhs)])) {
-//				txtout << *lhs->name  << " = " << *rhs->name << std::endl;
 				return false;
 				}
 			}
