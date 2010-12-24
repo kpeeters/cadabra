@@ -434,6 +434,7 @@ bool vary::can_apply(iterator it)
 	{
 	if(*it->name=="\\prod") return true;
 	if(*it->name=="\\sum") return true;
+	if(*it->name=="\\pow") return true;
 	if(is_single_term(it)) return true;
 	if(is_nonprod_factor_in_prod(it)) return true;
 	const Derivative *der = properties::get<Derivative>(it);
@@ -532,7 +533,7 @@ algorithm::result_t vary::apply(iterator& it)
 		expression_modified=true;
 		return l_applied;
 		}
-	
+
 	der = properties::get<Derivative>(tr.parent(it));
 	acc = properties::get<Accent>(tr.parent(it));
 
