@@ -669,7 +669,7 @@ prodrule::prodrule(exptree& tr, iterator it)
 bool prodrule::can_apply(iterator it)
 	{
 	const Derivative *der=properties::get<Derivative>(it);
-	if(der) {
+	if(der || *it->name=="\\cdb_Derivative") {
 		prodnode=tr.end();
 		number_of_indices=0;
 		if(tr.number_of_children(it)>0) {

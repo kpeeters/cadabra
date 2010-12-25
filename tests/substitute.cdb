@@ -823,3 +823,14 @@ obj75d:= \partial_{m1}{\phi} \partial_{n}{h^{m1 p}} h_{m p};
 tst75d:= - \partial_{m1}{\phi} * \partial_{n}{h_{m p}} * h^{m1 p} - @(obj75d);
 @collect_terms!(%);
 @assert(tst75d);
+
+# Test 76: Vary on powers.
+#
+@reset.
+obj76:= A**3;
+@vary(%)( A -> \delta{A} );
+tst76:= 3 A**2 \delta{A} - @(obj76);
+@collect_terms(tst76);
+@assert(tst76);
+
+

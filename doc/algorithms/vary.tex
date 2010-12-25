@@ -11,11 +11,18 @@ A B + A C;
 \epsilon D B + A \epsilon C + \epsilon D C 
                    + A (\epsilon A - \epsilon B);
 \end{screen}
+It also works when acting on powers, in which case it will use the
+product rule to expand them.
+\begin{screen}{1,2}
+A**3;
+@vary(%)( A -> \delta{A} );
+3 A**{2} \delta{A};
+\end{screen}
 This algorithm is thus mostly intended for variational derivatives
 (subsequent partial integrations can be done
-using \subscommand{pintegrate}).
+using \subscommand{pintegrate}). 
 
-Note: In the example above, the command is applied only at the top
+Note: In the examples above, the command is applied only at the top
 level (there is no exclamation mark used in the call
 of \subscommand{vary}). To understand why this is important, compare
 the following two examples. The first one works as expected,

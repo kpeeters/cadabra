@@ -534,6 +534,31 @@ algorithm::result_t vary::apply(iterator& it)
 		return l_applied;
 		}
 
+	if(*it->name=="\\pow") { 
+		// Wrap the power in a \cdb_Derivative and then call @prodrule.
+		it=tr.wrap(it, str_node("\\cdb_Derivative"));
+		prodrule pr(tr, it);
+		pr.can_apply(it);
+		pr.apply(it);
+		// Find the '\cdb_Derivative node again'.
+		sibling_iterator sib=tr.begin(it);
+		while(sib!=tr.end()) {
+			if(*sib->name=="\\cdb_Derivative") {
+				tr.flatten(sib);
+				sib=tr.erase(sib);
+				vary vry(tr, this_command);
+				iterator app=sib;
+				if(vry.can_apply(app)) {
+					vry.apply(app);
+					expression_modified=true;
+					}
+				break;
+				}
+			++sib;
+			}
+//		tr.print_recursive_treeform(txtout, it);
+		}
+	
 	der = properties::get<Derivative>(tr.parent(it));
 	acc = properties::get<Accent>(tr.parent(it));
 
