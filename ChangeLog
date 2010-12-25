@@ -1,3 +1,7 @@
+2010-12-25  Kasper Peeters  <kasper.peeters@aei.mpg.de>
+
+	* Made @vary work on powers.
+
 2010-12-23  Kasper Peeters  <kasper.peeters@aei.mpg.de>
 
 	* Final fixes for pattern matching with super/sub indices done
