@@ -102,6 +102,7 @@ std::ostream& exptree::print_recursive_treeform(std::ostream& str, exptree::iter
 		}
 //	str << "  (" << calc_hash(it) << ")";
 //	str << "  (" << depth(it) << ")";
+	str << "  (" << &(*it) << ")";
 	if(!compact_tree) str << std::endl;
 
 	while(beg!=fin) {
@@ -902,9 +903,18 @@ bool str_node::is_object_wildcard() const
 
 bool str_node::is_range_wildcard() const
 	{
-	size_t pos=name->find('#');
-	if(pos!=std::string::npos)
-		return true;
+	if(name->size()>0) {
+		if((*name)[0]=='#')
+			return true;
+		}
+	return false;
+	}
+
+bool str_node::is_autodeclare_wildcard() const
+	{
+	if(name->size()>0)
+		if((*name)[name->size()-1]=='#')
+			return true;
 	return false;
 	}
 
@@ -945,7 +955,7 @@ nset_t::iterator str_node::name_only()
 		std::string tmp=(*name).substr(0, name->size()-2);
 		return name_set.insert(tmp).first;
 		}
-	else if(is_range_wildcard()) {
+	else if(is_autodeclare_wildcard()) {
 		size_t pos=name->find('#');
 		std::string tmp=(*name).substr(0, pos);
 		return name_set.insert(tmp).first;
@@ -1040,7 +1050,11 @@ void half(rset_t::iterator& num)
 int subtree_compare(exptree::iterator one, exptree::iterator two, 
 						  int mod_prel, bool checksets, int compare_multiplier, bool literal_wildcards) 
 	{
-	// Compare multiplier
+	// The logic is to compare successive aspects of the two objects, returning a
+	// no-match code if a difference is found at a particular level, or continuing
+	// further down the line if there still is a match.
+	
+	// Compare multipliers.
 	if(one->is_index()==false && two->is_index()==false) {
 		 if(compare_multiplier==-2 && !two->is_name_wildcard() && !one->is_name_wildcard())
 			if(one->multiplier != two->multiplier) {
@@ -1051,28 +1065,33 @@ int subtree_compare(exptree::iterator one, exptree::iterator two,
 
 	// First lookup some information about the index sets, if any.
 	// (note: to avoid having properties::get enter here recursively, we
-	// perform this check only when both objects are sub/superscripts).
+	// perform this check only when both objects are sub/superscripts, i.e. is_index()==true).
+	// If one and two are sub/superscript, and sit in the same Indices, we keep mult=1, all
+	// other cases get mult=2. 
+
 	int  mult=1;
 	if(one->is_index() && two->is_index() && one->is_rational() && two->is_rational()) mult=2;
-
 	Indices::position_t position_type=Indices::free;
-	if(one->is_index() && two->is_index() && checksets) {
-		// Strip off the parent_rel because Indices properties are declared without
-		// those.
-		const Indices *ind1=properties::get<Indices>(one, true);
-		const Indices *ind2=properties::get<Indices>(two, true);
-		if(ind1!=ind2) { 
-			// It may still be that one set is a subset of the other, i.e that the
-			// parent argument of Indices has been used.
-			mult=2;
-// FIXME: this is required for implicit symmetry patterns on split_index objects
-//			if(ind1!=0 && ind2!=0) 
-//				if(ind1->parent_name==ind2->set_name || ind2->parent_name==ind1->set_name)
-//					mult=1;
+	if(one->is_index() && two->is_index()) {
+		if(checksets) {
+			// Strip off the parent_rel because Indices properties are declared without
+			// those.
+			const Indices *ind1=properties::get<Indices>(one, true);
+			const Indices *ind2=properties::get<Indices>(two, true);
+			if(ind1!=ind2) { 
+				// It may still be that one set is a subset of the other, i.e that the
+				// parent argument of Indices has been used.
+				mult=2;
+				// FIXME: this is required for implicit symmetry patterns on split_index objects
+				//			if(ind1!=0 && ind2!=0) 
+				//				if(ind1->parent_name==ind2->set_name || ind2->parent_name==ind1->set_name)
+				//					mult=1;
+				}
+			if(ind1!=0 && ind1==ind2) 
+				position_type=ind1->position_type;
 			}
-		if(ind1!=0 && ind1==ind2) 
-			position_type=ind1->position_type;
 		}
+	else mult=2;
 	
 	// Compare sub/superscript relations.
 	if((mod_prel==-2 && position_type!=Indices::free) && one->is_index() && two->is_index() ) {
@@ -1082,92 +1101,47 @@ int subtree_compare(exptree::iterator one, exptree::iterator two,
 			}
 		}
 
-	// Once we hit an index, the comparison at a lower level goes differently. 
-	if(one->is_index() && two->is_index()) {
-//		 std::cerr << "is index" << std::endl;
-		if(literal_wildcards==false && (one->is_object_wildcard() || two->is_object_wildcard())) return 0;
-		bool wildcard=(one->is_name_wildcard() || two->is_name_wildcard()) && (literal_wildcards==false);
-
-		if(one->name == two->name || wildcard ) {
-			int numch1=exptree::number_of_children(one);
-			int numch2=exptree::number_of_children(two);
-			if(numch1==numch2) {
-				if(numch1==0) {
-					if(wildcard) return 0;
-					if(*one->multiplier < *two->multiplier)     return mult;
-					else if(*one->multiplier > *two->multiplier) return -mult;
-					else return 0;
-					}
-				
-				// FIXME: this only compares the first child
-//				txtout << "subtree compare " << *(one.begin()->name) << " " << *(two.begin()->name) << std::endl;
-				int ret=subtree_compare(one.begin(), two.begin(), -2, false, true, true);
-//				txtout << "ret= " << ret << std::endl;
-				if(ret>0)      return mult;
-				else if(ret<0) return -mult;
-				else {
-					if(*one->multiplier < *two->multiplier)     return 2;
-					else if(*one->multiplier > *two->multiplier) return -2;
-					else return 0;
-					}
-				}
-			else {
-				// One is an index, but the number of children on one and two does not match,
-				// so the structure is different.
-				if(numch1 < numch2) return 2; //mult;
-				else                return -2; //mult;
-				}
-			}
-		// If the names are not equal but they come from the same index set,
-		// return either 1 or -1.
-		// If the names come from different index sets, return 2 or -2.
-		else if(*one->name < *two->name) return mult;
-		else                            return -mult;
-		}
-	else {
-		// Compare node names.
-		if(one->name!=two->name) { 
-			if(literal_wildcards) {
-				if(*one->name < *two->name) return 2;
-				else return -2;
-				}
-			else {
-				if(one->is_object_wildcard()==false && two->is_object_wildcard()==false) {
-					if(one->is_name_wildcard()==false && two->is_name_wildcard()==false) {
-						if(*one->name < *two->name) return 2;
-						else return -2;
-						}
-					}
-				}
-			}
-		else if(mod_prel==-2 && one->fl.parent_rel!=two->fl.parent_rel) {
-			if(one->fl.parent_rel < two->fl.parent_rel) return 2;
-			else return -2;
-			}
-		}
- 	
-	// Handle object wildcards
-	if(!literal_wildcards) 
+	// Handle object wildcards and comparison
+	if(!literal_wildcards) {
 		if(one->is_object_wildcard() || two->is_object_wildcard())
 			return 0;
+		}
 
-	// Compare number of children.
-//	std::cout << *one->name << " " << *two->name << std::endl;
-//	iterator range_wildcard;
+	// Handle mismatching node names.
+	if(one->name!=two->name) {
+		if(literal_wildcards) {
+			if(*one->name < *two->name) return mult;
+			else return -mult;
+			}
+
+		if( (one->is_autodeclare_wildcard() && two->is_numbered_symbol()) || (two->is_autodeclare_wildcard() && one->is_numbered_symbol()) ) {
+			if( one->name_only() != two->name_only() ) {
+				if(*one->name < *two->name) return mult;
+				else return -mult;
+				}
+			}
+		else if( one->is_name_wildcard()==false && two->is_name_wildcard()==false ) {
+			if(*one->name < *two->name) return mult;
+			else return -mult;
+			}
+		}
+
+	// Now turn to the child nodes. Before comparing them directly, first compare
+	// the number of children, taking into account range wildcards.
 	int numch1=exptree::number_of_children(one);
 	int numch2=exptree::number_of_children(two);
 
-	if(numch1>0 && one.begin()->is_range_wildcard()) {
+//	if(numch1>0 && one.begin()->is_range_wildcard()) {
 		// FIXME: insert the code from props.cc here, ditto in the next if.
-		return 0;
-		}
-	if(numch2>0 && two.begin()->is_range_wildcard()) return 0;
+//		return 0;
+//		}
+
+//	if(numch2>0 && two.begin()->is_range_wildcard()) return 0;
 
 	if(numch1!=numch2) {
 		if(numch1<numch2) return 2;
 		else return -2;
 		}
-//	txtout << numch1 << " == " << numch2 << std::endl;
 
 	// Compare actual children.
 	exptree::sibling_iterator sib1=one.begin(), sib2=two.begin();

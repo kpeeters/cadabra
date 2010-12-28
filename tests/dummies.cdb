@@ -77,3 +77,4 @@ obj5c:= @(obj5b) * @(obj5b);
 tst5:= A_{n1 n2} * B_{n2 n3} * A_{n1 n4} * B_{n4 n3} * A_{n5 n6} * B_{n6 n7} * A_{n5 n8} * B_{n8 n7} - @(obj5c);
 @collect_terms!(%);
 @assert(tst5);
+

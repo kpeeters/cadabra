@@ -320,7 +320,7 @@ void properties::insert_prop(const exptree& et, const property *pr)
 	pattern *pat=new pattern(et);
 
 	std::pair<property_map_t::iterator, property_map_t::iterator> pit=
-		props.equal_range(pat->obj.begin()->name);
+		props.equal_range(pat->obj.begin()->name_only());
 
 	property_map_t::iterator first_nonpattern=pit.first;
 
@@ -350,7 +350,7 @@ void properties::insert_prop(const exptree& et, const property *pr)
 		}
 
 	pats.insert(pattern_map_t::value_type(pr, pat));
-	properties::props.insert(property_map_t::value_type(pat->obj.begin()->name, pat_prop_pair_t(pat,pr)));
+	properties::props.insert(property_map_t::value_type(pat->obj.begin()->name_only(), pat_prop_pair_t(pat,pr)));
 	}
 
 void properties::insert_list_prop(const std::vector<exptree>& its, const list_property *pr)
@@ -441,7 +441,7 @@ void properties::insert_list_prop(const std::vector<exptree>& its, const list_pr
 		// Now register the property.
 //		txtout << "registering " << *(pat->headnode) << std::endl;
 		pats.insert(pattern_map_t::value_type(pr, pat));
-		properties::props.insert(property_map_t::value_type(pat->obj.begin()->name, pat_prop_pair_t(pat,pr)));
+		properties::props.insert(property_map_t::value_type(pat->obj.begin()->name_only(), pat_prop_pair_t(pat,pr)));
 		}
 	}
 

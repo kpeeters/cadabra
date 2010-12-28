@@ -2115,6 +2115,8 @@ algorithm::result_t factor_out::apply(iterator& it)
 		 it=tr.erase(it);
 		 }
 	
+//	tr.print_recursive_treeform(txtout, tr.begin());
+
 	if(expression_modified) return l_applied;
 	else                    return l_no_action;
 	}

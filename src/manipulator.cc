@@ -586,7 +586,10 @@ void manipulator::handle_input()
 					 // We need to walk back up to the top of the subtree for this 
 					 // expression.
 					 pit = expressions.named_parent(pit, "\\expression");
+//					 txtout << "DONE NOW?" << std::endl;
 //					 exptree::print_recursive_treeform(txtout, pit);
+					 // At this stage, expressions can still have \prod{A}{3} in them, they are
+					 // cleaned up only later?
 					 pit=apply_post_default_rules_(pit);
 					extract_properties_(pit);
 					last_used_equation_number=expressions.equation_number(pit);

@@ -156,6 +156,9 @@ class properties {
 		// When inserting a property or list_property, ownership of the
 		// property gets transferred to this singleton class.
 		typedef std::pair<pattern *, const property_base *>                     pat_prop_pair_t;
+
+		/// Pattern-property map indexed on the name_only part of the head of the pattern,
+		/// for rapid lookup.
 		typedef std::multimap<nset_t::iterator, pat_prop_pair_t, nset_it_less>  property_map_t;
 		/// FIXME: the above contains an iterator, which we now take to be pointing to an element
 		/// in the obj tree of the pattern of the pat_prop_pair_t. However, that is brittle...
@@ -174,7 +177,6 @@ class properties {
 
 		// Normal search: given a pattern, get its property if any.
 		template<class T> static const T*  get(exptree::iterator, bool ignore_parent_rel=false);
-		template<class T> static const T*  get(nset_t::iterator);
 		template<class T> static const T*  get();
 		template<class T> static const T*  get_composite(exptree::iterator, bool ignore_parent_rel=false);
 		template<class T> static const T*  get_composite(exptree::iterator, int& serialnum, bool doserial=true, bool ignore_parent_rel=false);
@@ -204,6 +206,8 @@ class properties {
 template<class T>
 const T* properties::get(exptree::iterator it, bool ignore_parent_rel)
 	{
+	return get_composite<T>(it, ignore_parent_rel);
+
 	const T* ret=0;
 
 	if(it->is_numbered_symbol() || it->is_range_wildcard()) { 
@@ -218,7 +222,6 @@ const T* properties::get(exptree::iterator it, bool ignore_parent_rel)
 			}
 		}
 
-//	std::pair<property_map_t::iterator, property_map_t::iterator> pit=props.equal_range(it->name);
 	property_map_t::iterator pit=props.lower_bound(it->name);
 	bool wildcards=false;
 	for(;;) {
@@ -238,22 +241,6 @@ const T* properties::get(exptree::iterator it, bool ignore_parent_rel)
 	}
 
 template<class T>
-const T* properties::get(nset_t::iterator it)
-	{
-	const T* ret=0;
-
-	std::pair<property_map_t::iterator, property_map_t::iterator> pit=props.equal_range(it);
-	while(pit.first!=pit.second) {
-		if(exptree::number_of_children((*pit.first).second.first->obj.begin())==0) {
-			ret=dynamic_cast<const T *>((*pit.first).second.second);
-			if(ret) break;
-			}
-		++pit.first;
-		}
-	return ret;
-	}
-
-template<class T>
 const T* properties::get_composite(exptree::iterator it, bool ignore_parent_rel)
 	{
 	int tmp;
@@ -265,8 +252,9 @@ const T* properties::get_composite(exptree::iterator it, int& serialnum, bool do
 	{
 	const T* ret=0;
 	bool inherits=false;
-	std::pair<property_map_t::iterator, property_map_t::iterator> pit=props.equal_range(it->name);
 
+	std::pair<property_map_t::iterator, property_map_t::iterator> pit=props.equal_range(it->name_only());
+	
 	// First look for properties of the node itself. Go through the loop twice:
 	// once looking for patterns which do not have wildcards, and then looking
 	// for wildcard patterns.
@@ -317,7 +305,6 @@ const T* properties::get_composite(exptree::iterator it, int& serialnum, bool do
 
 	// If no property was found, figure out whether a property is inherited from a child node.
 	if(!ret && inherits) {
-//		std::cerr << "searching inheritance tree?" << std::endl;
 		exptree::sibling_iterator sib=it.begin();
 		while(sib!=it.end()) {
 			const T* tmp=get_composite<T>((exptree::iterator)(sib), serialnum, doserial);
@@ -328,7 +315,7 @@ const T* properties::get_composite(exptree::iterator it, int& serialnum, bool do
 			++sib;
 			}
 		}
-//	else std::cerr << typeid(*ret).name() << std::endl;
+
 	return ret;
 	}
 
@@ -507,6 +494,10 @@ class Symbol : public property {
 	public:
 		virtual std::string name() const;
 };
+
+//class SymbolBase : public property {
+//
+//};
 
 class Coordinate : public property {
 	public:

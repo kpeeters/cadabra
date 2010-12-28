@@ -102,6 +102,7 @@ substitute::substitute(exptree& tr, iterator it)
 			}
 		catch(std::exception& er) {
 			txtout << "substitute: index error in replacement rule " << i+1 << "." << std::endl;
+			txtout << er.what() << std::endl;
 			throw constructor_error();
 			}
 		}
@@ -158,7 +159,6 @@ bool substitute::can_apply(iterator st)
 
 algorithm::result_t substitute::apply(iterator& st)
 	{
-//	txtout << "hi " << *st->name << std::endl;
 //	prod_wrap_single_term(st);
 
    sibling_iterator arrow=tr.arg(args_begin(), use_rule);
@@ -372,14 +372,17 @@ algorithm::result_t substitute::apply(iterator& st)
 	// Cleanup nests on all insertion points and on the top node.
 	for(unsigned int i=0; i<subtree_insertion_points.size(); ++i) {
 		iterator ip=subtree_insertion_points[i];
+//		txtout << "another insertion point" << std::endl;
 		cleanup_nests(tr, ip);
 		}
 
+//	tr.print_recursive_treeform(txtout, tr.begin());
 	
 //	prod_unwrap_single_term(st);
 
 	cleanup_nests(tr, st);
 
+//	tr.print_recursive_treeform(txtout, tr.begin());
 //	prodcollectnum pc(tr, tr.end());
 //	pc.apply(st);
 	tmr.stop();

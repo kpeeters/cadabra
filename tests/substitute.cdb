@@ -777,13 +777,16 @@ tst73c:= Q*(A*C*A+D*E)*E*A + A*(Q*C*A + A*C*Q)*E*A + A*(A*C*A+D*E)*E*Q - @(obj73
 @collect_terms!(%);
 @assert(tst73c);
 
-# Test 74: matching Indices should not match identically non-Indices objects.
+# Test 74: matching Indices should also match objects on the right-hand side
+#          which are not indices (this really makes most sense, the alternative
+#          breaks many other applications, and if this non-match is required it is
+#          always possible to rename indices in the rule).
 #
 @reset.
 {A,B,C,D}::Indices.
 obj74:= X_{C D}:
 @substitute!(%)( X_{A B} -> A g_{A B} f(A) );
-tst74:= A g_{C D} f(A) - @(obj74);
+tst74:= C g_{C D} f(C) - @(obj74);
 @collect_terms!(%);
 @assert(tst74);
 
@@ -791,7 +794,7 @@ tst74:= A g_{C D} f(A) - @(obj74);
 # Test 75: long-standing pattern matching bug showing only in kk.cdb.
 #
 @reset.
-{m,n,p,q,r,s,t,u,v,w,x,y,z,m#}::Indices(subspace, position=independent).
+{m,p,q,r,m#}::Indices(subspace, position=independent).
 obj75a:= h^{m1 p} * h_{m r} * h^{q r};
 @substitute!(%)( h_{m1 m2} h^{m3 m2} -> \delta_{m1}^{m3} );
 tst75a:= h^{m1 p} \delta_{m}^{q} - @(obj75a);
@@ -833,4 +836,29 @@ tst76:= 3 A**2 \delta{A} - @(obj76);
 @collect_terms(tst76);
 @assert(tst76);
 
+# Test 77: Segfault on funny replacement
+#
+@reset.
+obj77:= A * h^{c}_{c} + B;
+@substitute!(%)(h^{c}_{c} -> 3);
+tst77:= 3 A + B - @(obj77);
+@collect_terms!(%);
+@assert(tst77);
 
+obj77a:= A * C + B;
+@substitute!(%)(C -> 1);
+
+# - need to separate indices with minus signs using explicit new index object, as below.
+# - cannot match with index dummies, need wildcards
+# - still error?
+
+@reset.
+{m,n,k,p}::Symbol.
+rule:= \commutator{L_{m}}{L_{n}} -> (m - n) L_{m+n} + \delta_{m}_{-n} (D-2)/12 (m**3-m);
+obj78:= \commutator{L_{k}}{L_{p}};
+@substitute!(%)( @(rule) );
+
+virasoro:= { \commutator{L_k}{L_p} -> (m-n) L_{m+n} };
+I get
+\commutator{L_m}{L_n}:
+@substitute!( %)( @(virasoro) );

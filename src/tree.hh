@@ -390,6 +390,10 @@ class tree {
 		static sibling_iterator child(const iterator_base& position, unsigned int);
 		/// Return iterator to the sibling indicated by index
 		sibling_iterator sibling(const iterator_base& position, unsigned int);  				
+
+		/// For debugging only: verify internal consistency by inspecting all pointers in the tree
+		/// (which will also trigger a valgrind error in case something got corrupted).
+		void debug_verify_consistency() const;
 		
 		/// Comparator class for iterators (compares pointer values; why doesn't this work automatically?)
 		class iterator_base_less {
@@ -1898,6 +1902,24 @@ typename tree<T, tree_node_allocator>::sibling_iterator tree<T, tree_node_alloca
    return tmp;
    }
  
+template <class T, class tree_node_allocator>
+void tree<T, tree_node_allocator>::debug_verify_consistency() const
+	{
+	iterator it=begin();
+	while(it!=end()) {
+		if(it.node->parent!=0) {
+			if(it.node->prev_sibling==0) 
+				assert(it.node->parent->first_child==it.node);
+			else 
+				assert(it.node->prev_sibling->next_sibling==it.node);
+			if(it.node->next_sibling==0) 
+				assert(it.node->parent->last_child==it.node);
+			else
+				assert(it.node->next_sibling->prev_sibling==it.node);
+			}
+		++it;
+		}
+	}
 
 template <class T, class tree_node_allocator>
 typename tree<T, tree_node_allocator>::sibling_iterator tree<T, tree_node_allocator>::child(const iterator_base& it, unsigned int num) 

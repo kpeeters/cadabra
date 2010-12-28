@@ -199,7 +199,8 @@ class algorithm : public active_node {
 		// multiplier up the tree when the node is a \sum node, or push it into the
 		// \prod node if that is the parent. Do this recursively
 		// in case a child is a sum as well. Note that 'pushup' is actually 'pushdown'
-      // in the case of sums.
+      // in the case of sums. 
+		// This never changes the tree structure, only the distribution of multipliers.
 		void     pushup_multiplier(iterator);
 
 		// Turn a node into a '1' or '0' node.

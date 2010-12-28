@@ -26,9 +26,9 @@ tst4:= a ( b + c e + d - 1 ) - @(obj4);
 @collect_terms!(%);
 @assert(tst4);
 
-@reset.
-obj4b:= c - a;
-@factor_out!(%){a};
+#@reset.
+#obj4b:= c - a;
+#@factor_out!(%){a};
 # FIXME: leads to \prod{a}{-1}.
 
 @reset.
