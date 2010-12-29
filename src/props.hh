@@ -176,7 +176,7 @@ class properties {
 		static pattern_map_t   pats;   // for list properties, objects are stored here in order
 
 		// Normal search: given a pattern, get its property if any.
-		template<class T> static const T*  get(exptree::iterator, bool ignore_parent_rel=false);
+		template<class T> static const T*  get(exptree::iterator, bool ignore_parent_rel=false); // Shorthand for get_composite
 		template<class T> static const T*  get();
 		template<class T> static const T*  get_composite(exptree::iterator, bool ignore_parent_rel=false);
 		template<class T> static const T*  get_composite(exptree::iterator, int& serialnum, bool doserial=true, bool ignore_parent_rel=false);
@@ -211,37 +211,6 @@ template<class T>
 const T* properties::get(exptree::iterator it, bool ignore_parent_rel)
 	{
 	return get_composite<T>(it, ignore_parent_rel);
-
-	const T* ret=0;
-
-	if(it->is_numbered_symbol() || it->is_range_wildcard()) { 
-		// See if we have a property for the 'base'+'#'.
-		// FIXME: only for objects without children right now.
-		nset_t::iterator nit=name_set.insert( *(it->name_only())+"#" ).first;
-		std::pair<property_map_t::iterator, property_map_t::iterator> pit=props.equal_range(nit);
-		while(pit.first!=pit.second) {
-			ret=dynamic_cast<const T*>((*pit.first).second.second);
-			if(ret) return ret;
-			++pit.first;
-			}
-		}
-
-	property_map_t::iterator pit=props.lower_bound(it->name);
-	bool wildcards=false;
-	for(;;) {
-		property_map_t::iterator walk=pit;
-		while(walk!=props.end() && walk->first==it->name) {
-			if(wildcards==walk->second.first->children_wildcard()) {
-				ret=dynamic_cast<const T *>(walk->second.second);
-				if(ret && walk->second.first->match(it, ignore_parent_rel))  // match found
-					return ret;
-				}
-			++walk;
-			}
-		if(!wildcards) wildcards=true;
-		else break;
-		}
-	return 0;
 	}
 
 template<class T>
