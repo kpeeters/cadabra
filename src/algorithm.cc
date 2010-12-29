@@ -462,7 +462,7 @@ bool algorithm::apply_recursive(exptree::iterator& st, bool check_cons, int act_
 				result_t res=apply(start);
 //				debugout << "after apply: " << *(start->multiplier) << std::endl;
 //				exptree::print_recursive_treeform(debugout, start);
-//				exptree::print_recursive_treeform(debugout, tr.begin());
+//				exptree::print_recursive_treeform(txtout, tr.begin());
 				wit=start; // this copying back and forth is needed because wit has different type
 				switch(res) {
 					case l_no_action:
@@ -492,11 +492,11 @@ bool algorithm::apply_recursive(exptree::iterator& st, bool check_cons, int act_
 								}
 							else if(act_at_level!=-1) wit=nextone; // do not follow post_order sequence
 							}
-						else if(wit!=tr.end() && wit->is_identity()) {
+						else if(wit!=tr.end() && wit->is_rational()) { // handle multipliers in products and identity powers
 							bool tryprod=false;
 							bool ispow=true;
 							sibling_iterator tmpact=wit;
-							if( *tr.parent(tmpact)->name=="\\pow" ) {
+							if( *tr.parent(tmpact)->name=="\\pow" && wit->is_identity() ) {
 								iterator par=tr.parent(tmpact);
 								if( tmpact==tr.begin(par) ) { // 1**x = 1
 									node_one(par);
@@ -514,6 +514,7 @@ bool algorithm::apply_recursive(exptree::iterator& st, bool check_cons, int act_
 							
 							if( (!ispow || tryprod) && *tr.parent(tmpact)->name=="\\prod") {
 								iterator tmp=tr.parent(tmpact);
+								multiply(tmp->multiplier, *tmpact->multiplier);
 								tr.erase(tmpact); // may leave us with 0 or 1 children
 								cleanup_anomalous_products(tr,tmp);
 								if(tryprod) wit=tmp;
@@ -528,6 +529,7 @@ bool algorithm::apply_recursive(exptree::iterator& st, bool check_cons, int act_
 							if(wit!=tr.end()) {
 //								txtout << "THEN HERE" << std::endl;
 								pushup_multiplier(wit); // Ensure a valid tree wrt. multipliers.
+//								txtout << "THEN HERE DONE" << std::endl;
 								}
 							wit=nextone;
 							}
@@ -568,6 +570,9 @@ bool algorithm::apply_recursive(exptree::iterator& st, bool check_cons, int act_
 			check_consistency(tr.named_parent(cit,"\\expression"));
 	//	txtout << "algorithm " << (this_command==tr.end()?"?":*this_command->name) << " worked " << worked 
 	//			 << " failed " << failed << std::endl;
+
+//	tr.debug_verify_consistency();
+//	exptree::print_recursive_treeform(txtout, tr.begin());
 
 	return atleastoneglobal;
 	}
@@ -708,7 +713,8 @@ void algorithm::pushup_multiplier(iterator it)
 			if(tr.is_valid(tr.parent(it))) {
 //				txtout << "test propinherit" << std::endl;
 				iterator tmp=tr.parent(it);
-				// tmp not always valid?!?
+				// tmp not always valid?!? This one crashes hard with a loop!?!
+//				txtout << " of " << *tmp->name << std::endl;
 				const PropertyInherit *pin=properties::get<PropertyInherit>(tr.parent(it));
 				if(pin || *(tr.parent(it)->name)=="\\prod") {
 					multiply(tr.parent(it)->multiplier, *it->multiplier);
@@ -1085,7 +1091,7 @@ exptree algorithm::get_dummy(const list_property *dums,
 	while(pr.first!=pr.second) {
 //		txtout << "trying " << std::endl;
 //		tr.print_recursive_treeform(txtout, (*pr.first).second->obj.begin());
-		if(pr.first->second->obj.begin()->is_range_wildcard()) {
+		if(pr.first->second->obj.begin()->is_autodeclare_wildcard()) {
 			std::string base=*pr.first->second->obj.begin()->name_only();
 			int used=max_numbered_name(base, one, two, three, four, five);
 			std::ostringstream str;
@@ -1411,8 +1417,8 @@ void algorithm::classify_indices(iterator it, index_map_t& ind_free, index_map_t
 				if(!is_first_term) {
 					index_map_t::iterator fri=first_free.begin();
 					while(fri!=first_free.end()) {
-						const Coordinate *cdn=properties::get<Coordinate>(fri->second, true);
-						const Symbol     *smb=properties::get<Symbol>(fri->second, true);
+						const Coordinate *cdn=properties::get_composite<Coordinate>(fri->second, true);
+						const Symbol     *smb=properties::get_composite<Symbol>(fri->second, true);
                   // integer, coordinate or symbol indices always ok
 						if(fri->second->is_integer()==false && !cdn && !smb) { 
 							if(term_free.count((*fri).first)==0) {
@@ -1431,8 +1437,8 @@ void algorithm::classify_indices(iterator it, index_map_t& ind_free, index_map_t
 						}
 					fri=term_free.begin();
 					while(fri!=term_free.end()) {
-						const Coordinate *cdn=properties::get<Coordinate>(fri->second, true);
-						const Symbol     *smb=properties::get<Symbol>(fri->second, true);
+						const Coordinate *cdn=properties::get_composite<Coordinate>(fri->second, true);
+						const Symbol     *smb=properties::get_composite<Symbol>(fri->second, true);
                   // integer, coordinate or symbol indices always ok
 						if(fri->second->is_integer()==false && !cdn && !smb) { 
 							if(first_free.count((*fri).first)==0) {

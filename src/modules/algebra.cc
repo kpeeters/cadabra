@@ -284,14 +284,7 @@ unsigned int KroneckerDelta::size(exptree&, exptree::iterator) const
 
 unsigned int Derivative::size(exptree& tr, exptree::iterator it) const
 	{
-	// Descend until we actually find the object with the Derivative property.
-	const Derivative *pd;
-	for(;;) {
-		pd=properties::get<Derivative>(it);
-		if(!pd)
-			it=tr.begin(it);
-		else break;
-		} 
+	it=properties::head<Derivative>(it);
 
 	int ret=0;
 	exptree::sibling_iterator sib=tr.begin(it);
@@ -487,13 +480,7 @@ TableauBase::tab_t KroneckerDelta::get_tab(exptree& tr, exptree::iterator it, un
 
 TableauBase::tab_t PartialDerivative::get_tab(exptree& tr, exptree::iterator it, unsigned int num) const
 	{
-	const PartialDerivative *pd;
-	for(;;) {
-		pd=properties::get<PartialDerivative>(it);
-		if(!pd)
-			it=tr.begin(it);
-		else break;
-		} 
+	it=properties::head<PartialDerivative>(it);
 
 	bool indices_first=tr.begin(it)->is_index();
 	exptree::sibling_iterator argnode=tr.begin(it);
@@ -525,16 +512,7 @@ TableauBase::tab_t PartialDerivative::get_tab(exptree& tr, exptree::iterator it,
 
 TableauBase::tab_t Derivative::get_tab(exptree& tr, exptree::iterator it, unsigned int num) const
 	{
-	// Find the actual object which has the PartialDerivative property, i.e.
-	// move inside of possible wrapping inheriting objects.
-	// FIXME: should be a general routine
-	const Derivative *pd;
-	for(;;) {
-		pd=properties::get<Derivative>(it);
-		if(!pd)
-			it=tr.begin(it);
-		else break;
-		} 
+	it=properties::head<Derivative>(it);
 
 	bool indices_first=tr.begin(it)->is_index();
 	exptree::sibling_iterator argnode=tr.begin(it);
@@ -2115,6 +2093,8 @@ algorithm::result_t factor_out::apply(iterator& it)
 		 it=tr.erase(it);
 		 }
 	
+//	tr.print_recursive_treeform(txtout, tr.begin());
+
 	if(expression_modified) return l_applied;
 	else                    return l_no_action;
 	}
@@ -2908,7 +2888,7 @@ bool canonicalise::remove_vanishing_numericals(iterator& it)
 			if(indit->is_rational()) {
 				indit2=indit; ++indit2;
 				while(indit2!=tr.end_index(facit)) {
-					if(indit2->is_rational()==false)
+					if(indit2->is_rational()==false) 
 						break;
 					if(indit2->multiplier!=indit->multiplier) {
 						zero(it->multiplier);
