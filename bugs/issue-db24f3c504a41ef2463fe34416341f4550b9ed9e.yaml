@@ -1,0 +1,21 @@
+--- !ditz.rubyforge.org,2008-03-06/issue 
+title: PropertyInherit is not universally honoured
+desc: |-
+  Not all algorithms call head<T> properly when they act on arguments
+  of an object with a given property. PartialDerivative::get_tab is an
+  exception, but many others are not correct.
+type: :bugfix
+component: cadabra
+release: 
+reporter: Kasper Peeters <kasper.peeters@aei.mpg.de>
+status: :unstarted
+disposition: 
+creation_time: 2010-12-29 17:34:23.746888 Z
+references: []
+
+id: db24f3c504a41ef2463fe34416341f4550b9ed9e
+log_events: 
+- - 2010-12-29 17:34:24.506756 Z
+  - Kasper Peeters <kasper.peeters@aei.mpg.de>
+  - created
+  - ""

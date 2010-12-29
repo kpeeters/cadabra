@@ -1054,14 +1054,15 @@ int subtree_compare(exptree::iterator one, exptree::iterator two,
 	// no-match code if a difference is found at a particular level, or continuing
 	// further down the line if there still is a match.
 	
-	// Compare multipliers.
-	if(one->is_index()==false && two->is_index()==false) {
-		 if(compare_multiplier==-2 && !two->is_name_wildcard() && !one->is_name_wildcard())
+	// Compare multipliers. Skip this step if one of the objects is a rational and the
+	// other not, as in that case we are matching values to symbols.
+	if( one->is_rational()==two->is_rational() ) {
+		if(compare_multiplier==-2 && !two->is_name_wildcard() && !one->is_name_wildcard())
 			if(one->multiplier != two->multiplier) {
 				if(*one->multiplier < *two->multiplier) return 2;
 				else return -2;
 				}
-		 }
+		}
 
 	// First lookup some information about the index sets, if any.
 	// (note: to avoid having properties::get enter here recursively, we
@@ -1154,7 +1155,7 @@ int subtree_compare(exptree::iterator one, exptree::iterator two,
 	while(sib1!=one.end()) {
 		int ret=subtree_compare(sib1,sib2, mod_prel, checksets, compare_multiplier, literal_wildcards);
 		if(abs(ret)>1)
-			return ret;
+			return ret/abs(ret)*mult;
 		if(ret!=0 && remember_ret==0) 
 			remember_ret=ret;
 		++sib1;

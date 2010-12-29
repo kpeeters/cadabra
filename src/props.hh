@@ -187,6 +187,10 @@ class properties {
 		template<class T> static const T*  get_composite(exptree::iterator, exptree::iterator, bool ignore_parent_rel=false);
 		template<class T> static const T*  get_composite(exptree::iterator, exptree::iterator, int&, int&, bool ignore_parent_rel=false);
 
+		// Get the outermost node which has the given property attached, i.e. go down through
+		// all (if any) nodes which have just inherited the property.
+		template<class T> exptree::iterator static head(exptree::iterator, bool ignore_parent_rel=false);
+
 		// Search through pointers
 		static bool has(const property_base *, exptree::iterator);
 		// Find serial number of a pattern in a given list property
@@ -470,6 +474,22 @@ const T* properties::get()
 		++pit.first;
 		}
 	return ret;
+	}
+
+template<class T>
+exptree::iterator properties::head(exptree::iterator it, bool ignore_parent_rel)
+	{
+	exptree::iterator dn=it;
+	for(;;) {
+		if(get<PropertyInherit>(dn, ignore_parent_rel)) {
+			dn=dn.begin();
+			}
+		else {
+			assert(get<T>(dn));
+			break;
+			}
+		}
+	return dn;
 	}
 
 //template<class PropType>

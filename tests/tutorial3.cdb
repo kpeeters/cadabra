@@ -28,15 +28,23 @@ S:= -(1/4) f_{a b} f_{a b}
 @substitute!(%)( @(susy) ): @prodrule!(%): @distribute!(%): @unwrap!(%);
 @rewrite_diracbar!(%);
 
-@substitute!(%)( \partial_{c}{f_{a b}} -> \ppartial_{c}{f_{a b}} ):
+@substitute!(%)( \partial_{c}{f_{a b}} -> \ppartial_{c}{f_{a b}} );
 @pintegrate!(%){\ppartial}: 
 @rename!(%){"\ppartial"}{"\partial"}:
 @prodrule!(%): @unwrap!(%);
 
-@join!(%){expand}: @distribute!(%): @eliminate_kr!(%):
+@join!(%){expand}; 
+@distribute!(%); 
+@eliminate_kr!(%);
 @substitute!(%)( \partial_{a}{\bar{\lambda}} -> \bar{\partial_{a}{\lambda}} );
 @spinorsort!(%);
 
 tst:= 1/2 \bar{\epsilon} * \gamma_{a b c} * \partial_{a}{\lambda} * f_{b c}
      + @(S);
 @assert(tst);
+
+
+
+#\bar{\partial_{a}{\lambda}} \gamma_{a b c} \epsilon f_{b c} ;
+#@canonicalise!(%);
+
