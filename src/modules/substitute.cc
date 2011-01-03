@@ -248,8 +248,14 @@ algorithm::result_t substitute::apply(iterator& st)
 				it->multiplier=(*loc).second.begin()->multiplier;
 				it->fl=(*loc).second.begin()->fl;
 				}
-			else
-				 it=tr.replace_index(it, (*loc).second.begin());
+			else {
+				// Careful with the multiplier: the object has been matched to the pattern
+				// without taking into account the top-level multiplier. So keep the multiplier
+				// of the thing we are replacing.
+				multiplier_t mt=*it->multiplier;
+				it=tr.replace_index(it, (*loc).second.begin());
+				multiply(it->multiplier, mt);
+				}
 			it->fl.bracket=remember_br;
 			if(rhs_contains_dummies[use_rule])
 				ind_forced.insert(index_map_t::value_type(exptree(it), it));

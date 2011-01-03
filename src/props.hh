@@ -482,6 +482,8 @@ exptree::iterator properties::head(exptree::iterator it, bool ignore_parent_rel)
 class Symbol : public property {
 	public:
 		virtual std::string name() const;
+
+		static const Symbol *get(exptree::iterator, bool ignore_parent_rel=false);
 };
 
 //class SymbolBase : public property {

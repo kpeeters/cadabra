@@ -845,20 +845,21 @@ tst77:= 3 A + B - @(obj77);
 @collect_terms!(%);
 @assert(tst77);
 
-obj77a:= A * C + B;
-@substitute!(%)(C -> 1);
-
-# - need to separate indices with minus signs using explicit new index object, as below.
-# - cannot match with index dummies, need wildcards
-# - still error?
-
+# Test 78: Handling of Symbols in substitution rules.
+#
 @reset.
 {m,n,k,p}::Symbol.
 rule:= \commutator{L_{m}}{L_{n}} -> (m - n) L_{m+n} + \delta_{m}_{-n} (D-2)/12 (m**3-m);
 obj78:= \commutator{L_{k}}{L_{p}};
 @substitute!(%)( @(rule) );
+tst78:= (k-p) L_{k+p} + \delta_{k}_{-p} (D-2)/12 (k**3 - k) - @(obj78);
+@collect_terms!(%);
+@assert(tst78);
 
-virasoro:= { \commutator{L_k}{L_p} -> (m-n) L_{m+n} };
-I get
-\commutator{L_m}{L_n}:
-@substitute!( %)( @(virasoro) );
+@reset.
+{m,n,p,r}::Indices.
+obj79:= L_{r};
+@substitute!(%)( L_{m} -> q - m + R m );
+tst79:= q - r + R r - @(obj79);
+@collect_terms!(%);
+@assert(tst79);

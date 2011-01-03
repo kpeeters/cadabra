@@ -1234,7 +1234,7 @@ bool tree_exact_less_obj::operator()(const exptree& one, const exptree& two) con
 
 bool tree_exact_less_no_wildcards_obj::operator()(const exptree& one, const exptree& two) const
 	{
-	return tree_exact_less(one, two, -2, true, -2, true);
+	return tree_exact_less(one, two, -2, true, 0, true);
 	}
 
 bool tree_exact_less_no_wildcards_mod_prel_obj::operator()(const exptree& one, const exptree& two) const
