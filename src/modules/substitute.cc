@@ -268,6 +268,7 @@ algorithm::result_t substitute::apply(iterator& st)
 			multiplier_t tmpmult=*it->multiplier; // remember target multiplier
 			iterator tmp= tr.insert_subtree(it, (*sloc).second);
 			tmp->fl.bracket=it->fl.bracket;
+			tmp->fl.parent_rel=it->fl.parent_rel; // ok?
 			it=tr.erase(it);
 			multiply(tmp->multiplier, tmpmult);
 			subtree_insertion_points.push_back(tmp);
@@ -378,11 +379,20 @@ algorithm::result_t substitute::apply(iterator& st)
 	// Cleanup nests on all insertion points and on the top node.
 	for(unsigned int i=0; i<subtree_insertion_points.size(); ++i) {
 		iterator ip=subtree_insertion_points[i];
-//		txtout << "another insertion point" << std::endl;
+		if(*ip->name=="\\sum") { // FIXME: is also in algorithm.cc, and should be factored out
+			if(*ip->multiplier!=1) {
+				sibling_iterator sib=tr.begin(ip);
+				while(sib!=tr.end(ip)) {
+					multiply(sib->multiplier, *ip->multiplier);
+					++sib;
+					}
+				::one(ip->multiplier);
+				}
+			}
 		cleanup_nests(tr, ip);
 		}
 
-//	tr.print_recursive_treeform(txtout, tr.begin());
+//	tr.print_recursive_treeform(txtout, st);
 	
 //	prod_unwrap_single_term(st);
 

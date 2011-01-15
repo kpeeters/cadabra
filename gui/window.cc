@@ -1239,7 +1239,10 @@ void XCadabra::on_help_about()
 #endif
 
 	std::vector<std::string> authors;
-	authors.push_back("Kasper Peeters <kasper.peeters@aei.mpg.de>");
+	authors.push_back("Kasper Peeters <kasper.peeters@aei.mpg.de>\n");
+	authors.push_back("with contributions by:");
+	authors.push_back("\tJosé M. Martín-García");
+	authors.push_back("\tJames Allen");
 	md.set_authors(authors);
 
 	md.run();

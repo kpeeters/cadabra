@@ -1932,38 +1932,15 @@ bool exptree_comparator::satisfies_conditions(exptree::iterator conditions, std:
 
 bool exptree_is_equivalent::operator()(const exptree& one, const exptree& two)
 	{
-	exptree_comparator comparator;
-	
-	comparator.lhs_contains_dummies=true;
-	exptree_comparator::match_t ret;
-
-//	std::cerr << "-------" << std::endl;
-//	exptree::print_recursive_treeform(std::cerr, one.begin());
-//	exptree::print_recursive_treeform(std::cerr, two.begin());
-
-	ret=comparator.equal_subtree(one.begin(), two.begin());
-
-//	std::cerr << "==? " << (ret==exptree_comparator::subtree_match) << " " << ret << std::endl;
-
-	if(ret==exptree_comparator::subtree_match) return true;
-	else                                       return false;
+	int ret=subtree_compare(one.begin(), two.begin());
+	if(ret==0) return true;
+	else       return false;
 	}
 
 bool exptree_is_less::operator()(const exptree& one, const exptree& two)
 	{
-	exptree_comparator comparator;
-	
-	comparator.lhs_contains_dummies=true;
-	exptree_comparator::match_t ret;
-
-//	std::cerr << "-------" << std::endl;
-//	exptree::print_recursive_treeform(std::cerr, one.begin());
-//	exptree::print_recursive_treeform(std::cerr, two.begin());
-
-	ret=comparator.equal_subtree(one.begin(), two.begin());
-
-//	std::cerr << "<? " << (ret==exptree_comparator::no_match_less) << " " << ret << std::endl;
-
-	if(ret==exptree_comparator::no_match_less) return true;
-	else                                       return false;
+	int ret=subtree_compare(one.begin(), two.begin());
+	if(ret < 0) return true;
+	else        return false;
 	}
+

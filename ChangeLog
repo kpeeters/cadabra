@@ -1,3 +1,14 @@
+2011-01-15  Kasper Peeters  <kasper.peeters@aei.mpg.de>
+
+	* Released 1.26.
+
+	* Merged in a fix to partially fix @factor_out with tensors
+	(avoids the incorrect mathematical expressions but still requires
+	more work on @rename_dummies to make it generally useful).
+
+	* Merged in the @factor_out patch by James Allen. This makes it
+	handle non-commuting factors.
+
 2010-12-25  Kasper Peeters  <kasper.peeters@aei.mpg.de>
 
 	* Made @vary work on powers.
@@ -8,12 +19,6 @@
 	correctly. This now also fixes replacement rules in which objects
 	with the same name appear both as indices and normal objects on
 	the right-hand side. Documentation on this added.
-
-2010-11-06  Kasper Peeters  <kasper.peeters@aei.mpg.de>
-
-	* Folding in @factor_out fixes for non-commutative objects
-	received from James Allen (the first proper patches from an
-	outsider, yeah!)
 
 2010-11-05  Kasper Peeters  <kasper.peeters@aei.mpg.de>
 

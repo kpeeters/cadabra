@@ -881,27 +881,27 @@ rule:= \commutator{L_{m??}}{L_{n??}} -> (m?? - n??) L_{m??+n??};
 obj80b:= \commutator{L_{k}}{L_{m + n}};
 @substitute!(%)( @(rule) );
 @sumflatten!(%);
-tst80b:= (k - (m+n)) L_{k+m+n};
+tst80b:= (k - m - n) L_{k+m+n} - @(obj80b);
 @collect_terms!(%);
 @assert(tst80b);
 
-
-@reset.
-{m,n,k,p}::Symbol.
-L_{m}::Depends(\commutator).
-\delta{#}::KroneckerDelta.
-rule:= \commutator{L_{m??}}{L_{n??}} -> (m?? - n??) L_{m??+n??} + A(m??) \delta_{m??}_{-n??};
-obj80:= \commutator{L_{k}}{\commutator{L_{m}}{L_{n}}} +
-        \commutator{L_{m}}{\commutator{L_{n}}{L_{k}}} +
-        \commutator{L_{n}}{\commutator{L_{k}}{L_{m}}};
-@substitute!(%)( @(rule) );
-@distribute!(%);
-@unwrap!(%);
-@substitute!(%)( @(rule) );
-@sumflatten!(%);
-@distribute!(%);
-@sumsort!(%);
-@prodsort!(%);
-@collect_terms!(%);
-@substitute!(%)( k -> -m - n);
+# 
+# @reset.
+# {m,n,k,p}::Symbol.
+# L_{m}::Depends(\commutator).
+# \delta{#}::KroneckerDelta.
+# rule:= \commutator{L_{m??}}{L_{n??}} -> (m?? - n??) L_{m??+n??} + A(m??) \delta_{m??}_{-n??};
+# obj80:= \commutator{L_{k}}{\commutator{L_{m}}{L_{n}}} +
+#         \commutator{L_{m}}{\commutator{L_{n}}{L_{k}}} +
+#         \commutator{L_{n}}{\commutator{L_{k}}{L_{m}}};
+# @substitute!(%)( @(rule) );
+# @distribute!(%);
+# @unwrap!(%);
+# @substitute!(%)( @(rule) );
+# @sumflatten!(%);
+# @distribute!(%);
+# @sumsort!(%);
+# @prodsort!(%);
+# @collect_terms!(%);
+# @substitute!(%)( k -> -m - n);
 

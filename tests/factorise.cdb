@@ -39,11 +39,90 @@ tst5:=  a * c * (2 * e + 5) + c * ( - 2 * e + d - 1) + a * (3 * b - d + 1) + 7 *
 @collect_terms!(%);
 @assert(tst5);
 
+# Non-commuting objects
+
+# Basic behaviour
+@reset.
+{A, B, C, D, E}::NonCommuting.
+obj := A B + A C + D A + E A:
+@factor_out!(%)(A);
+tst := A*(B + C) + (D + E)*A - @(obj);
+@collect_terms!(%);
+@assert(tst);
+
+@reset.
+{A, B, C, D}::AntiCommuting.
+obj := A B + A C + D A:
+@factor_out!(%)(A);
+tst := A*(B + C - D) - @(obj);
+@collect_terms!(%);
+@assert(tst);
+
+
+# Ordering of pulled out factors
+@reset.
+{A, B}::AntiCommuting.
+obj := A B c X + c B A Y:
+@factor_out!(%)(A, B, c);
+tst := A B c * (X - Y) - @(obj);
+@collect_terms!(%);
+@assert(tst);
+
+@reset.
+{A, B}::AntiCommuting.
+{A, X, Y}::NonCommuting.
+{B, X, Y}::NonCommuting.
+obj := A B c X + c B A Y + X A B c + Y c B A:
+@factor_out!(%)(c, A, B);
+tst := c A B * (X - Y) + c * (X - Y) * A B - @(obj);
+@collect_terms!(%);
+@assert(tst);
+
+# Ordering past a non commuting term
+@reset.
+{A, B, C, D, E}::AntiCommuting.
+{A, X}::NonCommuting.
+{B, X}::NonCommuting.
+obj := X A B Y + X B A Z:
+@factor_out!(%)(A, B, X);
+tst := X A B (Y - Z) - @(obj);
+@collect_terms!(%);
+@assert(tst);
+
+obj := A B X A B Y + B A X B A Z:
+@factor_out!(%)(A, B, X);
+tst := A B X A B (Y + Z) - @(obj);
+@collect_terms!(%);
+@assert(tst);
+
+obj := A B C D Y + D A B C Z:
+@factor_out!(%)(A, B, C, D);
+tst := A B C D (Y - Z) - @(obj);
+@collect_terms!(%);
+@assert(tst);
+
+
+
+# Test 10: Indices
+#
+@reset.
+obj:= A_{a} B_{b} + A_{a} C_{b} + A_{b} D_{a};
+@factor_out!(%)(A_{a});
+tst: A_{a} (B_{b} + C_{b}) + A_{b} D_{a} - @(obj);
+@collect_terms!(%);
+@assert(%);
+
+
+
 @reset.
 {a,b,m,n,p,q}::Indices.
 obj6:= A_{m n} C_{m n} D_{p q} + A_{p m} C_{m n} D_{n q} + A_{m n} C_{m n} E_{p q} Q;
-@factor_out!(%){ A_{a b}, C_{a b} };
+@factor_out!(%){ A_{a b}, C_{m n} };
 
+# NOTE: see the email to James Allen on Thu, 14 Oct 2010 20:58:52 +0100. 
+# Should be solved by modifying @rename_dummies. The text below is obsolete but
+# kept until the bug is fixed.
+#
 # This is very subtle. Consider
 #
 #   A_{m n} C_{n p} D_{m p} + A_{q r} C_{r s} E_{q t} F_{t s}

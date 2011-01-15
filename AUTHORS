@@ -1,1 +1,6 @@
 Kasper Peeters, <kasper.peeters@aei.mpg.de>
+
+with contributions from:
+
+	 José M. Martín-García (the excellent xperm code)
+	 James Allen (non-commuting factors patch for @factor_out)
