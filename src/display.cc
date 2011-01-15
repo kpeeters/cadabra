@@ -1150,6 +1150,10 @@ void node_printer::print_multiplier(std::ostream& str, exptree::iterator it)
 				str << "(\\frac{" << it->multiplier->get_num() << "}{" 
 					 << it->multiplier->get_den() << "})";
 				}
+			else if(*it->multiplier==-1) {
+				str << "-";
+				turned_one=true;
+				}
 			else {
 				str << "(" << *it->multiplier << ")";
 				}

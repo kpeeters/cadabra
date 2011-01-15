@@ -460,3 +460,14 @@ a::Depends(x^{0}).
 \partial{#}::Derivative.
 \partial_{x^{0}}{a} + \partial_{x^{1}}{a};
 @unwrap!(%);
+
+# Test 38: Kronecker deltas with Symbol indices.
+#
+@reset.
+{m,k}::Symbol.
+\delta{#}::KroneckerDelta.
+obj38:= A_{m} \delta_{k}_{-m};
+@eliminate_kr!(%);
+tst38:= A_{-k} - @(obj38);
+@collect_terms!(%);
+@assert(tst38);

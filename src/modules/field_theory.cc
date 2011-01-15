@@ -760,7 +760,10 @@ algorithm::result_t eliminate_kronecker::apply(iterator& st)
 							++nxt;
 							if(ii1->is_rational()==false && subtree_compare(ind, ii1, 1, false, true)==0 ) {
 								if(! (replaced && doing2) ) {
-									tr.replace_index(ind, ii2)->fl.parent_rel=ii2->fl.parent_rel; 
+									multiplier_t mt=(*ind->multiplier) / (*ii1->multiplier);
+									iterator rep=tr.replace_index(ind, ii2);
+									rep->fl.parent_rel=ii2->fl.parent_rel; 
+									multiply(rep->multiplier, mt);
 									replaced=true;
 									doing1=true;
 									}
@@ -769,7 +772,10 @@ algorithm::result_t eliminate_kronecker::apply(iterator& st)
 								}
 							else if(ii2->is_rational()==false && subtree_compare(ind, ii2, 1, false, true)==0) {
 								if(! (replaced && doing1) ) {
-									tr.replace_index(ind, ii1)->fl.parent_rel=ii1->fl.parent_rel;
+									multiplier_t mt=(*ind->multiplier) / (*ii2->multiplier);
+									iterator rep=tr.replace_index(ind, ii1);
+									rep->fl.parent_rel=ii1->fl.parent_rel;
+									multiply(rep->multiplier, mt);
 									replaced=true;
 									doing2=true;
 									}

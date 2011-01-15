@@ -863,3 +863,45 @@ obj79:= L_{r};
 tst79:= q - r + R r - @(obj79);
 @collect_terms!(%);
 @assert(tst79);
+
+# The following does not yet work automatically, see the next example for the current
+# way to tackle this.
+@reset.
+{m,k}::Indices.
+L_{m}::SelfNonCommuting.
+obj80a:= \commutator{L_{m}}{L_{k}};
+@unwrap!(%);
+tst80a:= \commutator{L_{m}}{L_{k}} - @(obj80a);
+@collect_terms!(%);
+#@assert(tst80a);
+
+@reset.
+{m,n,k,p}::Symbol.
+rule:= \commutator{L_{m??}}{L_{n??}} -> (m?? - n??) L_{m??+n??};
+obj80b:= \commutator{L_{k}}{L_{m + n}};
+@substitute!(%)( @(rule) );
+@sumflatten!(%);
+tst80b:= (k - (m+n)) L_{k+m+n};
+@collect_terms!(%);
+@assert(tst80b);
+
+
+@reset.
+{m,n,k,p}::Symbol.
+L_{m}::Depends(\commutator).
+\delta{#}::KroneckerDelta.
+rule:= \commutator{L_{m??}}{L_{n??}} -> (m?? - n??) L_{m??+n??} + A(m??) \delta_{m??}_{-n??};
+obj80:= \commutator{L_{k}}{\commutator{L_{m}}{L_{n}}} +
+        \commutator{L_{m}}{\commutator{L_{n}}{L_{k}}} +
+        \commutator{L_{n}}{\commutator{L_{k}}{L_{m}}};
+@substitute!(%)( @(rule) );
+@distribute!(%);
+@unwrap!(%);
+@substitute!(%)( @(rule) );
+@sumflatten!(%);
+@distribute!(%);
+@sumsort!(%);
+@prodsort!(%);
+@collect_terms!(%);
+@substitute!(%)( k -> -m - n);
+
