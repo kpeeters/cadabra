@@ -1,7 +1,7 @@
 /* 
 
 	STL-like templated tree class.
-	Copyright (C) 2001-2010  Kasper Peeters <kasper.peeters@aei.mpg.de>
+	Copyright (C) 2001-2011  Kasper Peeters <kasper.peeters@aei.mpg.de>
 
    This is the Microsoft VC 6 version of tree.hh (1.80) by Tony Cook, see 
 

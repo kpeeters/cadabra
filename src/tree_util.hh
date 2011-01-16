@@ -4,7 +4,7 @@
 	tree.hh class.
 
 
-	Copyright (C) 2001-2010  Kasper Peeters <kasper.peeters@aei.mpg.de>
+	Copyright (C) 2001-2011  Kasper Peeters <kasper.peeters@aei.mpg.de>
 
 	(At the moment this only contains a printing utility, thanks to Linda
 	Buisman <linda.buisman@studentmail.newcastle.edu.au>)
