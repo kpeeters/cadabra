@@ -3,7 +3,7 @@
 \usepackage{bm}
 \usepackage{amsmath}
 \usepackage{amssymb}
-\usepackage[colorlinks=true]{hyperref}
+\usepackage[colorlinks=true, citecolor=red, linkcolor=blue, urlcolor=red, plainpages=false, pdfpagelabels]{hyperref}
 \usepackage{relsize}
 \usepackage{xspace}
 \usepackage{multicol}
@@ -185,7 +185,7 @@
 \pagestyle{empty}
 \begin{flushright}
 original: July 2006\\
-this version: March 24th, 2010\\
+this version: January 16, 2011\\
 AEI-2006-038
 \end{flushright}
 \vspace{6ex}
@@ -3418,10 +3418,10 @@ hard-coded but will be user-defineable at a later stage.
 In addition to querying for object properties, some algorithms
 also act on objects which encode their
 property in a special reserved node name. As an example, the 
-\subsalg{prodrule} acts on objects which carry a \subsprop{Derivative}
-property, but it also acts on \subsalg{cdb\_Derivative} objects. This
-allows e.g.~the \subsalg{vary} algorithm to wrap a derivative-like
-object around powers and have \subsalg{prodrule} expand that
+\subscommand{prodrule} acts on objects which carry a \subsprop{Derivative}
+property, but it also acts on \subscommand{cdb\_Derivative} objects. This
+allows e.g.~the \subscommand{vary} algorithm to wrap a derivative-like
+object around powers and have \subscommand{prodrule} expand that
 
 % \begin{sectionunit}
 % \title{Labelling and selection of expressions}
