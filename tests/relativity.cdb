@@ -265,3 +265,19 @@ g^{a b}::InverseMetric.
 h_{a b}::Symmetric.
 g^{a k} * \nabla_{b}{h_{k c}} +g^{a k} * \nabla_{c}{h_{k b}};
 @eliminate_metric!(%);
+
+
+# Test 14: rewrite indices of argument of a derivative.
+#
+@reset.
+{a,b,c,d,e,f,h,i,j,k,l}::Indices(position=fixed).
+g_{a b}::Metric.
+g^{a b}::InverseMetric.
+\partial{#}::PartialDerivative.
+obj14:= \partial_{a}{A_{b}};
+@rewrite_indices!(%){A^{c}}{g_{a b}};
+tst14:= \partial_{a}{ g_{b a} A^{a} } - @(obj14);
+@prodsort!(%);
+@rename_dummies!(%);
+@collect_terms!(%);
+@assert(tst14);

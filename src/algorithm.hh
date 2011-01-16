@@ -188,6 +188,9 @@ class algorithm : public active_node {
 		bool     is_nonprod_factor_in_prod(iterator);
 		bool     prod_wrap_single_term(iterator&);
 		bool     prod_unwrap_single_term(iterator&);
+		/// Wrap a term in a product, irrespective of its parent (it usually makes
+		/// more sense to call the safer prod_wrap_single_term above).
+		void     force_prod_wrap(iterator&);
 
 		/// Figure out whether two objects (commonly indices) are separated by a derivative
 		/// operator, as in \partial_{a}{A_{b}} C^{b}.

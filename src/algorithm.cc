@@ -1636,6 +1636,9 @@ bool algorithm::is_single_term(iterator it)
 		if(tr.is_valid(tr.parent(it))) {
 			if(*tr.parent(it)->name=="\\sum" || *tr.parent(it)->name=="\\expression" || tr.parent(it)->is_command())
 				return true;
+//			if(*tr.parent(it)->name!="\\prod" && 
+//				it->fl.parent_rel==str_node::p_none) // object is an argument of a wrapping object, not an index
+//				return true;
 			}
 		else return true;
 		}
@@ -1658,18 +1661,23 @@ bool algorithm::is_nonprod_factor_in_prod(iterator it)
 bool algorithm::prod_wrap_single_term(iterator& it)
 	{
 	if(is_single_term(it)) {
-		iterator prodnode=tr.insert(it, str_node("\\prod"));
-		sibling_iterator fr=it, to=it;
-		++to;
-		tr.reparent(prodnode, fr, to);
-		prodnode->fl.bracket=it->fl.bracket;
-		it->fl.bracket=str_node::b_none;
-		prodnode->multiplier=it->multiplier;
-		one(it->multiplier);
-		it=prodnode;
+		force_prod_wrap(it);
 		return true;
 		}
-	return false;
+	else return false;
+	}
+
+void algorithm::force_prod_wrap(iterator& it)
+	{
+	iterator prodnode=tr.insert(it, str_node("\\prod"));
+	sibling_iterator fr=it, to=it;
+	++to;
+	tr.reparent(prodnode, fr, to);
+	prodnode->fl.bracket=it->fl.bracket;
+	it->fl.bracket=str_node::b_none;
+	prodnode->multiplier=it->multiplier;
+	one(it->multiplier);
+	it=prodnode;
 	}
 
 bool algorithm::prod_unwrap_single_term(iterator& it)

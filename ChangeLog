@@ -1,3 +1,9 @@
+2011-01-16  Kasper Peeters  <kasper.peeters@aei.mpg.de>
+
+	* Released 1.27
+
+	* Handle @rewrite_indices on arguments of Derivatives.
+
 2011-01-15  Kasper Peeters  <kasper.peeters@aei.mpg.de>
 
 	* Released 1.26.

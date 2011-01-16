@@ -112,6 +112,9 @@ class rewrite_indices : public algorithm {
 		virtual void     description() const;
 		virtual bool     can_apply(iterator);
 		virtual result_t apply(iterator&);
+
+	private:
+		bool        is_derivative_argument;
 };
 
 class ricci_identity : public algorithm {

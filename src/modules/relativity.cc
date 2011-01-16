@@ -292,15 +292,27 @@ void rewrite_indices::description() const
 
 bool rewrite_indices::can_apply(iterator it) 
 	{
+	is_derivative_argument=false;
 	if(*it->name=="\\prod" || is_single_term(it))
 		return true;
+
+	if(tr.is_valid(tr.parent(it))) { // FIXME: should eventually go into prod_wrap_single_term
+		const Derivative *der=properties::get<Derivative>(tr.parent(it));
+		if(der) {
+			if(it->fl.parent_rel==str_node::p_none) {
+				is_derivative_argument=true;
+				return true;
+				}
+			}
+		}
 
 	return false;
 	}
 
 algorithm::result_t rewrite_indices::apply(iterator& it) 
 	{
-	prod_wrap_single_term(it);
+	if(is_derivative_argument) force_prod_wrap(it);
+	else                       prod_wrap_single_term(it);
 
 	index_map_t ind_free, ind_dummy;
 	classify_indices(it, ind_free, ind_dummy);
