@@ -1005,7 +1005,7 @@ void node_printer::print_infix(std::ostream& str, exptree::iterator it)
 		print_multiplier(str, it);
 	
 	if(*it->name=="1") {
-		if(*it->multiplier==1) // this would print nothing altogether.
+		if(*it->multiplier==1 || (*it->multiplier==-1)) // this would print nothing altogether.
 			str << "1";
 		return;
 		}

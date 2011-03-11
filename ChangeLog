@@ -1,3 +1,7 @@
+2011-03-11  Kasper Peeters  <kasper.peeters@aei.mpg.de>
+
+	* Fixed printing of "(-1)".
+
 2011-01-16  Kasper Peeters  <kasper.peeters@aei.mpg.de>
 
 	* Released 1.27
