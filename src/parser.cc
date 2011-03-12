@@ -277,10 +277,11 @@ bool parser::string2tree(const std::string& inp)
 					current_parent=tree.parent(current_parent);
 					}
 				else if(is_opening_bracket(c)) {
-					if(tmp.size()>0)
+					if(tmp.size()>0) {
 						current_parent=tree.append_child(current_parent,str_node(tmp, 
 																									current_bracket.back(),
 																									current_parent_rel.back()));
+						}
 					current_mode.push_back(m_childgroup);
 					}
 				advance(i);
@@ -293,7 +294,7 @@ bool parser::string2tree(const std::string& inp)
 				advance(i);
 				break;
 			case m_backslashname:
-				// std::cerr << "m_backslashname" << " " << c << std::endl;
+//				std::cerr << "m_backslashname" << " " << c << std::endl;
 				if(c==' ' || c=='\n' || c=='\\' || is_link(c)!=str_node::p_none 
 					|| is_closing_bracket(c)!=str_node::b_no) {
 					current_mode.pop_back();
