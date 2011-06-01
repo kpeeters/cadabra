@@ -1,4 +1,20 @@
+2011-06-01  Kasper Peeters  <kasper.peeters@aei.mpg.de>
+
+	* Released 1.29
+
+	* Fixed compilation problems in tree.hh and youngtab.hh with newer
+	versions of g++.
+
+	* Fixed bug with @vary acting on derivatives or accented symbols.
+
+2011-04-10  Kasper Peeters  <kasper.peeters@aei.mpg.de>
+
+	* Added 'self' attribute to WeightInherit to allow for dimension
+	counting in which operators have a dimension themselves too.
+
 2011-03-11  Kasper Peeters  <kasper.peeters@aei.mpg.de>
+
+	* Released 1.28
 
 	* Fixed printing of "(-1)".
 

@@ -1,4 +1,4 @@
-\cdbproperty{WeightInherit}{\it label={\sf name}$\vert$all, type=Additive$\vert$Multiplicative}
+\cdbproperty{WeightInherit}{\it label={\sf name}$\vert$all, type=Additive$\vert$Multiplicative, self={\sf value}}
 
 Indicates that the object inherits all weights of its child nodes. The
 label indicates which weights are inherited; use {\tt all} to inherit
@@ -25,6 +25,9 @@ A::Weight(label=field, value=3).
 then the expression~\verb|f{A}{A}| has weight~6. This is what would
 happen if `\verb|f|' would be a product: the weight of the product is the same
 as the sum of the weights of the factors.
+
+Terms can be selected based on their weight by using the
+\subsalg{keep\_weight} and \subsalg{drop\_weight} algorithms.
 
 For more information on related topics, see \subsprop{IndexInherit}
 and \subsprop{PropertyInherit}.

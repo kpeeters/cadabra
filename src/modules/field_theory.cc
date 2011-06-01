@@ -149,6 +149,13 @@ bool WeightInherit::parse(exptree& tr, exptree::iterator pat, exptree::iterator 
 		else                                      combination_type=additive;
 		}
 	else combination_type=multiplicative;
+
+	tpit = kv.find("self");
+	if(tpit!=kv.end()) {
+		value_self=*tpit->second->multiplier;
+		}
+	else value_self=0;
+
 	return true;
 	}
 
@@ -184,6 +191,9 @@ multiplier_t WeightInherit::value(exptree::iterator it, const std::string& force
 			 }
 		 ++sib;
 		}
+
+	ret+=value_self;  // Add our own weight.
+
 	return ret;
 	}
 

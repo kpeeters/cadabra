@@ -480,11 +480,12 @@ algorithm::result_t vary::apply(iterator& it)
 			++sib;
 			if(app->is_index()) continue;
 			if(vry.can_apply(app)) {
-				vry.apply(app);
+				if(vry.apply(app)==l_applied)
+					expression_modified=true;
 				}// not complete: should remove object when zero
 			}
-		expression_modified=true;
-		return l_applied;		
+		if(expression_modified) return l_applied;
+		else                    return l_no_action;
 		}
 
 	if(*it->name=="\\prod") {
@@ -508,11 +509,14 @@ algorithm::result_t vary::apply(iterator& it)
 			
 			iterator fcit2(fcit);
 			if(subs.can_apply(fcit2)) {
-				subs.apply(fcit2);
-				expression_modified=true;
+//				txtout << "in " << *fcit2->name << std::endl;
+				algorithm::result_t res = subs.apply(fcit2);
 				
-				if(fcit2->is_zero()==false)
+				if(fcit2->is_zero()==false && res==algorithm::l_applied) {
+					expression_modified=true;
+//					txtout << "new term\n";
 					iterator newterm=result.append_child(newsum, it);
+					}
 
 				// restore original
 				it=tr.replace(it, prodcopy.begin());
@@ -520,6 +524,7 @@ algorithm::result_t vary::apply(iterator& it)
 			++pos;
 			}
 		if(expression_modified && tr.number_of_children(newsum)>0) {
+//			tr.print_recursive_treeform(txtout, newsum.begin());
 			it=tr.move_ontop(it, newsum);
 			cleanup_nests(tr, it);
 			cleanup_expression(tr, it);
@@ -583,12 +588,14 @@ algorithm::result_t vary::apply(iterator& it)
 
 	if(der || acc || is_single_term(it)) { // easy: just vary this term by substitution
 		substitute subs(tr, this_command);
+//		txtout << "substituting single factor " << *it->name << std::endl;
 		if(subs.can_apply(it)) {
 			if(subs.apply(it)==l_applied) {
 				expression_modified=true;
 				return l_applied;
 				}
 			}
+//		txtout << "nothing" << std::endl;
 		return l_no_action;
 		}
 	

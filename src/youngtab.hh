@@ -33,6 +33,7 @@
 #include <list>
 #include <gmpxx.h>
 #include "combinatorics.hh"
+#include <cstddef>
 
 typedef mpz_class yngint_t;
 typedef mpq_class yngrat_t;

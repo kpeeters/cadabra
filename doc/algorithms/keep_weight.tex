@@ -51,6 +51,22 @@ partial derivatives,
 @keep_weight!(%){small}{1};
 \lambda \partial_{3}{\chi};
 \end{screen}
+
+If you want to use weights for dimension counting, in which operators
+can also carry a dimension themselves (e.g.~derivatives), then use the
+\verb|self| attribute,
+\begin{screen}{1,2,3,4,6}
+{\phi,\chi}::Weight(label=length, value=1).
+
+x::Coordinate.
+\partial{#}::PartialDerivative.
+\partial{#}::WeightInherit(label=length, type=Multiplicative, self=-1).
+
+\phi \partial_{x}{\phi} + \phi\chi + \partial_{x}{ \phi \chi**2 };
+@keep_weight!(%){length}{1};
+\end{screen}
+This keeps only the first term.
+
 ~
 \cdbseealgo{drop_weight}
 \cdbseeprop{Weight}

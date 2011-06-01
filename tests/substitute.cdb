@@ -777,6 +777,16 @@ tst73c:= Q*(A*C*A+D*E)*E*A + A*(Q*C*A + A*C*Q)*E*A + A*(A*C*A+D*E)*E*Q - @(obj73
 @collect_terms!(%);
 @assert(tst73c);
 
+# Reported by UB June 2011.
+@reset.
+\hat{#}::Accent.
+obj73d:= \hat{A} B C;
+@vary(%)( B-> \delta{B} );
+tst73d:= \hat{A} \delta{B} C - @(obj73d);
+@collect_terms!(%);
+@assert(tst73d);
+
+
 # Test 74: matching Indices should also match objects on the right-hand side
 #          which are not indices (this really makes most sense, the alternative
 #          breaks many other applications, and if this non-match is required it is

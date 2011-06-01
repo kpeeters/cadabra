@@ -77,6 +77,8 @@ class WeightInherit : virtual public WeightBase {
 		virtual std::string   name() const;
 		
 		enum { multiplicative, additive } combination_type;
+
+		multiplier_t value_self;
 };
 
 class generate_indexbracket : public algorithm {
