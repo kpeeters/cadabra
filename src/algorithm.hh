@@ -182,6 +182,10 @@ class algorithm : public active_node {
 		range_vector_t::iterator find_arg_superset(range_vector_t&, Iter st, Iter nd);
 		range_vector_t::iterator find_arg_superset(range_vector_t&, sibling_iterator it);
 
+		/// Determine structure (version-2)
+		bool     is_termlike(iterator);
+		bool     is_factorlike(iterator);
+		
 		/// Take a single non-product node in a sum and wrap it in a 
 		/// product node, so it can be handled on the same footing as a proper product.
 		bool     is_single_term(iterator);

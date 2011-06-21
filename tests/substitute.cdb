@@ -780,11 +780,30 @@ tst73c:= Q*(A*C*A+D*E)*E*A + A*(Q*C*A + A*C*Q)*E*A + A*(A*C*A+D*E)*E*Q - @(obj73
 # Reported by UB June 2011.
 @reset.
 \hat{#}::Accent.
-obj73d:= \hat{A} B C;
+obj73d2:= \hat{A} B C;
 @vary(%)( B-> \delta{B} );
-tst73d:= \hat{A} \delta{B} C - @(obj73d);
+tst73d2:= \hat{A} \delta{B} C - @(obj73d2);
 @collect_terms!(%);
-@assert(tst73d);
+@assert(tst73d2);
+
+@reset.
+\hat{#}::Accent.
+obj73e:= \hat{A} B C + E;
+@vary(%)( B-> \delta{B} );
+tst73e:= \hat{A} \delta{B} C - @(obj73e);
+@collect_terms!(%);
+@assert(tst73e);
+
+@reset.
+\hat{#}::Accent.
+obj73f:= \hat{A} + E;
+@vary(%)( B-> \delta{B} );
+@assert(tst73f);
+
+@reset.
+obj73g:= A + E;
+@vary(%)( B-> \delta{B} );
+@assert(tst73g);
 
 
 # Test 74: matching Indices should also match objects on the right-hand side

@@ -467,6 +467,14 @@ bool vary::can_apply(iterator it)
 	return false;
 	}
 
+/*
+
+      D(A) C + D(A);
+      @vary(%)( 
+
+
+ */
+
 algorithm::result_t vary::apply(iterator& it)
 	{
 	const Derivative *der = properties::get<Derivative>(it);
@@ -475,15 +483,26 @@ algorithm::result_t vary::apply(iterator& it)
 		vary vry(tr, this_command);
 
 		sibling_iterator sib=tr.begin(it);
+		bool has_applied=false;
 		while(sib!=tr.end(it)) {
 			iterator app=sib;
 			++sib;
 			if(app->is_index()) continue;
 			if(vry.can_apply(app)) {
-				if(vry.apply(app)==l_applied)
+				if(vry.apply(app)==l_applied) {
+					has_applied=true;
 					expression_modified=true;
-				}// not complete: should remove object when zero
+					}
+				}
 			}
+
+		// If no variation took place, set to zero if we are termlike.
+		if(!has_applied && is_termlike(it)) {
+			zero(it->multiplier);
+			expression_modified=true;
+			return l_applied;
+			}
+
 		if(expression_modified) return l_applied;
 		else                    return l_no_action;
 		}
@@ -546,16 +565,27 @@ algorithm::result_t vary::apply(iterator& it)
 			if(vry.can_apply(app)) {
 				vry.apply(app);
 				if(app->is_zero()) {
-					tr.erase(app);
+					expression_modified=true;
+					tr.erase(app);  // remove this term
 					}
 				}
 			else {
 				// remove this term
+				expression_modified=true;
 				tr.erase(app);
 				}
 			}
-		expression_modified=true;
-		return l_applied;
+
+		if(tr.number_of_children(it)==0) {
+			zero(it->multiplier);
+			}
+		else if(tr.number_of_children(it)==1) {
+			tr.flatten(it);
+			it=tr.erase(it);
+			}
+
+		if(expression_modified) return l_applied;
+		else return l_no_action;
 		}
 
 	if(*it->name=="\\pow") { 
@@ -595,7 +625,12 @@ algorithm::result_t vary::apply(iterator& it)
 				return l_applied;
 				}
 			}
-//		txtout << "nothing" << std::endl;
+		
+		if(is_termlike(it)) {
+			zero(it->multiplier);
+			expression_modified=true;
+			return l_applied;
+			}
 		return l_no_action;
 		}
 	
@@ -607,10 +642,13 @@ algorithm::result_t vary::apply(iterator& it)
 				return l_applied;
 				}
 			}
-		// else set to zero
-		zero(it->multiplier);
-		expression_modified=true;
-		return l_applied;
+
+		if(is_termlike(it)) {
+			zero(it->multiplier);
+			expression_modified=true;
+			return l_applied;
+			}
+		return l_no_action;
 		}
 
 	return l_no_action;
