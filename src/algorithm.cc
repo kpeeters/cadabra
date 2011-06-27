@@ -98,7 +98,8 @@ algorithm::constructor_error::constructor_error()
 
 
 algorithm::algorithm(exptree& tr_, iterator it_)
-	: active_node(tr_, it_), 
+	: active_node(tr_, it_),
+	  expression_modified(false), 
 	  equation_number(0), global_success(g_not_yet_started), 
 	  number_of_calls(0), number_of_modifications(0),
 	  suppress_normal_output(false),

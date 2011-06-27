@@ -1,0 +1,48 @@
+
+
+\section{Version 2 notes}
+
+\subsection{Structure of expressions}
+
+To note:
+\begin{itemize}
+\item For a variety of reasons it is make precise when a node is ``a
+  term in a sum'' or ``a factor in a product''; the reason being that
+  a node being zero only influences a single term in a sum but it
+  influences all factors in a product. 
+
+\item Related to the above: many structure-probing functions currently
+  use ``parent'' without taking proper care of the fact that the
+  parent may be a wrapping ``Accent'' or ``Derivative''. 
+
+\item This is captured by ``term-like'' and ``factor-like''. The main
+  complication here is to make precise how far up we should go in the
+  tree. Probably just one step. ``Accent'' nodes should handle their
+  zero coefficients themselves, not rely on their child nodes to do
+  it. Single terms in an expression (e.g.~an expression which is just
+  ``A'') should also classify as term-like.
+\end{itemize}
+
+\subsection{Localisation of algorithms}
+
+\begin{itemize}
+\item Many algorithms be in a situation in which the called
+  node is a sum which ends up having zero or one terms. The logic of
+  propagating this should always be: you can touch everything at or
+  below the node, but you cannot remove the node, only set its
+  coefficient to zero. 
+
+\item However, whether or not a node becomes zero may be a function of
+  the parent node (example: varying a term should keep it intact if
+  the parent is a product-like node, but should remove it if it is a
+  sum-like node. See above.
+
+\item All algorithms should always return a consistent
+  tree. Therefore, it is for instance not allowed to return with the
+  iterator pointing to a sum node with zero coefficients (sum node
+  with non-unit multiplier error), the algorithm has to change this to
+  something valid.
+
+\end{itemize}
+
+

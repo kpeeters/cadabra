@@ -497,6 +497,7 @@ algorithm::result_t vary::apply(iterator& it)
 			}
 
 		// If no variation took place, set to zero if we are termlike.
+//		txtout << "on " << *it->name << " " << has_applied << " " << is_termlike(it) << " " << expression_modified << std::endl;
 		if(!has_applied && is_termlike(it)) {
 			zero(it->multiplier);
 			expression_modified=true;
@@ -577,7 +578,7 @@ algorithm::result_t vary::apply(iterator& it)
 			}
 
 		if(tr.number_of_children(it)==0) {
-			zero(it->multiplier);
+			node_zero(it);
 			}
 		else if(tr.number_of_children(it)==1) {
 			tr.flatten(it);

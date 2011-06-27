@@ -796,12 +796,12 @@ tst73e:= \hat{A} \delta{B} C - @(obj73e);
 
 @reset.
 \hat{#}::Accent.
-obj73f:= \hat{A} + E;
+tst73f:= \hat{A} + E;
 @vary(%)( B-> \delta{B} );
 @assert(tst73f);
 
 @reset.
-obj73g:= A + E;
+tst73g:= A + E;
 @vary(%)( B-> \delta{B} );
 @assert(tst73g);
 
