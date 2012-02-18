@@ -116,50 +116,50 @@ bool algorithm::is_output_module() const
 	return false;
 	}
 
-bool algorithm::can_apply(iterator it) 
-	{
-	if(tr.begin(it)!=tr.end(it))
-		return can_apply(tr.begin(it), tr.end(it));
-	else return false;
-	}
+//bool algorithm::can_apply(iterator it) 
+//	{
+//	if(tr.begin(it)!=tr.end(it))
+//		return can_apply(tr.begin(it), tr.end(it));
+//	else return false;
+//	}
 
-bool algorithm::can_apply(sibling_iterator st, sibling_iterator nd)
-	{
-	while(st!=nd) {
-		if(can_apply(st)) return true;
-		++st;
-		}
-	return false;
-	}
+//bool algorithm::can_apply(sibling_iterator st, sibling_iterator nd)
+//	{
+//	while(st!=nd) {
+//		if(can_apply(st)) return true;
+//		++st;
+//		}
+//	return false;
+//	}
 
-algorithm::result_t algorithm::apply(iterator& it)
-	{
-	// This will be called when acting recursively or pointwise, yet the
-	// algorithm only implements range operations.
-
-	sibling_iterator st=tr.begin(it);
-	sibling_iterator nd=tr.end(it);
-	return apply(st, nd);
-	}
-
-algorithm::result_t algorithm::apply(sibling_iterator& st, sibling_iterator& nd)
-	{
-	// This will be called when acting on a mark but the algorithms
-	// implements only node-wise operations.
-
-	// FIXME: fix this, does not work yet (handle error conditions).
-	result_t retval=l_error;
-	sibling_iterator sbb=st;
-	while(sbb!=nd) {
-		iterator backup=sbb;
-		retval=apply(backup);
-		if(sbb==st) 
-			st=backup;
-		sbb=backup;
-		++sbb;
-		}
-	return retval;
-	}
+//algorithm::result_t algorithm::apply(iterator& it)
+//	{
+//	// This will be called when acting recursively or pointwise, yet the
+//	// algorithm only implements range operations.
+//
+//	sibling_iterator st=tr.begin(it);
+//	sibling_iterator nd=tr.end(it);
+//	return apply(st, nd);
+//	}
+//
+//algorithm::result_t algorithm::apply(sibling_iterator& st, sibling_iterator& nd)
+//	{
+//	// This will be called when acting on a mark but the algorithms
+//	// implements only node-wise operations.
+//
+//	// FIXME: fix this, does not work yet (handle error conditions).
+//	result_t retval=l_error;
+//	sibling_iterator sbb=st;
+//	while(sbb!=nd) {
+//		iterator backup=sbb;
+//		retval=apply(backup);
+//		if(sbb==st) 
+//			st=backup;
+//		sbb=backup;
+//		++sbb;
+//		}
+//	return retval;
+//	}
 
 // The entry point called by manipulator.cc
 void algorithm::apply(unsigned int lue, bool multiple, bool until_nochange, bool make_copy, int act_at_level, 
@@ -346,38 +346,38 @@ void algorithm::apply(unsigned int lue, bool multiple, bool until_nochange, bool
 			subtree=tr.end();
 			}
 		}
-	else { // act on marked nodes
-		if(prepare_for_modification(make_copy)) { // there are marks
-			sibling_iterator start=marks[0].first;
-			sibling_iterator end  =marks[0].second;
-			result_t res;
-			if(can_apply(start, end)) {
-				++number_of_calls;
-				res=apply(start,end);
-				if(res==l_error) {
-					cancel_modification();
-					subtree=previous_expression;
-					}
-				else if(getenv("CDB_PARANOID"))  
-					check_consistency(tr.named_parent(subtree,"\\expression"));
-				}
-			else {
-				cancel_modification();
-				subtree=previous_expression;
-				}
-			}
-		else { // no marks
-//			debugout << "no marks" << std::endl;
-			iterator dummy=tr.end();
-			++number_of_calls;
-			if( can_apply(dummy) ) {
-				result_t res=apply(dummy);
-				if(is_output_module || res!=l_error)
-					global_success=g_applied;
-				}
-			}
-		discard_command_node=true;
-		}
+// 	else { // act on marked nodes
+// 		if(prepare_for_modification(make_copy)) { // there are marks
+// 			sibling_iterator start=marks[0].first;
+// 			sibling_iterator end  =marks[0].second;
+// 			result_t res;
+// 			if(can_apply(start, end)) {
+// 				++number_of_calls;
+// 				res=apply(start,end);
+// 				if(res==l_error) {
+// 					cancel_modification();
+// 					subtree=previous_expression;
+// 					}
+// 				else if(getenv("CDB_PARANOID"))  
+// 					check_consistency(tr.named_parent(subtree,"\\expression"));
+// 				}
+// 			else {
+// 				cancel_modification();
+// 				subtree=previous_expression;
+// 				}
+// 			}
+// 		else { // no marks
+// //			debugout << "no marks" << std::endl;
+// 			iterator dummy=tr.end();
+// 			++number_of_calls;
+// 			if( can_apply(dummy) ) {
+// 				result_t res=apply(dummy);
+// 				if(is_output_module || res!=l_error)
+// 					global_success=g_applied;
+// 				}
+// 			}
+// 		discard_command_node=true;
+// 		}
 
 	if(is_output_module) {
 		suppress_normal_output=true;

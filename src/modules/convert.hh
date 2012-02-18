@@ -27,8 +27,8 @@ class frommath : public algorithm {
 	public:
 		frommath(exptree&, iterator);
 
-		virtual bool     can_apply(sibling_iterator, sibling_iterator);
-		virtual result_t apply(sibling_iterator&, sibling_iterator&);
+		virtual bool     can_apply(iterator);
+		virtual result_t apply(iterator&);
 };
 
 class frommaple : public algorithm {

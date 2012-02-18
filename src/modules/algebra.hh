@@ -400,7 +400,7 @@ class collect_terms : public algorithm {
 
 		virtual bool     can_apply(iterator);
 		virtual result_t apply(iterator&);
-		virtual result_t apply(sibling_iterator&, sibling_iterator&);
+//		virtual result_t apply(sibling_iterator&, sibling_iterator&);
 
 		void  fill_hash_map(iterator);
 		void  fill_hash_map(sibling_iterator, sibling_iterator);
@@ -496,8 +496,7 @@ class drop_keep_weight : public algorithm {
 	public:
 		drop_keep_weight(exptree&, iterator);
 		virtual bool     can_apply(iterator);
-
-		result_t apply(iterator&, bool keepthem);
+		result_t do_apply(iterator&, bool keepthem);
 	protected:
 		const WeightInherit *gmn;
 		const Weight        *wgh;
@@ -558,7 +557,7 @@ class sym : virtual public algorithm, virtual public sym_asym {
 		sym(exptree&, iterator);
 		
 		virtual result_t apply(iterator& it);
-		virtual result_t apply(sibling_iterator&, sibling_iterator&);		
+//		virtual result_t apply(sibling_iterator&, sibling_iterator&);		
 };
 
 class asym : virtual public algorithm, virtual public sym_asym {
@@ -566,7 +565,7 @@ class asym : virtual public algorithm, virtual public sym_asym {
 		asym(exptree&, iterator);
 		
 		virtual result_t apply(iterator& it);
-		virtual result_t apply(sibling_iterator&, sibling_iterator&);
+//		virtual result_t apply(sibling_iterator&, sibling_iterator&);
 };
 
 class order : virtual public algorithm, virtual public locate {

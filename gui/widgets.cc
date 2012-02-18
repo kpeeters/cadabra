@@ -353,15 +353,15 @@ void TeXEngine::convert_set(std::set<TeXRequest *>& reqs)
 		erase_file(std::string(templ)+".aux");
 		erase_file(std::string(templ)+".log");
 		
-		std::string err=handle_latex_errors(result);
+		std::string latex_err=handle_latex_errors(result);
 		reqit=reqs.begin();
 		while(reqit!=reqs.end()) 
 			(*reqit++)->needs_generating=false;
 
-		if(err.size()>0) {
+		if(latex_err.size()>0) {
 			 if(chdir(olddir)==-1)
-				 throw TeXException(err+" (and cannot chdir back to original "+olddir+")");
-			 throw TeXException(err); 
+				 throw TeXException(latex_err+" (and cannot chdir back to original "+olddir+")");
+			 throw TeXException(latex_err); 
 			 }
 
 		// Even if we cannot find an explicit error in the output, we have to terminate

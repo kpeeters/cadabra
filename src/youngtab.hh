@@ -584,7 +584,7 @@ typename filled_tableau<T>::iterator filled_tableau<T>::iterator::operator++(int
 	{
 	iterator tmp(*this);
 	while(this->n>0) {
-		if(++column_number==rows[row_number]) {
+		if(++column_number==tab->rows[row_number]) {
 			column_number=0;
 			++row_number;
 			}

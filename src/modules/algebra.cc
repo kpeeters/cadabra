@@ -1677,7 +1677,7 @@ bool drop_keep_weight::can_apply(iterator st)
 	return false;
 	}
 
-algorithm::result_t drop_keep_weight::apply(iterator& it, bool keepthem)
+algorithm::result_t drop_keep_weight::do_apply(iterator& it, bool keepthem)
 	{
 	if(gmn) {
 		if(gmn->combination_type==WeightInherit::multiplicative) {
@@ -1748,7 +1748,7 @@ drop_weight::drop_weight(exptree& tr, iterator it)
 
 algorithm::result_t drop_weight::apply(iterator& it)
 	{
-	return drop_keep_weight::apply(it, false);
+	return drop_keep_weight::do_apply(it, false);
 	}
 
 
@@ -1759,7 +1759,7 @@ keep_weight::keep_weight(exptree& tr, iterator it)
 
 algorithm::result_t keep_weight::apply(iterator& it)
 	{
-	return drop_keep_weight::apply(it, true);
+	return drop_keep_weight::do_apply(it, true);
 	}
 
 
@@ -2600,14 +2600,14 @@ void collect_terms::remove_zeroed_terms(sibling_iterator from, sibling_iterator 
 		}
 	}
 
-algorithm::result_t collect_terms::apply(sibling_iterator& from, sibling_iterator& to)
-	{
-	assert(*tr.parent(from)->name=="\\sum");
-	fill_hash_map(from, to);
-	result_t res=collect_from_hash_map();
-	remove_zeroed_terms(from, to);
-	return res;
-	}
+//algorithm::result_t collect_terms::apply(sibling_iterator& from, sibling_iterator& to)
+//	{
+//	assert(*tr.parent(from)->name=="\\sum");
+//	fill_hash_map(from, to);
+//	result_t res=collect_from_hash_map();
+//	remove_zeroed_terms(from, to);
+//	return res;
+//	}
 
 algorithm::result_t collect_terms::apply(iterator& st)
 	{
@@ -2781,7 +2781,7 @@ algorithm::result_t sym::apply(iterator& it)
 	prod_wrap_single_term(it);
 	sibling_iterator st=tr.begin(it);
 	sibling_iterator nd=tr.end(it);
-	result_t res=apply(st,nd);
+	result_t res=doit(st,nd,false);
 	if(res==l_applied)
 		it=tr.parent(st);
 	return res;
@@ -2792,26 +2792,26 @@ algorithm::result_t asym::apply(iterator& it)
 	prod_wrap_single_term(it);
 	sibling_iterator st=tr.begin(it);
 	sibling_iterator nd=tr.end(it);
-	result_t res=apply(st,nd);
+	result_t res=doit(st,nd,true);
 	if(res==l_applied)
 		it=tr.parent(st);
 	return res;
 	}
 
-algorithm::result_t sym::apply(sibling_iterator& st, sibling_iterator& nd)
-	{
-	return doit(st, nd, false);
-	}
+//algorithm::result_t sym::apply(sibling_iterator& st, sibling_iterator& nd)
+//	{
+//	return doit(st, nd, false);
+//	}
 
 asym::asym(exptree& tr, iterator it)
 	: algorithm(tr, it), locate(tr, it), sym_asym(tr, it)
 	{
 	}
 
-algorithm::result_t asym::apply(sibling_iterator& st, sibling_iterator& nd)
-	{
-	return doit(st, nd, true);
-	}
+//algorithm::result_t asym::apply(sibling_iterator& st, sibling_iterator& nd)
+//	{
+//	return doit(st, nd, true);
+//	}
 
 
 algorithm::result_t sym_asym::doit(sibling_iterator& st, sibling_iterator& nd, bool sign)

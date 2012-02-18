@@ -27,6 +27,8 @@ class aticksen : public algorithm {
 	public:
 		aticksen(exptree&, iterator);
 
+		using algorithm::apply;
+		using algorithm::can_apply;
 		virtual void     description() const;
 		virtual bool     can_apply(iterator);
 		virtual result_t apply(iterator&);
@@ -44,6 +46,8 @@ class riemannid : public algorithm {
 	public:
 		riemannid(exptree&, iterator);
 
+		using algorithm::apply;
+		using algorithm::can_apply;
 		virtual void     description() const;
 		virtual bool     can_apply(iterator);
 		virtual result_t apply(iterator&);

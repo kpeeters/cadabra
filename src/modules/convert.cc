@@ -55,16 +55,18 @@ frommath::frommath(exptree& tr, iterator it)
 	{
 	}
 
-bool frommath::can_apply(sibling_iterator, sibling_iterator)
+bool frommath::can_apply(iterator)
 	{
 	// FIXME: crude check: if there are still comma separated lists, there
 	// is work to be done.
 	return true;
 	}
 
-algorithm::result_t frommath::apply(sibling_iterator& st, sibling_iterator& nd)
+algorithm::result_t frommath::apply(iterator& top)
 	{
 	// hack: insert something at beginning and end, to be removed later.
+	sibling_iterator st=tr.begin(top);
+	sibling_iterator nd=tr.end(top);
 	st=tr.insert(st, str_node("\\dummy"));
 	nd=tr.insert(nd, str_node("\\dummy"));
 	iterator it=st;

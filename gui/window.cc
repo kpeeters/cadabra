@@ -1330,7 +1330,7 @@ bool XCadabra::current_objtype_and_name(CadabraHelp::objtype_t& objtype, std::st
 		 // for a right-delimiter.
 		 
 		 
-		 size_t lpos=before.size()-1;
+		 int lpos=before.size()-1;
 		 bool accepted_underscore=false;
 		 while(lpos>=0) {
 			  if(before[lpos]==':' && lpos>0 && before[lpos-1]==':') {

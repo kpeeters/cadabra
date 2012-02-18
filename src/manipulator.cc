@@ -1143,7 +1143,8 @@ exptree::iterator manipulator::run_procedure(exptree::iterator proc, long collec
 			collected=true;
 			txtout << "collecting terms; of " << expressions.number_of_children(act) << " terms ";
 			sibling_iterator from(expressions.begin(act)), to(sib);
-			collector.apply(from, to);
+			collector.apply(act);
+//			collector.apply(from, to);
 			txtout << expressions.number_of_children(act) << " remain." << std::endl;
 			if(getenv("JUSTPROFILE"))
 				goto justforprofiling;

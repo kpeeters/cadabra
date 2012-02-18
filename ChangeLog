@@ -1,3 +1,11 @@
+2012-02-18  Kasper Peeters  <kasper.peeters@aei.mpg.de>
+
+	* Released 1.31
+
+	* Fixed compilation problems on newer g++ versions having to do
+	with functions hiding virtual base functions. Simplified algorithm
+	base class.
+
 2011-06-27  Kasper Peeters  <kasper.peeters@aei.mpg.de>
 
 	* Released 1.30

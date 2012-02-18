@@ -53,6 +53,8 @@ namespace numerical {
 		public:
 			numerical_flatten(exptree&, iterator);
 			
+			using algorithm::apply;
+			using algorithm::can_apply;
 			virtual void     description() const;
 			virtual bool     can_apply(iterator);
 			virtual result_t apply(iterator&);

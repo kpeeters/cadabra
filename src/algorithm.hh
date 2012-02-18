@@ -121,11 +121,11 @@ class algorithm : public active_node {
 
 		virtual bool     is_output_module() const;
 
-		virtual bool     can_apply(iterator);
-		virtual bool     can_apply(sibling_iterator, sibling_iterator);
+		virtual bool     can_apply(iterator)=0;
+//		virtual bool     can_apply(sibling_iterator, sibling_iterator);
 		// These return their result in the return value
-		virtual result_t apply(iterator&);
-		virtual result_t apply(sibling_iterator&, sibling_iterator&);
+		virtual result_t apply(iterator&)=0;
+//		virtual result_t apply(sibling_iterator&, sibling_iterator&);
 
 		// These give result in global_success.
 		bool             apply_recursive(iterator&, bool check_consistency=true, int act_at_level=-1,
