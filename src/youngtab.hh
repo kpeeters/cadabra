@@ -599,7 +599,7 @@ typename filled_tableau<T>::iterator& filled_tableau<T>::iterator::operator-=(un
 	while(n>0) {
 		if(column_number==0) {
 			--row_number;
-			column_number=rows[row_number].size()-1;
+			column_number=tab->rows[row_number].size()-1;
 			}
 		else --column_number;
 		--n;
