@@ -1,0 +1,62 @@
+% Cadabra notebook version 1.1
+\documentclass[11pt]{article}
+\usepackage[textwidth=460pt, textheight=660pt]{geometry}
+\usepackage[dvipsnames,usenames]{color}
+\usepackage{amssymb}
+\usepackage[parfill]{parskip}
+\usepackage{breqn}
+\usepackage{tableaux}
+\def\specialcolon{\mathrel{\mathop{:}}\hspace{-.5em}}
+\renewcommand{\bar}[1]{\overline{#1}}
+\begin{document}
+{\color[named]{Blue}\begin{verbatim}
+{a,b,c,d}::Indices.
+\end{verbatim}}
+% Begin TeX comment
+Assigning list property Indices to $\{a,\; b,\; c,\; d\}$.
+\\
+% End TeX comment
+{\color[named]{Blue}\begin{verbatim}
+R_{a b c d}::RiemannTensor.
+\end{verbatim}}
+% Begin TeX comment
+Assigning property RiemannTensor to ${R}_{a b c d}$.
+\\
+% End TeX comment
+{\color[named]{Blue}\begin{verbatim}
+2 R_{a b c d} R_{a c b d} - R_{a b c d} R_{a b c d};
+\end{verbatim}}
+% orig
+% 2 R_{a b c d} R_{a c b d} - R_{a b c d} R_{a b c d}
+% end_orig
+\begin{dmath*}[compact, spread=2pt]
+1\specialcolon{}= 2\, {R}_{a b c d} {R}_{a c b d} - {R}_{a b c d} {R}_{a b c d};
+\end{dmath*}
+{\color[named]{Blue}\begin{verbatim}
+@young_project_product!(%);
+\end{verbatim}}
+% orig
+% (2/3 R_{a b c d} R_{a c b d} + 2/3 R_{a b c d} R_{a b c d}) + ( - 2/3 R_{a b c d} R_{a b c d} - 2/3 R_{a b c d} R_{a c b d})
+% end_orig
+\begin{dmath*}[compact, spread=2pt]
+1\specialcolon{}= (\frac{2}{3}\, {R}_{a b c d} {R}_{a c b d} + \frac{2}{3}\, {R}_{a b c d} {R}_{a b c d}) + ( - \frac{2}{3}\, {R}_{a b c d} {R}_{a b c d} - \frac{2}{3}\, {R}_{a b c d} {R}_{a c b d});
+\end{dmath*}
+{\color[named]{Blue}\begin{verbatim}
+@sumflatten!(%);
+\end{verbatim}}
+% orig
+% 2/3 R_{a b c d} R_{a c b d} + 2/3 R_{a b c d} R_{a b c d} - 2/3 R_{a b c d} R_{a b c d} - 2/3 R_{a b c d} R_{a c b d}
+% end_orig
+\begin{dmath*}[compact, spread=2pt]
+1\specialcolon{}= \frac{2}{3}\, {R}_{a b c d} {R}_{a c b d} + \frac{2}{3}\, {R}_{a b c d} {R}_{a b c d} - \frac{2}{3}\, {R}_{a b c d} {R}_{a b c d} - \frac{2}{3}\, {R}_{a b c d} {R}_{a c b d};
+\end{dmath*}
+{\color[named]{Blue}\begin{verbatim}
+@collect_terms!(%);
+\end{verbatim}}
+% orig
+% 0
+% end_orig
+\begin{dmath*}[compact, spread=2pt]
+1\specialcolon{}= 0;
+\end{dmath*}
+\end{document}
