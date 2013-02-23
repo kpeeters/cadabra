@@ -154,10 +154,10 @@ if test "`uname`" == "Darwin"
    else echo "checking system type... Unix"
 fi
 
-echo -n "Checking whether to use -fnested-functions..."
+echo -n "Checking whether to use -fnested-functions with ${CXX}... "
 echo "main() {};" > conftmp.c
 NESTED=-fnested-functions
-if gcc -fnested-functions -c -o conftmp.o conftmp.c 1>/dev/null 2>&1
+if ${CXX} -fnested-functions -c -o conftmp.o conftmp.c 1>/dev/null 2>&1
    then echo " yes"
    else NESTED=""
         echo " no"
