@@ -67,8 +67,8 @@ class exit_exception {
 
 
 /// Singleton object which pulls in data from the input streams, handles switching
-/// between streams, feeds data to the parser, and calls the algorithm objects
-/// to perform action on the expression tree.
+/// between streams, and feeds data to the parser in 'engine'.
+
 class manipulator : public sigc::trackable {
 	public:
 		manipulator();
