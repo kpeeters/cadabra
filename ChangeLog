@@ -1,3 +1,11 @@
+2014-03-14  Kasper Peeters  <kasper.peeters@aei.mpg.de>
+
+	* Tagged 1.34
+
+	* Modified xperm_new.c -> .cc to not rely on nested functions and
+	variable-sized arrays anymore. This makes it compile with clang.
+	Passes all tests again.
+
 2012-02-18  Kasper Peeters  <kasper.peeters@aei.mpg.de>
 
 	* Released 1.31

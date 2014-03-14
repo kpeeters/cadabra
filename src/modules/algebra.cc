@@ -32,13 +32,7 @@
 #include "dummies.hh"
 #include "field_theory.hh"
 #include "numerical.hh"
-extern "C" {
-#ifdef NEW_XPERM
-  #include "xperm_new.h"
-#else
-  #include "xperm.h"
-#endif
-}
+#include "xperm_new.h"
 #include <utility>
 #include <algorithm>
 #include <set>
