@@ -2659,10 +2659,10 @@ std::string XCadabra::save(const std::string& fn) const
 		return "Cannot open file for writing.";
 		}
 	else {
-		str << "% Cadabra notebook version 1.1\n"
+		str << "% Cadabra notebook version 1.2\n"
 			 << "\\documentclass[11pt]{article}\n"
 			 << "\\usepackage[textwidth=460pt, textheight=660pt]{geometry}\n"
-			 << "\\usepackage[usenames]{color}\n"
+			 << "\\usepackage[usenames,dvipsnames]{color}\n"
 			 << "\\usepackage{amssymb}\n"
 			 << "\\usepackage[parfill]{parskip}\n"
 			 << "\\usepackage{breqn}\n"

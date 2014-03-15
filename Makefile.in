@@ -1,5 +1,5 @@
 
-export RELEASE=1.34
+export RELEASE=1.35
 export LDFLAGS=@LDFLAGS@
 
 .PHONY: static program_static test fasttest gui gui_static doc
