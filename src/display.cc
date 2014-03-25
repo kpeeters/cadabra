@@ -205,7 +205,7 @@ void print_productlike::doprint(std::ostream& str, exptree::iterator it, const s
 //	bool close_bracket=false;
 	if(*it->multiplier!=1) {
 		print_multiplier(str, it);
-		sibling_iterator st=tr.begin(it);
+//		sibling_iterator st=tr.begin(it);
 //		while(st!=tr.end(it)) {
 //			if(*st->name=="\\sum") {
 //				str << "(";
@@ -834,7 +834,7 @@ print_indexbracket::print_indexbracket(exptree_output& eo)
 
 void print_indexbracket::print_infix(std::ostream& str, exptree::iterator it)
 	{
-	iterator arg=tr.begin(it);
+//	iterator arg=tr.begin(it);
 //	if(*arg->name!="\\sum" && *arg->name!="\\prod") {
 //		if(children_have_brackets(it))
 //			print_opening_bracket(str,arg->fl.bracket);
@@ -1409,8 +1409,8 @@ void mathml_node_printer::print_multiplier(std::ostream& str, exptree::iterator 
 		}
 
 	if(!turned_one && !(*it->name=="1")) {
-		if(parent.print_star && !parent.output_format==exptree_output::out_texmacs &&
-			!parent.output_format==exptree_output::out_xcadabra ) {
+		if(parent.print_star && !(parent.output_format==exptree_output::out_texmacs) &&
+			!(parent.output_format==exptree_output::out_xcadabra) ) {
 			if(parent.tight_star) str << "*";
 			else if(parent.utf8_output)
 				str << unichar(0x00a0) << "*" << unichar(0x00a0);

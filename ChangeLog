@@ -1,5 +1,9 @@
 2014-03-25  Kasper Peeters  <kasper.peeters@aei.mpg.de>
 
+	* 1.37
+
+	* Fixes for problems flagged by clang.
+
 	* Released 1.36
 
 	* Fixed a bug that made 2*(-A+B) get simplified

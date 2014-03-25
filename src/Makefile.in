@@ -6,7 +6,7 @@ MACTEST= @MAC_OS_X@
 all:     cadabra modules tests 
 static:  cadabra_static
 tests:   test_gmp test_preprocessor test_tree tree_example test_combinatorics test_young \
-         tree_regression_tests test_xperm test_lie
+         tree_regression_tests test_lie
 #test_parser 
 
 OBJS =preprocessor.o storage.o display.o parser.o main.o algorithm.o manipulator.o \
@@ -29,8 +29,8 @@ TIMESTAMP = -D"RELEASE=\"${RELEASE}\"" -D"DATETIME=\"`date | sed -e 's/  / /'`\"
 %.o: %.cc
 	@CXX@ ${MCFLAGS} ${TIMESTAMP} -c -o $@ $<
 
-modules/xperm.o: modules/xperm.c
-	@CC@ @NESTED@ ${MCFLAGS} ${TIMESTAMP} -c -o $@ $<
+# modules/xperm.o: modules/xperm.c
+# 	@CC@ @NESTED@ ${MCFLAGS} ${TIMESTAMP} -c -o $@ $<
 
 #modules/xperm_new.o: modules/xperm_new.c
 #	@CC@ @NESTED@ ${MCFLAGS} ${TIMESTAMP} -c -o $@ $<
@@ -89,8 +89,8 @@ endif
 tree_regression_tests: tree_regression_tests.o 
 	@CXX@ -o tree_regression_tests tree_regression_tests.o
 
-test_xperm: test_xperm.o modules/xperm.o
-	@CXX@ -o test_xperm test_xperm.o modules/xperm.o
+#test_xperm: test_xperm.o modules/xperm_new.o
+#	@CXX@ -o test_xperm test_xperm.o modules/xperm_new.o
 
 tree_example: tree_example.o tree.hh
 	@CXX@ -o tree_example tree_example.o
