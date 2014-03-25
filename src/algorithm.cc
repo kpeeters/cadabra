@@ -1777,12 +1777,16 @@ void cleanup_expression(exptree& tr)
 void cleanup_expression(exptree& tr, exptree::iterator& it)
 	{
 //	txtout << "cleanup called on " << *it->name << std::endl;
+//	tr.print_recursive_treeform(txtout, it);
 	ratrewrite rr(tr, tr.end());
 	rr.apply_recursive(it,false);
+//	tr.print_recursive_treeform(txtout, it);
 	reduce_sub rsub(tr, tr.end());
 	rsub.apply_recursive(it, false);
+//	tr.print_recursive_treeform(txtout, it);
 	reduce_div rdiv(tr, tr.end());
 	rdiv.apply_recursive(it, false);
+//	tr.print_recursive_treeform(txtout, it);
 
 	cleanup_sums_products(tr,it);
 //	cleanup_nests_below(tr, tr.begin());
