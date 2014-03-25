@@ -366,12 +366,12 @@ class exptree_comparator {
 
 class exptree_is_equivalent {
 	public:
-		bool operator()(const exptree&, const exptree&);
+		bool operator()(const exptree&, const exptree&) const;
 };
 
 class exptree_is_less {
 	public:
-		bool operator()(const exptree&, const exptree&);
+		bool operator()(const exptree&, const exptree&) const;
 };
 
 

@@ -1930,14 +1930,14 @@ bool exptree_comparator::satisfies_conditions(exptree::iterator conditions, std:
 	return true;
 	}
 
-bool exptree_is_equivalent::operator()(const exptree& one, const exptree& two)
+bool exptree_is_equivalent::operator()(const exptree& one, const exptree& two) const
 	{
 	int ret=subtree_compare(one.begin(), two.begin());
 	if(ret==0) return true;
 	else       return false;
 	}
 
-bool exptree_is_less::operator()(const exptree& one, const exptree& two)
+bool exptree_is_less::operator()(const exptree& one, const exptree& two) const
 	{
 	int ret=subtree_compare(one.begin(), two.begin());
 	if(ret < 0) return true;
