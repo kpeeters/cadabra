@@ -287,7 +287,7 @@ class prodsort : public algorithm {
 		virtual result_t apply(iterator&);
 
 	private:
-		bool ignore_numbers_;
+//		bool ignore_numbers_;
 };
 
 class spinorsort : public algorithm {

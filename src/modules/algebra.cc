@@ -1303,7 +1303,7 @@ bool sumsort::should_swap(iterator obj, int subtree_comparison) const
 
 
 prodsort::prodsort(exptree& tr, iterator it)
-	: algorithm(tr, it), ignore_numbers_(false)
+	: algorithm(tr, it) //, ignore_numbers_(false)
 	{
 //	if(has_argument("IgnoreNumbers")) {
 //		txtout << "ignoring numbers" << std::endl;
@@ -3240,6 +3240,8 @@ algorithm::result_t canonicalise::apply(iterator& it)
 //				vec_perm.push_back(ii->second+1);
 //				num_to_tree_map.push_back(exptree(i2->first));
 //				num_to_tree_map.push_back(exptree(ii->first));
+				break;
+			default:
 				break;
 			}
 

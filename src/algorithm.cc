@@ -713,7 +713,7 @@ void algorithm::pushup_multiplier(iterator it)
 //			txtout << "PUSHUP: " << *it->name << std::endl;
 			if(tr.is_valid(tr.parent(it))) {
 //				txtout << "test propinherit" << std::endl;
-				iterator tmp=tr.parent(it);
+//				iterator tmp=tr.parent(it);
 				// tmp not always valid?!? This one crashes hard with a loop!?!
 //				txtout << " of " << *tmp->name << std::endl;
 				const PropertyInherit *pin=properties::get<PropertyInherit>(tr.parent(it));
@@ -823,7 +823,7 @@ bool algorithm::check_consistency(iterator it) const
 	w1.start();
 	debugout << "checking consistency ... " << std::flush;
 	assert(*it->name=="\\expression");
-	iterator entry=it;
+//	iterator entry=it;
 	iterator end=it;
 	end.skip_children();
 	++end;

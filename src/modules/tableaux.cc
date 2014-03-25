@@ -535,7 +535,7 @@ algorithm::result_t young_project_product::apply(iterator& it)
 					// Distribute this projected factor over all existing terms in rep,
 					sibling_iterator trm=rep.begin(topsum);
 					while(trm!=rep.end(topsum)) {
-						 iterator tmp=trm;
+//						 iterator tmp=trm;
 						 sibling_iterator nxttrm=trm;
 						 ++nxttrm;
 

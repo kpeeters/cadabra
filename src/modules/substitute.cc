@@ -24,7 +24,7 @@
 #include "dummies.hh"
 
 substitute::substitute(exptree& tr, iterator it)
-	: algorithm(tr, it), start_reporting_outside(false), prodsort_(tr, it)
+	: algorithm(tr, it), prodsort_(tr, it) // start_reporting_outside(false), 
 	{
 	if(number_of_args()==0) {
 		txtout << "substitute: need (list of) replacement rules." << std::endl;
@@ -535,7 +535,8 @@ algorithm::result_t vary::apply(iterator& it)
 				if(fcit2->is_zero()==false && res==algorithm::l_applied) {
 					expression_modified=true;
 //					txtout << "new term\n";
-					iterator newterm=result.append_child(newsum, it);
+//					iterator newterm=
+					result.append_child(newsum, it);
 					}
 
 				// restore original

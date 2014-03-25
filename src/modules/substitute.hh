@@ -48,7 +48,7 @@ class substitute : public algorithm {
 		std::vector<bool>  lhs_contains_dummies, rhs_contains_dummies;
 
 		stopwatch tmr;
-		bool start_reporting_outside;
+//		bool start_reporting_outside;
 
 		// For object swap testing routines:
 		prodsort    prodsort_;

@@ -283,7 +283,7 @@ bool manipulator::getline_precut(std::istream& str, std::string& buf)
 	if(getline_precut_buffer.size()==0 || getline_was_eof) {
 		std::string input_now;
 		getline_was_eof=false;
-		if(std::getline(str, input_now)==false)
+		if(!std::getline(str, input_now))
 			return false;
 		getline_precut_buffer+=input_now;
 		}
@@ -770,7 +770,8 @@ nset_t::iterator manipulator::collect_labels_(exptree& tr, exptree::iterator it)
 			nset_t::iterator name=tr.child(sit,0)->name;
 			// insert a label
 			iterator lit=tr.insert(it, str_node("\\label", str_node::b_no));
-			iterator nameit=tr.append_child(lit, str_node(*name, str_node::b_none));
+//			iterator nameit=
+			tr.append_child(lit, str_node(*name, str_node::b_none));
 			// remove the declare node
 			tr.flatten(sit);
 			sit=tr.erase(sit);
@@ -1142,7 +1143,8 @@ exptree::iterator manipulator::run_procedure(exptree::iterator proc, long collec
 			collectcount=0;
 			collected=true;
 			txtout << "collecting terms; of " << expressions.number_of_children(act) << " terms ";
-			sibling_iterator from(expressions.begin(act)), to(sib);
+//			sibling_iterator from(expressions.begin(act)),
+			sibling_iterator to(sib);
 			collector.apply(act);
 //			collector.apply(from, to);
 			txtout << expressions.number_of_children(act) << " remain." << std::endl;

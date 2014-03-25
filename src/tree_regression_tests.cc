@@ -87,7 +87,8 @@ int test2()
 	h1  =tr.append_child(body, "h1");
 	bh1 =tr.insert(h1,"before h1");
 	sometext = tr.append_child(h1, "some text");
-	tree<std::string>::sibling_iterator more_text=tr.append_child(body, "more text");
+//	tree<std::string>::sibling_iterator more_text=
+	tr.append_child(body, "more text");
 	
 	res*=compare_tree("basic algorithms", tr, "extra\nhtml(body(before h1, h1(some text), more text))");
 

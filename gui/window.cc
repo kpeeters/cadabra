@@ -488,7 +488,8 @@ VisualCell *NotebookCanvas::add_cell(Glib::RefPtr<DataCell> dc, Glib::RefPtr<Dat
 			std::ostringstream fstr;
 			fstr << THEFONT << " " << 12+(doc.font_step*2); 
 			newcell->inbox=manage( new ExpressionInput(dc->textbuf, fstr.str()) );
-			Gtk::VBox::BoxList::iterator newit=bl.insert(gtkit, *newcell->inbox);
+//			Gtk::VBox::BoxList::iterator newit=
+			bl.insert(gtkit, *newcell->inbox);
 
 			gtk_box_set_child_packing(((Gtk::Box *)(&scrollbox))->gobj(), 
 											  ((Gtk::Widget *)(newcell->inbox))->gobj(),
@@ -517,7 +518,8 @@ VisualCell *NotebookCanvas::add_cell(Glib::RefPtr<DataCell> dc, Glib::RefPtr<Dat
 		case DataCell::c_texcomment:
 		case DataCell::c_comment: {
 			newcell->outbox=manage( new TeXView(dc->texbuf) );
-			Gtk::VBox::BoxList::iterator newit=bl.insert(gtkit, *newcell->outbox);
+//			Gtk::VBox::BoxList::iterator newit=
+			bl.insert(gtkit, *newcell->outbox);
          // REPORT BUG: this sometimes segfaults
          //			(*newit).set_options(Gtk::PACK_SHRINK);
 			gtk_box_set_child_packing(((Gtk::Box *)(&scrollbox))->gobj(), 
@@ -542,7 +544,8 @@ VisualCell *NotebookCanvas::add_cell(Glib::RefPtr<DataCell> dc, Glib::RefPtr<Dat
 				sigc::bind(
 					sigc::mem_fun(doc, &XCadabra::handle_tex_update_request), this, newcell));
 
-			Gtk::VBox::BoxList::iterator newit=bl.insert(gtkit, *newcell->texbox);
+//			Gtk::VBox::BoxList::iterator newit=
+			bl.insert(gtkit, *newcell->texbox);
 
 			gtk_box_set_child_packing(((Gtk::Box *)(&scrollbox))->gobj(), 
 											  ((Gtk::Widget *)(newcell->texbox))->gobj(),
@@ -1593,7 +1596,8 @@ Glib::RefPtr<DataCell> XCadabra::add_cell(Glib::RefPtr<DataCell> newcell, Glib::
 			}
 		}
 
-	Gtk::Allocation al=get_allocation();
+//	Gtk::Allocation al=
+	get_allocation();
 
 	try {
 		switch(newcell->cell_type) {
@@ -3284,7 +3288,7 @@ std::string XCadabra::load_config()
 			  if(rl.size()>0 && rl[0]=='#')
 					continue;
 
-			  unsigned int pos=rl.find(":=");
+			  size_t pos=rl.find(":=");
 			  if(pos==std::string::npos) {
 					str << "Error parsing ~/.xcadabra on line " << line << std::endl;
 					return str.str();
