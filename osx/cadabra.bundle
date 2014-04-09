@@ -1,0 +1,24 @@
+<?xml version="1.0"?> <!--*- mode: xml -*-->
+<app-bundle>
+  <meta>
+    <prefix>/usr/local/opt/gtk+-quartz</prefix>
+  </meta>
+
+  <plist>Info.plist</plist>
+
+  <!-- Optionally specify a launcher script to use. Builtin script is
+       used if not specified.  -->
+  <!--launcher-script>${project}/launcher.sh</launcher-script-->
+
+  <!-- The executable for the application -->
+  <main-binary dest="${bundle}/bin">/usr/local/bin/xcadabra</main-binary>
+
+  <!-- Modules for GTK+ (image loaders, etc) -->
+  <binary>${prefix}/lib/gtk-2.0</binary>
+
+  <!-- Any additional data, like images, or Glade files -->
+<!--  <data>
+    ${prefix}/share/my-app
+  </data>
+-->
+</app-bundle>
