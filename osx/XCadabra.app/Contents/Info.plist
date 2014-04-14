@@ -4,13 +4,13 @@ PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
   <key>CFBundleGetInfoString</key>
-  <string>Cadabra</string>  
+  <string>XCadabra</string>  
   <key>CFBundleExecutable</key>
   <string>launch</string>
   <key>CFBundleIdentifier</key>
   <string>com.phi-sci.cadabra</string>
   <key>CFBundleName</key>
-  <string>cadabra</string>
+  <string>xcadabra</string>
   <key>CFBundleIconFile</key>
   <string>cadabra.icns</string>
   <key>CFBundleShortVersionString</key>

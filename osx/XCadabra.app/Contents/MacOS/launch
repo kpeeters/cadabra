@@ -1,4 +1,4 @@
 #!/bin/bash
 cd "${0%/*}"
 #./cadabra
-open -a Terminal ./cadabra
+open -a Terminal ./xcadabra
