@@ -452,7 +452,6 @@ tst36:= - a b - @(obj36);
 @collect_terms!(%);
 @assert(tst36);
 
-
 # Test 37: weight inheritance
 #
 @reset.
@@ -462,3 +461,10 @@ D{#}::Derivative.
 D_{a}( b c ) + D_{c}( d e );
 @keep_weight!(%){grassmann}{3};
 
+# Test 38: stupid nested expression bug
+@reset.
+obj37:= A - ( B - ( C - ( D - E ) ) );
+@sumflatten!(%);
+tst38:= A - B + C - D + E - @(obj37);
+@collect_terms!(%);
+@assert(tst38);

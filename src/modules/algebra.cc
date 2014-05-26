@@ -1573,7 +1573,7 @@ algorithm::result_t reduce_sub::apply(iterator& it)
 	{
 	assert(tr.number_of_children(it)>1); // To guarantee that we have really cleaned up that old stuff.
 
-	it->name=name_set.insert("\\sum").first;
+	it->name=name_set.insert("\\sum").first; // Rename the node to \sum.
 	exptree::sibling_iterator sit=tr.begin(it);
 
 	// Make sure that all terms have the right sign, and zeroes are removed.
@@ -1599,6 +1599,9 @@ algorithm::result_t reduce_sub::apply(iterator& it)
 		tr.flatten(it);
 		it=tr.erase(it);
 		}
+
+//	txtout << "reduce_sub:" << std::endl;
+//	tr.print_recursive_treeform(txtout, it);
 
 	expression_modified=true;
 	return l_applied;

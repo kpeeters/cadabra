@@ -82,7 +82,7 @@ tst8:= (1/4 * k_{r1} * k_{s1} * zeta_{r2 s2}
      - 1/4 * k_{s3} * k_{r4} * zeta_{r3 s4}
      + 1/4 * k_{s3} * k_{s4} * zeta_{r3 r4}) - @(obj8);
 @distribute!(%);
-@collect_terms!(%):
+@collect_terms!(%);
 @assert(tst8);
 
 

@@ -1,3 +1,10 @@
+2014-05-26  Kasper Peeters  <kasper.peeters@aei.mpg.de>
+
+	* Released 1.38
+
+	* Fixed a sign bug with nested expressions (probably related to
+	the one fixed for 1.36...).
+
 2014-03-25  Kasper Peeters  <kasper.peeters@aei.mpg.de>
 
 	* 1.37

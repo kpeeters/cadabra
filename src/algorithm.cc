@@ -698,16 +698,17 @@ void algorithm::pushup_multiplier(iterator it)
 		if(*it->name=="\\sum") {
 //			txtout << "SUM" << std::endl;
 			sibling_iterator sib=tr.begin(it);
+			multiplier_t sum_multiplier=*it->multiplier;
+			::one(it->multiplier);
 			while(sib!=tr.end(it)) {
-				multiply(sib->multiplier, *it->multiplier);
+				multiply(sib->multiplier, sum_multiplier);
 //				txtout << "going up" << std::endl;
 				pushup_multiplier(tr.parent(it));
 //				txtout << "back and back up" << std::endl;
-				pushup_multiplier(sib);
+//				pushup_multiplier(sib);
 //				txtout << "back" << std::endl;
 				++sib;
 				}
-			::one(it->multiplier);
 			}
 		else {
 //			txtout << "PUSHUP: " << *it->name << std::endl;
@@ -1786,7 +1787,6 @@ void cleanup_expression(exptree& tr, exptree::iterator& it)
 //	tr.print_recursive_treeform(txtout, it);
 	reduce_div rdiv(tr, tr.end());
 	rdiv.apply_recursive(it, false);
-//	tr.print_recursive_treeform(txtout, it);
 
 	cleanup_sums_products(tr,it);
 //	cleanup_nests_below(tr, tr.begin());
@@ -1798,6 +1798,8 @@ void cleanup_sums_products(exptree& tr, exptree::iterator& it)
 	sumflatten sf(tr, tr.end());
 	sf.make_consistent_only=true;
 	sf.apply_recursive(it, false);
+//	txtout << "one" << std::endl;
+//	tr.print_recursive_treeform(txtout, it);
 	prodflatten pf(tr, tr.end());
 	pf.make_consistent_only=true;
 	pf.apply_recursive(it, false);
@@ -1871,18 +1873,20 @@ void cleanup_nests(exptree&tr, exptree::iterator &it, bool ignore_bracket_types)
 //		txtout << tr.begin(it)->fl.bracket << " " << it->fl.bracket << std::endl;
 		if(*(tr.parent(it)->name)=="\\sum" && (ignore_bracket_types || tr.begin(it)->fl.bracket==it->fl.bracket) ) {
 			// WARNING, this is a copy of code in sumflatten!
+//			txtout << "still ok?" << std::endl;
+//			tr.print_recursive_treeform(txtout, tr.begin());
 			exptree::sibling_iterator facs=tr.begin(tr.parent(it));
 			str_node::bracket_t btype_par=facs->fl.bracket;
 			exptree::sibling_iterator terms=tr.begin(it);
 			while(terms!=tr.end(it)) {
-				multiplier_t tfac=(*terms->multiplier)*(*it->multiplier);
-				terms->multiplier=rat_set.insert(tfac).first;
+				multiply(terms->multiplier,*it->multiplier);
 				terms->fl.bracket=btype_par;
 				++terms;
 				}
 			tr.flatten(it);
 			// FIXME: this is dangerous:
 			it=tr.parent(tr.erase(it));
+//			tr.print_recursive_treeform(txtout, tr.begin());
 			}
 		return;
 		}
