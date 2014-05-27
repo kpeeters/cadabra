@@ -2797,7 +2797,9 @@ std::string XCadabra::load(const std::string& fn, bool ignore_nonexistence)
 		std::getline(str,ln);
 		if(ln.substr(0,30)!="% Cadabra notebook version 1.0") {
 			if(ln.substr(0,30)!="% Cadabra notebook version 1.1") {
-				return "Not in Cadabra notebook version <= 1.1 format.";
+				if(ln.substr(0,30)!="% Cadabra notebook version 1.2") {
+					return "Not in Cadabra notebook version <= 1.2 format.";
+					}
 				}
 			}
 
