@@ -952,3 +952,12 @@ X:= c a**3;
 tst82:= @(X) - \epsilon a**{3} + 3 c a**{2} \epsilon;
 @collect_terms!(%);
 @assert(tst82);
+
+# Bug reported Wed, 28 May 2014 11:15:28 +0800
+#
+@reset.
+obj83:= A B+B A;
+@vary(%)( A -> \epsilon D,B -> \epsilon C,C -> \epsilon A - \epsilon B );
+tst83:= \epsilon D B + A \epsilon C + \epsilon C A + B \epsilon D - @(obj83);
+@collect_terms!(%);
+@assert(tst83);

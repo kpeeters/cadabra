@@ -1867,7 +1867,7 @@ void cleanup_nests(exptree&tr, exptree::iterator &it, bool ignore_bracket_types)
 		assert(tr.parent(it)!=tr.end());
 //		txtout << "*** " << *tr.parent(it)->name << std::endl;
       if(*(tr.parent(it)->name)=="\\prod" && (ignore_bracket_types || tr.begin(it)->fl.bracket==it->fl.bracket) ) {
-			txtout << "going to flatten product" << std::endl;
+//			txtout << "going to flatten product" << std::endl;
          multiplier_t fac=*(tr.parent(it)->multiplier)*(*it->multiplier);
          tr.parent(it)->multiplier=rat_set.insert(fac).first;
          tr.flatten(it);
