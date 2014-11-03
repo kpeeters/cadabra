@@ -716,7 +716,11 @@ algorithm::result_t prodrule::apply(iterator& it)
 			  ++repch;
 		 sibling_iterator pw2=tr.begin(repch);
 		 rep.move_before(repch, pw2);
+//		 txtout << "after rep.move_before" << std::endl;
+//		 tr.print_recursive_treeform(txtout, rep.begin());
 		 rep.erase(repch);
+//		 txtout << "after rep.erase" << std::endl;
+//		 tr.print_recursive_treeform(txtout, rep.begin());
 
 		 if(pw->is_integer()) {                                   // A**n -> A**(n-1)
 			  if(*pw->multiplier==2) {
@@ -729,6 +733,8 @@ algorithm::result_t prodrule::apply(iterator& it)
 					++pw2;
 					add(pw2->multiplier, -1);
 					}
+//			  txtout << "after all done " << std::endl;
+//			  tr.print_recursive_treeform(txtout, rep.begin());
 			  }
 		 else {
 			  pw2=tr.begin(pref);
@@ -825,8 +831,13 @@ algorithm::result_t prodrule::apply(iterator& it)
 	expression_modified=true;
 	it=tr.replace(it,rep.begin()); 
 //	multiply(it->multiplier, mult);
+//	TODO: this cleans up too much
 	cleanup_expression(tr, it);
-	cleanup_nests(tr, it);
+//	txtout << "before cleanup_nests" << std::endl;
+//	tr.print_recursive_treeform(txtout, it);
+	cleanup_nests_below(tr, it);
+//	txtout << "after cleanup_nests" << std::endl;
+//	tr.print_recursive_treeform(txtout, it);
 	return l_applied;
 	}
 

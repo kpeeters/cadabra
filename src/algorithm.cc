@@ -1787,8 +1787,16 @@ void cleanup_expression(exptree& tr, exptree::iterator& it)
 //	tr.print_recursive_treeform(txtout, it);
 	reduce_div rdiv(tr, tr.end());
 	rdiv.apply_recursive(it, false);
+	
+
+//	txtout << "---" << std::endl;
+//	tr.print_recursive_treeform(txtout, it);
 
 	cleanup_sums_products(tr,it);
+
+//	txtout << "after cleanup" << std::endl;
+//	tr.print_recursive_treeform(txtout, it);
+
 //	cleanup_nests_below(tr, tr.begin());
 //	cleanup_nests(tr,it); // FIXME: enabling this is pointless as 'it' points to \expression
 	}
@@ -1859,6 +1867,7 @@ void cleanup_nests(exptree&tr, exptree::iterator &it, bool ignore_bracket_types)
 		assert(tr.parent(it)!=tr.end());
 //		txtout << "*** " << *tr.parent(it)->name << std::endl;
       if(*(tr.parent(it)->name)=="\\prod" && (ignore_bracket_types || tr.begin(it)->fl.bracket==it->fl.bracket) ) {
+			txtout << "going to flatten product" << std::endl;
          multiplier_t fac=*(tr.parent(it)->multiplier)*(*it->multiplier);
          tr.parent(it)->multiplier=rat_set.insert(fac).first;
          tr.flatten(it);

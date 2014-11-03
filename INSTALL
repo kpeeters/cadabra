@@ -1,9 +1,48 @@
 
-To install `cadabra', do
+Generic instructions
+----------------------------------
+
+On a Linux machine, or on an OS X machine with all required dependencies
+installed (see below), installation is a matter of
 
    ./configure
    make
-   make install
+   sudo make install
 
 as usual. If you want it installed in a different directory
 than /usr/local, use the --prefix option to configure.
+
+
+OS-X
+----------------------------------
+
+On OS-X you need to install a bunch of other things before you can
+compile cadabra. The following has been tested on a clean installation
+of Mavericks, and uses Homebrew to get the third-party libraries.
+
+The first steps are easy:
+
+ - install XCode from the Apple store.
+ - install Homebrew from http://brew.sh
+ - install MacTeX from http://tug.org/mactex/downloading.html
+
+You now have two options. Either you use the Gtk which relies on X11,
+or you use a version of Gtk which directly uses the Quartz interface. 
+
+ - X11 version:
+
+     brew install gtk+ pango pangomm gtkmm cairo cairomm
+     export PKG_CONFIG_PATH=/opt/X11/lib/pkgconfig
+
+ - Quartz version:
+
+     brew tap acornejo/quartz
+     brew install gtk+-quartz pango-quartz pangomm-quartz 
+     brew install gtkmm-quartz cairo-quartz cairomm-quartz
+
+After this you should be able to configure and build Cadabra with
+
+     ./configure --disable-runtime-dependency-checks
+     make
+     sudo make install
+

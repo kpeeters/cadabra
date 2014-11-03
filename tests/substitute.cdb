@@ -934,3 +934,21 @@ tst80b:= (k - m - n) L_{k+m+n} - @(obj80b);
 # @collect_terms!(%);
 # @substitute!(%)( k -> -m - n);
 
+# Bug reported Sun, 2 Nov 2014 09:41:51 +0800
+#
+@reset.
+\partial{#}::PartialDerivative.
+xx:= \partial_{m}{A}\partial_{n}{B}:
+@vary(xx)(A->\delta{A});
+tst81:= \partial_{m}{\delta{A}}\partial_{n}{B} - @(xx);
+@collect_terms!(%);
+@assert(tst81);
+
+# Bug reported a long time ago
+#
+@reset.
+X:= c a**3;
+@vary(%)( c -> \epsilon, a -> -\epsilon);
+tst82:= @(X) - \epsilon a**{3} + 3 c a**{2} \epsilon;
+@collect_terms!(%);
+@assert(tst82);

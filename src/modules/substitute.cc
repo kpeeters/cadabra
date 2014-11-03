@@ -497,15 +497,15 @@ algorithm::result_t vary::apply(iterator& it)
 			}
 
 		// If no variation took place, set to zero if we are termlike.
-//		txtout << "on " << *it->name << " " << has_applied << " " << is_termlike(it) << " " << expression_modified << std::endl;
+//		txtout << "on " << *it->name << " " << has_applied << " " << is_termlike(it) << " " << expression_modified << " " << vry.expression_modified << std::endl;
 		if(!has_applied && is_termlike(it)) {
 			zero(it->multiplier);
 			expression_modified=true;
 			return l_applied;
 			}
 
-		if(expression_modified) return l_applied;
-		else                    return l_no_action;
+		if(vry.expression_modified) return l_applied;
+		else                        return l_no_action;
 		}
 
 	if(*it->name=="\\prod") {
@@ -554,7 +554,9 @@ algorithm::result_t vary::apply(iterator& it)
 			zero(it->multiplier);
 			expression_modified=true;
 			}
-		return l_applied;
+//		txtout << "exit prod, expression modified " << expression_modified << std::endl;
+		if(expression_modified) return l_applied;
+		else                    return l_no_action;
 		}
 
 	if(*it->name=="\\sum") { // call vary on every term
@@ -562,14 +564,17 @@ algorithm::result_t vary::apply(iterator& it)
 
 		sibling_iterator sib=tr.begin(it);
 		while(sib!=tr.end(it)) {
+//			txtout << "in sum, acting on " << *sib->name << std::endl;
 			iterator app=sib;
 			++sib;
 			if(vry.can_apply(app)) {
-				vry.apply(app);
+				algorithm::result_t res = vry.apply(app);
 				if(app->is_zero()) {
 					expression_modified=true;
 					tr.erase(app);  // remove this term
 					}
+				if(res==l_applied)
+					expression_modified=true;
 				}
 			else {
 				// remove this term
@@ -593,12 +598,16 @@ algorithm::result_t vary::apply(iterator& it)
 	if(*it->name=="\\pow") { 
 		// Wrap the power in a \cdb_Derivative and then call @prodrule.
 		it=tr.wrap(it, str_node("\\cdb_Derivative"));
+//		txtout << "** before prodrule\n";
+//		tr.print_recursive_treeform(txtout, it);
 		prodrule pr(tr, it);
 		pr.can_apply(it);
 		pr.apply(it);
+//		txtout << "** after prodrule\n";
+//		tr.print_recursive_treeform(txtout, it);
 		// Find the '\cdb_Derivative node again'.
 		sibling_iterator sib=tr.begin(it);
-		while(sib!=tr.end()) {
+		while(sib!=tr.end(it)) {
 			if(*sib->name=="\\cdb_Derivative") {
 				tr.flatten(sib);
 				sib=tr.erase(sib);
@@ -612,6 +621,7 @@ algorithm::result_t vary::apply(iterator& it)
 				}
 			++sib;
 			}
+//		txtout << "** after removing cdb_der" << std::endl;
 //		tr.print_recursive_treeform(txtout, it);
 		}
 	
@@ -653,7 +663,8 @@ algorithm::result_t vary::apply(iterator& it)
 		return l_no_action;
 		}
 
-	return l_no_action;
+	if(expression_modified) return l_applied;
+	else return l_no_action;
 	}
 
 

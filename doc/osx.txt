@@ -1,0 +1,30 @@
+In order to build cadabra on osx, first install XCode and then make
+sure that a working homebrew installation is present,
+
+  http://brew.sh
+
+You need to install several packages from homebrew in order to build
+modglue and cadabra. Install them with
+
+ brew install pkgconfig libsigc++ libtool pcre pcre++ gmp 
+ brew tap NickBeeuwsaert/homebrew-native
+ brew install gtkmm-native
+
+The last two lines instruct brew to get a native OS X version of the
+GTK libraries, instead of a version that uses X11 and requires
+XQuartz. You can build with the X11 versions as well (i.e. you can
+instead do 'brew install gtkmm'), but cadabra will not look as nice.
+
+Install modglue with
+
+   cd modglue
+   ./configure
+   make
+   sudo make install
+
+Then install cadabra with
+
+   cd cadabra
+   export CXXFLAGS=-I/usr/local/include
+   ./configure --enable-runtime-dependency-check
+   
