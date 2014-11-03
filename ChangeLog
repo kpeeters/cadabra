@@ -2,7 +2,7 @@
 
 	* Released 1.41
 
-	* Fixed another @vary bug (tst82 in substitute.cdb).
+	* Fixed another two @vary bugs (tst82 & tst83 in substitute.cdb).
 
 2014-11-02  Kasper Peeters  <kasper.peeters@aei.mpg.de>
 
