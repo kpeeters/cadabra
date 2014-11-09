@@ -396,7 +396,7 @@ algorithm::result_t substitute::apply(iterator& st)
 	
 //	prod_unwrap_single_term(st);
 
-	cleanup_nests(tr, st);
+	cleanup_nests(tr, st); 
 
 //	tr.print_recursive_treeform(txtout, tr.begin());
 //	prodcollectnum pc(tr, tr.end());
@@ -571,7 +571,9 @@ algorithm::result_t vary::apply(iterator& it)
 				algorithm::result_t res = vry.apply(app);
 				if(app->is_zero()) {
 					expression_modified=true;
-					tr.erase(app);  // remove this term
+//					tr.erase(app);  // remove this term. Actually, this will mess with nodes at the 
+					// sum, leading to a crash later (substitute.cdb/tst84). The zero terms get 
+					// removed automatically anyway, so just don't bother.
 					}
 				if(res==l_applied)
 					expression_modified=true;
@@ -579,18 +581,24 @@ algorithm::result_t vary::apply(iterator& it)
 			else {
 				// remove this term
 				expression_modified=true;
-				tr.erase(app);
+				node_zero(app);
+//				tr.erase(app);
 				}
+//			tr.print_recursive_treeform(txtout, tr.begin());
 			}
+
+		// FIXME: erase zero nodes?
 
 		if(tr.number_of_children(it)==0) {
 			node_zero(it);
 			}
-		else if(tr.number_of_children(it)==1) {
-			tr.flatten(it);
-			it=tr.erase(it);
-			}
+//		else if(tr.number_of_children(it)==1) {
+//			tr.flatten(it);
+//			it=tr.erase(it);
+//			}
 
+//		txtout << "all terms done" << std::endl;
+//		tr.print_recursive_treeform(txtout, tr.begin());
 		if(expression_modified) return l_applied;
 		else return l_no_action;
 		}

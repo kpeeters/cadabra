@@ -961,3 +961,13 @@ obj83:= A B+B A;
 tst83:= \epsilon D B + A \epsilon C + \epsilon C A + B \epsilon D - @(obj83);
 @collect_terms!(%);
 @assert(tst83);
+
+# Bug reported Sun, 9 Nov 2014 15:51:05 +0800
+#
+@reset.
+\partial{#}::PartialDerivative.
+yy:= a+ a*A;
+@vary(yy)(A->\delta{A});
+tst84:= a \delta{A} - @(yy);
+@collect_terms!(%);
+@assert(tst84);
