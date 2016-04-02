@@ -21,6 +21,7 @@
 #ifndef algorithm_hh_
 #define algorithm_hh_
 
+#include <stddef.h>
 #include <modglue/pipe.hh>
 #include "stopwatch.hh"
 #include "storage.hh"

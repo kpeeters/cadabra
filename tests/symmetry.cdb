@@ -7,8 +7,7 @@
 #
 obj1:= b*a^{i j k};
 @sym!(%){^{i},^{k}};
-@asym!(%){^{i}, ^{j}};
-
+@asym!(%){^{i},^{j}};
 tst1:= b/4*( a^{i j k} + a^{k j i} - a^{j i k} - a^{k i j} ) - @(obj1);
 @distribute!(%);
 @collect_terms!(%);

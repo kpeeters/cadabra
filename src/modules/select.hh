@@ -21,6 +21,7 @@
 #ifndef select_hh_
 #define select_hh_
 
+#include <stddef.h>
 #include "algorithm.hh"
 
 /* class select : public algorithm {

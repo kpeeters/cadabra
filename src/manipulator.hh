@@ -21,6 +21,7 @@
 #ifndef manipulator_hh_
 #define manipulator_hh_
 
+#include <stddef.h>
 #include "storage.hh"
 #include "algorithm.hh"
 #include "display.hh"

@@ -27,6 +27,7 @@
 #ifndef youngtab_hh_
 #define youngtab_hh_
 
+#include <stddef.h>
 #include <iostream>
 #include <iterator>
 #include <vector>
