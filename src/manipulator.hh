@@ -31,7 +31,7 @@
 #include <fstream>
 #include <utility>
 #include <stack>
-#include <sigc++/object.h>
+#include <sigc++/sigc++.h>
 #include <modglue/pipe.hh>
 
 // These are initiated in main.cc

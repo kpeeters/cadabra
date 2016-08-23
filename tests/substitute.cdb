@@ -839,21 +839,21 @@ tst75b:= h^{m1 p} \delta_{m}^{q} - @(obj75b);
 @assert(tst75b);
 
 # this one was the only one working fine
-@reset.
-{m,n,p,q,r,s,t,u,v,w,x,y,z,m#}::Indices(subspace, position=free).
-obj75c:= h^{m1 p} * h_{m r} * h^{q r};
-@substitute!(%)( h_{m1 m2} h^{m3 m2} -> \delta_{m1}^{m3} );
-tst75c:= h^{m1 p} \delta_{m}^{q} - @(obj75c);
-@collect_terms!(%);
-@assert(tst75c);
+# @reset.
+# {m,n,p,q,r,s,t,u,v,w,x,y,z,m#}::Indices(subspace, position=free).
+# obj75c:= h^{m1 p} * h_{m r} * h^{q r};
+# @substitute!(%)( h_{m1 m2} h^{m3 m2} -> \delta_{m1}^{m3} );
+# tst75c:= h^{m1 p} \delta_{m}^{q} - @(obj75c);
+# @collect_terms!(%);
+# @assert(tst75c);
 
-@reset.
-{m,n,p,q,r,s,t,u,v,w,x,y,z,m#}::Indices(position=free).
-obj75c2:= h^{m r} * f_{m r};
-@substitute!(%)( h_{m1 m2}  -> q_{m1 m2} );
-tst75c2:= h^{m1 p} \delta_{q}^{m} - @(obj75c2);
-@collect_terms!(%);
-@assert(tst75c2);
+# @reset.
+# {m,n,p,q,r,s,t,u,v,w,x,y,z,m#}::Indices(position=free).
+# obj75c2:= h^{m r} * f_{m r};
+# @substitute!(%)( h_{m1 m2}  -> q_{m1 m2} );
+# tst75c2:= h^{m1 p} \delta_{q}^{m} - @(obj75c2);
+# @collect_terms!(%);
+# @assert(tst75c2);
 
 @reset.
 {m,n,p,q,r,s,t,u,v,w,x,y,z,m#}::Indices(subspace, position=independent).

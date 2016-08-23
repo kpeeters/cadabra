@@ -1,3 +1,12 @@
+2016-08-23  Kasper Peeters  <kasper.peeters@phi-sci.com>
+
+	* Release 1.44
+
+	* Fix to build with more recent libsigc++-2.0 as included in
+	e.g. Debian testing.
+
+	* Fixed tests.
+
 2015-03-31  Kasper Peeters  <kasper.peeters@phi-sci.com>
 
 	* Release 1.43
