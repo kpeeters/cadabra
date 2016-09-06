@@ -58,9 +58,9 @@ algorithm::result_t extract_properties::apply(iterator& st)
 
 				if(thepropbase->parse(tr,st,proptree.begin(), keyvals)) {
 					list_property *thelistprop=dynamic_cast<list_property *>(thepropbase);
-					bool is_index=false;
-					if(dynamic_cast<Indices *>(thepropbase)!=0)
-						is_index=true;
+//					bool is_index=false;
+//					if(dynamic_cast<Indices *>(thepropbase)!=0)
+//						is_index=true;
 					if(thelistprop) {                   // a list property
 						std::vector<exptree> objs;
 						if(*st->name=="\\comma") {

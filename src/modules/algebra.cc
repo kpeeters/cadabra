@@ -316,9 +316,7 @@ multiplier_t Derivative::value(exptree::iterator it, const std::string& forcedla
 unsigned int SatisfiesBianchi::size(exptree& tr, exptree::iterator it) const
 	{
 	exptree::sibling_iterator chld=tr.begin(it);
-	bool indexfirst=false;
 	if(chld->fl.parent_rel!=str_node::p_none) {
-		indexfirst=true;
 		++chld;
 		}
 	assert(chld->fl.parent_rel==str_node::p_none);
@@ -459,9 +457,9 @@ TableauBase::tab_t KroneckerDelta::get_tab(exptree& tr, exptree::iterator it, un
 	if(tr.number_of_children(it)%2!=0)
 		 throw consistency_error("Encountered a KroneckerDelta object with an odd number of indices.");
 
-	bool onlytwo=false;
-	if(tr.number_of_children(it)==2)
-		onlytwo=true;
+//	bool onlytwo=false;
+//	if(tr.number_of_children(it)==2)
+//		onlytwo=true;
 
 	tab_t tab;
 	for(unsigned int i=0; i<tr.number_of_children(it); i+=2) {

@@ -178,11 +178,11 @@ algorithm::result_t substitute::apply(iterator& st)
 	// First activate the inert '@(...)' commands present on the rhs.
 	// FIXME: this is a hack, it should be much easier to activate inert commands
 	// inside algorithm modules.
-	bool replacer_found=false;
+//	bool replacer_found=false;
 	iterator rit=repl.begin();
 	while(rit!=repl.end()) {
 		if(*rit->name=="@@") {
-			replacer_found=true;
+//			replacer_found=true;
 			eqn replacer(tr, tr.end());
 			iterator num=repl.begin(rit);
 			replacer.apply(num);

@@ -114,7 +114,7 @@ display_interrupted::display_interrupted()
 	{
 	}
 
-std::auto_ptr<node_base_printer> exptree_output::get_printer(exptree::iterator it) 
+std::shared_ptr<node_base_printer> exptree_output::get_printer(exptree::iterator it) 
 	{
 	if(interrupted) {
 		interrupted=false;
@@ -222,14 +222,12 @@ void print_productlike::doprint(std::ostream& str, exptree::iterator it, const s
 	// then print brackets.
 	
 	str_node::bracket_t previous_bracket_=str_node::b_invalid;
-	bool beginning_of_group=true;
 	sibling_iterator ch=tr.begin(it);
 	while(ch!=tr.end(it)) {
 		str_node::bracket_t current_bracket_=(*ch).fl.bracket;
 		if(previous_bracket_!=current_bracket_) {
 			if(current_bracket_!=str_node::b_none) {
 				print_opening_bracket(str, current_bracket_, str_node::p_none);
-				beginning_of_group=true;
 				}
 			}
 		parent.get_printer(ch)->print_infix(str, ch);

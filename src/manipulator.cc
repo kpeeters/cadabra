@@ -38,7 +38,7 @@ exit_exception::exit_exception()
 	{
 	}
 
-manipulator::algo_info::algo_info(std::auto_ptr<algorithm> (*cr)(exptree&, iterator))
+manipulator::algo_info::algo_info(std::shared_ptr<algorithm> (*cr)(exptree&, iterator))
 	: create(cr), calls(0)
 	{
 	}
@@ -1211,7 +1211,7 @@ bool manipulator::handle_external_commands_(exptree::iterator& original_expressi
 	algorithm_map_t::iterator ait=algorithms.find(node_name);
 	if(ait!=algorithms.end()) {
 		try {
-			std::auto_ptr<algorithm> thealg=ait->second->create(expressions, it);
+			std::shared_ptr<algorithm> thealg=ait->second->create(expressions, it);
 			thealg->eo=&eo;
 
 			if(last_used_equation_number==0)

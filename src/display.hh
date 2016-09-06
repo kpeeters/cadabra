@@ -394,23 +394,23 @@ class exptree_output {
 		void setup_handlers(bool infix=true);
 		void newline(std::ostream&);
 
-		std::auto_ptr<node_base_printer> get_printer(exptree::iterator);		
+		std::shared_ptr<node_base_printer> get_printer(exptree::iterator);		
 		
 		unsigned int bracket_level; // FIXME: perhaps a stack?
 	private:
-		typedef std::map<std::string, std::auto_ptr<node_base_printer> (*)(exptree_output&)> printmap_t;
-		typedef std::map<std::string, std::auto_ptr<node_base_printer> (*)(exptree_output&)> printmap_prop_t;
+		typedef std::map<std::string, std::shared_ptr<node_base_printer> (*)(exptree_output&)> printmap_t;
+		typedef std::map<std::string, std::shared_ptr<node_base_printer> (*)(exptree_output&)> printmap_prop_t;
 
 		printmap_t        printers_;
 		printmap_prop_t   printers_prop_;
 
-		std::auto_ptr<node_base_printer> (*print_default_)(exptree_output&);
+		std::shared_ptr<node_base_printer> (*print_default_)(exptree_output&);
 };
 
 template<class T>
-std::auto_ptr<node_base_printer> create(exptree_output& eo)
+std::shared_ptr<node_base_printer> create(exptree_output& eo)
 	{
-	return std::auto_ptr<node_base_printer>(new T(eo));
+	return std::shared_ptr<node_base_printer>(new T(eo));
 	}
 
 const char *unichar(kunichar c);

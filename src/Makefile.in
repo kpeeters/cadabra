@@ -21,7 +21,7 @@ MOBJS=modules/algebra.o modules/pertstring.o modules/convert.o modules/gamma.o \
 #modules/xperm_no_nests.o 
 
 SRCS      = `find . -name "*.cc"`
-MCFLAGS   = @CFLAGS@ -I. -I@top_srcdir@/src `pkg-config modglue --cflags`
+MCFLAGS   = @CFLAGS@ --std=c++11 -I. -I@top_srcdir@/src `pkg-config modglue --cflags`
 TIMESTAMP = -D"RELEASE=\"${RELEASE}\"" -D"DATETIME=\"`date | sed -e 's/  / /'`\"" -DHOSTNAME=\"`hostname`\"
 
 

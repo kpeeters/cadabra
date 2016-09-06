@@ -149,9 +149,9 @@ class manipulator : public sigc::trackable {
 		/// as global timing information.
 		class algo_info {
 			public:
-				algo_info(std::auto_ptr<algorithm> (*)(exptree&, iterator));
+				algo_info(std::shared_ptr<algorithm> (*)(exptree&, iterator));
 
-				std::auto_ptr<algorithm> (*create)(exptree&, iterator);
+				std::shared_ptr<algorithm> (*create)(exptree&, iterator);
 				stopwatch sw;
 				long      calls;
 		};
