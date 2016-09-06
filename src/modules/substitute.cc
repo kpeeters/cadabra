@@ -896,7 +896,7 @@ algorithm::result_t index_rename::apply(iterator& it)
 					}
 				std::string nm=*to_->name + fnd->first.begin()->name->substr(from_->name->size());
 				nset_t::iterator to_it=name_set.insert(nm).first;
-				to_rename.insert(std::make_pair(to_it, fnd->second));
+				to_rename.insert(std::make_pair(str_node(to_it), fnd->second));
 				}
 			++fnd;
 			}
@@ -905,7 +905,7 @@ algorithm::result_t index_rename::apply(iterator& it)
 		std::pair<index_map_t::iterator, index_map_t::iterator> eq=ind_free.equal_range(exptree(from_));
 		index_map_t::iterator fnd=eq.first;
 		while(fnd!=eq.second) {
-			to_rename.insert(std::make_pair(to_->name, fnd->second));
+			to_rename.insert(std::make_pair(str_node(to_->name), fnd->second));
 			++fnd;
 			}
 		}

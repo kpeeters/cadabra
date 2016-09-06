@@ -4,11 +4,13 @@ MACTEST= @MAC_OS_X@
 TESTS=pre.res tree.res \
       properties.res \
 	   procedure.res substitute.res dummies.res numerical.res relativity.res mixed1.res distribute.res \
-      gamma.res symmetry.res fieldtheory.res sorting.res factorise.res \
+      gamma.res symmetry.res fieldtheory.res sorting.res \
       canonicalise.res output.res young.res diff_geometry.res \
       powers.res derivative.res indexbracket.res linear.res linear.res combinat.res \
 		tutorial2.res tutorial3.res algebra.res lists.res defaults.res patterns.res tableaux.res \
       repeated.res paper.res 
+
+#factorise.res 
 
 MAPLETESTS=maple.res
 

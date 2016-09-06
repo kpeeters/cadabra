@@ -273,9 +273,9 @@ void cleanup_nests(exptree&tr, exptree::iterator &it, bool ignore_bracket_types=
 void cleanup_nests_below(exptree&tr, exptree::iterator it, bool ignore_bracket_types=false);
 
 template<class T>
-std::auto_ptr<algorithm> create(exptree& tr, exptree::iterator it)
+std::shared_ptr<algorithm> create(exptree& tr, exptree::iterator it)
 	{
-	return std::auto_ptr<algorithm>(new T(tr, it));
+	return std::shared_ptr<algorithm>(new T(tr, it));
 	}
 
 /// Determine the number of elements in the first range which also occur in the
