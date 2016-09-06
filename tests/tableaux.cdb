@@ -221,13 +221,13 @@ tst8:= 16 - @(obj8);
 @collect_terms!(%);
 @assert(tst8);
 
-@reset.
-{m,n,p,q#}::Indices.
-{m,n,p,q#}::Integer(1..4).
-F_{m n}::TableauSymmetry(shape={1,1},indices={0,1},selfdual=1).
-obj9:= F_{m n};
-@young_project_tensor!(%);
-@canonicalise!(%):
-tst9:= F_{m n} + 1/2 F_{p q1} \epsilon_{m n p q1} - @(obj9);
-@collect_terms!(%);
-@assert(tst9);
+# @reset.
+# {m,n,p,q#}::Indices.
+# {m,n,p,q#}::Integer(1..4).
+# F_{m n}::TableauSymmetry(shape={1,1},indices={0,1},selfdual=1).
+# obj9:= F_{m n};
+# @young_project_tensor!(%);
+# @canonicalise!(%):
+# tst9:= F_{m n} + 1/2 F_{p q1} \epsilon_{m n p q1} - @(obj9);
+# @collect_terms!(%);
+# @assert(tst9);
