@@ -139,12 +139,14 @@ bool test_symmetriser()
 	sm.permute_blocks.push_back(0);
 	sm.permute_blocks.push_back(1);
 	sm.apply_symmetry();
+	std::cerr << "---" << std::endl;
 
 	sm.permute_blocks.clear();
 	sm.permutation_sign=-1;
 	sm.permute_blocks.push_back(2);
 	sm.permute_blocks.push_back(3);
 	sm.apply_symmetry();
+	std::cerr << "---" << std::endl;
 
 	sm.permute_blocks.clear();
 	sm.block_length=2;
@@ -152,6 +154,7 @@ bool test_symmetriser()
 	sm.permute_blocks.push_back(0);
 	sm.permute_blocks.push_back(2);
 	sm.apply_symmetry();
+	std::cerr << "---" << std::endl;
 
 	print(sm);
 	return true;
@@ -192,14 +195,14 @@ int main(int, char **)
 	test_input_asym();
 	cout << endl << "non-unit block length test:" << endl;
 	test_non_unit_block_length();
-	cout << endl << "symmetriser test:" << endl;
-	test_symmetriser();
+//	cout << endl << "symmetriser test:" << endl;
+//	test_symmetriser();
 	cout << endl << "val permute test:" << endl;
 	test_val_permute();
 	cout << endl;
 
 	combinations<string> mmm;
-	mmm.multiple_pick=false;//true;
+	mmm.multiple_pick=true;
 	mmm.block_length=2;
 	// output ranges
 	mmm.sublengths.push_back(2);

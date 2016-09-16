@@ -372,8 +372,10 @@ void combinations_base<T>::permute(long start, long end)
 
 	// Consistency checks.
 	assert(original.size()%block_length==0);
-	if(!multiple_pick)
+	if(!multiple_pick) {
+//		std::cerr << len << ", " << block_length << ", " << original.size() << std::endl;;
 		assert(len*block_length<=original.size());
+		}
 
 	for(unsigned int i=0; i<this->input_asym.size(); ++i)
 		std::sort(this->input_asym[i].begin(), this->input_asym[i].end());
