@@ -1,3 +1,9 @@
+2016-12-20  Kasper Peeters  <kasper@debiantesting.local>
+
+	* Release 1.46
+
+	* Fixed another issue for Debian testing.
+
 2016-09-06  Kasper Peeters  <kasper.peeters@phi-sci.com>
 
 	* Release 1.45

@@ -438,7 +438,7 @@ VisualCell *NotebookCanvas::add_cell(Glib::RefPtr<DataCell> dc, Glib::RefPtr<Dat
 	// track of the number so we can insert the widget at the right spot in the Gtk
 	// container later.
 	int cellnum=0;
-	if(ref==0)
+	if(!ref)
 		visualcells.push_back(newcell);
 	else {
 		VisualCells_t::iterator it=visualcells.begin();
@@ -467,7 +467,7 @@ VisualCell *NotebookCanvas::add_cell(Glib::RefPtr<DataCell> dc, Glib::RefPtr<Dat
 #endif
 	Gtk::VBox::BoxList bl=scrollbox.children();
 	Gtk::VBox::BoxList::iterator gtkit;
-	if(ref==0) gtkit=bl.end();
+	if(!ref) gtkit=bl.end();
 	else {
 		gtkit=bl.begin();
 		while(cellnum!=0) {
@@ -1577,7 +1577,7 @@ Glib::RefPtr<DataCell> XCadabra::add_cell(Glib::RefPtr<DataCell> newcell, Glib::
 	update_title();
 
 	// First the data object, of which there is only one per cell.
-	if(ref==0)
+	if(!ref)
 		datacells.push_back(newcell);
 	else {
 		DataCells_t::iterator fnd=find(datacells.begin(), datacells.end(), ref); 
@@ -2281,7 +2281,7 @@ bool XCadabra::receive(modglue::ipipe& p)
 						}
 					}
 				else { // everything hunky dorey
-					if(datacells.back()==cp || cp==0 ) { // we are at the last cell of the notebook
+					if(datacells.back()==cp || !cp ) { // we are at the last cell of the notebook
 						if(datacells.size()>0 && datacells.back()->cell_type==DataCell::c_input &&
 							trim(datacells.back()->textbuf->get_text()).size()==0 ) {
 							 // we still have an empty cell below
