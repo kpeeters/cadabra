@@ -339,10 +339,11 @@ void print_pow::print_infix(std::ostream& str, exptree::iterator it)
 		str << "}";
 		}
 	else {
-		str << "**{";
+		str << "**"
+                    << (parent.output_format==exptree_output::out_plain?"(":"{");
 		++ch;
 		parent.get_printer(ch)->print_infix(str, ch);
-		str << "}";
+                str << (parent.output_format==exptree_output::out_plain?")":"}");
 		}
 	}
 
